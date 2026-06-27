@@ -1,5 +1,6 @@
 """Architecture guards for deterministic layout codegen."""
 
+from figma_flutter_agent.generator.background import partition_wallpaper_foreground_tree
 from figma_flutter_agent.generator.layout import (
     body_needs_dart_ui,
     body_needs_text_scaler,
@@ -7,7 +8,13 @@ from figma_flutter_agent.generator.layout import (
     render_widget_file,
 )
 from figma_flutter_agent.generator.layout.file_methods import _tree_depth, plan_layout_methods
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 
 def _chain(depth: int, *, leaf_type: NodeType = NodeType.CONTAINER) -> CleanDesignTreeNode:
@@ -99,3 +106,72 @@ def test_deep_tree_generates_private_builder_methods() -> None:
     ]
     assert "Widget _build" in layout
     assert methods[0].name in layout
+
+
+def _ambient_wallpaper_ellipse(node_id: str, name: str) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name=name,
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=357.0, height=357.0),
+        style=NodeStyle(background_color="0xFF94BCEB"),
+        vector_asset_key=f"assets/icons/{node_id.replace(':', '_')}.svg",
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(
+            left=-200.0,
+            top=-40.0,
+            width=357.0,
+            height=357.0,
+        ),
+    )
+
+
+def test_wallpaper_partition_decomposed_methods_align_with_render_tree() -> None:
+    """Law: layout_methods_planned_from_render_tree."""
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        style=NodeStyle(background_color="0xFFFFFFFF"),
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[
+            _ambient_wallpaper_ellipse("bg:1", "Ellipse 1"),
+            _ambient_wallpaper_ellipse("bg:2", "Ellipse 2"),
+            CleanDesignTreeNode(
+                id="logo",
+                name="Logo",
+                type=NodeType.STACK,
+                sizing=Sizing(width=128.0, height=23.0),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    horizontal="CENTER",
+                    left=123.5,
+                    top=76.0,
+                    width=128.0,
+                    height=23.0,
+                ),
+                children=[],
+            ),
+            _chain(9),
+            CleanDesignTreeNode(
+                id="status",
+                name="Native / Status Bar",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=44.0),
+                children=[],
+            ),
+        ],
+    )
+    assert _tree_depth(root) > 7
+    render_tree, wallpaper_children, _ = partition_wallpaper_foreground_tree(root)
+    assert len(wallpaper_children) == 2
+    assert len(render_tree.children) == 3
+    methods = plan_layout_methods(render_tree)
+    assert methods is not None
+    assert len(methods) == len(render_tree.children)
+    assert {method.node.id for method in methods} == {child.id for child in render_tree.children}
+    layout = render_layout_file(root, feature_name="wallpaper_shell", uses_svg=False)[
+        "lib/generated/wallpaper_shell_layout.dart"
+    ]
+    assert "Widget _build" in layout
+    assert "SingleChildScrollView(" in layout

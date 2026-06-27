@@ -132,6 +132,24 @@ def test_wizard_resolve_screen_without_prompts_single_screen() -> None:
     assert _wizard_resolve_screen(ctx, manifest, without_prompts=True) == "sign_in"
 
 
+def test_wizard_resolve_screen_uses_active_without_confirmation() -> None:
+    manifest = BatchManifest(
+        file_key="k",
+        project_dir=Path("/p"),
+        screens=(
+            ScreenEntry(feature="sign_in", node_id="1:1"),
+            ScreenEntry(feature="home", node_id="1:2"),
+        ),
+    )
+    ctx = _ctx(
+        CliSession(interactive=True),
+        wizard=WizardState(active_screen="sign_in"),
+    )
+    with patch("figma_flutter_agent.wizard.prompt_confirm") as confirm:
+        assert _wizard_resolve_screen(ctx, manifest) == "sign_in"
+        confirm.assert_not_called()
+
+
 def test_main_shows_help_when_not_tty() -> None:
     result = runner.invoke(app, [])
     assert result.exit_code == 0

@@ -130,7 +130,7 @@ def render_layout_file(
         partition_wallpaper_foreground_tree,
     )
 
-    methods = plan_layout_methods(tree)
+    methods = plan_layout_methods(render_tree)
     method_defs = ""
     chunk_bodies: list[tuple[str, str]] = []
     with (

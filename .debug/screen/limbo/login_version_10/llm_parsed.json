@@ -1,0 +1,1155 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "login_version_10",
+  "screenIr": {
+    "root": {
+      "figmaId": "53:1896",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "54:2043",
+          "kind": "auto",
+          "children": [],
+          "fidelityTier": "png_baked",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "54:2042",
+          "kind": "auto",
+          "children": [],
+          "fidelityTier": "png_baked",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "55:2044",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "56:2126",
+              "kind": "auto",
+              "children": [],
+              "fidelityTier": "png_baked",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "55:2096",
+              "kind": "auto",
+              "children": [],
+              "fidelityTier": "native_unverified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "55:2045",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "55:2046",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Login",
+                    "accessibilityLabel": "Login",
+                    "textColor": "color6",
+                    "fontSize": 32.0
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "55:2048",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Enter your email and password to log in",
+                    "accessibilityLabel": "Enter your email and password to log in",
+                    "textColor": "primary",
+                    "fontSize": 12.0
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "fidelityTier": "native_unverified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "55:2050",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "56:2097",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "55:2051",
+                      "kind": "extracted",
+                      "children": [],
+                      "ref": {
+                        "widgetName": "InputFieldWidget",
+                        "namedArgs": {}
+                      },
+                      "hintText": "Email",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "Email",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_text_field",
+                        "confidence": 0.79,
+                        "rationale": "Component variant indicates email input field with entered value."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    },
+                    {
+                      "figmaId": "55:2052",
+                      "kind": "extracted",
+                      "children": [],
+                      "ref": {
+                        "widgetName": "PasswordInputFieldWidget",
+                        "namedArgs": {}
+                      },
+                      "hintText": "Password",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "Password",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_text_field",
+                        "confidence": 0.79,
+                        "rationale": "Component variant indicates password input with trailing visibility icon."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    }
+                  ],
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "55:2053",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "55:2054",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "55:2055",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I55:2055;3:13302",
+                              "kind": "auto",
+                              "children": [],
+                              "isSelected": false,
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
+                            }
+                          ],
+                          "isSelected": false,
+                          "payload": {
+                            "payloadKind": "control_checkbox"
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "control_checkbox",
+                            "confidence": 0.72,
+                            "rationale": "Square check control next to 'Remember me' label."
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "policy_fallback"
+                        },
+                        {
+                          "figmaId": "55:2056",
+                          "kind": "auto",
+                          "children": [],
+                          "overrides": {
+                            "text": "Remember me",
+                            "accessibilityLabel": "Remember me",
+                            "textColor": "primary",
+                            "fontSize": 12.0
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "policy_fallback"
+                        }
+                      ],
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "policy_fallback"
+                    },
+                    {
+                      "figmaId": "55:2057",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Forgot Password ?",
+                        "accessibilityLabel": "Forgot Password ?",
+                        "textColor": "color4",
+                        "fontSize": 12.0
+                      },
+                      "payload": {
+                        "payloadKind": "button_text"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_text",
+                        "confidence": 0.68,
+                        "rationale": "Standalone tappable text action for password recovery."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    }
+                  ],
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "fidelityTier": "native_unverified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "55:2058",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "55:2059",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I55:2059;3:6045",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Log In",
+                        "accessibilityLabel": "Log In",
+                        "textColor": "color1",
+                        "fontSize": 14.0
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    }
+                  ],
+                  "overrides": {
+                    "text": "Log In",
+                    "accessibilityLabel": "Log In",
+                    "textColor": "color1",
+                    "backgroundColor": "color10",
+                    "fontSize": 14.0
+                  },
+                  "payload": {
+                    "payloadKind": "button_filled"
+                  },
+                  "classificationHint": {
+                    "suggestedKind": "button_filled",
+                    "confidence": 0.79,
+                    "rationale": "Primary filled action button for login submission."
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "56:2098",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "56:2099",
+                      "kind": "auto",
+                      "children": [],
+                      "wrap": "expanded",
+                      "classificationHint": {
+                        "suggestedKind": "technical_divider",
+                        "confidence": 0.67,
+                        "rationale": "Horizontal divider line."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    },
+                    {
+                      "figmaId": "56:2100",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Or login with",
+                        "accessibilityLabel": "Or login with",
+                        "textColor": "primary",
+                        "fontSize": 12.0
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    },
+                    {
+                      "figmaId": "56:2101",
+                      "kind": "auto",
+                      "children": [],
+                      "wrap": "expanded",
+                      "classificationHint": {
+                        "suggestedKind": "technical_divider",
+                        "confidence": 0.67,
+                        "rationale": "Horizontal divider line."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    }
+                  ],
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "56:2102",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "56:2103",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I56:2103;3:6131",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I56:2103;3:6131;136:155",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "accessibilityLabel": "vector",
+                                "backgroundColor": "color11"
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
+                            },
+                            {
+                              "figmaId": "I56:2103;3:6131;136:156",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "accessibilityLabel": "vector",
+                                "backgroundColor": "color12"
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
+                            },
+                            {
+                              "figmaId": "I56:2103;3:6131;136:157",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "accessibilityLabel": "vector",
+                                "backgroundColor": "color13"
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
+                            },
+                            {
+                              "figmaId": "I56:2103;3:6131;136:158",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "accessibilityLabel": "vector",
+                                "backgroundColor": "color14"
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
+                            }
+                          ],
+                          "fidelityTier": "svg_baked",
+                          "tierSource": "policy_fallback"
+                        }
+                      ],
+                      "overrides": {
+                        "accessibilityLabel": "Google login",
+                        "backgroundColor": "color1"
+                      },
+                      "wrap": "expanded",
+                      "payload": {
+                        "payloadKind": "button_outlined"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_outlined",
+                        "confidence": 0.75,
+                        "rationale": "Social auth button with Google branding."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    },
+                    {
+                      "figmaId": "56:2104",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I56:2104;3:6134",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I56:2104;3:6135",
+                              "kind": "auto",
+                              "children": [],
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
+                            },
+                            {
+                              "figmaId": "I56:2104;3:6136",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "accessibilityLabel": "Vector",
+                                "backgroundColor": "color1"
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
+                            }
+                          ],
+                          "fidelityTier": "svg_baked",
+                          "tierSource": "policy_fallback"
+                        }
+                      ],
+                      "overrides": {
+                        "accessibilityLabel": "Facebook login",
+                        "backgroundColor": "color1"
+                      },
+                      "wrap": "expanded",
+                      "payload": {
+                        "payloadKind": "button_outlined"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_outlined",
+                        "confidence": 0.75,
+                        "rationale": "Social auth button with Facebook branding."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    },
+                    {
+                      "figmaId": "56:2105",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I56:2105;3:6139",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I56:2105;3:6140",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I56:2105;3:6141",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I56:2105;3:6142",
+                                      "kind": "auto",
+                                      "children": [],
+                                      "overrides": {
+                                        "accessibilityLabel": "Vector",
+                                        "backgroundColor": "color4"
+                                      },
+                                      "fidelityTier": "native_unverified",
+                                      "tierSource": "policy_fallback"
+                                    },
+                                    {
+                                      "figmaId": "I56:2105;3:6143",
+                                      "kind": "auto",
+                                      "children": [],
+                                      "overrides": {
+                                        "accessibilityLabel": "Vector",
+                                        "backgroundColor": "color4"
+                                      },
+                                      "fidelityTier": "native_unverified",
+                                      "tierSource": "policy_fallback"
+                                    }
+                                  ],
+                                  "fidelityTier": "svg_baked",
+                                  "tierSource": "policy_fallback"
+                                }
+                              ],
+                              "fidelityTier": "svg_baked",
+                              "tierSource": "policy_fallback"
+                            }
+                          ],
+                          "fidelityTier": "svg_baked",
+                          "tierSource": "policy_fallback"
+                        }
+                      ],
+                      "overrides": {
+                        "accessibilityLabel": "Apple login",
+                        "backgroundColor": "color1"
+                      },
+                      "wrap": "expanded",
+                      "payload": {
+                        "payloadKind": "button_outlined"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_outlined",
+                        "confidence": 0.75,
+                        "rationale": "Social auth button with Apple branding."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    },
+                    {
+                      "figmaId": "56:2106",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I56:2106;3:6146",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I56:2106;3:6146;4:73383",
+                              "kind": "auto",
+                              "children": [],
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
+                            }
+                          ],
+                          "fidelityTier": "native_unverified",
+                          "tierSource": "policy_fallback"
+                        }
+                      ],
+                      "overrides": {
+                        "accessibilityLabel": "Phone Number login",
+                        "backgroundColor": "color1"
+                      },
+                      "wrap": "expanded",
+                      "payload": {
+                        "payloadKind": "button_outlined"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_outlined",
+                        "confidence": 0.75,
+                        "rationale": "Alternative auth button with phone icon."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    }
+                  ],
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "fidelityTier": "native_unverified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "56:2127",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "56:2128",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Don’t have an account?",
+                    "accessibilityLabel": "Don’t have an account?",
+                    "textColor": "primary",
+                    "fontSize": 12.0
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "56:2129",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Sign Up",
+                    "accessibilityLabel": "Sign Up",
+                    "textColor": "color4",
+                    "fontSize": 12.0
+                  },
+                  "payload": {
+                    "payloadKind": "button_text"
+                  },
+                  "classificationHint": {
+                    "suggestedKind": "button_text",
+                    "confidence": 0.69,
+                    "rationale": "Inline signup call to action."
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "fidelityTier": "native_unverified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "overrides": {
+            "accessibilityLabel": "Input",
+            "backgroundColor": "color1"
+          },
+          "classificationHint": {
+            "suggestedKind": "container_card",
+            "confidence": 0.63,
+            "rationale": "Card-like form container with grouped controls."
+          },
+          "fidelityTier": "native_unverified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "53:1983",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "NativeStatusBarWidget",
+            "namedArgs": {}
+          },
+          "payload": {
+            "payloadKind": "nav_app_bar"
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_app_bar",
+            "confidence": 0.58,
+            "rationale": "Prebuilt native status bar system chrome."
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manual_override"
+        },
+        {
+          "figmaId": "53:1984",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I53:1984;3:6790",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "accessibilityLabel": "rectangle",
+                "backgroundColor": "color6"
+              },
+              "fidelityTier": "native_unverified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "payload": {
+            "payloadKind": "nav_bottom_bar"
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_bottom_bar",
+            "confidence": 0.52,
+            "rationale": "Native home indicator system chrome."
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        }
+      ],
+      "fidelityTier": "native_unverified",
+      "tierSource": "policy_fallback"
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "54:2042",
+      "54:2043",
+      "55:2044",
+      "53:1983",
+      "53:1984"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "authentication",
+      "confidence": 0.96,
+      "explanation": "Login screen with email/password inputs, primary submit action, remember-me checkbox, password recovery, social auth options, and sign-up link.",
+      "warnings": [
+        "Status bar is extracted as a prebuilt widget.",
+        "Social auth buttons are icon-only in the source tree; provider identity inferred from component variants."
+      ]
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "55:2051",
+        "role": "input",
+        "subtype": "email",
+        "controlNodeId": "55:2051",
+        "boundaryNodeId": "I55:2051;3:6011",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I55:2051;3:6014"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Loisbecket@gmail.com",
+          "keyboardIntent": "email",
+          "visualState": "Inputed"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center"
+        ],
+        "value": "Loisbecket@gmail.com",
+        "options": [],
+        "confidence": 0.96,
+        "proposedEffects": [
+          "text_editable",
+          "focusable"
+        ],
+        "explanation": "Email text field inferred from component variant label/value and single-line input area."
+      },
+      {
+        "nodeId": "55:2052",
+        "role": "input",
+        "subtype": "password",
+        "controlNodeId": "55:2052",
+        "boundaryNodeId": "I55:2052;3:6011",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I55:2052;3:6014"
+        ],
+        "decorationNodeIds": [
+          "I55:2052;3:6015"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "I55:2052;3:6015"
+        ],
+        "contractKind": "password_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": true,
+          "currentValue": "*******",
+          "keyboardIntent": "password",
+          "visualState": "Inputed"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center"
+        ],
+        "value": "*******",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "text_editable",
+          "focusable",
+          "password_visibility_toggle"
+        ],
+        "explanation": "Password input inferred from masked value and trailing eye-off icon."
+      },
+      {
+        "nodeId": "55:2055",
+        "role": "control",
+        "subtype": "checkbox",
+        "controlNodeId": "55:2055",
+        "boundaryNodeId": "55:2055",
+        "labelNodeIds": [
+          "55:2056"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I55:2055;3:13302"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "I55:2055;3:13302"
+        ],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "currentValue": false,
+          "actionKind": "toggle",
+          "visualState": "unchecked"
+        },
+        "proposedLayoutLaws": [
+          "checkbox_label_inline"
+        ],
+        "value": false,
+        "options": [],
+        "confidence": 0.82,
+        "proposedEffects": [
+          "toggleable"
+        ],
+        "explanation": "Checkbox-like square control paired with 'Remember me' text."
+      },
+      {
+        "nodeId": "55:2059",
+        "role": "action",
+        "subtype": "primary",
+        "controlNodeId": "55:2059",
+        "boundaryNodeId": "55:2059",
+        "labelNodeIds": [
+          "I55:2059;3:6045"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "submit",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "button_label_centered"
+        ],
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Primary login submission button."
+      },
+      {
+        "nodeId": "55:2057",
+        "role": "action",
+        "subtype": "link",
+        "controlNodeId": "55:2057",
+        "boundaryNodeId": "55:2057",
+        "labelNodeIds": [
+          "55:2057"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate_recovery",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "text_action_inline_end"
+        ],
+        "options": [],
+        "confidence": 0.89,
+        "proposedEffects": [
+          "tap",
+          "navigate"
+        ],
+        "explanation": "Password recovery text action aligned opposite remember-me control."
+      },
+      {
+        "nodeId": "56:2102",
+        "role": "group",
+        "subtype": "social_auth",
+        "controlNodeId": "56:2102",
+        "boundaryNodeId": "56:2102",
+        "labelNodeIds": [
+          "56:2100"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [
+          "56:2103",
+          "56:2104",
+          "56:2105",
+          "56:2106"
+        ],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "actionKind": "social_auth",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "equal_width_action_row"
+        ],
+        "options": [
+          {
+            "nodeId": "56:2103",
+            "label": "Google",
+            "value": "google",
+            "confidence": 0.97
+          },
+          {
+            "nodeId": "56:2104",
+            "label": "Facebook",
+            "value": "facebook",
+            "confidence": 0.97
+          },
+          {
+            "nodeId": "56:2105",
+            "label": "Apple",
+            "value": "apple",
+            "confidence": 0.97
+          },
+          {
+            "nodeId": "56:2106",
+            "label": "Phone Number",
+            "value": "phone_number",
+            "confidence": 0.97
+          }
+        ],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Row of alternative authentication provider actions under divider label."
+      },
+      {
+        "nodeId": "56:2129",
+        "role": "action",
+        "subtype": "signup_link",
+        "controlNodeId": "56:2129",
+        "boundaryNodeId": "56:2127",
+        "labelNodeIds": [
+          "56:2128",
+          "56:2129"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate_signup",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "inline_supporting_text_then_action"
+        ],
+        "options": [],
+        "confidence": 0.92,
+        "proposedEffects": [
+          "tap",
+          "navigate"
+        ],
+        "explanation": "Inline sign-up call to action following supporting account text."
+      },
+      {
+        "nodeId": "53:1983",
+        "role": "system",
+        "subtype": "status_bar",
+        "controlNodeId": "53:1983",
+        "boundaryNodeId": "53:1983",
+        "labelNodeIds": [
+          "I53:1983;3:6767"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I53:1983;3:6768"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "system_chrome",
+        "contractTraits": {
+          "currentValue": "9:41",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "system_status_bar_top_pinned"
+        ],
+        "value": "9:41",
+        "options": [],
+        "confidence": 0.99,
+        "proposedEffects": [],
+        "explanation": "Native status bar chrome extracted as prebuilt widget."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "InputFieldWidget",
+      "widgetIr": {
+        "figmaId": "55:2051",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I55:2051;3:6011",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I55:2051;3:6012",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I55:2051;3:6014",
+                    "kind": "auto",
+                    "children": [],
+                    "overrides": {
+                      "text": "Loisbecket@gmail.com",
+                      "accessibilityLabel": "Loisbecket@gmail.com",
+                      "textColor": "color2",
+                      "fontSize": 14.0
+                    },
+                    "isMultiline": false,
+                    "maxLines": 1,
+                    "fidelityTier": "native_verified",
+                    "tierSource": "policy_fallback"
+                  }
+                ],
+                "fidelityTier": "native_unverified",
+                "tierSource": "policy_fallback"
+              }
+            ],
+            "overrides": {
+              "accessibilityLabel": "Input Area",
+              "backgroundColor": "color1"
+            },
+            "hintText": "Email",
+            "isMultiline": false,
+            "maxLines": 1,
+            "payload": {
+              "payloadKind": "input_text_field",
+              "hintText": "Email",
+              "isMultiline": false,
+              "maxLines": 1
+            },
+            "classificationHint": {
+              "suggestedKind": "input_text_field",
+              "confidence": 0.79,
+              "rationale": "Email field extracted from repeated component."
+            },
+            "fidelityTier": "native_verified",
+            "tierSource": "policy_fallback"
+          }
+        ],
+        "hintText": "Email",
+        "isMultiline": false,
+        "maxLines": 1,
+        "payload": {
+          "payloadKind": "input_text_field",
+          "hintText": "Email",
+          "isMultiline": false,
+          "maxLines": 1
+        },
+        "classificationHint": {
+          "suggestedKind": "input_text_field",
+          "confidence": 0.79,
+          "rationale": "Reusable email-style input component."
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "policy_fallback"
+      }
+    },
+    {
+      "widgetName": "PasswordInputFieldWidget",
+      "widgetIr": {
+        "figmaId": "55:2052",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I55:2052;3:6011",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I55:2052;3:6012",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I55:2052;3:6014",
+                    "kind": "auto",
+                    "children": [],
+                    "overrides": {
+                      "text": "*******",
+                      "accessibilityLabel": "*******",
+                      "textColor": "color2",
+                      "fontSize": 14.0
+                    },
+                    "isMultiline": false,
+                    "maxLines": 1,
+                    "fidelityTier": "native_verified",
+                    "tierSource": "policy_fallback"
+                  }
+                ],
+                "fidelityTier": "native_unverified",
+                "tierSource": "policy_fallback"
+              },
+              {
+                "figmaId": "I55:2052;3:6015",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I55:2052;3:6015;4:78000",
+                    "kind": "auto",
+                    "children": [],
+                    "fidelityTier": "native_unverified",
+                    "tierSource": "policy_fallback"
+                  }
+                ],
+                "classificationHint": {
+                  "suggestedKind": "button_icon",
+                  "confidence": 0.66,
+                  "rationale": "Trailing visibility toggle icon inside password field."
+                },
+                "fidelityTier": "native_verified",
+                "tierSource": "policy_fallback"
+              }
+            ],
+            "overrides": {
+              "accessibilityLabel": "Input Area",
+              "backgroundColor": "color1"
+            },
+            "hintText": "Password",
+            "isMultiline": false,
+            "maxLines": 1,
+            "payload": {
+              "payloadKind": "input_text_field",
+              "hintText": "Password",
+              "isMultiline": false,
+              "maxLines": 1
+            },
+            "classificationHint": {
+              "suggestedKind": "input_text_field",
+              "confidence": 0.79,
+              "rationale": "Password field extracted from repeated component with visibility icon."
+            },
+            "fidelityTier": "native_verified",
+            "tierSource": "policy_fallback"
+          }
+        ],
+        "hintText": "Password",
+        "isMultiline": false,
+        "maxLines": 1,
+        "payload": {
+          "payloadKind": "input_text_field",
+          "hintText": "Password",
+          "isMultiline": false,
+          "maxLines": 1
+        },
+        "classificationHint": {
+          "suggestedKind": "input_text_field",
+          "confidence": 0.79,
+          "rationale": "Reusable password input component."
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "policy_fallback"
+      }
+    },
+    {
+      "widgetName": "NativeStatusBarWidget",
+      "widgetIr": {
+        "figmaId": "53:1983",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I53:1983;3:6767",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "text": "9:41",
+              "accessibilityLabel": "9:41",
+              "textColor": "color3",
+              "fontSize": 16.0
+            },
+            "fidelityTier": "native_verified",
+            "tierSource": "policy_fallback"
+          },
+          {
+            "figmaId": "I53:1983;3:6768",
+            "kind": "auto",
+            "children": [],
+            "fidelityTier": "svg_baked",
+            "tierSource": "manual_override"
+          }
+        ],
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    }
+  ]
+}

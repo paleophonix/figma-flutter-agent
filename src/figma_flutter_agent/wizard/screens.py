@@ -26,12 +26,11 @@ def _wizard_resolve_screen(
         ctx: Wizard session context.
         manifest: Batch manifest for the current Flutter project.
         without_prompts: When True (``launch`` defaults), use active or sole screen
-            without confirmation menus.
+            without the numbered picker when a default exists.
 
     Returns:
         Feature slug for the screen to run.
     """
-    from figma_flutter_agent.wizard.prompts import prompt_confirm
     from figma_flutter_agent.wizard.state import _wizard_active_screen_label
 
     options = [screen.feature for screen in manifest.screens]
@@ -54,11 +53,7 @@ def _wizard_resolve_screen(
             return options[0]
         return options[0]
 
-    if (
-        active is not None
-        and active in option_set
-        and prompt_confirm(f"Use active screen '{active}'?", default=True)
-    ):
+    if active is not None and active in option_set:
         return active
     return _wizard_pick_screen(ctx, manifest)
 

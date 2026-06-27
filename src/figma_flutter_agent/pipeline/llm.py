@@ -107,7 +107,10 @@ def _normalize_cached_ir_generation(
     semantics: SemanticsSettings | None = None,
     strict_contrast: bool = False,
 ) -> FlutterGenerationResponse:
-    from figma_flutter_agent.generator.ir.presence import normalize_screen_ir_presence
+    from figma_flutter_agent.generator.ir.presence import (
+        expand_extracted_widget_names_for_validate,
+        normalize_screen_ir_presence,
+    )
     from figma_flutter_agent.generator.ir.validate import (
         validate_extracted_widgets,
         validate_screen_ir,
@@ -122,15 +125,21 @@ def _normalize_cached_ir_generation(
     )
     if screen_ir is not generation.screen_ir:
         generation = generation.model_copy(update={"screen_ir": screen_ir})
+    extracted_for_validate = expand_extracted_widget_names_for_validate(
+        extracted_names,
+        clean_tree=clean_tree,
+        screen_ir=generation.screen_ir,
+    )
     validate_screen_ir(
         generation.screen_ir,
         clean_tree,
-        extracted_widget_names=extracted_names,
+        extracted_widget_names=extracted_for_validate,
         declared_extracted_widget_names=extracted_names,
         project_dir=project_dir,
         tokens=tokens,
         semantics=semantics or SemanticsSettings(),
         strict_contrast=strict_contrast,
+        skip_presence_normalize=True,
     )
     if generation.extracted_widgets:
         validate_extracted_widgets(

@@ -18,8 +18,18 @@ from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
+from figma_flutter_agent.generator.subtree import collect_subtree_widget_specs
 from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
-from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    DesignTokens,
+    NodeType,
+    ScreenIr,
+    Sizing,
+    WidgetIrKind,
+    WidgetIrNode,
+    WidgetIrRef,
+)
 
 
 def _minimal_tree() -> CleanDesignTreeNode:
@@ -86,6 +96,67 @@ def test_load_generation_from_ir_dump_roundtrip(tmp_path: Path) -> None:
 
     assert loaded.screen_ir is not None
     assert loaded.screen_ir.root.figma_id == screen_ir.root.figma_id
+
+
+def _tree_with_subtree_spec_extracted_ref() -> tuple[CleanDesignTreeNode, str]:
+    vectors = [
+        CleanDesignTreeNode(id=f"1:10:{index}", name=f"Vector {index}", type=NodeType.VECTOR)
+        for index in range(12)
+    ]
+    illustration = CleanDesignTreeNode(
+        id="1:10",
+        name="Illustration Group",
+        type=NodeType.STACK,
+        sizing=Sizing(width=330, height=240),
+        children=vectors,
+    )
+    root = CleanDesignTreeNode(
+        id="1:1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[illustration],
+    )
+    specs = collect_subtree_widget_specs(root, widget_suffix="Widget")
+    assert len(specs) == 1
+    return root, specs[0].class_name
+
+
+def test_cached_ir_validate_expands_subtree_spec_extracted_refs(tmp_path: Path) -> None:
+    """Cached IR replay must accept EXTRACTED refs on deterministic subtree widget specs."""
+    project = tmp_path / "demo"
+    project.mkdir()
+    tree, subtree_class = _tree_with_subtree_spec_extracted_ref()
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="1:1",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figma_id="1:10",
+                    kind=WidgetIrKind.EXTRACTED,
+                    ref=WidgetIrRef(widget_name=subtree_class),
+                ),
+            ],
+        ),
+    )
+    write_screen_ir_snapshot(
+        stage="llm_validated",
+        feature_name="background",
+        screen_ir=screen_ir,
+        extracted_widgets=[],
+        project_dir=project,
+    )
+    settings = Settings()
+    outcome = load_cached_ir_llm_outcome(
+        __import__("loguru").logger,
+        settings=settings,
+        project_dir=project,
+        resolved_feature="background",
+        clean_tree=tree,
+        tokens=DesignTokens(),
+    )
+    assert outcome.llm_result.generation is not None
+    assert outcome.llm_result.generation.screen_ir is not None
 
 
 def test_load_cached_ir_returns_screen_ir_generation(tmp_path: Path) -> None:
