@@ -1711,3 +1711,147 @@ def test_pill_cta_centered_label_without_nested_positioned() -> None:
     compact = body.replace("\n", "")
     assert "Center(child: Positioned(" not in compact
     assert "ADD TO CART" in compact
+
+
+def test_stack_should_emit_mixed_inflow_column_overlay_for_flow_plus_absolute() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        stack_should_emit_mixed_inflow_column_overlay,
+    )
+    from figma_flutter_agent.schemas.geometry import GeometryFrame, GeomRect
+
+    logo = CleanDesignTreeNode(
+        id="logo",
+        name="Logo",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=27.0, height=27.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=0.0, width=27.0, height=27.0),
+            placement_origin=GeomRect(y=0.0),
+        ),
+    )
+    headline = CleanDesignTreeNode(
+        id="headline",
+        name="Headline",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=327.0, height=90.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=51.0, width=327.0, height=90.0),
+            placement_origin=GeomRect(y=51.0),
+        ),
+        children=[],
+    )
+    form = CleanDesignTreeNode(
+        id="form",
+        name="Form",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=327.0, height=200.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=225.0, width=327.0, height=200.0),
+            placement_origin=GeomRect(y=225.0),
+        ),
+        children=[],
+    )
+    pattern = CleanDesignTreeNode(
+        id="pattern",
+        name="Pattern",
+        type=NodeType.STACK,
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(left=-5.0, top=-38.0, width=375.0, height=257.0),
+        sizing=Sizing(width=375.0, height=257.0),
+        children=[],
+    )
+    host = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.STACK,
+        spacing=24.0,
+        sizing=Sizing(width=327.0, height=706.0),
+        stack_placement=StackPlacement(
+            left=24.0, top=68.0, right=24.0, width=327.0, height=706.0
+        ),
+        children=[logo, headline, form, pattern],
+    )
+    assert stack_should_emit_mixed_inflow_column_overlay(host) is True
+
+
+def test_mixed_inflow_absolute_stack_emits_column_plus_positioned_overlay() -> None:
+    from figma_flutter_agent.schemas.geometry import GeometryFrame, GeomRect
+
+    logo = CleanDesignTreeNode(
+        id="logo",
+        name="Logo",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=27.0, height=27.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=0.0, width=27.0, height=27.0),
+            placement_origin=GeomRect(y=0.0),
+        ),
+    )
+    headline = CleanDesignTreeNode(
+        id="headline",
+        name="Headline",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=327.0, height=90.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=51.0, width=327.0, height=90.0),
+            placement_origin=GeomRect(y=51.0),
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Get Started now",
+                sizing=Sizing(width=200.0, height=32.0),
+            )
+        ],
+    )
+    tabs = CleanDesignTreeNode(
+        id="tabs",
+        name="Tabs",
+        type=NodeType.ROW,
+        sizing=Sizing(width=327.0, height=36.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=165.0, width=327.0, height=36.0),
+            placement_origin=GeomRect(y=165.0),
+        ),
+        children=[],
+    )
+    form = CleanDesignTreeNode(
+        id="form",
+        name="Form",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=327.0, height=200.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=225.0, width=327.0, height=200.0),
+            placement_origin=GeomRect(y=225.0),
+        ),
+        children=[],
+    )
+    pattern = CleanDesignTreeNode(
+        id="pattern",
+        name="Pattern",
+        type=NodeType.STACK,
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(left=-5.0, top=-38.0, width=375.0, height=257.0),
+        sizing=Sizing(width=375.0, height=257.0),
+        children=[],
+    )
+    host = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.STACK,
+        spacing=24.0,
+        sizing=Sizing(width=327.0, height=706.0),
+        stack_placement=StackPlacement(
+            left=24.0, top=68.0, right=24.0, width=327.0, height=706.0
+        ),
+        children=[logo, headline, tabs, form, pattern],
+    )
+    body = render_node_body(host, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Column(mainAxisSize: MainAxisSize.min" in compact
+    assert "spacing: 24.0" in compact
+    assert "Positioned(" in compact
+    assert "top: -38.0" in compact
+    assert "Get Started now" in compact

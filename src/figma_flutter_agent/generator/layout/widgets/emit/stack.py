@@ -583,6 +583,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         stack_flow_child_horizontal_wrap,
         stack_flow_child_vertical_extent_wrap,
         stack_pill_button_wrap_spacing,
+        stack_should_emit_mixed_inflow_column_overlay,
         stack_should_flow_as_centered_wrap,
         stack_should_flow_as_column,
     )
@@ -754,6 +755,56 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         stack_widget = (
             f"Column({main_axis}crossAxisAlignment: CrossAxisAlignment.stretch, children: [{body}])"
         )
+    elif stack_should_emit_mixed_inflow_column_overlay(node):
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            stack_child_is_absolute_overlay,
+            stack_flow_column_child_sort_key,
+            stack_should_emit_mixed_inflow_column_overlay,
+        )
+        from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+            repair_flex_parent_data_order,
+        )
+
+        ordered_pairs = sorted(
+            zip(sorted_children, stack_children, strict=True),
+            key=lambda pair: stack_flow_column_child_sort_key(pair[0]),
+        )
+        segments: list[str] = []
+        inflow_run: list[str] = []
+
+        def flush_inflow_run() -> None:
+            if not inflow_run:
+                return
+            spacing_field = ""
+            if (node.spacing or 0.0) > 0.0 and len(inflow_run) >= 2:
+                spacing_field = f"spacing: {format_geometry_literal(node.spacing)}, "
+            inflow_body = ", ".join(inflow_run) or "const SizedBox.shrink()"
+            segments.append(
+                "Column("
+                "mainAxisSize: MainAxisSize.min, "
+                "crossAxisAlignment: CrossAxisAlignment.stretch, "
+                f"{spacing_field}"
+                f"children: [{inflow_body}]"
+                ")"
+            )
+            inflow_run.clear()
+
+        for child, widget in ordered_pairs:
+            flow_widget = stack_flow_child_horizontal_wrap(child, widget, parent_node=node)
+            if column_child_should_center_hug(node, child):
+                flow_widget = column_center_hug_child_wrap(node, child, flow_widget)
+            flow_widget = repair_flex_parent_data_order(flow_widget)
+            if stack_child_is_absolute_overlay(child):
+                flush_inflow_run()
+                segments.append(flow_widget)
+            else:
+                inflow_run.append(flow_widget)
+        flush_inflow_run()
+        body = ", ".join(segments) or "const SizedBox.shrink()"
+        stack_clip = (
+            "Clip.none" if not is_layout_root or stack_needs_soft_clip(node) else "Clip.hardEdge"
+        )
+        stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
     elif metadata_column_host:
         spacing_field = ""
         if len(stack_children) >= 2:

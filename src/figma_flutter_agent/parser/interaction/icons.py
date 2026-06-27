@@ -564,3 +564,21 @@ def layout_fact_stack_vertical_icon_label_chip_tile(node: CleanDesignTreeNode) -
         return False
     top = placement.top if placement.top is not None else 0.0
     return top >= float(height) * 0.55
+
+
+def layout_fact_input_calendar_trailing_chrome(node: CleanDesignTreeNode) -> bool:
+    """True when compact INPUT trailing chrome is a filled calendar glyph."""
+    if node.type not in {NodeType.BUTTON, NodeType.STACK, NodeType.COLUMN, NodeType.ROW}:
+        return False
+    for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH):
+        if item.type != NodeType.VECTOR:
+            continue
+        if item.style.has_stroke and not item.style.background_color:
+            continue
+        if not item.style.background_color:
+            continue
+        width = float(item.sizing.width or 0.0)
+        height = float(item.sizing.height or 0.0)
+        if 8.0 <= width <= 16.0 and 8.0 <= height <= 16.0:
+            return True
+    return False

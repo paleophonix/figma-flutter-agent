@@ -271,6 +271,8 @@ def stack_child_should_emit_positioned(
             return False
         if stack_should_flow_as_column(parent_node):
             return False
+        if stack_should_emit_mixed_inflow_column_overlay(parent_node):
+            return stack_child_is_absolute_overlay(node)
         if stack_should_flow_as_centered_wrap(parent_node):
             return False
     return True
@@ -845,6 +847,42 @@ def _children_form_phone_shell_layout(
         elif role == "BOTTOM":
             has_bottom_chrome = True
     return has_top_chrome and has_bottom_chrome
+
+
+def stack_child_is_absolute_overlay(child: CleanDesignTreeNode) -> bool:
+    """True when a stack child is absolutely positioned relative to its stack host."""
+    if child.stack_placement is not None:
+        return True
+    return child.layout_positioning == "ABSOLUTE"
+
+
+def stack_should_emit_mixed_inflow_column_overlay(stack: CleanDesignTreeNode) -> bool:
+    """True when in-flow siblings must ``Column``-flow inside a ``Stack`` with absolute overlays.
+
+    Mixed auto-layout stacks keep AUTO/in-flow children in document order while one or more
+    ABSOLUTE siblings (for example decorative backgrounds) retain ``Positioned`` slots. Bare
+    in-flow children in a ``Stack`` collapse to the origin and overlap.
+    """
+    from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+        is_tag_option_chip_group,
+        stack_should_preserve_absolute_tag_chips,
+    )
+
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    if stack_should_flow_as_column(stack):
+        return False
+    if stack_has_non_sequential_raster_overlay(stack):
+        return False
+    if is_tag_option_chip_group(stack) or stack_should_preserve_absolute_tag_chips(stack):
+        return False
+    inflow = [child for child in stack.children if not stack_child_is_absolute_overlay(child)]
+    absolute = [child for child in stack.children if stack_child_is_absolute_overlay(child)]
+    if not inflow or not absolute:
+        return False
+    if len(inflow) < 2 and (stack.spacing or 0.0) <= 0.0:
+        return False
+    return tree_children_are_vertically_sequential(inflow)
 
 
 def stack_has_non_sequential_raster_overlay(stack: CleanDesignTreeNode) -> bool:

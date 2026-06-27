@@ -171,6 +171,7 @@ def _render_stack_input(
     if trailing:
         suffix_icon = _render_input_trailing_suffix_icon(
             trailing[0],
+            host_node=node,
             uses_svg=uses_svg,
             theme_variant=theme_variant,
             bundled_font_families=bundled_font_families,
@@ -398,6 +399,7 @@ def _render_flex_input_with_trailing_chrome(
 
     suffix_icon = _render_input_trailing_suffix_icon(
         trailing[0],
+        host_node=node,
         uses_svg=uses_svg,
         theme_variant=theme_variant,
         bundled_font_families=bundled_font_families,

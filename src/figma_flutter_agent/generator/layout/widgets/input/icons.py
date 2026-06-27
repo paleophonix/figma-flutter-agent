@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.style import dart_color_expr
+from figma_flutter_agent.parser.interaction import input_trailing_chrome_nodes
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -111,9 +112,27 @@ def _find_trailing_input_icon_expr(node: CleanDesignTreeNode) -> str | None:
     return _find_icon_glyph_expr(node)
 
 
+def _default_trailing_input_suffix_icon(
+    chrome: CleanDesignTreeNode,
+    *,
+    host_node: CleanDesignTreeNode | None = None,
+) -> str:
+    """Resolve the fallback trailing glyph for INPUT chrome without stroke/SVG hits."""
+    from figma_flutter_agent.parser.interaction import layout_fact_input_calendar_trailing_chrome
+
+    if layout_fact_input_calendar_trailing_chrome(chrome):
+        return "Icon(Icons.calendar_today_outlined, size: 18.0)"
+    if host_node is not None:
+        for trailing in input_trailing_chrome_nodes(host_node):
+            if layout_fact_input_calendar_trailing_chrome(trailing):
+                return "Icon(Icons.calendar_today_outlined, size: 18.0)"
+    return "Icon(Icons.keyboard_arrow_down_outlined, size: 18.0)"
+
+
 def _render_input_trailing_suffix_icon(
     chrome: CleanDesignTreeNode,
     *,
+    host_node: CleanDesignTreeNode | None = None,
     uses_svg: bool,
     theme_variant: str,
     bundled_font_families: frozenset[str] | None,
@@ -126,8 +145,9 @@ def _render_input_trailing_suffix_icon(
     del text_theme_slot_by_style_name, text_theme_size_slots
     from figma_flutter_agent.generator.layout.cupertino import _on_pressed_handler
 
-    icon_expr = _find_trailing_input_icon_expr(chrome) or (
-        "Icon(Icons.calendar_today_outlined, size: 18.0)"
+    icon_expr = _find_trailing_input_icon_expr(chrome) or _default_trailing_input_suffix_icon(
+        chrome,
+        host_node=host_node,
     )
     on_pressed = _on_pressed_handler(chrome.id, "button-action")
     return (

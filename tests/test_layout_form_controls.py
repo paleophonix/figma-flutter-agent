@@ -439,6 +439,52 @@ def test_flex_input_with_trailing_calendar_emits_row_and_icon() -> None:
     assert "14.06.1995" in body
 
 
+def test_input_trailing_stroke_chevron_defaults_to_dropdown_not_calendar() -> None:
+    chevron = CleanDesignTreeNode(
+        id="trail",
+        name="Chevron",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=18.0, height=18.0),
+        children=[
+            CleanDesignTreeNode(
+                id="v",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=10.0, height=6.0),
+                style=NodeStyle(has_stroke=True, border_color="0xFF000000"),
+            )
+        ],
+    )
+    field = CleanDesignTreeNode(
+        id="phone",
+        name="Phone",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=327.0, height=46.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=10.0),
+        children=[
+            CleanDesignTreeNode(
+                id="row",
+                name="Row",
+                type=NodeType.ROW,
+                sizing=Sizing(width=300.0, height=46.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="val",
+                        name="Value",
+                        type=NodeType.TEXT,
+                        text="(454) 726-0592",
+                        sizing=Sizing(width=120.0, height=20.0),
+                    ),
+                    chevron,
+                ],
+            )
+        ],
+    )
+    body = render_node_body(field, uses_svg=False)
+    assert "keyboard_arrow_down_outlined" in body
+    assert "calendar_today_outlined" not in body
+
+
 def test_compact_icon_back_button_emits_chevron() -> None:
     back = CleanDesignTreeNode(
         id="362:327",
