@@ -1059,10 +1059,9 @@ def test_inset_image_card_preserves_hero_geometry_and_clips_shell() -> None:
     card = _inset_image_card_fixture()
     assert card_has_inset_hero_media_frame(card)
     body = render_node_body(card, uses_svg=False).replace("\n", "")
-    assert "clipBehavior: Clip.antiAlias" in body
-    assert "clipBehavior: Clip.none, child: Column" not in body
     assert "SizedBox(width: 152.0, height: 152.0" in body
     assert "BorderRadius.circular(12.0)" in body
+    assert "clipBehavior: Clip.antiAlias" in body
     assert "AspectRatio(aspectRatio:" not in body
     assert "BorderRadius.vertical(top: Radius.circular(22.0))" not in body
     assert "EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 16.0)" in body
@@ -1099,13 +1098,70 @@ def test_light_theme_image_card_from_processed_tree_uses_inset_media_emit() -> N
     assert card is not None
     assert card_has_inset_hero_media_frame(card)
     body = render_node_body(card, uses_svg=False).replace("\n", "")
-    assert "clipBehavior: Clip.antiAlias" in body
+    assert "SizedBox(width: 168.0, height: 296.0" in body
+    assert "Material(elevation:" not in body
     assert "SizedBox(width: 152.0, height: 152.0" in body
     assert "BorderRadius.circular(12.0)" in body
     assert "AspectRatio(aspectRatio:" not in body
 
 
-def test_space_between_total_row_from_cart_tree_has_no_flexible_children() -> None:
+def test_inset_image_card_without_figma_surface_uses_transparent_shell() -> None:
+    """Law: inset_card_shell_must_not_paint_full_bounds_material_surface."""
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        card_has_inset_hero_media_frame,
+    )
+
+    card = _inset_image_card_fixture().model_copy(update={"style": NodeStyle()})
+    assert card_has_inset_hero_media_frame(card)
+    body = render_node_body(card, uses_svg=False).replace("\n", "")
+    assert "SizedBox(width: 168.0, height: 296.0" in body
+    assert "Material(elevation:" not in body
+    assert "SizedBox(width: 152.0, height: 152.0" in body
+    assert "BorderRadius.circular(12.0)" in body
+
+
+def test_light_theme_carousel_pruned_cards_hydrate_and_emit_inset_media() -> None:
+    """Law: cluster_pruned_card_must_hydrate_inline_tile_structure."""
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.parser.dedup.hydrate import hydrate_pruned_cluster_instances
+
+    dump_path = Path(".debug/screen/limbo/light_theme_06/processed.json")
+    if not dump_path.is_file():
+        pytest.skip("light_theme_06 processed dump not present")
+
+    root = CleanDesignTreeNode.model_validate(
+        json.loads(dump_path.read_text(encoding="utf-8"))["cleanTree"]
+    )
+    hydrate_pruned_cluster_instances(root)
+
+    def find_slider(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+        if node.name == "Content row slider":
+            return node
+        for child in node.children:
+            found = find_slider(child)
+            if found is not None:
+                return found
+        return None
+
+    slider = find_slider(root)
+    assert slider is not None
+    row = slider.children[0]
+    assert len(row.children) >= 2
+    for card in row.children:
+        assert len(card.children) >= 2
+        body = render_node_body(card, uses_svg=False).replace("\n", "")
+        assert "SizedBox(width: 152.0, height: 152.0" in body
+        assert "BorderRadius.circular(12.0)" in body
+        assert "width: 168.0, height: 296.0, child: Image.asset" not in body
+
+    slider_body = render_node_body(slider, uses_svg=False).replace("\n", "")
+    assert "ListView(" in slider_body
+    assert "scrollDirection: Axis.horizontal" in slider_body
+    assert slider_body.count("width: 168.0, height: 296.0, child: Image.asset") == 0
     import json
     from pathlib import Path
 

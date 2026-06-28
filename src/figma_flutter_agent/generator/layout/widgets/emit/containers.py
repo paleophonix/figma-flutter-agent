@@ -18,6 +18,7 @@ from figma_flutter_agent.generator.layout.style import (
     border_radius_expr,
     box_decoration_expr,
     card_elevation_expr,
+    card_emit_needs_material_shell,
     dart_color_expr,
 )
 from figma_flutter_agent.parser.interaction import (
@@ -357,14 +358,38 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
                 card_padding = padding_edge_insets(node)
                 if card_padding is not None:
                     column_widget = f"Padding(padding: {card_padding}, child: {column_widget})"
-                widget = (
-                    f"Material("
-                    f"elevation: {elevation}, "
-                    f"borderRadius: {radius}, "
-                    "clipBehavior: Clip.antiAlias, "
-                    f"child: {column_widget}"
-                    "))"
+                card_width = node.sizing.width
+                card_height = node.sizing.height
+                width_lit = (
+                    format_geometry_literal(float(card_width))
+                    if card_width is not None and float(card_width) > 0
+                    else "double.infinity"
                 )
+                height_lit = (
+                    format_geometry_literal(float(card_height))
+                    if card_height is not None and float(card_height) > 0
+                    else "double.infinity"
+                )
+                if card_emit_needs_material_shell(node.style):
+                    shell_color = (
+                        f"color: {dart_color_expr(node.style)}, "
+                        if node.style.background_color
+                        else "color: Colors.transparent, "
+                    )
+                    widget = (
+                        f"Material("
+                        f"elevation: {elevation}, "
+                        f"{shell_color}"
+                        f"borderRadius: {radius}, "
+                        "clipBehavior: Clip.antiAlias, "
+                        f"child: {column_widget}"
+                        "))"
+                    )
+                else:
+                    widget = (
+                        f"SizedBox(width: {width_lit}, height: {height_lit}, "
+                        f"child: {column_widget})"
+                    )
             else:
                 top_radius = format_geometry_literal(float(node.style.border_radius or 22.0))
                 hero_aspect = format_geometry_literal(float(hero_width) / float(hero_height))

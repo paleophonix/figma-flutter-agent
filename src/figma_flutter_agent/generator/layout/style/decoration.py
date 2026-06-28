@@ -24,7 +24,16 @@ def card_elevation_expr(style: NodeStyle) -> str:
     """Build a Dart elevation expression for Material cards."""
     if style.elevation is not None:
         return str(style.elevation)
-    return "AppElevation.md"
+    return "0"
+
+
+def card_emit_needs_material_shell(style: NodeStyle) -> bool:
+    """Return True when a card shell should emit a Material surface."""
+    if style.elevation is not None and float(style.elevation) > 0:
+        return True
+    if style.background_color:
+        return True
+    return bool(style.effects)
 
 
 _MAX_SANE_BORDER_RADIUS = 512.0

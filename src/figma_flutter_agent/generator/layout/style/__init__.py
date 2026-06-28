@@ -14,6 +14,7 @@ from figma_flutter_agent.generator.layout.style.decoration import (
     box_decoration_expr,
     box_foreground_decoration_expr,
     card_elevation_expr,
+    card_emit_needs_material_shell,
     has_box_decoration,
 )
 from figma_flutter_agent.generator.layout.style.facts import (
@@ -40,6 +41,7 @@ __all__ = [
     "box_decoration_expr",
     "box_foreground_decoration_expr",
     "card_elevation_expr",
+    "card_emit_needs_material_shell",
     "chip_row_palette_exprs",
     "dart_color_expr",
     "fill_luminance",

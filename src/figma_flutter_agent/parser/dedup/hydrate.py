@@ -61,21 +61,31 @@ def _hydrate_component_instance_from_template(
         return target
     hydrated = _clear_cluster_ids_subtree(deep_copy_clean_tree(template))
     hydrated = _remap_subtree_node_ids(hydrated, id_map)
-    return target.model_copy(
-        update={
-            "children": hydrated.children,
-            "flatten_figma_node_ids": None,
-        }
-    )
+    updates: dict[str, object] = {
+        "children": hydrated.children,
+        "flatten_figma_node_ids": None,
+    }
+    if target.type == NodeType.CARD:
+        updates["vector_asset_key"] = None
+        updates["image_asset_key"] = None
+    return target.model_copy(update=updates)
 
 
 def _should_hydrate_pruned_instance(node: CleanDesignTreeNode) -> bool:
     """Return True when a pruned duplicate should regain inline children."""
-    if not node.flatten_figma_node_ids or node.children:
+    if node.children:
+        return False
+    if (
+        node.type == NodeType.CARD
+        and node.flatten_figma_node_ids
+        and node.cluster_id
+    ):
+        return True
+    if not node.flatten_figma_node_ids:
         return False
     if node.vector_asset_key or node.image_asset_key:
         return False
-    if node.type in {NodeType.CARD, NodeType.VECTOR, NodeType.IMAGE}:
+    if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
         return False
     return bool(node.component_ref or node.cluster_id)
 

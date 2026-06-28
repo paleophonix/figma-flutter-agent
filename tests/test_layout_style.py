@@ -47,8 +47,8 @@ def test_dart_color_expr_prefers_css_rgba_over_black_text_color() -> None:
     assert dart_color_expr(style, css_key="color") == "Color(0xFFF6F1FB)"
 
 
-def test_card_elevation_uses_theme_token_by_default() -> None:
-    assert card_elevation_expr(NodeStyle()) == "AppElevation.md"
+def test_card_elevation_defaults_to_zero_without_figma_elevation() -> None:
+    assert card_elevation_expr(NodeStyle()) == "0"
 
 
 def test_fill_luminance_classifies_dark_and_light_fills() -> None:
