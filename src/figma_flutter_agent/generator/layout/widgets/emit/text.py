@@ -18,6 +18,7 @@ from figma_flutter_agent.generator.layout.style import (
     text_align_expr,
     text_style_expr,
     text_widget_trailing_params,
+    wrap_gradient_fill_text,
     wrap_painted_pill_scale_down_label,
     wrap_tight_chip_label,
 )
@@ -276,6 +277,8 @@ def render_text_node(
                 if geometry_multiline:
                     trailing = f"{trailing}, maxLines: {geometry_multiline_max_lines(node)}"
             widget = f"Text('{text}', style: {style_expr}, {trailing})"
+            if node.style.gradient is not None and node.style.gradient.stops:
+                widget = wrap_gradient_fill_text(widget, node.style)
             if notification_counter_glyph:
                 widget = f"Center(child: {widget})"
             if painted_pill_label:

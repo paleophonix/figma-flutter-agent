@@ -88,6 +88,23 @@ def wrap_painted_pill_scale_down_label(widget: str, *, align: str = "Alignment.c
     )
 
 
+def wrap_gradient_fill_text(widget: str, style: NodeStyle) -> str:
+    """Paint gradient-filled copy via ``ShaderMask`` when Figma supplies a gradient fill."""
+    from figma_flutter_agent.generator.layout.style.colors import gradient_fill_expr
+
+    if style.gradient is None or not style.gradient.stops:
+        return widget
+    gradient = gradient_fill_expr(style.gradient)
+    if gradient is None:
+        return widget
+    return (
+        f"ShaderMask("
+        f"shaderCallback: (bounds) => {gradient}.createShader(bounds), "
+        "blendMode: BlendMode.srcIn, "
+        f"child: {widget})"
+    )
+
+
 def text_widget_trailing_params(
     style: NodeStyle,
     *,
@@ -247,8 +264,11 @@ def _text_style_delta_fields(
     omit_line_height: bool = False,
 ) -> list[str]:
     """Build ``copyWith`` deltas for theme-backed text (no inline font family)."""
-    color = dart_color_expr(style, css_key=css_key, fallback=fallback)
-    parts = [f"color: {color}"]
+    if style.gradient is not None and style.gradient.stops:
+        parts = ["color: Colors.white"]
+    else:
+        color = dart_color_expr(style, css_key=css_key, fallback=fallback)
+        parts = [f"color: {color}"]
     # Pin explicit Figma glyph size; TextTheme slot metrics rarely match runtime Theme.
     emit_font_size = style.font_size is not None
     emit_font_weight = True

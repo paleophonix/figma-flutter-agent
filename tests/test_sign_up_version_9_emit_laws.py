@@ -174,9 +174,28 @@ def test_sign_up_layout_emits_tappable_back_nav_and_bounded_phone_prefix() -> No
     assert "vector_I49_1740;4_70829.svg', width: 14.0, height: 8.0" in layout
     assert "fromLTRB(14.0, 27.0" not in layout
     assert "fromLTRB(14.0, 23.5" not in layout
+    prefix = layout.split("prefix-dropdown")[1][:900]
+    assert "11.5" in prefix
+    assert "spacing: 7.0" in prefix
 
 
-def test_primary_cta_label_emits_custom_code_not_empty_link_tap() -> None:
+def test_sign_up_heading_emits_gradient_shader_not_theme_primary() -> None:
+    """Law: text_fill_must_emit_source_gradient_or_color_not_theme_primary_fallback."""
+    processed = json.loads(
+        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
+    )
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    layout = render_layout_file(root, feature_name="sign_up_version_9_heading", uses_svg=True)[
+        "lib/generated/sign_up_version_9_heading_layout.dart"
+    ]
+    sign_up_index = layout.index("Text('Sign Up'")
+    assert sign_up_index >= 0
+    heading = layout[max(0, sign_up_index - 320) : sign_up_index + 320]
+    assert "LinearGradient(" in heading
+    assert "createShader(bounds)" in heading
+    assert "0xFF4983F6" in heading
+    assert "Colors.white" in heading
+    assert "AppColors.primary" not in heading
     """Law: primary_cta_must_wire_interaction_not_empty_gesture."""
     processed = json.loads(
         Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")

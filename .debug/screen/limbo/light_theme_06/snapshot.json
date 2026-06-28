@@ -11,7 +11,7 @@
     "lib/widgets/copy_widget.dart": "3cf0041103215cb350491fd3b2537e95fa543015371cd1f8269a299fbdd2e82e",
     "lib/widgets/section_header_widget.dart": "7cfb0b6204edf47521042151dae17ab02e5761ab1765e91dbe7a62060b6150e7",
     "lib/widgets/clusterd2e87d01_widget.dart": "d1fbc722717b03ec9bcb425ee017ce88fe858f223f0521340f08f11eebfd3fe0",
-    "lib/widgets/image_card_widget.dart": "922c7213d50c75c2e810c2c81e9cdede1522cf9b5c33b8559c5501c15a2981f5",
+    "lib/widgets/image_card_widget.dart": "8470cfd1f754df97b5b7ee527083311e8a9be3a37c7e5a03140f1ca26ea97f5e",
     "lib/widgets/status_bar_widget.dart": "abd8a06c49a5ea863ec43e4f0efb3b504a6e834ff60435741ec6411810b0de3f",
     "lib/widgets/scroll_group_widget.dart": "131a7cede0f1fad49c98ab6588a9f58b67360ee811466d2e61f0275f1e037bfb",
     "lib/widgets/footer_widget.dart": "faa799978fd8edc16b5dc4bd9f447c790c3ffe26a841d590258460ade3fd2289",
@@ -48,6 +48,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.06.2",
-  "version": 10,
-  "updated_at": "2026-06-28T18:45:41.305550+00:00"
+  "version": 11,
+  "updated_at": "2026-06-28T20:52:39.906832+00:00"
 }

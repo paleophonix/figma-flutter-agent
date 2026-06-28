@@ -112,6 +112,14 @@ def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
     )
 
 
+def _host_stroke_inset(node: CleanDesignTreeNode) -> float:
+    """Return per-edge inset consumed by a stroked flex host border."""
+    style = node.style
+    if style.has_stroke and style.border_width is not None and float(style.border_width) > 0:
+        return float(style.border_width)
+    return 0.0
+
+
 def _row_cross_axis_intrinsic_min_extent(node: CleanDesignTreeNode) -> float:
     """Return the tallest child span on a ROW host for vertical padding budgeting."""
     if node.type != NodeType.ROW or not node.children:
@@ -128,31 +136,98 @@ def _row_cross_axis_intrinsic_min_extent(node: CleanDesignTreeNode) -> float:
     return max_extent
 
 
+def _row_main_axis_intrinsic_min_extent(node: CleanDesignTreeNode) -> float:
+    """Return the minimum main-axis span for a ROW host (children + gaps)."""
+    if node.type != NodeType.ROW or not node.children:
+        return 0.0
+    total = 0.0
+    spacing = float(node.spacing) if node.spacing > 0 else 0.0
+    for index, child in enumerate(node.children):
+        if index > 0 and spacing > 0:
+            total += spacing
+        child_width = child.sizing.width
+        if child_width is not None and float(child_width) > 0:
+            total += float(child_width)
+            continue
+        placement = child.stack_placement
+        if placement is not None and placement.width is not None and float(placement.width) > 0:
+            total += float(placement.width)
+    return total
+
+
+def _padding_needs_host_fit(node: CleanDesignTreeNode) -> bool:
+    """Return True when raw Figma padding would clip fixed-size ROW chrome."""
+    padding = node.padding
+    if (
+        padding.top == 0
+        and padding.bottom == 0
+        and padding.left == 0
+        and padding.right == 0
+    ):
+        return False
+    stroke = _host_stroke_inset(node)
+    height = node.sizing.height
+    width = node.sizing.width
+    if height is not None and float(height) > 0:
+        host_height = float(height)
+        if float(padding.top) + float(padding.bottom) > host_height:
+            return True
+        content_height = _row_cross_axis_intrinsic_min_extent(node)
+        if content_height > 0 and content_height + 2.0 * stroke > host_height:
+            return True
+    if width is not None and float(width) > 0 and node.type == NodeType.ROW:
+        host_width = float(width)
+        if float(padding.left) + float(padding.right) > host_width:
+            return True
+        content_width = _row_main_axis_intrinsic_min_extent(node)
+        if content_width > 0 and content_width + 2.0 * stroke + float(padding.left) + float(
+            padding.right
+        ) > host_width:
+            return True
+    return False
+
+
 def padding_edge_insets_fitted_to_host(node: CleanDesignTreeNode) -> str | None:
-    """Render host-bounded padding when vertical insets would clip fixed-height chrome."""
+    """Render host-bounded padding when flex chrome would clip fixed child spans."""
     padding = node.padding
     if padding.top == 0 and padding.bottom == 0 and padding.left == 0 and padding.right == 0:
         return None
+    stroke = _host_stroke_inset(node)
     height = node.sizing.height
+    width = node.sizing.width
     top = float(padding.top)
     bottom = float(padding.bottom)
+    left = float(padding.left)
+    right = float(padding.right)
     if height is not None and float(height) > 0:
         host_height = float(height)
         content_min = _row_cross_axis_intrinsic_min_extent(node)
-        max_vertical = max(0.0, host_height - content_min)
+        max_vertical = max(0.0, host_height - 2.0 * stroke - content_min)
         if top + bottom > max_vertical:
             max_each = max_vertical / 2.0
             top = min(top, max_each)
             bottom = min(bottom, max_each)
-        elif top + bottom > host_height:
-            legacy_max = max(0.0, (host_height - 1.0) / 2.0)
+        elif top + bottom > host_height - 2.0 * stroke:
+            legacy_max = max(0.0, (host_height - 2.0 * stroke - 1.0) / 2.0)
             top = min(top, legacy_max)
             bottom = min(bottom, legacy_max)
+    if width is not None and float(width) > 0 and node.type == NodeType.ROW:
+        host_width = float(width)
+        content_min = _row_main_axis_intrinsic_min_extent(node)
+        max_horizontal = max(0.0, host_width - 2.0 * stroke - content_min)
+        if left + right > max_horizontal:
+            max_each = max_horizontal / 2.0
+            left = min(left, max_each)
+            right = min(right, max_each)
+        elif left + right > host_width - 2.0 * stroke:
+            legacy_max = max(0.0, (host_width - 2.0 * stroke - 1.0) / 2.0)
+            left = min(left, legacy_max)
+            right = min(right, legacy_max)
     return (
         "const EdgeInsets.fromLTRB("
-        f"{format_geometry_literal(padding.left)}, "
+        f"{format_geometry_literal(left)}, "
         f"{format_geometry_literal(top)}, "
-        f"{format_geometry_literal(padding.right)}, "
+        f"{format_geometry_literal(right)}, "
         f"{format_geometry_literal(bottom)})"
     )
 
@@ -236,16 +311,9 @@ def wrap_flex_auto_layout_padding(
         if padding is None:
             return widget
         return f"Padding(padding: {padding}, child: {widget})"
-    height = node.sizing.height
-    use_fitted_padding = (
-        height is not None
-        and float(height) > 0
-        and node.padding is not None
-        and float(node.padding.top) + float(node.padding.bottom) > float(height)
-    )
     padding = (
         padding_edge_insets_fitted_to_host(node)
-        if use_fitted_padding
+        if _padding_needs_host_fit(node)
         else padding_edge_insets(node)
     )
     if padding is None:

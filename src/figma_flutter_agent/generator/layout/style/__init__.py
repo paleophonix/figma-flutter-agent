@@ -30,6 +30,7 @@ from figma_flutter_agent.generator.layout.style.text import (
     text_span_style_expr,
     text_style_expr,
     text_widget_trailing_params,
+    wrap_gradient_fill_text,
     wrap_painted_pill_scale_down_label,
     wrap_tight_chip_label,
 )
@@ -56,6 +57,7 @@ __all__ = [
     "text_span_style_expr",
     "text_style_expr",
     "text_widget_trailing_params",
+    "wrap_gradient_fill_text",
     "wrap_painted_pill_scale_down_label",
     "wrap_tight_chip_label",
 ]

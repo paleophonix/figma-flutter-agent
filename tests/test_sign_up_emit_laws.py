@@ -225,10 +225,12 @@ def test_phone_country_prefix_padding_fits_host_height() -> None:
     assert insets is not None
     assert "27.0" not in insets
     assert "23.5" not in insets
-    assert "15.0" in insets
+    assert "14.0" in insets
+    assert "11.5" in insets
     body = render_node_body(_phone_country_prefix_row(), uses_svg=True)
     assert "27.0" not in body
     assert "23.5" not in body
+    assert "11.5" in body
 
 
 def test_production_back_arrow_child_vector_emits_tap_target_and_glyph_bounds() -> None:
