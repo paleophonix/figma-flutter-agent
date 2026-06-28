@@ -161,6 +161,21 @@ def test_phone_composite_field_host_fact_matches_country_prefix_column() -> None
     assert layout_fact_phone_composite_field_host(phone_form)
 
 
+def test_sign_up_layout_emits_tappable_back_nav_and_bounded_phone_prefix() -> None:
+    processed = json.loads(
+        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
+    )
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    layout = render_layout_file(root, feature_name="sign_up_version_9_nav_prefix", uses_svg=True)[
+        "lib/generated/sign_up_version_9_nav_prefix_layout.dart"
+    ]
+    assert "back-nav" in layout
+    assert "InkWell(" in layout
+    assert "vector_I49_1740;4_70829.svg', width: 14.0, height: 8.0" in layout
+    assert "fromLTRB(14.0, 27.0" not in layout
+    assert "fromLTRB(14.0, 23.5" not in layout
+
+
 def test_primary_cta_label_emits_custom_code_not_empty_link_tap() -> None:
     """Law: primary_cta_must_wire_interaction_not_empty_gesture."""
     processed = json.loads(

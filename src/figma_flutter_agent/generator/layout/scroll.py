@@ -112,6 +112,22 @@ def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
     )
 
 
+def _row_cross_axis_intrinsic_min_extent(node: CleanDesignTreeNode) -> float:
+    """Return the tallest child span on a ROW host for vertical padding budgeting."""
+    if node.type != NodeType.ROW or not node.children:
+        return 0.0
+    max_extent = 0.0
+    for child in node.children:
+        child_height = child.sizing.height
+        if child_height is not None and float(child_height) > max_extent:
+            max_extent = float(child_height)
+            continue
+        placement = child.stack_placement
+        if placement is not None and placement.height is not None:
+            max_extent = max(max_extent, float(placement.height))
+    return max_extent
+
+
 def padding_edge_insets_fitted_to_host(node: CleanDesignTreeNode) -> str | None:
     """Render host-bounded padding when vertical insets would clip fixed-height chrome."""
     padding = node.padding
@@ -121,10 +137,17 @@ def padding_edge_insets_fitted_to_host(node: CleanDesignTreeNode) -> str | None:
     top = float(padding.top)
     bottom = float(padding.bottom)
     if height is not None and float(height) > 0:
-        max_vertical = max(0.0, (float(height) - 1.0) / 2.0)
-        if top + bottom > float(height):
-            top = min(top, max_vertical)
-            bottom = min(bottom, max_vertical)
+        host_height = float(height)
+        content_min = _row_cross_axis_intrinsic_min_extent(node)
+        max_vertical = max(0.0, host_height - content_min)
+        if top + bottom > max_vertical:
+            max_each = max_vertical / 2.0
+            top = min(top, max_each)
+            bottom = min(bottom, max_each)
+        elif top + bottom > host_height:
+            legacy_max = max(0.0, (host_height - 1.0) / 2.0)
+            top = min(top, legacy_max)
+            bottom = min(bottom, legacy_max)
     return (
         "const EdgeInsets.fromLTRB("
         f"{format_geometry_literal(padding.left)}, "

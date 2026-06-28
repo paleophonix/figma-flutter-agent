@@ -19,6 +19,7 @@ from figma_flutter_agent.schemas import (
     NodeType,
     Padding,
     Sizing,
+    StackPlacement,
 )
 
 
@@ -105,6 +106,7 @@ def _phone_country_prefix_row() -> CleanDesignTreeNode:
         padding=Padding(top=27.0, bottom=27.0, left=14.0, right=14.0),
         sizing=Sizing(width=62.0, height=48.0),
         alignment=Alignment(cross="center"),
+        spacing=7.0,
         style=NodeStyle(
             background_color="0xFFFFFFFF",
             border_width=1.0,
@@ -126,6 +128,55 @@ def _phone_country_prefix_row() -> CleanDesignTreeNode:
                         sizing=Sizing(width=18.0, height=18.0),
                     )
                 ],
+            ),
+            CleanDesignTreeNode(
+                id="chevron",
+                name="chevron-down",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=12.0, height=12.0),
+                vector_asset_key="assets/icons/chevron.svg",
+            ),
+        ],
+    )
+
+
+def _production_back_arrow_stack() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="49:1740",
+        name="arrow-narrow-left",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        component_ref="3:4467",
+        variant=ComponentVariant(
+            component_id="3:4467",
+            component_name="arrow-narrow-left",
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="I49:1740;4:70829",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=14.0, height=8.0),
+                style=NodeStyle(
+                    has_stroke=True,
+                    border_width=2.0,
+                    border_color="0xFF1A1C1E",
+                    render_bounds_expand={
+                        "top": 1.0,
+                        "bottom": 1.0,
+                        "left": 1.0,
+                        "right": 1.0,
+                    },
+                ),
+                vector_asset_key="assets/icons/vector_I49_1740;4_70829.svg",
+                stack_placement=StackPlacement(
+                    left=5.0,
+                    top=8.0,
+                    right=5.0,
+                    bottom=8.0,
+                    width=14.0,
+                    height=8.0,
+                ),
             )
         ],
     )
@@ -173,8 +224,21 @@ def test_phone_country_prefix_padding_fits_host_height() -> None:
     insets = padding_edge_insets_fitted_to_host(_phone_country_prefix_row())
     assert insets is not None
     assert "27.0" not in insets
+    assert "23.5" not in insets
+    assert "15.0" in insets
     body = render_node_body(_phone_country_prefix_row(), uses_svg=True)
     assert "27.0" not in body
+    assert "23.5" not in body
+
+
+def test_production_back_arrow_child_vector_emits_tap_target_and_glyph_bounds() -> None:
+    node = _production_back_arrow_stack()
+    body = render_node_body(node, uses_svg=True, parent_type=NodeType.COLUMN)
+    assert "InkWell(" in body or "GestureDetector(" in body
+    assert "back-nav" in body
+    assert "width: 24.0, height: 24.0" in body
+    assert "width: 14.0, height: 8.0" in body
+    assert "width: 24.0, height: 24.0, fit: BoxFit.contain" not in body
 
 
 def test_flattened_back_arrow_export_emits_tap_target() -> None:

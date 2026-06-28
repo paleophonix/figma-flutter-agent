@@ -1322,7 +1322,7 @@
               "textColor": "0xFF0F0F0F",
               "fontSize": 18.0
             },
-            "wrap": "flexibleLoose"
+            "wrap": "expanded"
           },
           {
             "figmaId": "I3212:20786;257:6414",

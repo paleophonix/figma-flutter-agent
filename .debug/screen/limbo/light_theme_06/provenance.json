@@ -31,11 +31,11 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
+      "transform": "row_fill_text_expanded_guard",
       "nodeId": "I3212:20786;0:1039",
       "field": "wrap",
       "old": null,
-      "new": "flexibleLoose",
+      "new": "expanded",
       "policy": null
     },
     {
@@ -49,11 +49,11 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
+      "transform": "row_fill_text_expanded_guard",
       "nodeId": "I3212:20175;0:1039",
       "field": "wrap",
       "old": null,
-      "new": "flexibleLoose",
+      "new": "expanded",
       "policy": null
     },
     {
@@ -63,6 +63,15 @@
       "field": "min_touch_target",
       "old": null,
       "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3212:20786;0:1039",
+      "field": "wrap",
+      "old": "flexibleLoose",
+      "new": "expanded",
       "policy": null
     },
     {
@@ -274,11 +283,11 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
+      "transform": "row_fill_text_expanded_guard",
       "nodeId": "I3212:20786;0:1039",
       "field": "wrap",
       "old": null,
-      "new": "flexibleLoose",
+      "new": "expanded",
       "policy": null
     },
     {
@@ -292,11 +301,11 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
+      "transform": "row_fill_text_expanded_guard",
       "nodeId": "I3212:20175;0:1039",
       "field": "wrap",
       "old": null,
-      "new": "flexibleLoose",
+      "new": "expanded",
       "policy": null
     },
     {
