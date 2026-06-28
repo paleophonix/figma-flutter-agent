@@ -1,8 +1,8 @@
 {
   "feature": "light_theme_06",
-  "pipeline_run_id": "9f05ee84e72c",
-  "candidate_build_run_id": "9f05ee84e72c",
-  "committed_build_run_id": "9f05ee84e72c",
+  "pipeline_run_id": "47982776effb",
+  "candidate_build_run_id": "47982776effb",
+  "committed_build_run_id": "47982776effb",
   "writeback": "committed",
   "written_files": [
     "lib/features/light_theme_06/light_theme_06_screen.dart",
@@ -16,12 +16,17 @@
     "lib/theme/app_spacing.dart",
     "lib/theme/app_theme.dart",
     "lib/theme/app_typography.dart",
+    "lib/widgets/clusterd2e87d01_widget.dart",
+    "lib/widgets/content_widget.dart",
+    "lib/widgets/copy_widget.dart",
     "lib/widgets/footer_widget.dart",
+    "lib/widgets/image_card_widget.dart",
     "lib/widgets/scroll_group_widget.dart",
+    "lib/widgets/section_header_widget.dart",
     "lib/widgets/status_bar_widget.dart",
     "test/golden/light_theme_06_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-28T14:57:32.067839+00:00"
+  "captured_at": "2026-06-28T15:45:11.378864+00:00"
 }
