@@ -293,7 +293,9 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
 
     from figma_flutter_agent.generator.layout.flex_policy import (
         card_has_edge_to_edge_hero_stack,
+        card_has_inset_hero_media_frame,
     )
+    from figma_flutter_agent.generator.layout.scroll import padding_edge_insets
 
     elevation = card_elevation_expr(node.style)
     radius = border_radius_expr(node.style)
@@ -332,25 +334,57 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             and float(hero_width) > 0
             and float(hero_height) > 0
         ):
-            top_radius = format_geometry_literal(float(node.style.border_radius or 22.0))
-            hero_aspect = format_geometry_literal(float(hero_width) / float(hero_height))
-            hero_slot = (
-                f"ClipRRect("
-                f"borderRadius: BorderRadius.vertical("
-                f"top: Radius.circular({top_radius})), "
-                f"child: AspectRatio(aspectRatio: {hero_aspect}, child: {hero_widget}))"
-            )
-            widget = (
-                f"Material("
-                f"elevation: {elevation}, "
-                f"borderRadius: {radius}, "
-                "clipBehavior: Clip.none, "
-                "child: Column("
-                "mainAxisSize: MainAxisSize.min, "
-                f"crossAxisAlignment: {cross_axis}, "
-                f"children: [{hero_slot}, {meta_body}]"
-                "))"
-            )
+            if card_has_inset_hero_media_frame(node):
+                hero_w_lit = format_geometry_literal(float(hero_width))
+                hero_h_lit = format_geometry_literal(float(hero_height))
+                hero_radius = hero.style.border_radius
+                hero_radius_lit = format_geometry_literal(
+                    float(hero_radius) if hero_radius is not None and float(hero_radius) > 0 else 0.0
+                )
+                hero_slot = (
+                    f"SizedBox(width: {hero_w_lit}, height: {hero_h_lit}, "
+                    f"child: ClipRRect("
+                    f"borderRadius: BorderRadius.circular({hero_radius_lit}), "
+                    f"child: {hero_widget}))"
+                )
+                column_widget = (
+                    "Column("
+                    "mainAxisSize: MainAxisSize.min, "
+                    f"crossAxisAlignment: {cross_axis}, "
+                    f"children: [{hero_slot}, {meta_body}]"
+                    ")"
+                )
+                card_padding = padding_edge_insets(node)
+                if card_padding is not None:
+                    column_widget = f"Padding(padding: {card_padding}, child: {column_widget})"
+                widget = (
+                    f"Material("
+                    f"elevation: {elevation}, "
+                    f"borderRadius: {radius}, "
+                    "clipBehavior: Clip.antiAlias, "
+                    f"child: {column_widget}"
+                    "))"
+                )
+            else:
+                top_radius = format_geometry_literal(float(node.style.border_radius or 22.0))
+                hero_aspect = format_geometry_literal(float(hero_width) / float(hero_height))
+                hero_slot = (
+                    f"ClipRRect("
+                    f"borderRadius: BorderRadius.vertical("
+                    f"top: Radius.circular({top_radius})), "
+                    f"child: AspectRatio(aspectRatio: {hero_aspect}, child: {hero_widget}))"
+                )
+                widget = (
+                    f"Material("
+                    f"elevation: {elevation}, "
+                    f"borderRadius: {radius}, "
+                    "clipBehavior: Clip.none, "
+                    "child: Column("
+                    "mainAxisSize: MainAxisSize.min, "
+                    f"crossAxisAlignment: {cross_axis}, "
+                    f"children: [{hero_slot}, {meta_body}]"
+                    "))"
+                )
         else:
             widget = (
                 f"Material("

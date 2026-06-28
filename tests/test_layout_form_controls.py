@@ -1008,6 +1008,103 @@ def test_product_card_emits_edge_to_edge_hero_without_outer_padding() -> None:
     assert "Expanded(child:" not in body
 
 
+def _inset_image_card_fixture() -> CleanDesignTreeNode:
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="image",
+        type=NodeType.STACK,
+        sizing=Sizing(width=152.0, height=152.0),
+        style=NodeStyle(border_radius=12.0),
+        children=[
+            CleanDesignTreeNode(
+                id="img",
+                name="image",
+                type=NodeType.IMAGE,
+                sizing=Sizing(width=152.0, height=152.0),
+                image_asset_key="assets/images/inset_hero.png",
+            )
+        ],
+    )
+    meta = CleanDesignTreeNode(
+        id="meta",
+        name="copy",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=152.0, height=100.0),
+        children=[
+            CleanDesignTreeNode(
+                id="label",
+                name="Header",
+                type=NodeType.TEXT,
+                text="Header",
+            )
+        ],
+    )
+    return CleanDesignTreeNode(
+        id="card",
+        name="Image Card",
+        type=NodeType.CARD,
+        padding=Padding(top=16.0, bottom=16.0, left=8.0, right=8.0),
+        sizing=Sizing(width=168.0, height=296.0),
+        style=NodeStyle(elevation=2.0),
+        children=[hero, meta],
+    )
+
+
+def test_inset_image_card_preserves_hero_geometry_and_clips_shell() -> None:
+    """Law: card_media_emit_must_match_source_frame_geometry (inset branch)."""
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        card_has_inset_hero_media_frame,
+    )
+
+    card = _inset_image_card_fixture()
+    assert card_has_inset_hero_media_frame(card)
+    body = render_node_body(card, uses_svg=False).replace("\n", "")
+    assert "clipBehavior: Clip.antiAlias" in body
+    assert "clipBehavior: Clip.none, child: Column" not in body
+    assert "SizedBox(width: 152.0, height: 152.0" in body
+    assert "BorderRadius.circular(12.0)" in body
+    assert "AspectRatio(aspectRatio:" not in body
+    assert "BorderRadius.vertical(top: Radius.circular(22.0))" not in body
+    assert "EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 16.0)" in body
+
+
+def test_light_theme_image_card_from_processed_tree_uses_inset_media_emit() -> None:
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        card_has_inset_hero_media_frame,
+    )
+
+    dump_path = Path(".debug/screen/limbo/light_theme_06/processed.json")
+    if not dump_path.is_file():
+        pytest.skip("light_theme_06 processed dump not present")
+
+    root = CleanDesignTreeNode.model_validate(
+        json.loads(dump_path.read_text(encoding="utf-8"))["cleanTree"]
+    )
+
+    def find_image_card(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+        if node.type == NodeType.CARD and node.name == "Image Card":
+            return node
+        for child in node.children:
+            found = find_image_card(child)
+            if found is not None:
+                return found
+        return None
+
+    card = find_image_card(root)
+    assert card is not None
+    assert card_has_inset_hero_media_frame(card)
+    body = render_node_body(card, uses_svg=False).replace("\n", "")
+    assert "clipBehavior: Clip.antiAlias" in body
+    assert "SizedBox(width: 152.0, height: 152.0" in body
+    assert "BorderRadius.circular(12.0)" in body
+    assert "AspectRatio(aspectRatio:" not in body
+
+
 def test_space_between_total_row_from_cart_tree_has_no_flexible_children() -> None:
     import json
     from pathlib import Path

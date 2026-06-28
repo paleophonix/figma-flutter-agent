@@ -345,6 +345,21 @@ def card_has_edge_to_edge_hero_stack(node: CleanDesignTreeNode) -> bool:
     return float(hero_height) / float(card_height) >= CARD_HERO_MIN_HEIGHT_RATIO
 
 
+_CARD_HERO_INSET_WIDTH_EPSILON = 1.0
+
+
+def card_has_inset_hero_media_frame(node: CleanDesignTreeNode) -> bool:
+    """True when a product-tile hero is narrower than the card shell (inset media)."""
+    if not card_has_edge_to_edge_hero_stack(node):
+        return False
+    hero = node.children[0]
+    card_width = node.sizing.width
+    hero_width = hero.sizing.width
+    if card_width is None or hero_width is None or float(card_width) <= 0:
+        return False
+    return float(hero_width) < float(card_width) - _CARD_HERO_INSET_WIDTH_EPSILON
+
+
 def card_child_is_product_tile_metadata_slot(
     node: CleanDesignTreeNode,
     parent_node: CleanDesignTreeNode | None,
