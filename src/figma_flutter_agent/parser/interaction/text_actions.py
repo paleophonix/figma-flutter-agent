@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 _PRICE_VALUE_RE = re.compile(r"^[\d\s.,₹$€£¥₴₸%+\-]+$")
 
@@ -34,6 +34,42 @@ def looks_like_price_or_value_label(text: str | None) -> bool:
     if _PRICE_VALUE_RE.fullmatch(label):
         return True
     return label.replace(",", "").replace(".", "").isdigit()
+
+
+def layout_fact_static_screen_heading_text(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """Return True for large centered headline copy that must stay non-interactive."""
+    if node.type != NodeType.TEXT or parent_node is None:
+        return False
+    if parent_node.type != NodeType.COLUMN:
+        return False
+    font_size = node.style.font_size
+    if font_size is None or float(font_size) < 20.0:
+        return False
+    if (node.style.text_align or "").upper() != "CENTER":
+        return False
+    weight = (node.style.font_weight or "").lower()
+    is_bold = weight in {"w700", "bold", "700"} or (
+        weight.startswith("w") and weight[1:].isdigit() and int(weight[1:]) >= 600
+    )
+    if not is_bold and float(font_size) < 24.0:
+        return False
+    parent_main = (parent_node.alignment.main or "start").lower()
+    parent_cross = (parent_node.alignment.cross or "start").lower()
+    if parent_main != "center" and parent_cross != "center":
+        return False
+    label = (node.text or "").strip()
+    if not label or len(label) > 48:
+        return False
+    if node.sizing.width_mode == SizingMode.FILL:
+        return True
+    width = node.sizing.width
+    parent_width = parent_node.sizing.width
+    if width is None or parent_width is None:
+        return float(font_size) >= 24.0
+    return float(width) >= float(parent_width) * 0.6
 
 
 def layout_fact_actionable_accent_text_node(node: CleanDesignTreeNode) -> bool:

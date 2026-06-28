@@ -208,6 +208,41 @@ def render_node_body(
             if exported is not None:
                 fill_parent = _should_center_in_parent_stack(node, parent_node)
                 widget = exported
+                from figma_flutter_agent.generator.layout.cupertino import wrap_back_nav_stack
+                from figma_flutter_agent.parser.interaction import (
+                    is_back_navigation_icon_stack,
+                    layout_fact_compact_icon_action_stack,
+                )
+                from figma_flutter_agent.parser.numeric_rounding import (
+                    format_geometry_literal as fmt_dim,
+                )
+
+                if layout_fact_compact_icon_action_stack(node) and is_back_navigation_icon_stack(
+                    node
+                ):
+                    width = node.sizing.width
+                    height = node.sizing.height
+                    if (
+                        width is not None
+                        and height is not None
+                        and float(width) > 0
+                        and float(height) > 0
+                    ):
+                        widget = (
+                            f"SizedBox("
+                            f"width: {fmt_dim(float(width))}, "
+                            f"height: {fmt_dim(float(height))}, "
+                            f"child: {widget})"
+                        )
+                    stack_body = (
+                        "Stack(clipBehavior: Clip.none, alignment: Alignment.center, "
+                        f"children: [{widget}])"
+                    )
+                    widget = wrap_back_nav_stack(
+                        stack_body,
+                        theme_variant=theme_variant,
+                        node_id=node.id,
+                    )
                 if fill_parent:
                     widget = _wrap_centered_stack_child(node, widget)
                 return _finalize_widget(
@@ -244,11 +279,11 @@ def render_node_body(
         and node.vector_asset_key
         and not layout_fact_stack_category_component_tile(node)
     ):
-        from figma_flutter_agent.generator.layout.flex_policy.stack import (
-            layout_fact_icon_badge_stack,
-        )
         from figma_flutter_agent.generator.cluster_variants import (
             resolve_cluster_delegate_class,
+        )
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            layout_fact_icon_badge_stack,
         )
 
         delegate_class = resolve_cluster_delegate_class(

@@ -566,19 +566,30 @@ def layout_fact_stack_vertical_icon_label_chip_tile(node: CleanDesignTreeNode) -
     return top >= float(height) * 0.55
 
 
+def _node_names_calendar_affordance(node: CleanDesignTreeNode) -> bool:
+    """Return True when Figma component/name metadata identifies calendar chrome."""
+    labels = [node.name or "", node.accessibility_label or ""]
+    if node.variant is not None and node.variant.component_name:
+        labels.append(node.variant.component_name)
+    combined = " ".join(label.lower() for label in labels if label)
+    return "calendar" in combined
+
+
 def layout_fact_input_calendar_trailing_chrome(node: CleanDesignTreeNode) -> bool:
     """True when compact INPUT trailing chrome is a filled calendar glyph."""
+    if _node_names_calendar_affordance(node):
+        return True
     if node.type not in {NodeType.BUTTON, NodeType.STACK, NodeType.COLUMN, NodeType.ROW}:
         return False
     for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH):
         if item.type != NodeType.VECTOR:
             continue
-        if item.style.has_stroke and not item.style.background_color:
-            continue
-        if not item.style.background_color:
-            continue
         width = float(item.sizing.width or 0.0)
         height = float(item.sizing.height or 0.0)
-        if 8.0 <= width <= 16.0 and 8.0 <= height <= 16.0:
+        if not (8.0 <= width <= 16.0 and 8.0 <= height <= 16.0):
+            continue
+        if item.style.background_color:
+            return True
+        if item.style.has_stroke and _node_names_calendar_affordance(node):
             return True
     return False

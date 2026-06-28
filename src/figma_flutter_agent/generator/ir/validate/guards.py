@@ -275,6 +275,19 @@ def _apply_row_text_flex_guard(
     parent = tree_by_id.get(parent_id)
     if parent is None or parent.type != NodeType.ROW:
         return
+    if clean.sizing.width_mode == SizingMode.FILL:
+        if ir_node.wrap == FlexWrapIr.EXPANDED:
+            return
+        previous = ir_node.wrap
+        ir_node.wrap = FlexWrapIr.EXPANDED
+        _record_guard_mutation(
+            node_id=clean.id,
+            field="wrap",
+            old=previous.value if previous else None,
+            new=ir_node.wrap.value,
+            transform="row_fill_text_expanded_guard",
+        )
+        return
     if ir_node.wrap in {
         FlexWrapIr.EXPANDED,
         FlexWrapIr.FLEXIBLE_LOOSE,

@@ -152,6 +152,35 @@ class DemoLayout extends StatelessWidget {
     run_static_contract_gates(reconciled)
 
 
+def test_static_gate_rejects_loose_flex_with_infinite_width() -> None:
+    from figma_flutter_agent.errors import PlannedDartGraphError
+    from figma_flutter_agent.generator.dart.static_contract_gates import (
+        find_loose_flex_infinite_width_violations,
+        run_static_contract_gates,
+    )
+
+    bad = {
+        "lib/widgets/section_header_widget.dart": """
+class SectionHeaderWidget extends StatelessWidget {
+  const SectionHeaderWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(
+        width: double.infinity,
+        child: Text('Title'),
+      )),
+    ]);
+  }
+}
+""",
+    }
+    violations = find_loose_flex_infinite_width_violations(bad)
+    assert violations
+    with pytest.raises(PlannedDartGraphError, match="row_flex_child_must_not_force_infinite_width"):
+        run_static_contract_gates(bad)
+
+
 def test_pre_launch_stale_import_scan(tmp_path) -> None:
     widgets = tmp_path / "lib" / "widgets"
     widgets.mkdir(parents=True)

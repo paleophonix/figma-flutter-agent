@@ -482,20 +482,17 @@ def artboard_static_wizard_preview(*, scroll_child: str) -> str:
     """Emit a centered, clipped Figma artboard for static wizard Chrome preview.
 
     Wizard passes artboard dart-defines for ``responsive.mode: static``. The shell
-    letterboxes the design inside the browser viewport instead of stretching a
-    narrow column across a wide window with a full-bleed white ``Material``.
+    letterboxes the design inside the browser viewport without an opaque overlay
+    that would hide hoisted ambient background layers behind the artboard.
     """
     return (
-        "ColoredBox("
-        "color: Color(0xFF1E1E1E), "
-        "child: Center("
+        "Center("
         "child: ClipRect("
         "child: SizedBox("
         "width: _artboardPreviewWidth, "
         "height: _artboardPreviewHeight, "
         "child: SingleChildScrollView("
         f"child: {scroll_child}"
-        ")"
         ")"
         ")"
         ")"

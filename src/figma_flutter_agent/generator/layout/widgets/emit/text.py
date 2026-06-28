@@ -306,12 +306,18 @@ def render_text_node(
     if (
         node.style.text_align == "LEFT"
         and node.sizing.width_mode == SizingMode.FILL
-        and parent_type in {NodeType.COLUMN, NodeType.ROW}
+        and parent_type == NodeType.COLUMN
     ):
         widget = (
             "SizedBox(width: double.infinity, child: "
             f"Align(alignment: Alignment.centerLeft, child: {widget}))"
         )
+    elif (
+        node.style.text_align == "LEFT"
+        and node.sizing.width_mode == SizingMode.FILL
+        and parent_type == NodeType.ROW
+    ):
+        widget = f"Align(alignment: Alignment.centerLeft, child: {widget})"
     elif (node.style.text_align or "").upper() == "CENTER" and parent_type in {
         NodeType.COLUMN,
         NodeType.STACK,
@@ -359,10 +365,13 @@ def render_text_node(
         _argb_rgb_channels,
         layout_fact_actionable_accent_text_node,
         layout_fact_primary_cta_label_in_painted_shell,
+        layout_fact_static_screen_heading_text,
     )
 
     if layout_fact_primary_cta_label_in_painted_shell(node, parent_node):
         widget = _wrap_primary_cta_text(widget, node_id=node.id)
+    elif layout_fact_static_screen_heading_text(node, parent_node):
+        pass
     elif parent_type != NodeType.BUTTON and is_link_text(node.text):
         channels = _argb_rgb_channels(node.style.text_color)
         if channels is not None and min(channels) >= 240:

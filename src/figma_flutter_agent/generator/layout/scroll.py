@@ -112,6 +112,28 @@ def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
     )
 
 
+def padding_edge_insets_fitted_to_host(node: CleanDesignTreeNode) -> str | None:
+    """Render host-bounded padding when vertical insets would clip fixed-height chrome."""
+    padding = node.padding
+    if padding.top == 0 and padding.bottom == 0 and padding.left == 0 and padding.right == 0:
+        return None
+    height = node.sizing.height
+    top = float(padding.top)
+    bottom = float(padding.bottom)
+    if height is not None and float(height) > 0:
+        max_vertical = max(0.0, (float(height) - 1.0) / 2.0)
+        if top + bottom > float(height):
+            top = min(top, max_vertical)
+            bottom = min(bottom, max_vertical)
+    return (
+        "const EdgeInsets.fromLTRB("
+        f"{format_geometry_literal(padding.left)}, "
+        f"{format_geometry_literal(top)}, "
+        f"{format_geometry_literal(padding.right)}, "
+        f"{format_geometry_literal(bottom)})"
+    )
+
+
 def _symmetric_pill_button_padding(node: CleanDesignTreeNode) -> str | None:
     """Horizontal Figma padding with symmetric vertical insets for pill buttons."""
     padding = node.padding
@@ -191,7 +213,18 @@ def wrap_flex_auto_layout_padding(
         if padding is None:
             return widget
         return f"Padding(padding: {padding}, child: {widget})"
-    padding = padding_edge_insets(node)
+    height = node.sizing.height
+    use_fitted_padding = (
+        height is not None
+        and float(height) > 0
+        and node.padding is not None
+        and float(node.padding.top) + float(node.padding.bottom) > float(height)
+    )
+    padding = (
+        padding_edge_insets_fitted_to_host(node)
+        if use_fitted_padding
+        else padding_edge_insets(node)
+    )
     if padding is None:
         return widget
     if layout_fact_row_bounded_inline_control_row(node):

@@ -187,6 +187,45 @@ def find_extracted_widget_empty_or_recursive_shells(planned: Mapping[str, str]) 
     return errors
 
 
+def find_loose_flex_infinite_width_violations(planned: Mapping[str, str]) -> list[str]:
+    """Detect ``Flexible(loose)`` descendants forcing ``width: double.infinity``."""
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        _FLEX_PARENT_DATA_START_RE,
+    )
+
+    errors: list[str] = []
+    for path, content in planned.items():
+        rel = path.replace("\\", "/")
+        if not rel.endswith(".dart"):
+            continue
+        pos = 0
+        while pos < len(content):
+            match = _FLEX_PARENT_DATA_START_RE.search(content, pos)
+            if match is None:
+                break
+            start = match.start()
+            if start >= 6 and content[start - 6 : start] == "const ":
+                start -= 6
+            open_paren = content.find("(", start)
+            if open_paren < 0:
+                pos = match.end()
+                continue
+            end = _find_matching_paren(content, open_paren)
+            if end is None:
+                pos = match.end()
+                continue
+            expr = content[start : end + 1]
+            trimmed = expr.lstrip()
+            if trimmed.startswith("Flexible(") and "width: double.infinity" in expr:
+                if "fit: FlexFit.tight" not in expr:
+                    errors.append(
+                        "row_flex_child_must_not_force_infinite_width: "
+                        f"{rel} near offset {start}"
+                    )
+            pos = end + 1
+    return errors
+
+
 def find_nested_flex_parent_data_wrappers(planned: Mapping[str, str]) -> list[str]:
     """Detect ``Expanded``/``Flexible`` nested inside another flex parent-data wrapper."""
     from figma_flutter_agent.generator.layout.flex_policy.wrap import (
@@ -258,6 +297,7 @@ def run_static_contract_gates(planned: Mapping[str, str]) -> None:
     violations.extend(find_widget_callsite_constructor_mismatches(planned))
     violations.extend(find_extracted_widget_empty_or_recursive_shells(planned))
     violations.extend(find_nested_flex_parent_data_wrappers(planned))
+    violations.extend(find_loose_flex_infinite_width_violations(planned))
 
     if not violations:
         return
