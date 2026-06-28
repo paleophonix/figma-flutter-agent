@@ -77,6 +77,8 @@ class PipelineContext:
     pipeline_run_id: str = ""
     warnings: list[str] = field(default_factory=list)
 
+    analyze_repair_exhausted: bool = False
+
     def apply_fetch(self, fetch: FigmaFetchResult) -> None:
         """Store raw fetch payload on the context."""
         self.figma_root = fetch.root

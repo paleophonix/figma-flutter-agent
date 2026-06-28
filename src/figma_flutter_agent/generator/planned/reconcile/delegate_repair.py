@@ -95,13 +95,9 @@ def _extract_build_return_expression(content: str, class_name: str) -> str | Non
 
 
 def _foreign_delegate_target_class(build: str, class_name: str) -> str | None:
-    bare = _bare_widget_ctor_return_class(build)
-    if bare and bare not in (class_name, "__context_widget__") and bare.endswith("Widget"):
-        return bare
-    refs = [name for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build) if name != class_name]
-    if len(refs) == 1:
-        return refs[0]
-    return None
+    from .class_inspect import _single_foreign_widget_delegate_target
+
+    return _single_foreign_widget_delegate_target(build, class_name)
 
 
 def _widget_body_is_inlinable_target(content: str, class_name: str) -> bool:
@@ -292,18 +288,99 @@ def repair_foreign_delegate_widget_builds(planned: dict[str, str]) -> dict[str, 
     return updated
 
 
+def _widget_foreign_delegate_target(content: str, class_name: str) -> str | None:
+    build = _widget_build_snippet(content, class_name=class_name, max_chars=4000)
+    return _foreign_delegate_target_class(build, class_name)
+
+
+def _find_delegate_cycles(planned: dict[str, str]) -> list[list[str]]:
+    """Return class-name cycles in the foreign-widget delegate graph."""
+    class_paths = _widget_class_paths(planned)
+    graph: dict[str, str] = {}
+    for path, class_name in _widget_class_names_by_path(planned).items():
+        content = planned.get(path, "")
+        if not _is_foreign_delegate_widget_build(content, class_name):
+            continue
+        target = _widget_foreign_delegate_target(content, class_name)
+        if target is None or target not in class_paths:
+            continue
+        graph[class_name] = target
+
+    cycles: list[list[str]] = []
+    visited: set[str] = set()
+    stack: set[str] = set()
+
+    def dfs(node: str) -> None:
+        if node in stack:
+            cycle_start = node
+            cycle = [node]
+            cursor = graph.get(node)
+            while cursor is not None and cursor != cycle_start:
+                cycle.append(cursor)
+                cursor = graph.get(cursor)
+            if cursor == cycle_start:
+                cycles.append(cycle)
+            return
+        if node in visited:
+            return
+        visited.add(node)
+        stack.add(node)
+        target = graph.get(node)
+        if target is not None:
+            dfs(target)
+        stack.remove(node)
+
+    for class_name in graph:
+        dfs(class_name)
+    return cycles
+
+
+def repair_mutual_delegate_widget_cycles(planned: dict[str, str]) -> dict[str, str]:
+    """Break acyclic violations in extracted-widget delegate graphs before write."""
+    updated = dict(planned)
+    for _ in range(8):
+        cycles = _find_delegate_cycles(updated)
+        if not cycles:
+            break
+        changed = False
+        broken: set[str] = set()
+        for cycle in cycles:
+            for break_class in cycle:
+                if break_class in broken:
+                    continue
+                paths = [
+                    path
+                    for path, name in _widget_class_names_by_path(updated).items()
+                    if name == break_class
+                ]
+                if not paths:
+                    continue
+                path = paths[0]
+                content = updated.get(path, "")
+                patched = _replace_foreign_delegate_build(content, break_class)
+                if patched == content:
+                    patched = _replace_self_referential_build(content, break_class)
+                if patched != content:
+                    logger.info("Broke delegate widget cycle via {} in {}", break_class, cycle)
+                    updated[path] = patched
+                    broken.add(break_class)
+                    changed = True
+        if not changed:
+            break
+    return updated
+
+
 def repair_self_referential_widget_builds(planned: dict[str, str]) -> dict[str, str]:
     """Drop widget files whose ``build`` only instantiates self or another widget class."""
-    class_paths = _widget_class_paths(planned)
+    updated = repair_mutual_delegate_widget_cycles(planned)
+    class_paths = _widget_class_paths(updated)
     if not class_paths:
-        return planned
+        return updated
 
     def _is_stub_build(content: str, class_name: str) -> bool:
         return _is_self_referential_widget_build(
             content, class_name
         ) or _is_foreign_delegate_widget_build(content, class_name)
-
-    updated = dict(planned)
     for class_name, paths in _group_paths_by_class(planned).items():
         if len(paths) < 2:
             continue

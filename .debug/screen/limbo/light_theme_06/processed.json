@@ -33,605 +33,6 @@
     "scrollAxis": "vertical",
     "children": [
       {
-        "id": "3212:20180",
-        "name": "Footer",
-        "type": "ROW",
-        "padding": {
-          "top": 16.0,
-          "bottom": 16.0,
-          "left": 24.0,
-          "right": 24.0
-        },
-        "spacing": 35.0,
-        "sizing": {
-          "widthMode": "FIXED",
-          "heightMode": "FIXED",
-          "width": 390.0,
-          "height": 106.0
-        },
-        "alignment": {
-          "main": "spaceBetween",
-          "cross": "stretch"
-        },
-        "style": {
-          "backgroundColor": "0xFFFFFFFF",
-          "strokeAlign": "INSIDE",
-          "backgroundBlur": 24.0
-        },
-        "componentRef": "0:573",
-        "variant": {
-          "componentId": "0:573",
-          "componentName": "Footer",
-          "variantProperties": {
-            "dark mode": "off",
-            "type": "fixed"
-          }
-        },
-        "layoutPositioning": "ABSOLUTE",
-        "stackPlacement": {
-          "horizontal": "LEFT_RIGHT",
-          "vertical": "BOTTOM",
-          "top": 738.0,
-          "width": 390.0,
-          "height": 106.0
-        },
-        "children": [
-          {
-            "id": "I3212:20180;0:580",
-            "name": "Icon button",
-            "type": "BUTTON",
-            "sizing": {
-              "widthMode": "FIXED",
-              "heightMode": "FIXED",
-              "width": 40.0,
-              "height": 40.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "borderRadius": 100.0,
-              "strokeAlign": "INSIDE",
-              "backgroundBlur": 4.0
-            },
-            "componentRef": "8:44253",
-            "clusterId": "component_8_44253",
-            "accessibilityLabel": "Icon button",
-            "accessibilityHint": "Icon button",
-            "variant": {
-              "componentId": "8:44253",
-              "componentName": "Icon button",
-              "variantProperties": {
-                "size": "medium-40px",
-                "state": "default"
-              },
-              "state": "default"
-            },
-            "children": [
-              {
-                "id": "I3212:20180;0:580;8:43285",
-                "name": "home",
-                "type": "STACK",
-                "sizing": {
-                  "widthMode": "FIXED",
-                  "heightMode": "FIXED",
-                  "width": 24.0,
-                  "height": 24.0
-                },
-                "alignment": {
-                  "cross": "stretch"
-                },
-                "style": {
-                  "strokeAlign": "INSIDE"
-                },
-                "vectorAssetKey": "assets/icons/home_I3212_20180;0_580;8_43285.svg",
-                "vectorSvgPathCount": 1,
-                "componentRef": "2912:12146",
-                "variant": {
-                  "componentId": "2912:12146",
-                  "componentName": "home"
-                },
-                "layoutPositioning": "ABSOLUTE",
-                "stackPlacement": {
-                  "horizontal": "CENTER",
-                  "vertical": "CENTER",
-                  "left": 8.0,
-                  "top": 8.0,
-                  "right": 8.0,
-                  "bottom": 8.0,
-                  "width": 24.0,
-                  "height": 24.0
-                },
-                "children": [
-                  {
-                    "id": "I3212:20180;0:580;8:43285;3073:10643",
-                    "name": "vector",
-                    "type": "VECTOR",
-                    "sizing": {
-                      "width": 18.0,
-                      "height": 20.0
-                    },
-                    "alignment": {
-                      "cross": "stretch"
-                    },
-                    "style": {
-                      "strokeAlign": "CENTER",
-                      "borderWidth": 1.5,
-                      "borderColor": "0xFF1A1A1A",
-                      "renderBoundsExpand": {
-                        "top": 0.8,
-                        "bottom": 0.8,
-                        "left": 0.8,
-                        "right": 0.8
-                      },
-                      "hasStroke": true
-                    },
-                    "accessibilityLabel": "vector",
-                    "layoutPositioning": "ABSOLUTE",
-                    "stackPlacement": {
-                      "horizontal": "SCALE",
-                      "vertical": "SCALE",
-                      "left": 3.0,
-                      "top": 2.0,
-                      "right": 3.0,
-                      "bottom": 2.0,
-                      "width": 18.0,
-                      "height": 20.0
-                    },
-                    "geometryFrame": {
-                      "localTransform": {
-                        "tx": 3.0,
-                        "ty": 2.0
-                      },
-                      "layoutRect": {
-                        "x": 3.0,
-                        "y": 2.0,
-                        "width": 18.0,
-                        "height": 20.0
-                      },
-                      "intrinsicSize": {
-                        "width": 18.0,
-                        "height": 20.0
-                      },
-                      "placementOrigin": {
-                        "x": 3.0,
-                        "y": 2.0
-                      },
-                      "placementAabb": {
-                        "x": 3.0,
-                        "y": 2.0,
-                        "width": 18.0,
-                        "height": 20.0
-                      },
-                      "parsedWorldAabb": {
-                        "x": 1358.0,
-                        "y": 405.0,
-                        "width": 18.0,
-                        "height": 20.0
-                      },
-                      "worldAabb": {
-                        "x": 1358.0,
-                        "y": 405.0,
-                        "width": 18.0,
-                        "height": 20.0
-                      },
-                      "paintRect": {
-                        "x": 1357.2,
-                        "y": 404.2,
-                        "width": 19.6,
-                        "height": 21.6
-                      }
-                    }
-                  }
-                ],
-                "geometryFrame": {
-                  "localTransform": {
-                    "tx": 8.0,
-                    "ty": 8.0
-                  },
-                  "layoutRect": {
-                    "x": 8.0,
-                    "y": 8.0,
-                    "width": 24.0,
-                    "height": 24.0
-                  },
-                  "intrinsicSize": {
-                    "width": 24.0,
-                    "height": 24.0
-                  },
-                  "placementOrigin": {
-                    "x": 8.0,
-                    "y": 8.0
-                  },
-                  "placementAabb": {
-                    "x": 8.0,
-                    "y": 8.0,
-                    "width": 24.0,
-                    "height": 24.0
-                  },
-                  "parsedWorldAabb": {
-                    "x": 1355.0,
-                    "y": 403.0,
-                    "width": 24.0,
-                    "height": 24.0
-                  },
-                  "worldAabb": {
-                    "x": 1355.0,
-                    "y": 403.0,
-                    "width": 24.0,
-                    "height": 24.0
-                  },
-                  "paintRect": {
-                    "x": 1355.0,
-                    "y": 403.0,
-                    "width": 24.0,
-                    "height": 24.0
-                  }
-                }
-              }
-            ],
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 24.0,
-                "ty": 16.0
-              },
-              "layoutRect": {
-                "x": 24.0,
-                "y": 16.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "intrinsicSize": {
-                "width": 40.0,
-                "height": 40.0
-              },
-              "placementOrigin": {
-                "x": 24.0,
-                "y": 16.0
-              },
-              "parsedWorldAabb": {
-                "x": 1347.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "worldAabb": {
-                "x": 1347.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "paintRect": {
-                "x": 1347.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              }
-            }
-          },
-          {
-            "id": "I3212:20180;0:578",
-            "name": "Icon button",
-            "type": "BUTTON",
-            "sizing": {
-              "widthMode": "FIXED",
-              "heightMode": "FIXED",
-              "width": 40.0,
-              "height": 40.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "borderRadius": 100.0,
-              "strokeAlign": "INSIDE",
-              "backgroundBlur": 4.0
-            },
-            "componentRef": "8:44253",
-            "clusterId": "component_8_44253",
-            "accessibilityLabel": "Icon button",
-            "accessibilityHint": "Icon button",
-            "variant": {
-              "componentId": "8:44253",
-              "componentName": "Icon button",
-              "variantProperties": {
-                "size": "medium-40px",
-                "state": "default"
-              },
-              "state": "default"
-            },
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 99.5,
-                "ty": 16.0
-              },
-              "layoutRect": {
-                "x": 99.5,
-                "y": 16.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "intrinsicSize": {
-                "width": 40.0,
-                "height": 40.0
-              },
-              "placementOrigin": {
-                "x": 99.5,
-                "y": 16.0
-              },
-              "parsedWorldAabb": {
-                "x": 1422.5,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "worldAabb": {
-                "x": 1422.5,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "paintRect": {
-                "x": 1422.5,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              }
-            }
-          },
-          {
-            "id": "I3212:20180;0:576",
-            "name": "Icon button",
-            "type": "BUTTON",
-            "sizing": {
-              "widthMode": "FIXED",
-              "heightMode": "FIXED",
-              "width": 40.0,
-              "height": 40.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "borderRadius": 100.0,
-              "strokeAlign": "INSIDE",
-              "backgroundBlur": 4.0
-            },
-            "componentRef": "8:44253",
-            "clusterId": "component_8_44253",
-            "accessibilityLabel": "Icon button",
-            "accessibilityHint": "Icon button",
-            "variant": {
-              "componentId": "8:44253",
-              "componentName": "Icon button",
-              "variantProperties": {
-                "size": "medium-40px",
-                "state": "default"
-              },
-              "state": "default"
-            },
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 175.0,
-                "ty": 16.0
-              },
-              "layoutRect": {
-                "x": 175.0,
-                "y": 16.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "intrinsicSize": {
-                "width": 40.0,
-                "height": 40.0
-              },
-              "placementOrigin": {
-                "x": 175.0,
-                "y": 16.0
-              },
-              "parsedWorldAabb": {
-                "x": 1498.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "worldAabb": {
-                "x": 1498.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "paintRect": {
-                "x": 1498.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              }
-            }
-          },
-          {
-            "id": "I3212:20180;14:11937",
-            "name": "Icon button",
-            "type": "BUTTON",
-            "sizing": {
-              "widthMode": "FIXED",
-              "heightMode": "FIXED",
-              "width": 40.0,
-              "height": 40.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "borderRadius": 100.0,
-              "strokeAlign": "INSIDE",
-              "backgroundBlur": 4.0
-            },
-            "componentRef": "8:44253",
-            "clusterId": "component_8_44253",
-            "accessibilityLabel": "Icon button",
-            "accessibilityHint": "Icon button",
-            "variant": {
-              "componentId": "8:44253",
-              "componentName": "Icon button",
-              "variantProperties": {
-                "size": "medium-40px",
-                "state": "default"
-              },
-              "state": "default"
-            },
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 250.5,
-                "ty": 16.0
-              },
-              "layoutRect": {
-                "x": 250.5,
-                "y": 16.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "intrinsicSize": {
-                "width": 40.0,
-                "height": 40.0
-              },
-              "placementOrigin": {
-                "x": 250.5,
-                "y": 16.0
-              },
-              "parsedWorldAabb": {
-                "x": 1573.5,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "worldAabb": {
-                "x": 1573.5,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "paintRect": {
-                "x": 1573.5,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              }
-            }
-          },
-          {
-            "id": "I3212:20180;0:577",
-            "name": "Icon button",
-            "type": "BUTTON",
-            "sizing": {
-              "widthMode": "FIXED",
-              "heightMode": "FIXED",
-              "width": 40.0,
-              "height": 40.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "borderRadius": 100.0,
-              "strokeAlign": "INSIDE",
-              "backgroundBlur": 4.0
-            },
-            "componentRef": "8:44253",
-            "clusterId": "component_8_44253",
-            "accessibilityLabel": "Icon button",
-            "accessibilityHint": "Icon button",
-            "variant": {
-              "componentId": "8:44253",
-              "componentName": "Icon button",
-              "variantProperties": {
-                "size": "medium-40px",
-                "state": "default"
-              },
-              "state": "default"
-            },
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 326.0,
-                "ty": 16.0
-              },
-              "layoutRect": {
-                "x": 326.0,
-                "y": 16.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "intrinsicSize": {
-                "width": 40.0,
-                "height": 40.0
-              },
-              "placementOrigin": {
-                "x": 326.0,
-                "y": 16.0
-              },
-              "parsedWorldAabb": {
-                "x": 1649.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "worldAabb": {
-                "x": 1649.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              },
-              "paintRect": {
-                "x": 1649.0,
-                "y": 395.0,
-                "width": 40.0,
-                "height": 40.0
-              }
-            }
-          }
-        ],
-        "geometryFrame": {
-          "localTransform": {
-            "ty": 738.0
-          },
-          "layoutRect": {
-            "y": 738.0,
-            "width": 390.0,
-            "height": 106.0
-          },
-          "intrinsicSize": {
-            "width": 390.0,
-            "height": 106.0
-          },
-          "placementOrigin": {
-            "y": 738.0
-          },
-          "placementAabb": {
-            "y": 738.0,
-            "width": 390.0,
-            "height": 106.0
-          },
-          "parsedWorldAabb": {
-            "x": 1323.0,
-            "y": 379.0,
-            "width": 390.0,
-            "height": 106.0
-          },
-          "worldAabb": {
-            "x": 1323.0,
-            "y": 379.0,
-            "width": 390.0,
-            "height": 106.0
-          },
-          "paintRect": {
-            "x": 1323.0,
-            "y": 379.0,
-            "width": 390.0,
-            "height": 106.0
-          }
-        }
-      },
-      {
         "id": "3212:20181",
         "name": "Navigation bar",
         "type": "COLUMN",
@@ -934,6 +335,170 @@
                       },
                       "state": "default"
                     },
+                    "children": [
+                      {
+                        "id": "I3212:20181;3207:13480;8:43285",
+                        "name": "search",
+                        "type": "STACK",
+                        "sizing": {
+                          "widthMode": "FIXED",
+                          "heightMode": "FIXED",
+                          "width": 24.0,
+                          "height": 24.0
+                        },
+                        "alignment": {
+                          "cross": "stretch"
+                        },
+                        "style": {
+                          "strokeAlign": "INSIDE"
+                        },
+                        "vectorAssetKey": "assets/icons/search_I3212_20181;3207_13480;8_43285.svg",
+                        "vectorSvgPathCount": 1,
+                        "componentRef": "2912:11547",
+                        "clusterId": "component_2912_11547",
+                        "variant": {
+                          "componentId": "2912:11547",
+                          "componentName": "search"
+                        },
+                        "layoutPositioning": "ABSOLUTE",
+                        "stackPlacement": {
+                          "horizontal": "CENTER",
+                          "vertical": "CENTER",
+                          "left": 8.0,
+                          "top": 8.0,
+                          "right": 8.0,
+                          "bottom": 8.0,
+                          "width": 24.0,
+                          "height": 24.0
+                        },
+                        "children": [
+                          {
+                            "id": "I3212:20181;3207:13480;8:43285;3073:9901",
+                            "name": "vector",
+                            "type": "VECTOR",
+                            "sizing": {
+                              "width": 18.0,
+                              "height": 18.0
+                            },
+                            "alignment": {
+                              "cross": "stretch"
+                            },
+                            "style": {
+                              "strokeAlign": "CENTER",
+                              "borderWidth": 1.5,
+                              "borderColor": "0xFF1A1A1A",
+                              "renderBoundsExpand": {
+                                "top": 0.8,
+                                "bottom": 0.8,
+                                "left": 0.8,
+                                "right": 0.8
+                              },
+                              "hasStroke": true
+                            },
+                            "accessibilityLabel": "vector",
+                            "layoutPositioning": "ABSOLUTE",
+                            "stackPlacement": {
+                              "horizontal": "SCALE",
+                              "vertical": "SCALE",
+                              "left": 3.0,
+                              "top": 3.0,
+                              "right": 3.0,
+                              "bottom": 3.0,
+                              "width": 18.0,
+                              "height": 18.0
+                            },
+                            "geometryFrame": {
+                              "localTransform": {
+                                "tx": 3.0,
+                                "ty": 3.0
+                              },
+                              "layoutRect": {
+                                "x": 3.0,
+                                "y": 3.0,
+                                "width": 18.0,
+                                "height": 18.0
+                              },
+                              "intrinsicSize": {
+                                "width": 18.0,
+                                "height": 18.0
+                              },
+                              "placementOrigin": {
+                                "x": 3.0,
+                                "y": 3.0
+                              },
+                              "placementAabb": {
+                                "x": 3.0,
+                                "y": 3.0,
+                                "width": 18.0,
+                                "height": 18.0
+                              },
+                              "parsedWorldAabb": {
+                                "x": 1632.0,
+                                "y": -290.0,
+                                "width": 18.0,
+                                "height": 18.0
+                              },
+                              "worldAabb": {
+                                "x": 1632.0,
+                                "y": -290.0,
+                                "width": 18.0,
+                                "height": 18.0
+                              },
+                              "paintRect": {
+                                "x": 1631.2,
+                                "y": -290.8,
+                                "width": 19.6,
+                                "height": 19.6
+                              }
+                            }
+                          }
+                        ],
+                        "geometryFrame": {
+                          "localTransform": {
+                            "tx": 8.0,
+                            "ty": 8.0
+                          },
+                          "layoutRect": {
+                            "x": 8.0,
+                            "y": 8.0,
+                            "width": 24.0,
+                            "height": 24.0
+                          },
+                          "intrinsicSize": {
+                            "width": 24.0,
+                            "height": 24.0
+                          },
+                          "placementOrigin": {
+                            "x": 8.0,
+                            "y": 8.0
+                          },
+                          "placementAabb": {
+                            "x": 8.0,
+                            "y": 8.0,
+                            "width": 24.0,
+                            "height": 24.0
+                          },
+                          "parsedWorldAabb": {
+                            "x": 1629.0,
+                            "y": -293.0,
+                            "width": 24.0,
+                            "height": 24.0
+                          },
+                          "worldAabb": {
+                            "x": 1629.0,
+                            "y": -293.0,
+                            "width": 24.0,
+                            "height": 24.0
+                          },
+                          "paintRect": {
+                            "x": 1629.0,
+                            "y": -293.0,
+                            "width": 24.0,
+                            "height": 24.0
+                          }
+                        }
+                      }
+                    ],
                     "geometryFrame": {
                       "layoutRect": {
                         "width": 40.0,
@@ -4483,6 +4048,442 @@
             "y": -239.0,
             "width": 390.0,
             "height": 1448.0
+          }
+        }
+      },
+      {
+        "id": "3212:20180",
+        "name": "Footer",
+        "type": "ROW",
+        "padding": {
+          "top": 16.0,
+          "bottom": 16.0,
+          "left": 24.0,
+          "right": 24.0
+        },
+        "spacing": 35.0,
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 390.0,
+          "height": 106.0
+        },
+        "alignment": {
+          "main": "spaceBetween",
+          "cross": "stretch"
+        },
+        "style": {
+          "backgroundColor": "0xFFFFFFFF",
+          "strokeAlign": "INSIDE",
+          "backgroundBlur": 24.0
+        },
+        "componentRef": "0:573",
+        "variant": {
+          "componentId": "0:573",
+          "componentName": "Footer",
+          "variantProperties": {
+            "dark mode": "off",
+            "type": "fixed"
+          }
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "horizontal": "LEFT_RIGHT",
+          "vertical": "BOTTOM",
+          "top": 738.0,
+          "width": 390.0,
+          "height": 106.0
+        },
+        "children": [
+          {
+            "id": "I3212:20180;0:580",
+            "name": "Icon button",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 40.0,
+              "height": 40.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 100.0,
+              "strokeAlign": "INSIDE",
+              "backgroundBlur": 4.0
+            },
+            "componentRef": "8:44253",
+            "clusterId": "component_8_44253",
+            "accessibilityLabel": "Icon button",
+            "accessibilityHint": "Icon button",
+            "variant": {
+              "componentId": "8:44253",
+              "componentName": "Icon button",
+              "variantProperties": {
+                "size": "medium-40px",
+                "state": "default"
+              },
+              "state": "default"
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 24.0,
+                "ty": 16.0
+              },
+              "layoutRect": {
+                "x": 24.0,
+                "y": 16.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "intrinsicSize": {
+                "width": 40.0,
+                "height": 40.0
+              },
+              "placementOrigin": {
+                "x": 24.0,
+                "y": 16.0
+              },
+              "parsedWorldAabb": {
+                "x": 1347.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "worldAabb": {
+                "x": 1347.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "paintRect": {
+                "x": 1347.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              }
+            }
+          },
+          {
+            "id": "I3212:20180;0:578",
+            "name": "Icon button",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 40.0,
+              "height": 40.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 100.0,
+              "strokeAlign": "INSIDE",
+              "backgroundBlur": 4.0
+            },
+            "componentRef": "8:44253",
+            "clusterId": "component_8_44253",
+            "accessibilityLabel": "Icon button",
+            "accessibilityHint": "Icon button",
+            "variant": {
+              "componentId": "8:44253",
+              "componentName": "Icon button",
+              "variantProperties": {
+                "size": "medium-40px",
+                "state": "default"
+              },
+              "state": "default"
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 99.5,
+                "ty": 16.0
+              },
+              "layoutRect": {
+                "x": 99.5,
+                "y": 16.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "intrinsicSize": {
+                "width": 40.0,
+                "height": 40.0
+              },
+              "placementOrigin": {
+                "x": 99.5,
+                "y": 16.0
+              },
+              "parsedWorldAabb": {
+                "x": 1422.5,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "worldAabb": {
+                "x": 1422.5,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "paintRect": {
+                "x": 1422.5,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              }
+            }
+          },
+          {
+            "id": "I3212:20180;0:576",
+            "name": "Icon button",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 40.0,
+              "height": 40.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 100.0,
+              "strokeAlign": "INSIDE",
+              "backgroundBlur": 4.0
+            },
+            "componentRef": "8:44253",
+            "clusterId": "component_8_44253",
+            "accessibilityLabel": "Icon button",
+            "accessibilityHint": "Icon button",
+            "variant": {
+              "componentId": "8:44253",
+              "componentName": "Icon button",
+              "variantProperties": {
+                "size": "medium-40px",
+                "state": "default"
+              },
+              "state": "default"
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 175.0,
+                "ty": 16.0
+              },
+              "layoutRect": {
+                "x": 175.0,
+                "y": 16.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "intrinsicSize": {
+                "width": 40.0,
+                "height": 40.0
+              },
+              "placementOrigin": {
+                "x": 175.0,
+                "y": 16.0
+              },
+              "parsedWorldAabb": {
+                "x": 1498.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "worldAabb": {
+                "x": 1498.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "paintRect": {
+                "x": 1498.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              }
+            }
+          },
+          {
+            "id": "I3212:20180;14:11937",
+            "name": "Icon button",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 40.0,
+              "height": 40.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 100.0,
+              "strokeAlign": "INSIDE",
+              "backgroundBlur": 4.0
+            },
+            "componentRef": "8:44253",
+            "clusterId": "component_8_44253",
+            "accessibilityLabel": "Icon button",
+            "accessibilityHint": "Icon button",
+            "variant": {
+              "componentId": "8:44253",
+              "componentName": "Icon button",
+              "variantProperties": {
+                "size": "medium-40px",
+                "state": "default"
+              },
+              "state": "default"
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 250.5,
+                "ty": 16.0
+              },
+              "layoutRect": {
+                "x": 250.5,
+                "y": 16.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "intrinsicSize": {
+                "width": 40.0,
+                "height": 40.0
+              },
+              "placementOrigin": {
+                "x": 250.5,
+                "y": 16.0
+              },
+              "parsedWorldAabb": {
+                "x": 1573.5,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "worldAabb": {
+                "x": 1573.5,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "paintRect": {
+                "x": 1573.5,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              }
+            }
+          },
+          {
+            "id": "I3212:20180;0:577",
+            "name": "Icon button",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 40.0,
+              "height": 40.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 100.0,
+              "strokeAlign": "INSIDE",
+              "backgroundBlur": 4.0
+            },
+            "componentRef": "8:44253",
+            "clusterId": "component_8_44253",
+            "accessibilityLabel": "Icon button",
+            "accessibilityHint": "Icon button",
+            "variant": {
+              "componentId": "8:44253",
+              "componentName": "Icon button",
+              "variantProperties": {
+                "size": "medium-40px",
+                "state": "default"
+              },
+              "state": "default"
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 326.0,
+                "ty": 16.0
+              },
+              "layoutRect": {
+                "x": 326.0,
+                "y": 16.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "intrinsicSize": {
+                "width": 40.0,
+                "height": 40.0
+              },
+              "placementOrigin": {
+                "x": 326.0,
+                "y": 16.0
+              },
+              "parsedWorldAabb": {
+                "x": 1649.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "worldAabb": {
+                "x": 1649.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              },
+              "paintRect": {
+                "x": 1649.0,
+                "y": 395.0,
+                "width": 40.0,
+                "height": 40.0
+              }
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "ty": 738.0
+          },
+          "layoutRect": {
+            "y": 738.0,
+            "width": 390.0,
+            "height": 106.0
+          },
+          "intrinsicSize": {
+            "width": 390.0,
+            "height": 106.0
+          },
+          "placementOrigin": {
+            "y": 738.0
+          },
+          "placementAabb": {
+            "y": 738.0,
+            "width": 390.0,
+            "height": 106.0
+          },
+          "parsedWorldAabb": {
+            "x": 1323.0,
+            "y": 379.0,
+            "width": 390.0,
+            "height": 106.0
+          },
+          "worldAabb": {
+            "x": 1323.0,
+            "y": 379.0,
+            "width": 390.0,
+            "height": 106.0
+          },
+          "paintRect": {
+            "x": 1323.0,
+            "y": 379.0,
+            "width": 390.0,
+            "height": 106.0
           }
         }
       }

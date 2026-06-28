@@ -15,7 +15,7 @@ from .paths import (
     preferred_widget_path_for_class,
 )
 
-_CLUSTER_VARIANT_PARAMS = ("isForward",)
+_CLUSTER_VARIANT_PARAMS = ("isForward", "label", "isSelected")
 _CLUSTER_GROUP_WIDGET_STEM_RE = re.compile(r"^group\d+", re.IGNORECASE)
 _WIDGET_CLASS_RE = re.compile(
     r"class\s+(?P<name>\w+)\s+extends\s+(?:StatelessWidget|StatefulWidget)\b"
@@ -215,6 +215,21 @@ def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
     return called == class_name
 
 
+def _single_foreign_widget_delegate_target(build: str, class_name: str) -> str | None:
+    """Return a sole extracted-widget ctor target referenced from a thin delegate build."""
+    bare = _bare_widget_ctor_return_class(build)
+    if (
+        bare
+        and bare not in (class_name, "__context_widget__", "SizedBox")
+        and bare.endswith("Widget")
+    ):
+        return bare
+    refs = [name for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build) if name != class_name]
+    if len(refs) == 1:
+        return refs[0]
+    return None
+
+
 def _is_foreign_delegate_widget_build(content: str, class_name: str) -> bool:
     """``build`` only forwards to another widget class (wrong or stale subtree body)."""
     if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
@@ -222,6 +237,8 @@ def _is_foreign_delegate_widget_build(content: str, class_name: str) -> bool:
     build = _widget_build_snippet(content, class_name=class_name, max_chars=4000)
     if "SvgPicture.asset" in build or "Image.asset" in build:
         return False
+    if _single_foreign_widget_delegate_target(build, class_name) is not None:
+        return True
     called = _bare_widget_ctor_return_class(build)
     if (
         called not in (None, "__context_widget__")

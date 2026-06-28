@@ -134,6 +134,30 @@ def _is_bottom_nav_background_shell(
     )
 
 
+def _row_is_docked_bottom_icon_bar(
+    node: CleanDesignTreeNode,
+    *,
+    viewport_height: float,
+) -> bool:
+    """Wide bottom rows of compact icon controls must paint above scroll bodies."""
+    placement = node.stack_placement
+    if placement is None or node.type != NodeType.ROW:
+        return False
+    top = placement.top if placement.top is not None else 0.0
+    height = node.sizing.height or placement.height or 0.0
+    min_interactive_top = viewport_height * _BOTTOM_INTERACTIVE_TOP_RATIO
+    docked = placement.vertical == "BOTTOM" or top >= min_interactive_top
+    if not docked or not (72.0 <= float(height) <= 140.0):
+        return False
+    compact_controls = 0
+    for child in node.children:
+        width = child.sizing.width or 0.0
+        child_height = child.sizing.height or 0.0
+        if 28.0 <= float(width) <= 56.0 and 28.0 <= float(child_height) <= 56.0:
+            compact_controls += 1
+    return compact_controls >= 4
+
+
 def _is_bottom_nav_interactive(
     node: CleanDesignTreeNode,
     *,
@@ -153,10 +177,19 @@ def _is_bottom_nav_interactive(
     height = node.sizing.height or placement.height or 0.0
     min_interactive_top = viewport_height * _BOTTOM_INTERACTIVE_TOP_RATIO
     min_bar_width = viewport_width * _BOTTOM_BAR_MIN_WIDTH_RATIO
-    if top < min_interactive_top:
+    if top < min_interactive_top and placement.vertical != "BOTTOM":
         return False
     if node.type == NodeType.BOTTOM_NAV:
         return True
+    if _row_is_docked_bottom_icon_bar(node, viewport_height=viewport_height):
+        return True
+    if node.type == NodeType.ROW:
+        from figma_flutter_agent.generator.layout.navigation.items import (
+            row_hosts_compact_nav_tabs,
+        )
+
+        if row_hosts_compact_nav_tabs(node) and 72.0 <= float(height) <= 140.0:
+            return True
     if width >= min_bar_width:
         return False
     if node.type == NodeType.STACK and height <= 72.0 and width <= 220.0:

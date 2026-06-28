@@ -307,24 +307,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "3212:20180",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "3212:20180",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "3212:20169",
       "field": "fidelity_tier",
       "old": null,
@@ -447,6 +429,24 @@
       "old": null,
       "new": "manifest",
       "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3212:20180",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3212:20180",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP1_guards",
@@ -577,20 +577,6 @@
       }
     },
     {
-      "nodeId": "3212:20180",
-      "kind": "control_segmented",
-      "confidence": 0.84,
-      "evidence": {
-        "control_segmented": true,
-        "child_type_counts": {
-          "BUTTON": 5
-        },
-        "child_count": 5,
-        "component_id": "0:573",
-        "variant.type": "fixed"
-      }
-    },
-    {
       "nodeId": "3212:20169",
       "kind": "container_accordion",
       "confidence": 0.82,
@@ -682,6 +668,20 @@
         "container_surface": "card",
         "component_id": "348:22",
         "variant.state": "default"
+      }
+    },
+    {
+      "nodeId": "3212:20180",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "BUTTON": 5
+        },
+        "child_count": 5,
+        "component_id": "0:573",
+        "variant.type": "fixed"
       }
     }
   ],

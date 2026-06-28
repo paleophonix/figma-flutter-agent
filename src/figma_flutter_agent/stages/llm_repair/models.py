@@ -56,3 +56,5 @@ class LlmRepairStageResult:
     llm_result: LlmStageResult
     warnings: list[str] = field(default_factory=list)
     repair_attempts: int = 0
+    analyze_repair_exhausted: bool = False
+    remaining_analyze_errors: tuple[str, ...] = field(default_factory=tuple)

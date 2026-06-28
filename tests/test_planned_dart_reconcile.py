@@ -497,6 +497,32 @@ class SignUpLayout extends StatelessWidget {
     assert "const GroupWidget()" in layout
 
 
+def test_reconcile_cluster_variant_args_strips_chip_label_args_from_layout() -> None:
+    planned = {
+        "lib/widgets/input_field_widget.dart": """
+class InputFieldWidget extends StatelessWidget {
+  const InputFieldWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/generated/sign_up_version_5_layout.dart": """
+class SignUpVersion5Layout extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return InputFieldWidget(label: 'Lois', isSelected: false);
+  }
+}
+""",
+    }
+    updated = reconcile_cluster_variant_args(planned)
+    layout = updated["lib/generated/sign_up_version_5_layout.dart"]
+    assert "label:" not in layout
+    assert "isSelected" not in layout
+    assert "InputFieldWidget(" in layout
+    assert "Lois" not in layout
+
+
 def test_sync_widget_class_constructors_fixes_mismatched_const_name() -> None:
     source = """
 class GroupWidget extends StatelessWidget {

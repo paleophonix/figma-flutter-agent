@@ -207,6 +207,8 @@ def horizontal_scroll_item_carrier(stack: CleanDesignTreeNode) -> CleanDesignTre
     if stack.scroll_axis != "horizontal":
         return None
     host_w = stack.sizing.width
+    if (host_w is None or float(host_w) <= 0) and stack.stack_placement is not None:
+        host_w = stack.stack_placement.width
     if host_w is None or float(host_w) <= 0:
         return None
     host_w = float(host_w)

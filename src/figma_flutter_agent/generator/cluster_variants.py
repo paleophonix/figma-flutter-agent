@@ -51,6 +51,59 @@ def component_id_for_node(node: CleanDesignTreeNode) -> str | None:
     return None
 
 
+def _component_cluster_base_id(cluster_id: str) -> str | None:
+    """Return ``component_<file>_<node>`` prefix for fingerprinted component cluster ids."""
+    if not cluster_id.startswith("component_"):
+        return None
+    parts = cluster_id.split("_")
+    if len(parts) < 3:
+        return None
+    return "_".join(parts[:3])
+
+
+def _expand_skip_cluster_ids(
+    skip_cluster_id: str | None,
+    cluster_classes: dict[str, str],
+) -> set[str]:
+    """Block every cluster alias for the same published component family as ``skip_cluster_id``."""
+    if skip_cluster_id is None:
+        return set()
+    blocked = {skip_cluster_id}
+    base = _component_cluster_base_id(skip_cluster_id)
+    if base is None:
+        return blocked
+    blocked.add(base)
+    prefix = f"{base}_"
+    blocked.update(
+        cluster_id
+        for cluster_id in cluster_classes
+        if cluster_id == base or cluster_id.startswith(prefix)
+    )
+    return blocked
+
+
+def _cluster_delegate_lookup_keys(node: CleanDesignTreeNode) -> list[str]:
+    """Return cluster map keys in preferred lookup order for delegate resolution."""
+    keys: list[str] = []
+    if node.cluster_id:
+        keys.append(node.cluster_id)
+    component_id = component_id_for_node(node)
+    if component_id:
+        from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
+        from figma_flutter_agent.parser.dedup.signatures import descendant_text_fingerprint
+
+        fingerprinted = component_cluster_id(
+            component_id,
+            text_fingerprint=descendant_text_fingerprint(node),
+        )
+        if fingerprinted not in keys:
+            keys.append(fingerprinted)
+        base = component_cluster_id(component_id)
+        if fingerprinted == base and base not in keys:
+            keys.append(base)
+    return keys
+
+
 def resolve_cluster_delegate_class(
     node: CleanDesignTreeNode,
     cluster_classes: dict[str, str] | None,
@@ -60,24 +113,17 @@ def resolve_cluster_delegate_class(
     """Resolve a cluster widget class for structural or component-family clusters."""
     if not cluster_classes:
         return None
-    skip_class_name = (
-        cluster_classes.get(skip_cluster_id) if skip_cluster_id is not None else None
-    )
-    keys: list[str] = []
-    if node.cluster_id:
-        keys.append(node.cluster_id)
-    component_id = component_id_for_node(node)
-    if component_id:
-        from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
-
-        keys.append(component_cluster_id(component_id))
-    for key in keys:
-        if key == skip_cluster_id:
+    blocked_cluster_ids = _expand_skip_cluster_ids(skip_cluster_id, cluster_classes)
+    blocked_class_names = {
+        cluster_classes[cluster_id]
+        for cluster_id in blocked_cluster_ids
+        if cluster_id in cluster_classes
+    }
+    for key in _cluster_delegate_lookup_keys(node):
+        if key in blocked_cluster_ids:
             continue
         class_name = cluster_classes.get(key)
-        if class_name:
-            if skip_class_name is not None and class_name == skip_class_name:
-                continue
+        if class_name and class_name not in blocked_class_names:
             return class_name
     return None
 
@@ -223,8 +269,11 @@ def cluster_uses_chip_variant_labels(
     trees: list[CleanDesignTreeNode],
     cluster_id: str,
 ) -> bool:
-    """Return True when any cluster member carries a ``Text#`` variant label."""
-    from figma_flutter_agent.parser.interaction.chip_variant import chip_component_label
+    """Return True when any tag chip row in the cluster carries a ``Text#`` label axis."""
+    from figma_flutter_agent.parser.interaction.chip_variant import (
+        chip_component_label,
+        is_tag_component_chip_row,
+    )
 
     found = False
 
@@ -232,7 +281,11 @@ def cluster_uses_chip_variant_labels(
         nonlocal found
         if found:
             return
-        if node.cluster_id == cluster_id and chip_component_label(node):
+        if (
+            node.cluster_id == cluster_id
+            and is_tag_component_chip_row(node)
+            and chip_component_label(node)
+        ):
             found = True
             return
         for child in node.children:
@@ -250,9 +303,10 @@ def cluster_chip_reference_args(node: CleanDesignTreeNode) -> str | None:
         chip_component_display_label,
         chip_component_label,
         chip_component_selected,
+        is_tag_component_chip_row,
     )
 
-    if not chip_component_label(node):
+    if not is_tag_component_chip_row(node) or not chip_component_label(node):
         return None
     label = chip_component_display_label(node)
     if not label:

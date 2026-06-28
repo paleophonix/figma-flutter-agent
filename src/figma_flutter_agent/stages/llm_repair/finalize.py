@@ -101,6 +101,8 @@ def finalize_repair_loop(
             f"({result.repair_attempts}/{max_attempts} attempts); "
             "rolled back to pre-repair baseline."
         )
+        result.analyze_repair_exhausted = True
+        result.remaining_analyze_errors = tuple(final_outcome.errors)
         remaining = "; ".join(final_outcome.errors[:3])
         log.warning(
             "Analyze repair exhausted after {} attempt(s); {} error(s) remain — {}",

@@ -170,7 +170,7 @@ from .widget_prune import (
     strip_inline_widget_duplicates_from_screens,
 )
 
-_CLUSTER_VARIANT_PARAMS = ("isForward",)
+_CLUSTER_VARIANT_PARAMS = ("isForward", "label", "isSelected")
 _PROACTIVE_LAYOUT_DELEGATE_SCREEN_BYTES = 8_192
 
 

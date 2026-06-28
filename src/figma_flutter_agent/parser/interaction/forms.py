@@ -679,4 +679,13 @@ def must_inline_extracted_widget_host(node: CleanDesignTreeNode) -> bool:
 
     if stack_interaction_kind(node) == "input":
         return True
-    return layout_fact_password_field_stack(node)
+    if layout_fact_password_field_stack(node):
+        return True
+    from figma_flutter_agent.parser.interaction.inline_input_hosts import (
+        layout_fact_inline_labeled_input_field_host,
+        layout_fact_phone_composite_field_host,
+    )
+
+    return layout_fact_inline_labeled_input_field_host(
+        node
+    ) or layout_fact_phone_composite_field_host(node)

@@ -20,6 +20,12 @@ _EXTRACTED_WIDGET_DRIFT_MARKERS = (
     "undefined_method",
 )
 
+_WIDGET_SIGNATURE_MISMATCH_MARKERS = (
+    "undefined_named_parameter",
+    "label",
+    "isselected",
+)
+
 
 @dataclass(frozen=True)
 class _GenerationSnapshot:
@@ -97,6 +103,26 @@ def _repair_generation_unchanged(
 def _errors_suggest_extracted_widget_drift(errors: tuple[str, ...]) -> bool:
     joined = " ".join(errors).lower()
     return any(marker in joined for marker in _EXTRACTED_WIDGET_DRIFT_MARKERS) and "_" in joined
+
+
+def _errors_suggest_widget_constructor_signature_mismatch(errors: tuple[str, ...]) -> bool:
+    joined = " ".join(errors).lower()
+    return all(marker in joined for marker in _WIDGET_SIGNATURE_MISMATCH_MARKERS[:1]) and any(
+        marker in joined for marker in _WIDGET_SIGNATURE_MISMATCH_MARKERS[1:]
+    )
+
+
+def _apply_widget_constructor_signature_reconcile(result: Any) -> bool:
+    """Strip layout call-site named args that widget declarations do not expose."""
+    from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
+        reconcile_cluster_variant_args,
+    )
+
+    updated = reconcile_cluster_variant_args(result.planned_files)
+    if updated == result.planned_files:
+        return False
+    result.planned_files = updated
+    return True
 
 
 def _apply_extracted_widget_reference_fixup(

@@ -204,6 +204,97 @@ def test_cluster_chip_reference_args_emits_with_text_variant_axis() -> None:
     assert "isSelected: true" in result
 
 
+def _input_field_component(
+    node_id: str,
+    *,
+    placeholder: str = "Lois",
+    cluster_id: str = "component_input_field",
+) -> CleanDesignTreeNode:
+    """Figma Input Field component with ``Text#`` placeholder axis (not a tag chip)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="Input Field",
+        type=NodeType.COLUMN,
+        cluster_id=cluster_id,
+        sizing=Sizing(width=155.5, height=69.0),
+        variant=ComponentVariant(
+            component_id="3:6008",
+            component_name="Input Field",
+            variant_properties={
+                "Text#664:10": placeholder,
+                "Label#664:14": "First Name",
+            },
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{node_id}:title",
+                name="Title",
+                type=NodeType.ROW,
+                sizing=Sizing(width=59.0, height=21.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id=f"{node_id}:label",
+                        name="Email",
+                        type=NodeType.TEXT,
+                        text="First Name",
+                        style=NodeStyle(font_size=12.0),
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id=f"{node_id}:surface",
+                name="Input Area",
+                type=NodeType.ROW,
+                sizing=Sizing(width=155.5, height=46.0),
+                style=NodeStyle(
+                    background_color="0xFFFFFFFF",
+                    border_color="0xFFEDF1F3",
+                    border_width=1.0,
+                    border_radius=10.0,
+                ),
+                children=[
+                    CleanDesignTreeNode(
+                        id=f"{node_id}:value",
+                        name="Value",
+                        type=NodeType.TEXT,
+                        text=placeholder,
+                        style=NodeStyle(font_size=14.0),
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def test_cluster_chip_reference_args_none_for_input_field_text_axis() -> None:
+    """ChipVariantAxisScopeLaw: Input Field placeholder axis is not chip label args."""
+    node = _input_field_component("42:3661")
+    assert cluster_chip_reference_args(node) is None
+
+
+def test_cluster_uses_chip_variant_labels_false_for_input_field_cluster() -> None:
+    node = _input_field_component("42:3661")
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[node],
+    )
+    assert not cluster_uses_chip_variant_labels([screen], node.cluster_id or "")
+
+
+def test_input_field_cluster_delegate_emit_has_no_chip_ctor_args() -> None:
+    node = _input_field_component("42:3661")
+    body = render_node_body(
+        node,
+        uses_svg=False,
+        cluster_classes={node.cluster_id or "": "InputFieldWidget"},
+    )
+    assert "InputFieldWidget(label:" not in body
+    assert "isSelected" not in body
+    assert "TextFormField" in body
+
+
 def test_cluster_chip_reference_args_aligns_with_widget_parameterization() -> None:
     """Call-site args must match cluster_uses_chip_variant_labels parameterization scope."""
     node_no_axis = _tag_chip_without_variant_axis("1", text_content="hello")

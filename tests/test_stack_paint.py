@@ -230,6 +230,45 @@ def test_sort_puts_full_bleed_vector_stack_backdrop_first() -> None:
     assert [child.id for child in ordered] == ["star", "sheet"]
 
 
+def test_docked_full_width_footer_row_paints_above_scroll_content() -> None:
+    from figma_flutter_agent.parser.stack_paint import (
+        _is_bottom_nav_interactive,
+        sort_absolute_stack_children,
+    )
+
+    scroll = CleanDesignTreeNode(
+        id="scroll",
+        name="Scroll",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=1448.0),
+        stack_placement=StackPlacement(top=120.0, width=390.0, height=1448.0),
+    )
+    tabs = [
+        CleanDesignTreeNode(
+            id=f"tab-{index}",
+            name="Icon button",
+            type=NodeType.BUTTON,
+            sizing=Sizing(width=40.0, height=40.0),
+        )
+        for index in range(5)
+    ]
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Footer",
+        type=NodeType.ROW,
+        sizing=Sizing(width=390.0, height=106.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=738.0, width=390.0, height=106.0),
+        children=tabs,
+    )
+    assert _is_bottom_nav_interactive(
+        footer,
+        viewport_width=390.0,
+        viewport_height=844.0,
+    )
+    ordered = sort_absolute_stack_children([footer, scroll], is_layout_root=True)
+    assert ordered[-1].id == "footer"
+
+
 def test_viewport_chrome_paints_above_content_sheet() -> None:
     """Home indicator and status chrome must paint above growable content cards."""
     content_sheet = CleanDesignTreeNode(

@@ -42,6 +42,16 @@ def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | No
     height_lit = format_geometry_literal(float(height))
     asset = escape_dart_string(asset_key)
     image = f"Image.asset('{asset}', width: {width_lit}, height: {height_lit}, fit: BoxFit.cover)"
+    border_radius = node.style.border_radius
+    if border_radius is not None and float(border_radius) > 0:
+        max_radius = min(float(width), float(height)) / 2.0
+        if float(border_radius) < max_radius - 0.5:
+            radius_lit = format_geometry_literal(float(border_radius))
+            clip = (
+                f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), "
+                f"child: SizedBox(width: {width_lit}, height: {height_lit}, child: {image}))"
+            )
+            return clip
     if abs(float(width) - float(height)) <= 2.0:
         clip = (
             f"ClipOval(child: SizedBox(width: {width_lit}, height: {height_lit}, child: {image}))"

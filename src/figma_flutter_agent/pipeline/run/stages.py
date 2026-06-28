@@ -872,6 +872,7 @@ async def run_validate_repair_refine_phase(
         repair_outcome = await run_analyze_repair_loop_fn(post_gen_request)
     planned_files = repair_outcome.planned_files
     ctx.warnings.extend(repair_outcome.warnings)
+    ctx.analyze_repair_exhausted = repair_outcome.analyze_repair_exhausted
 
     with log_stage(log, "llm_visual_refine"):
         visual_outcome = await run_visual_refine_loop(

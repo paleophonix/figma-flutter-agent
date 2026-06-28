@@ -42,7 +42,9 @@ from figma_flutter_agent.stages.llm_repair.models import (
 from figma_flutter_agent.stages.llm_repair.replan import replan_planned_files
 from figma_flutter_agent.stages.llm_repair.snapshot import (
     _apply_extracted_widget_reference_fixup,
+    _apply_widget_constructor_signature_reconcile,
     _errors_suggest_extracted_widget_drift,
+    _errors_suggest_widget_constructor_signature_mismatch,
     _GenerationSnapshot,
     _repair_generation_unchanged,
     _snapshot_generation,
@@ -249,6 +251,15 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 max_attempts,
                 analyze_outcome.detail,
             )
+        if _errors_suggest_widget_constructor_signature_mismatch(analyze_outcome.errors):
+            if _apply_widget_constructor_signature_reconcile(result):
+                log.info(
+                    "Applied deterministic widget constructor signature reconcile "
+                    "(attempt {}/{})",
+                    attempt,
+                    max_attempts,
+                )
+                continue
         syntax_error_history.append(_syntax_error_count(analyze_outcome))
         if (
             result.repair_attempts >= syntax_stall_limit
@@ -359,6 +370,20 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                     "CPI pattern interrupt"
                 )
                 break
+            elif _errors_suggest_widget_constructor_signature_mismatch(
+                analyze_outcome.errors
+            ):
+                log.warning(
+                    "Analyze repair: widget constructor signature mismatch unchanged on "
+                    "attempt {}/{}; stopping before further LLM repair",
+                    attempt,
+                    max_attempts,
+                )
+                result.warnings.append(
+                    "Analyze repair stopped: widget constructor signature mismatch is "
+                    "deterministic and not LLM-repairable"
+                )
+                break
             elif _errors_suggest_extracted_widget_drift(analyze_outcome.errors):
                 generation = result.llm_result.generation
                 if generation is not None and generation.extracted_widgets:
@@ -410,6 +435,19 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 analyze_outcome = style_check
 
         if result.llm_result.generation is None:
+            break
+
+        if _errors_suggest_widget_constructor_signature_mismatch(analyze_outcome.errors):
+            log.warning(
+                "Analyze repair: refusing LLM repair for widget constructor signature "
+                "mismatch (attempt {}/{})",
+                attempt,
+                max_attempts,
+            )
+            result.warnings.append(
+                "Analyze repair skipped LLM: widget constructor signature mismatch "
+                "requires deterministic emitter/reconcile fix"
+            )
             break
 
         if _errors_suggest_extracted_widget_drift(analyze_outcome.errors):

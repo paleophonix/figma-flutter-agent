@@ -209,6 +209,20 @@ def _component_id_for_node(node: CleanDesignTreeNode) -> str | None:
     return component_id_for_node(node)
 
 
+def _component_family_already_extracted(
+    component_id: str,
+    existing_cluster_ids: set[str],
+) -> bool:
+    """Return True when a fingerprinted or base component cluster is already extracted."""
+    from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
+
+    base = component_cluster_id(component_id)
+    if base in existing_cluster_ids:
+        return True
+    prefix = f"{base}_"
+    return any(cluster_id.startswith(prefix) for cluster_id in existing_cluster_ids)
+
+
 def _collect_component_family_widget_specs(
     root: CleanDesignTreeNode,
     *,
@@ -236,7 +250,7 @@ def _collect_component_family_widget_specs(
         if len(nodes) < min_count:
             continue
         base_cluster_id = component_cluster_id(component_id)
-        if base_cluster_id in existing_cluster_ids:
+        if _component_family_already_extracted(component_id, existing_cluster_ids):
             continue
         from figma_flutter_agent.parser.interaction import (
             layout_fact_hosts_compact_checkbox_control,

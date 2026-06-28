@@ -100,6 +100,35 @@ def test_fill_height_scroll_in_column_uses_expanded() -> None:
     assert "Expanded(child: RepaintBoundary(child: ListView(" in layout
 
 
+def test_horizontal_scroll_stack_with_overflow_row_renders_list_view() -> None:
+    cards = [
+        CleanDesignTreeNode(id=f"c{i}", name="Card", type=NodeType.TEXT, text=f"C{i}")
+        for i in range(3)
+    ]
+    row = CleanDesignTreeNode(
+        id="row",
+        name="scroll_frame",
+        type=NodeType.ROW,
+        sizing=Sizing(width=1024.0, height=296.0),
+        children=cards,
+    )
+    stack = CleanDesignTreeNode(
+        id="slider",
+        name="Content row slider",
+        type=NodeType.STACK,
+        scroll_axis="horizontal",
+        sizing=Sizing(width=390.0, height=296.0),
+        children=[row],
+    )
+
+    layout = render_layout_file(stack, feature_name="slider", uses_svg=False)[
+        "lib/generated/slider_layout.dart"
+    ]
+
+    assert "ListView(scrollDirection: Axis.horizontal" in layout
+    assert "OverflowBox(" not in layout
+
+
 def test_both_axis_scroll_renders_nested_single_child_scroll_view() -> None:
     scroll_child = CleanDesignTreeNode(
         id="2",

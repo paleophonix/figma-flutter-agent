@@ -180,111 +180,6 @@
           }
         },
         {
-          "figmaId": "3212:20180",
-          "kind": "control_segmented",
-          "children": [
-            {
-              "figmaId": "I3212:20180;0:580",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "I3212:20180;0:580;8:43285",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "I3212:20180;0:580;8:43285;3073:10643",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "figmaId": "I3212:20180;0:578",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "I3212:20180;0:578;8:43285",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "I3212:20180;0:578;8:43285;3073:9564",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "figmaId": "I3212:20180;0:576",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "I3212:20180;0:576;8:43285",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "I3212:20180;0:576;8:43285;3073:10622",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "figmaId": "I3212:20180;14:11937",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "I3212:20180;14:11937;8:43285",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "I3212:20180;14:11937;8:43285;3073:9901",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "figmaId": "I3212:20180;0:577",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "I3212:20180;0:577;8:43285",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "I3212:20180;0:577;8:43285;3073:10283",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "ref": {
-            "widgetName": "FooterWidget",
-            "namedArgs": {}
-          },
-          "payload": {
-            "payloadKind": "control_segmented"
-          },
-          "classificationHint": {
-            "suggestedKind": "nav_bottom_bar",
-            "confidence": 0.74,
-            "rationale": "Fixed bottom footer with five icon buttons functioning as destination navigation."
-          },
-          "fidelityTier": "native_unverified",
-          "tierSource": "policy_fallback"
-        },
-        {
           "figmaId": "3212:20183",
           "kind": "stack",
           "children": [
@@ -727,6 +622,111 @@
             "suggestedKind": "nav_scroll_host",
             "confidence": 0.78,
             "rationale": "Primary long content region intended to scroll vertically."
+          },
+          "fidelityTier": "native_unverified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "3212:20180",
+          "kind": "control_segmented",
+          "children": [
+            {
+              "figmaId": "I3212:20180;0:580",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20180;0:580;8:43285",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20180;0:580;8:43285;3073:10643",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "I3212:20180;0:578",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20180;0:578;8:43285",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20180;0:578;8:43285;3073:9564",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "I3212:20180;0:576",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20180;0:576;8:43285",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20180;0:576;8:43285;3073:10622",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "I3212:20180;14:11937",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20180;14:11937;8:43285",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20180;14:11937;8:43285;3073:9901",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "I3212:20180;0:577",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20180;0:577;8:43285",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20180;0:577;8:43285;3073:10283",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ref": {
+            "widgetName": "FooterWidget",
+            "namedArgs": {}
+          },
+          "payload": {
+            "payloadKind": "control_segmented"
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_bottom_bar",
+            "confidence": 0.74,
+            "rationale": "Fixed bottom footer with five icon buttons functioning as destination navigation."
           },
           "fidelityTier": "native_unverified",
           "tierSource": "policy_fallback"
