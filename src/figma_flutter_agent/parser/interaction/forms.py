@@ -620,8 +620,10 @@ def interaction_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode |
     surface = primary_surface_node(node)
     if surface is not None:
         return surface
-    if node.type not in {NodeType.BUTTON, NodeType.INPUT, NodeType.STACK}:
+    if node.type not in {NodeType.BUTTON, NodeType.INPUT, NodeType.STACK, NodeType.ROW, NodeType.COLUMN}:
         return None
+    if node.style.gradient is not None and node.sizing.width and node.sizing.height:
+        return node
     if not (node.style.background_color or node.style.border_color):
         return None
     if not node.sizing.width or not node.sizing.height:

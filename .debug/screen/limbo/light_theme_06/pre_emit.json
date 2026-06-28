@@ -260,7 +260,45 @@
                     {
                       "figmaId": "I3212:20170;348:766",
                       "kind": "container_card",
-                      "children": [],
+                      "children": [
+                        {
+                          "figmaId": "I3212:20170;348:766;2248:23869",
+                          "kind": "stack",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:766;2248:23869;2248:17249",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I3212:20170;348:766;1920:5901",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:766;348:19",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            },
+                            {
+                              "figmaId": "I3212:20170;348:766;348:20",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            }
+                          ],
+                          "layoutHints": {
+                            "minHeight": 100.0,
+                            "heightFit": "min"
+                          }
+                        }
+                      ],
                       "payload": {
                         "payloadKind": "container_card"
                       },
@@ -275,7 +313,45 @@
                     {
                       "figmaId": "I3212:20170;348:828",
                       "kind": "container_card",
-                      "children": [],
+                      "children": [
+                        {
+                          "figmaId": "I3212:20170;348:828;2248:23869",
+                          "kind": "stack",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:828;2248:23869;2248:17249",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I3212:20170;348:828;1920:5901",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:828;348:19",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            },
+                            {
+                              "figmaId": "I3212:20170;348:828;348:20",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            }
+                          ],
+                          "layoutHints": {
+                            "minHeight": 100.0,
+                            "heightFit": "min"
+                          }
+                        }
+                      ],
                       "payload": {
                         "payloadKind": "container_card"
                       },
@@ -290,7 +366,45 @@
                     {
                       "figmaId": "I3212:20170;348:914",
                       "kind": "container_card",
-                      "children": [],
+                      "children": [
+                        {
+                          "figmaId": "I3212:20170;348:914;2248:23869",
+                          "kind": "stack",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:914;2248:23869;2248:17249",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I3212:20170;348:914;1920:5901",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:914;348:19",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            },
+                            {
+                              "figmaId": "I3212:20170;348:914;348:20",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            }
+                          ],
+                          "layoutHints": {
+                            "minHeight": 100.0,
+                            "heightFit": "min"
+                          }
+                        }
+                      ],
                       "payload": {
                         "payloadKind": "container_card"
                       },
@@ -305,7 +419,45 @@
                     {
                       "figmaId": "I3212:20170;348:1024",
                       "kind": "container_card",
-                      "children": [],
+                      "children": [
+                        {
+                          "figmaId": "I3212:20170;348:1024;2248:23869",
+                          "kind": "stack",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:1024;2248:23869;2248:17249",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I3212:20170;348:1024;1920:5901",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:1024;348:19",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            },
+                            {
+                              "figmaId": "I3212:20170;348:1024;348:20",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            }
+                          ],
+                          "layoutHints": {
+                            "minHeight": 100.0,
+                            "heightFit": "min"
+                          }
+                        }
+                      ],
                       "payload": {
                         "payloadKind": "container_card"
                       },
@@ -320,7 +472,45 @@
                     {
                       "figmaId": "I3212:20170;348:1158",
                       "kind": "container_card",
-                      "children": [],
+                      "children": [
+                        {
+                          "figmaId": "I3212:20170;348:1158;2248:23869",
+                          "kind": "stack",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:1158;2248:23869;2248:17249",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I3212:20170;348:1158;1920:5901",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20170;348:1158;348:19",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            },
+                            {
+                              "figmaId": "I3212:20170;348:1158;348:20",
+                              "kind": "auto",
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
+                            }
+                          ],
+                          "layoutHints": {
+                            "minHeight": 100.0,
+                            "heightFit": "min"
+                          }
+                        }
+                      ],
                       "payload": {
                         "payloadKind": "container_card"
                       },
@@ -933,7 +1123,12 @@
       "I3212:20180;14:11937": "default",
       "I3212:20180;14:11937;8:43285": "default",
       "I3212:20180;0:577": "default",
-      "I3212:20180;0:577;8:43285": "default"
+      "I3212:20180;0:577;8:43285": "default",
+      "I3212:20170;348:766;2248:23869": "default",
+      "I3212:20170;348:828;2248:23869": "default",
+      "I3212:20170;348:914;2248:23869": "default",
+      "I3212:20170;348:1024;2248:23869": "default",
+      "I3212:20170;348:1158;2248:23869": "default"
     },
     "adaptiveRules": [],
     "semanticSummary": {

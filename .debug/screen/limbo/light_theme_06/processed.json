@@ -2004,7 +2004,6 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
-                    "vectorAssetKey": "assets/images/image_I3212_20170;348_766;2248_23869;2248_17249.png",
                     "componentRef": "348:22",
                     "clusterId": "component_348_22_190374ce",
                     "variant": {
@@ -2016,13 +2015,6 @@
                       },
                       "state": "default"
                     },
-                    "flattenFigmaNodeIds": [
-                      "I3212:20170;348:766;2248:23869",
-                      "I3212:20170;348:766;2248:23869;2248:17249",
-                      "I3212:20170;348:766;1920:5901",
-                      "I3212:20170;348:766;348:19",
-                      "I3212:20170;348:766;348:20"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 176.0
@@ -2081,7 +2073,6 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
-                    "vectorAssetKey": "assets/images/image_I3212_20170;348_828;2248_23869;2248_17249.png",
                     "componentRef": "348:22",
                     "clusterId": "component_348_22_190374ce",
                     "variant": {
@@ -2093,13 +2084,6 @@
                       },
                       "state": "default"
                     },
-                    "flattenFigmaNodeIds": [
-                      "I3212:20170;348:828;2248:23869",
-                      "I3212:20170;348:828;2248:23869;2248:17249",
-                      "I3212:20170;348:828;1920:5901",
-                      "I3212:20170;348:828;348:19",
-                      "I3212:20170;348:828;348:20"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 344.0
@@ -2158,7 +2142,6 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
-                    "vectorAssetKey": "assets/images/image_I3212_20170;348_914;2248_23869;2248_17249.png",
                     "componentRef": "348:22",
                     "clusterId": "component_348_22_190374ce",
                     "variant": {
@@ -2170,13 +2153,6 @@
                       },
                       "state": "default"
                     },
-                    "flattenFigmaNodeIds": [
-                      "I3212:20170;348:914;2248:23869",
-                      "I3212:20170;348:914;2248:23869;2248:17249",
-                      "I3212:20170;348:914;1920:5901",
-                      "I3212:20170;348:914;348:19",
-                      "I3212:20170;348:914;348:20"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 512.0
@@ -2235,7 +2211,6 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
-                    "vectorAssetKey": "assets/images/image_I3212_20170;348_1024;2248_23869;2248_17249.png",
                     "componentRef": "348:22",
                     "clusterId": "component_348_22_190374ce",
                     "variant": {
@@ -2247,13 +2222,6 @@
                       },
                       "state": "default"
                     },
-                    "flattenFigmaNodeIds": [
-                      "I3212:20170;348:1024;2248:23869",
-                      "I3212:20170;348:1024;2248:23869;2248:17249",
-                      "I3212:20170;348:1024;1920:5901",
-                      "I3212:20170;348:1024;348:19",
-                      "I3212:20170;348:1024;348:20"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 680.0
@@ -2312,7 +2280,6 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
-                    "vectorAssetKey": "assets/images/image_I3212_20170;348_1158;2248_23869;2248_17249.png",
                     "componentRef": "348:22",
                     "clusterId": "component_348_22_190374ce",
                     "variant": {
@@ -2324,13 +2291,6 @@
                       },
                       "state": "default"
                     },
-                    "flattenFigmaNodeIds": [
-                      "I3212:20170;348:1158;2248:23869",
-                      "I3212:20170;348:1158;2248:23869;2248:17249",
-                      "I3212:20170;348:1158;1920:5901",
-                      "I3212:20170;348:1158;348:19",
-                      "I3212:20170;348:1158;348:20"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 848.0

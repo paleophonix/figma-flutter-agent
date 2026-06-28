@@ -96,6 +96,37 @@ def layout_fact_actionable_accent_text_node(node: CleanDesignTreeNode) -> bool:
     return red > green + 40 and red > blue + 40
 
 
+def _primary_cta_painted_shell_height_ok(height: float | None) -> bool:
+    if height is None:
+        return False
+    return 40.0 <= float(height) <= 64.0
+
+
+def _primary_cta_painted_shell_style(node: CleanDesignTreeNode) -> bool:
+    if node.style.gradient is not None:
+        return True
+    channels = _argb_rgb_channels(node.style.background_color)
+    if channels is None:
+        return False
+    red, green, blue = channels
+    return blue >= 120 and red <= 140 and green <= 160
+
+
+def layout_fact_primary_cta_painted_row_shell(node: CleanDesignTreeNode) -> bool:
+    """Return True when a painted ROW is a primary CTA host (full-surface tap target)."""
+    if node.type != NodeType.ROW:
+        return False
+    if not _primary_cta_painted_shell_height_ok(node.sizing.height):
+        return False
+    if not _primary_cta_painted_shell_style(node):
+        return False
+    text_children = [child for child in node.children if child.type == NodeType.TEXT]
+    if len(text_children) != 1:
+        return False
+    label = (text_children[0].text or "").strip()
+    return bool(label) and len(label) <= 32
+
+
 def layout_fact_primary_cta_label_in_painted_shell(
     node: CleanDesignTreeNode,
     parent_node: CleanDesignTreeNode | None,
@@ -105,19 +136,14 @@ def layout_fact_primary_cta_label_in_painted_shell(
         return False
     if parent_node.type not in {NodeType.ROW, NodeType.COLUMN, NodeType.CONTAINER}:
         return False
+    if layout_fact_primary_cta_painted_row_shell(parent_node):
+        return False
     label = (node.text or "").strip()
     if not label or len(label) > 32:
         return False
-    height = parent_node.sizing.height
-    if height is None or not (40.0 <= float(height) <= 64.0):
+    if not _primary_cta_painted_shell_height_ok(parent_node.sizing.height):
         return False
-    if parent_node.style.gradient is not None:
-        return True
-    channels = _argb_rgb_channels(parent_node.style.background_color)
-    if channels is None:
-        return False
-    red, green, blue = channels
-    return blue >= 120 and red <= 140 and green <= 160
+    return _primary_cta_painted_shell_style(parent_node)
 
 
 def subtree_has_actionable_accent_text(node: CleanDesignTreeNode, *, max_depth: int = 12) -> bool:

@@ -185,6 +185,96 @@
     {
       "checkpoint": "CP2_ir_passes",
       "transform": "unpin",
+      "nodeId": "I3212:20170;348:766;1920:5901",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:766;1920:5901",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 100.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:828;1920:5901",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:828;1920:5901",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 100.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:914;1920:5901",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:914;1920:5901",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 100.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:1024;1920:5901",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:1024;1920:5901",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 100.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:1158;1920:5901",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I3212:20170;348:1158;1920:5901",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 100.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
       "nodeId": "I3212:20171;2921:13754",
       "field": "sizing.height_mode",
       "old": "FIXED",
@@ -719,8 +809,11 @@
       "confidence": 0.86,
       "evidence": {
         "container_card": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "STACK": 1,
+          "COLUMN": 1
+        },
+        "child_count": 2,
         "container_surface": "card",
         "component_id": "348:22",
         "variant.state": "default"
@@ -732,8 +825,11 @@
       "confidence": 0.86,
       "evidence": {
         "container_card": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "STACK": 1,
+          "COLUMN": 1
+        },
+        "child_count": 2,
         "container_surface": "card",
         "component_id": "348:22",
         "variant.state": "default"
@@ -745,8 +841,11 @@
       "confidence": 0.86,
       "evidence": {
         "container_card": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "STACK": 1,
+          "COLUMN": 1
+        },
+        "child_count": 2,
         "container_surface": "card",
         "component_id": "348:22",
         "variant.state": "default"
@@ -758,8 +857,11 @@
       "confidence": 0.86,
       "evidence": {
         "container_card": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "STACK": 1,
+          "COLUMN": 1
+        },
+        "child_count": 2,
         "container_surface": "card",
         "component_id": "348:22",
         "variant.state": "default"
@@ -771,8 +873,11 @@
       "confidence": 0.86,
       "evidence": {
         "container_card": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "STACK": 1,
+          "COLUMN": 1
+        },
+        "child_count": 2,
         "container_surface": "card",
         "component_id": "348:22",
         "variant.state": "default"

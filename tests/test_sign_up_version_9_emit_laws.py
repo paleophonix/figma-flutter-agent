@@ -196,7 +196,10 @@ def test_sign_up_heading_emits_gradient_shader_not_theme_primary() -> None:
     assert "0xFF4983F6" in heading
     assert "Colors.white" in heading
     assert "AppColors.primary" not in heading
-    """Law: primary_cta_must_wire_interaction_not_empty_gesture."""
+
+
+def test_sign_up_primary_cta_inkwell_covers_full_row_surface() -> None:
+    """Law: primary_cta_surface_must_be_the_click_target_not_only_label."""
     processed = json.loads(
         Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
     )
@@ -205,4 +208,12 @@ def test_sign_up_heading_emits_gradient_shader_not_theme_primary() -> None:
         "lib/generated/sign_up_version_9_cta_layout.dart"
     ]
     assert "custom-code" in layout
+    register_idx = layout.index("Text('Register'")
+    assert register_idx >= 0
+    register_chunk = layout[max(0, register_idx - 1400) : register_idx + 200]
+    assert "InkWell(" in register_chunk
+    assert "figma-49_1685:button-action" in register_chunk
+    label_prefix = layout[max(0, register_idx - 500) : register_idx]
+    assert "GestureDetector(" not in label_prefix
+    assert "3_6045:button-action" not in label_prefix
     assert "onTap: () {}" not in layout.split("Register")[1][:400]

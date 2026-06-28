@@ -81,7 +81,40 @@ def render_row(
     from figma_flutter_agent.generator.layout.navigation.items import (
         row_hosts_compact_nav_tabs,
     )
+    from figma_flutter_agent.generator.layout.widgets.button import _wrap_button_stack
+    from figma_flutter_agent.parser.interaction.text_actions import (
+        layout_fact_primary_cta_painted_row_shell,
+    )
 
+    if layout_fact_primary_cta_painted_row_shell(node) and child_widgets:
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            resolve_row_emit_spacing_body,
+            row_equal_metric_cards_cross_axis,
+        )
+
+        spacing_field, body, _needs_fitted = resolve_row_emit_spacing_body(
+            node,
+            child_widgets,
+            parent_node=parent_node,
+        )
+        row_cross = row_equal_metric_cards_cross_axis(node, cross_axis=cross_axis)
+        row_inner = (
+            f"Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {row_cross}, "
+            f"{spacing_field}children: [{body}])"
+        )
+        widget = _wrap_button_stack(
+            row_inner,
+            node,
+            theme_variant=theme_variant,
+            tap_role="button-action",
+        )
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
     checkbox_label_row = _try_render_checkbox_label_row(
         node,
         theme_variant=theme_variant,

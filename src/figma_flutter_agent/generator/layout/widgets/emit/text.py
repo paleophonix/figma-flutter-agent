@@ -368,14 +368,22 @@ def render_text_node(
         _argb_rgb_channels,
         layout_fact_actionable_accent_text_node,
         layout_fact_primary_cta_label_in_painted_shell,
+        layout_fact_primary_cta_painted_row_shell,
         layout_fact_static_screen_heading_text,
     )
 
+    parent_is_primary_cta_row = (
+        parent_node is not None and layout_fact_primary_cta_painted_row_shell(parent_node)
+    )
     if layout_fact_primary_cta_label_in_painted_shell(node, parent_node):
         widget = _wrap_primary_cta_text(widget, node_id=node.id)
     elif layout_fact_static_screen_heading_text(node, parent_node):
         pass
-    elif parent_type != NodeType.BUTTON and is_link_text(node.text):
+    elif (
+        not parent_is_primary_cta_row
+        and parent_type != NodeType.BUTTON
+        and is_link_text(node.text)
+    ):
         channels = _argb_rgb_channels(node.style.text_color)
         if channels is not None and min(channels) >= 240:
             widget = _wrap_primary_cta_text(widget, node_id=node.id)

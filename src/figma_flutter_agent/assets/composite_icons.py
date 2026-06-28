@@ -52,11 +52,7 @@ def is_figma_composite_icon_node(node: dict[str, Any]) -> bool:
     node_type = node.get("type")
     if node_type not in {"FRAME", "GROUP", "COMPONENT", "INSTANCE"}:
         return False
-    children = [
-        child for child in (node.get("children") or []) if child.get("visible") is not False
-    ]
-    vector_children = [child for child in children if child.get("type") in _FIGMA_VECTOR_TYPES]
-    if len(vector_children) < _MIN_COMPOSITE_ICON_VECTORS:
+    if _count_figma_vectors(node) < _MIN_COMPOSITE_ICON_VECTORS:
         return False
     width, height = _figma_bbox_size(node)
     if width is None or height is None:
@@ -182,8 +178,7 @@ def is_composite_icon_stack_shape(node: CleanDesignTreeNode) -> bool:
     """True when a stack matches a small multicolor icon group (with or without export)."""
     if node.type != NodeType.STACK:
         return False
-    vectors = [child for child in node.children if child.type == NodeType.VECTOR]
-    if len(vectors) < _MIN_COMPOSITE_ICON_VECTORS:
+    if _count_clean_tree_vectors(node) < _MIN_COMPOSITE_ICON_VECTORS:
         return False
     width = node.sizing.width
     height = node.sizing.height

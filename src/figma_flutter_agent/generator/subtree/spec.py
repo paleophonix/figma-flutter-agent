@@ -261,9 +261,24 @@ def _walk_compact_icon_subtrees(
     used_node_ids: set[str],
     excluded_node_ids: frozenset[str],
 ) -> None:
-    from figma_flutter_agent.assets.composite_icons import is_composite_icon_export_node
+    from figma_flutter_agent.assets.composite_icons import (
+        is_composite_icon_export_node,
+        is_composite_icon_stack_shape,
+    )
+    from figma_flutter_agent.parser.interaction import (
+        layout_fact_back_nav_stack,
+        layout_fact_compact_icon_action_stack,
+    )
+    from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
 
     if is_composite_icon_export_node(node):
+        return
+    if (
+        is_composite_icon_stack_shape(node)
+        and not layout_fact_back_nav_stack(node)
+        and not layout_fact_compact_icon_action_stack(node)
+        and not subtree_has_text_descendant(node)
+    ):
         return
     if node.id in excluded_node_ids:
         return

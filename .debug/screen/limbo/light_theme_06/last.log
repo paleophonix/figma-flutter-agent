@@ -1,29 +1,35 @@
 
---- dart format @ 2026-06-28T20:51:50.414978+00:00 ---
+--- dart format @ 2026-06-28T22:26:57.087699+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\features\light_theme_06\light_theme_06_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\widgets\clusterd2e87d01_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\widgets\content_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\widgets\copy_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\widgets\footer_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\widgets\image_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\widgets\section_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\lib\widgets\status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\test\golden\light_theme_06_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-18h96n49\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\features\light_theme_06\light_theme_06_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\widgets\clusterd2e87d01_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\widgets\content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\widgets\copy_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\widgets\footer_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\widgets\image_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\widgets\section_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\lib\widgets\status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\test\golden\light_theme_06_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yrtgl072\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 19 files (19 changed) in 0.79 seconds.
 
---- pub get --offline @ 2026-06-28T20:51:54.361307+00:00 ---
+--- pub get --offline @ 2026-06-28T22:27:02.612973+00:00 ---
 exit_code=0
+
+┌─────────────────────────────────────────────────────────┐
+│ A new version of Flutter is available!                  │
+│                                                         │
+│ To update to the latest version, run "flutter upgrade". │
+└─────────────────────────────────────────────────────────┘
 Resolving dependencies...
 Downloading packages...
   flutter_lints 4.0.0 (6.0.0 available)
@@ -35,25 +41,17 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/2) @ 2026-06-28T20:51:57.214056+00:00 ---
+--- dart analyze (generated) (1/2) @ 2026-06-28T22:27:05.527262+00:00 ---
 exit_code=0
-Analyzing clusterd2e87d01_widget.dart, content_widget.dart, copy_widget.dart, footer_widget.dart, image_card_widget.dart, scroll_group_widget.dart...
+Analyzing clusterd2e87d01_widget.dart, content_widget.dart, copy_widget.dart, footer_widget.dart, image_card_widget.dart, search_widget.dart...
 
    info - lib\widgets\footer_widget.dart:17:165 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:20:2464 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:202 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:1830 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:4975 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:6687 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:8315 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:9943 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:11571 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-9 issues found.
+1 issue found.
 
---- dart analyze (generated) (2/2) @ 2026-06-28T20:51:59.971710+00:00 ---
+--- dart analyze (generated) (2/2) @ 2026-06-28T22:27:08.198059+00:00 ---
 exit_code=0
-Analyzing search_widget.dart, section_header_widget.dart, status_bar_widget.dart...
+Analyzing section_header_widget.dart, status_bar_widget.dart...
 
 warning - lib\widgets\section_header_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\section_header_widget.dart:5:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
@@ -62,57 +60,61 @@ warning - lib\widgets\section_header_widget.dart:5:8 - Unused import: 'package:i
 
 4 issues found.
 
---- dart analyze (generated) (1/4) @ 2026-06-28T20:52:02.858703+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-06-28T22:27:11.037273+00:00 ---
 exit_code=0
-Analyzing light_theme_06_screen.dart, light_theme_06_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+Analyzing light_theme_06_screen.dart, light_theme_06_chunk_012bbd01.dart, light_theme_06_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart...
 
 warning - lib\features\light_theme_06\light_theme_06_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
 warning - lib\features\light_theme_06\light_theme_06_screen.dart:8:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\light_theme_06\light_theme_06_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\features\light_theme_06\light_theme_06_screen.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\light_theme_06_chunk_012bbd01.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\light_theme_06_chunk_012bbd01.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\light_theme_06_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\light_theme_06_layout.dart:17:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\light_theme_06_layout.dart:18:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\light_theme_06_layout.dart:30:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\generated\light_theme_06_layout.dart:31:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:24:2864 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:24:3980 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:1103 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:3885 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:5147 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:6263 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:7379 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:8495 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
    info - lib\generated\light_theme_06_layout.dart:12:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\light_theme_06_layout.dart:14:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\light_theme_06_layout.dart:73:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
    info - lib\generated\light_theme_06_layout.dart:80:407 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\generated\light_theme_06_layout.dart:80:969 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
    info - lib\generated\light_theme_06_layout.dart:80:1475 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\light_theme_06_layout.dart:81:2488 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\light_theme_06_layout.dart:81:3050 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\light_theme_06_layout.dart:81:3556 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\light_theme_06_layout.dart:81:8456 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\light_theme_06_layout.dart:81:9018 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\light_theme_06_layout.dart:81:9524 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_layout.dart:81:2582 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\light_theme_06_layout.dart:81:3144 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_layout.dart:81:3650 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_layout.dart:81:8644 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\light_theme_06_layout.dart:81:9206 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_layout.dart:81:9712 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-22 issues found.
+31 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-06-28T20:52:05.972391+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-06-28T22:27:13.559593+00:00 ---
 exit_code=0
-Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, clusterd2e87d01_widget.dart...
-No issues found!
+Analyzing app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart...
 
---- dart analyze (generated) (3/4) @ 2026-06-28T20:52:09.617542+00:00 ---
+warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+
+1 issue found.
+
+--- dart analyze (generated) (3/4) @ 2026-06-28T22:27:16.265951+00:00 ---
 exit_code=0
-Analyzing content_widget.dart, copy_widget.dart, footer_widget.dart, image_card_widget.dart, scroll_group_widget.dart, search_widget.dart...
+Analyzing clusterd2e87d01_widget.dart, content_widget.dart, copy_widget.dart, footer_widget.dart, image_card_widget.dart, search_widget.dart...
 
    info - lib\widgets\footer_widget.dart:17:165 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:20:2464 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:202 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:1830 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:4975 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:6687 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:8315 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:9943 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:11571 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-9 issues found.
+1 issue found.
 
---- dart analyze (generated) (4/4) @ 2026-06-28T20:52:12.988208+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-06-28T22:27:19.347298+00:00 ---
 exit_code=0
 Analyzing section_header_widget.dart, status_bar_widget.dart, light_theme_06_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -124,74 +126,74 @@ warning - lib\widgets\section_header_widget.dart:5:8 - Unused import: 'package:i
 
 5 issues found.
 
---- dart format @ 2026-06-28T20:52:16.342754+00:00 ---
+--- dart format @ 2026-06-28T22:27:22.189198+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\features\light_theme_06\light_theme_06_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\widgets\clusterd2e87d01_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\widgets\content_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\widgets\copy_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\widgets\footer_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\widgets\image_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\lib\widgets\status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\test\golden\light_theme_06_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-g57hax_j\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\features\light_theme_06\light_theme_06_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\widgets\clusterd2e87d01_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\widgets\content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\widgets\copy_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\widgets\footer_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\widgets\image_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\lib\widgets\status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\test\golden\light_theme_06_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l2dk323b\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 18 files (18 changed) in 0.77 seconds.
 
---- dart format @ 2026-06-28T20:52:20.050011+00:00 ---
+--- dart format @ 2026-06-28T22:27:24.943296+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\features\light_theme_06\light_theme_06_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\widgets\clusterd2e87d01_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\widgets\content_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\widgets\copy_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\widgets\footer_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\widgets\image_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\lib\widgets\status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\test\golden\light_theme_06_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ye66dqj_\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\features\light_theme_06\light_theme_06_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\widgets\clusterd2e87d01_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\widgets\content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\widgets\copy_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\widgets\footer_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\widgets\image_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\lib\widgets\status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\test\golden\light_theme_06_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38lonsa6\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 18 files (18 changed) in 0.78 seconds.
 
---- dart format @ 2026-06-28T20:52:24.047773+00:00 ---
+--- dart format @ 2026-06-28T22:27:27.991151+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\features\light_theme_06\light_theme_06_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\widgets\clusterd2e87d01_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\widgets\content_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\widgets\copy_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\widgets\footer_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\widgets\image_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\widgets\section_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\lib\widgets\status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\test\golden\light_theme_06_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-wwefepl7\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 19 files (19 changed) in 0.80 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\features\light_theme_06\light_theme_06_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\widgets\clusterd2e87d01_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\widgets\content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\widgets\copy_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\widgets\footer_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\widgets\image_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\widgets\section_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\lib\widgets\status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\test\golden\light_theme_06_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sgj9icxk\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 19 files (19 changed) in 0.78 seconds.
 
---- pub get --offline @ 2026-06-28T20:52:27.029977+00:00 ---
+--- pub get --offline @ 2026-06-28T22:27:30.951236+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -204,61 +206,65 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/4) @ 2026-06-28T20:52:30.211877+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-06-28T22:27:33.776977+00:00 ---
 exit_code=0
-Analyzing light_theme_06_screen.dart, light_theme_06_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+Analyzing light_theme_06_screen.dart, light_theme_06_chunk_012bbd01.dart, light_theme_06_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart...
 
 warning - lib\features\light_theme_06\light_theme_06_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
 warning - lib\features\light_theme_06\light_theme_06_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\light_theme_06\light_theme_06_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\features\light_theme_06\light_theme_06_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\light_theme_06_chunk_012bbd01.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\light_theme_06_chunk_012bbd01.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\light_theme_06_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\light_theme_06_layout.dart:17:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\light_theme_06_layout.dart:18:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\light_theme_06_layout.dart:30:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\generated\light_theme_06_layout.dart:31:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:24:2864 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:24:3980 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:1103 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:3885 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:5147 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:6263 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:7379 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_chunk_012bbd01.dart:25:8495 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
    info - lib\generated\light_theme_06_layout.dart:12:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\light_theme_06_layout.dart:14:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\light_theme_06_layout.dart:73:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
    info - lib\generated\light_theme_06_layout.dart:80:407 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\generated\light_theme_06_layout.dart:80:969 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
    info - lib\generated\light_theme_06_layout.dart:80:1475 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\light_theme_06_layout.dart:81:2488 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\light_theme_06_layout.dart:81:3050 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\light_theme_06_layout.dart:81:3556 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\light_theme_06_layout.dart:81:8456 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\light_theme_06_layout.dart:81:9018 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\light_theme_06_layout.dart:81:9524 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_layout.dart:81:2582 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\light_theme_06_layout.dart:81:3144 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_layout.dart:81:3650 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_layout.dart:81:8644 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\light_theme_06_layout.dart:81:9206 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\light_theme_06_layout.dart:81:9712 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-22 issues found.
+31 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-06-28T20:52:33.863240+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-06-28T22:27:36.327243+00:00 ---
 exit_code=0
-Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, clusterd2e87d01_widget.dart...
-No issues found!
+Analyzing app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart...
 
---- dart analyze (generated) (3/4) @ 2026-06-28T20:52:36.694476+00:00 ---
+warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+
+1 issue found.
+
+--- dart analyze (generated) (3/4) @ 2026-06-28T22:27:39.049170+00:00 ---
 exit_code=0
-Analyzing content_widget.dart, copy_widget.dart, footer_widget.dart, image_card_widget.dart, scroll_group_widget.dart, section_header_widget.dart...
+Analyzing clusterd2e87d01_widget.dart, content_widget.dart, copy_widget.dart, footer_widget.dart, image_card_widget.dart, section_header_widget.dart...
 
 warning - lib\widgets\section_header_widget.dart:2:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\section_header_widget.dart:3:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
    info - lib\widgets\footer_widget.dart:23:50 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:20:2674 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:20:3790 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:914 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:3694 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:4956 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:6072 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:7188 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\scroll_group_widget.dart:21:8304 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
    info - lib\widgets\section_header_widget.dart:71:51 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\widgets\section_header_widget.dart:95:53 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-13 issues found.
+5 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-06-28T20:52:39.869728+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-06-28T22:27:42.022266+00:00 ---
 exit_code=0
 Analyzing status_bar_widget.dart, light_theme_06_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -266,7 +272,7 @@ Analyzing status_bar_widget.dart, light_theme_06_screen_test.dart, element_coord
 
 1 issue found.
 
---- flutter pub get @ 2026-06-28T20:52:45.372113+00:00 ---
+--- flutter pub get @ 2026-06-28T22:27:45.899777+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -279,4 +285,4 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-28T20:52:45.373114+00:00 ---
+--- flutter render errors @ 2026-06-28T22:27:45.901455+00:00 ---
