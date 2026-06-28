@@ -31,6 +31,51 @@
     },
     {
       "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3212:20786;0:1039",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I3212:20786;257:6602",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3212:20175;0:1039",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I3212:20175;257:6602",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I3212:20786;257:6602",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
       "nodeId": "I3212:20180;0:580",
       "field": "min_touch_target",
@@ -222,6 +267,42 @@
       "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
       "nodeId": "I3212:20181;3207:13481",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3212:20786;0:1039",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I3212:20786;257:6602",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3212:20175;0:1039",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I3212:20175;257:6602",
       "field": "min_touch_target",
       "old": null,
       "new": 44.0,
@@ -451,6 +532,15 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
+      "nodeId": "I3212:20786;257:6602",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
       "nodeId": "I3212:20180;0:580",
       "field": "min_touch_target",
       "old": null,
@@ -488,6 +578,15 @@
       "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
       "nodeId": "I3212:20180;0:577",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I3212:20786;257:6602",
       "field": "min_touch_target",
       "old": null,
       "new": 44.0,

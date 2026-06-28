@@ -230,12 +230,40 @@ def _single_foreign_widget_delegate_target(build: str, class_name: str) -> str |
     return None
 
 
+def _host_has_structural_chrome(build: str, class_name: str) -> bool:
+    """True when ``build`` hosts real layout chrome plus a foreign widget reference."""
+    bare = _bare_widget_ctor_return_class(build)
+    if (
+        bare
+        and bare.endswith("Widget")
+        and bare not in (class_name, "__context_widget__", "SizedBox")
+    ):
+        return False
+    chrome_markers = (
+        "Container(",
+        "Row(",
+        "Column(",
+        "Expanded(",
+        "ClipRRect(",
+        "BoxDecoration",
+        "DecoratedBox(",
+    )
+    if not any(marker in build for marker in chrome_markers):
+        return False
+    foreign_refs = [
+        name for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build) if name != class_name
+    ]
+    return bool(foreign_refs)
+
+
 def _is_foreign_delegate_widget_build(content: str, class_name: str) -> bool:
     """``build`` only forwards to another widget class (wrong or stale subtree body)."""
     if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
         return False
     build = _widget_build_snippet(content, class_name=class_name, max_chars=4000)
     if "SvgPicture.asset" in build or "Image.asset" in build:
+        return False
+    if _host_has_structural_chrome(build, class_name):
         return False
     if _single_foreign_widget_delegate_target(build, class_name) is not None:
         return True
@@ -376,14 +404,14 @@ def _is_ctor_self_referential_widget_build(content: str, class_name: str) -> boo
 
 
 def _planned_has_widget_consumers(planned) -> bool:
-    from .paths import _is_widget_consumer_entry_path
+    from .paths import _is_widget_consumer_seed_path
 
-    return any(_is_widget_consumer_entry_path(path.replace("\\", "/")) for path in planned)
+    return any(_is_widget_consumer_seed_path(path.replace("\\", "/")) for path in planned)
 
 
 def transitively_referenced_widget_paths(planned) -> set[str]:
     """Return ``lib/widgets`` paths reachable from screens, layouts, and other widgets."""
-    from .paths import _is_widget_consumer_entry_path
+    from .paths import _is_widget_consumer_seed_path
 
     class_paths = _widget_class_paths(dict(planned))
     if not class_paths:
@@ -394,7 +422,7 @@ def transitively_referenced_widget_paths(planned) -> set[str]:
     queue: list[str] = []
     for path, content in planned.items():
         normalized = path.replace("\\", "/")
-        if not normalized.endswith(".dart") or not _is_widget_consumer_entry_path(normalized):
+        if not normalized.endswith(".dart") or not _is_widget_consumer_seed_path(normalized):
             continue
         for class_name in _collect_widget_use_class_names(content, known_class_names):
             widget_path = _widget_path_for_ctor_name(planned, class_name)

@@ -1,8 +1,8 @@
 {
   "feature": "light_theme_06",
-  "pipeline_run_id": "17714cabb917",
-  "candidate_build_run_id": "17714cabb917",
-  "committed_build_run_id": "17714cabb917",
+  "pipeline_run_id": "9f05ee84e72c",
+  "candidate_build_run_id": "9f05ee84e72c",
+  "committed_build_run_id": "9f05ee84e72c",
   "writeback": "committed",
   "written_files": [
     "lib/features/light_theme_06/light_theme_06_screen.dart",
@@ -23,5 +23,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-28T13:44:17.448520+00:00"
+  "captured_at": "2026-06-28T14:57:32.067839+00:00"
 }

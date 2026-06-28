@@ -187,6 +187,65 @@ def test_horizontal_icon_only_social_cluster_emits_row() -> None:
     assert "Stack(fit: StackFit.loose" not in compact
 
 
+def test_decomposed_wallpaper_stack_root_preview_is_bounded() -> None:
+    """Law: stack_root_requires_finite_bounds for wallpaper-partitioned auth shells."""
+    root = CleanDesignTreeNode(
+        id="53:1896",
+        name="Login Version 10",
+        type=NodeType.STACK,
+        style=NodeStyle(background_color="0xFFFFFFFF"),
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[
+            _ambient_wallpaper_ellipse("54:2043", "Ellipse 2"),
+            _ambient_wallpaper_ellipse("54:2042", "Ellipse 1"),
+            CleanDesignTreeNode(
+                id="55:2044",
+                name="Input",
+                type=NodeType.STACK,
+                spacing=24.0,
+                sizing=Sizing(width=343.0, height=561.0),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    left=16.0,
+                    top=125.5,
+                    width=343.0,
+                    height=561.0,
+                ),
+                style=NodeStyle(
+                    background_color="0xFFFFFFFF",
+                    border_radius=12.0,
+                    border_color="0xFFFFFFFF",
+                ),
+                children=[_deep_form_body(8)],
+            ),
+            CleanDesignTreeNode(
+                id="53:1983",
+                name="Native / Status Bar",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=44.0),
+                children=[],
+            ),
+            CleanDesignTreeNode(
+                id="53:1984",
+                name="Native / Home Indicator",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=34.0),
+                children=[],
+            ),
+        ],
+    )
+    layout = render_layout_file(
+        root,
+        feature_name="login_wallpaper_shell",
+        uses_svg=False,
+        responsive_enabled=True,
+    )["lib/generated/login_wallpaper_shell_layout.dart"]
+    assert "maxHeight: double.infinity" not in layout
+    assert "Stack(clipBehavior:" in layout
+    preview_section = layout.split("_artboardPreviewHeight", 1)[0]
+    assert "OverflowBox(" not in preview_section or "maxHeight: previewH" in layout
+
+
 def test_decomposed_layout_paints_partitioned_wallpaper() -> None:
     """Law: partitioned_wallpaper_is_painted."""
     root = CleanDesignTreeNode(

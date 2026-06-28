@@ -260,6 +260,25 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                     max_attempts,
                 )
                 continue
+        from figma_flutter_agent.stages.llm_repair.deterministic import (
+            apply_deterministic_analyzer_repairs,
+            errors_block_llm_repair,
+        )
+
+        if errors_block_llm_repair(analyze_outcome.errors, analyze_outcome.detail):
+            if apply_deterministic_analyzer_repairs(result, analyze_outcome.errors):
+                log.info(
+                    "Applied deterministic analyzer repair before LLM (attempt {}/{})",
+                    attempt,
+                    max_attempts,
+                )
+                continue
+            stall_msg = (
+                "Deterministic analyzer failure is not LLM-repairable: "
+                f"{'; '.join(analyze_outcome.errors[:3])}"
+            )
+            log.error(stall_msg)
+            raise GenerationError(stall_msg)
         syntax_error_history.append(_syntax_error_count(analyze_outcome))
         if (
             result.repair_attempts >= syntax_stall_limit

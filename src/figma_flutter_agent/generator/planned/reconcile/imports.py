@@ -445,14 +445,9 @@ def _insert_import_lines(content: str, imports: list[str]) -> str:
 
 
 def _consumer_paths_needing_widget_imports(path: str) -> bool:
-    normalized = path.replace("\\", "/")
-    if normalized.startswith("lib/features/") and normalized.endswith("_screen.dart"):
-        return True
-    if normalized.startswith("lib/widgets/") and normalized.endswith(".dart"):
-        return True
-    if not normalized.startswith("lib/generated/"):
-        return False
-    return normalized.endswith("_layout.dart") or "_chunk_" in normalized
+    from .paths import _is_widget_consumer_entry_path
+
+    return _is_widget_consumer_entry_path(path.replace("\\", "/"))
 
 
 def _insert_missing_widget_imports(

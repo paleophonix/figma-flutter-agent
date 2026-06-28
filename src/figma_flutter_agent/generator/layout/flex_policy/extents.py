@@ -252,6 +252,30 @@ def bind_row_cross_axis_height(
     ):
         return _bind_card_metadata_rail_width_only(node, widget)
     if _column_spaced_stack_skip_row_height_pin(node, parent_row=parent_row):
+        from figma_flutter_agent.generator.layout.flex_policy.column import (
+            _column_uses_loose_row_cross_axis_pin,
+        )
+
+        if (
+            parent_row is not None
+            and _column_uses_loose_row_cross_axis_pin(node, parent_row=parent_row)
+            and _column_spaced_stack_needs_loose_overflow(node)
+        ):
+            skip_height = node.sizing.height
+            if skip_height is not None and skip_height > 0:
+                skip_height_lit = format_geometry_literal(skip_height)
+                if not _row_loose_cross_axis_pin_already_applied(widget, skip_height_lit):
+                    from figma_flutter_agent.generator.layout.common import (
+                        wrap_loose_vertical_overflow_child,
+                    )
+
+                    return hoist_flex_parent_data(
+                        lambda inner: wrap_loose_vertical_overflow_child(
+                            inner,
+                            max_height=skip_height_lit,
+                        ),
+                        widget,
+                    )
         return widget
     height = node.sizing.height
     if parent_row is not None and node.type == NodeType.TEXT:

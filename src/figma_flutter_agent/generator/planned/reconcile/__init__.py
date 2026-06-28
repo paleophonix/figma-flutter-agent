@@ -622,4 +622,9 @@ def reconcile_planned_dart_files(
     updated = remediate_text_scaler_contract(updated)
     updated = sync_widget_consumer_imports(updated, skip_consolidate=True)
     ensure_planned_widget_import_closure(updated)
+    from figma_flutter_agent.generator.dart.static_contract_gates import (
+        run_static_contract_gates,
+    )
+
+    run_static_contract_gates(updated)
     return updated

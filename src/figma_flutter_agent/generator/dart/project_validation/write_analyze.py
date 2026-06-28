@@ -62,9 +62,9 @@ def resolve_planned_for_write_analyze(
 ) -> dict[str, str]:
     """Build the planned Dart map for write-stage ``dart analyze``.
 
-    Resolution order per path: staged write payload, on-disk project file, then
-    the full planned catalog from the current pipeline run. Package-import
-    closure adds any additional ``lib/`` dependencies required by the seed set.
+    Resolution order per path: staged write payload, frozen planned catalog,
+    then on-disk project file when absent from catalog. Package-import closure
+    adds any additional ``lib/`` dependencies required by the seed set.
 
     Args:
         analyze_paths: Relative Dart paths selected for analyze.
@@ -84,13 +84,13 @@ def resolve_planned_for_write_analyze(
         if normalized in files_to_write:
             seeds[normalized] = files_to_write[normalized]
             continue
+        if normalized in catalog:
+            seeds[normalized] = catalog[normalized]
+            continue
         disk_path = project_dir / normalized
         if disk_path.is_file():
             seeds[normalized] = disk_path.read_text(encoding="utf-8")
-            catalog.setdefault(normalized, seeds[normalized])
             continue
-        if normalized in catalog:
-            seeds[normalized] = catalog[normalized]
     return expand_planned_package_import_closure(
         seeds,
         catalog,

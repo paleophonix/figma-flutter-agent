@@ -36,11 +36,9 @@ def _apply_disk_planned_drift(
 ) -> dict[str, str]:
     """Force writes when on-disk project files diverge from planned emit.
 
-    Snapshot metadata can match planned content while the Flutter project tree
-    still holds a stale fossil (partial write, manual edit, or debug deploy),
-    or while the file is entirely absent after rollback/partial write.
-    Only applies when incremental selection skipped the path but the snapshot
-    already records the planned hash (fossil on disk) or the file is missing.
+    Applies when incremental selection skipped the path but the Flutter project
+    tree still holds a fossil (partial write, reconcile mutation, manual edit)
+    or the file is missing on disk.
     """
     if project_dir is None:
         return selected
@@ -52,8 +50,6 @@ def _apply_disk_planned_drift(
         disk_hash = _read_disk_file_hash(project_dir, path)
         if disk_hash is None:
             updated[path] = content
-            continue
-        if snapshot is not None and snapshot.file_hashes.get(path) != planned_hash:
             continue
         if disk_hash == planned_hash:
             continue

@@ -153,14 +153,6 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
     write_batch: WriteBatch | None = None
     pubspec_batch: PubspecUpdateBatch | None = None
     try:
-        from figma_flutter_agent.generator.planned.reconcile import (
-            prune_disk_unplanned_agent_widgets,
-            prune_disk_widget_stem_aliases,
-        )
-
-        cleanup_planned = request.planned_files_for_widget_cleanup or files_to_write
-        prune_disk_widget_stem_aliases(request.project_dir, cleanup_planned)
-        prune_disk_unplanned_agent_widgets(request.project_dir, cleanup_planned)
         write_batch = writer.write_files(files_to_write)
         has_illustrations = any(
             entry.kind == "illustration" for entry in request.asset_manifest.entries
@@ -191,22 +183,44 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
             )
             run_build_runner(request.project_dir, require_dart_sdk=sdk_required)
         if request.analyze_scope == "written_only":
-            analyze_paths = sorted(files_to_write.keys())
             analyze_scope = "written_only"
         elif request.analyze_scope == "all_planned":
-            analyze_paths = sorted(request.analyze_relative_paths or files_to_write.keys())
             analyze_scope = "all_planned"
         else:
-            analyze_paths = sorted(request.analyze_relative_paths or files_to_write.keys())
             analyze_scope = request.analyze_scope
         from figma_flutter_agent.generator.dart.project_validation.write_analyze import (
+            expand_planned_package_import_closure,
             resolve_planned_for_write_analyze,
         )
+
+        analyze_catalog = dict(request.planned_files_for_widget_cleanup or {})
+        if request.frozen_planned_graph is not None:
+            analyze_catalog = dict(request.frozen_planned_graph.files)
+        analyze_catalog.update(files_to_write)
+        analyze_seeds = expand_planned_package_import_closure(
+            dict(files_to_write),
+            analyze_catalog,
+            package_name=request.package_name,
+        )
+        analyze_paths = sorted(analyze_seeds.keys())
+
+        from figma_flutter_agent.generator.planned.reconcile.imports import (
+            find_stale_widget_package_imports,
+        )
+
+        stale_imports = find_stale_widget_package_imports(analyze_seeds)
+        if stale_imports:
+            preview = "; ".join(stale_imports[:5])
+            if len(stale_imports) > 5:
+                preview += f" (+{len(stale_imports) - 5} more)"
+            raise GenerationError(
+                f"Write stage blocked by planned widget import graph: {preview}"
+            )
 
         planned_for_analyze = resolve_planned_for_write_analyze(
             analyze_paths,
             files_to_write=files_to_write,
-            planned_catalog=request.planned_files_for_widget_cleanup,
+            planned_catalog=analyze_catalog,
             project_dir=request.project_dir,
             package_name=request.package_name,
         )
@@ -230,6 +244,14 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
 
     writer.commit_batch(write_batch)
     commit_pubspec_batch(pubspec_batch)
+    from figma_flutter_agent.generator.planned.reconcile import (
+        prune_disk_unplanned_agent_widgets,
+        prune_disk_widget_stem_aliases,
+    )
+
+    cleanup_planned = request.planned_files_for_widget_cleanup or files_to_write
+    prune_disk_widget_stem_aliases(request.project_dir, cleanup_planned)
+    prune_disk_unplanned_agent_widgets(request.project_dir, cleanup_planned)
     written = sorted(files_to_write.keys())
     logger.info("Write stage complete with {} files", len(written))
     return WriteStageResult(written_files=written)

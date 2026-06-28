@@ -169,6 +169,56 @@ def test_select_files_for_sync_writes_missing_disk_file_when_snapshot_matches(
     assert selected["lib/generated/sign_up_layout.dart"] == layout
 
 
+def test_select_files_for_sync_writes_when_reconcile_changed_planned_but_snapshot_stale(
+    tmp_path: Path,
+) -> None:
+    """Reconcile mutations must write consumers even when snapshot lags planned."""
+    tree = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.COLUMN)
+    tokens = DesignTokens(colors={"primary": "0xFF6750A4"})
+    tree_hash = hash_clean_tree(tree)
+    colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
+    fossil = "class SectionHeaderWidget { const ClusterWidget(); }"
+    planned_new = "class SectionHeaderWidget { const SizedBox.shrink(); }"
+    widget_path = "lib/widgets/section_header_widget.dart"
+    planned = {
+        widget_path: planned_new,
+        "lib/features/light_theme_06/light_theme_06_screen.dart": "screen",
+    }
+    snapshot = GenerationSnapshot(
+        file_key="abc",
+        node_id="1:1",
+        feature_name="light_theme_06",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        file_hashes={
+            widget_path: hash_file_contents(fossil),
+            "lib/features/light_theme_06/light_theme_06_screen.dart": hash_file_contents(
+                "screen"
+            ),
+        },
+    )
+    disk_file = tmp_path / widget_path
+    disk_file.parent.mkdir(parents=True, exist_ok=True)
+    disk_file.write_text(fossil, encoding="utf-8")
+
+    selected = select_files_for_sync(
+        snapshot,
+        file_key="abc",
+        node_id="1:1",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        planned_files=planned,
+        project_dir=tmp_path,
+    )
+
+    assert widget_path in selected
+    assert selected[widget_path] == planned_new
+
+
 def test_build_feature_routes_returns_go_router_metadata() -> None:
     routes = build_feature_routes("onboarding")
 

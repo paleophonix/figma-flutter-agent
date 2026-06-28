@@ -351,6 +351,50 @@ class InputFieldWidget extends StatelessWidget {
     assert find_missing_planned_widget_classes(updated) == []
 
 
+def test_prune_reconciles_widget_consumer_refs_after_cluster_removed() -> None:
+    """Consumers must drop stale cluster imports and ctors when the widget file is absent."""
+    from figma_flutter_agent.generator.planned.reconcile.imports import (
+        ensure_planned_widget_import_closure,
+    )
+
+    planned = {
+        "lib/widgets/section_header_widget.dart": """
+import 'package:flutter/material.dart';
+import 'package:inbox/widgets/cluster_chip_widget.dart';
+
+class SectionHeaderWidget extends StatelessWidget {
+  const SectionHeaderWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(child: Text('SECTION HEADER')),
+        const ClusterChipWidget(),
+      ],
+    );
+  }
+}
+""",
+        "lib/generated/light_theme_06_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:inbox/widgets/section_header_widget.dart';
+
+class LightTheme06Layout extends StatelessWidget {
+  const LightTheme06Layout({super.key});
+  @override
+  Widget build(BuildContext context) => const SectionHeaderWidget();
+}
+""",
+    }
+    updated = reconcile_planned_dart_files(planned, package_name="inbox")
+    header = updated["lib/widgets/section_header_widget.dart"]
+    assert "cluster_chip_widget.dart" not in header
+    assert "ClusterChipWidget" not in header
+    assert "SECTION HEADER" in header
+    ensure_planned_widget_import_closure(updated)
+    assert find_missing_planned_widget_classes(updated) == []
+
+
 def test_widget_import_stems_for_screen_prefers_largest_widget_file() -> None:
     from figma_flutter_agent.generator.planned.reconcile import widget_import_stems_for_screen
 
@@ -985,6 +1029,31 @@ class MoonCrescentIntersect extends StatelessWidget {
     body = updated["lib/widgets/moon_crescent_intersect.dart"]
     assert "IntersectWidget" not in body
     assert "MoonCrescentIntersect" in body
+
+
+def test_repair_stale_widget_ctor_rewrites_missing_layout_consumer_refs() -> None:
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_stale_widget_ctor_names_in_planned,
+    )
+
+    planned = {
+        "lib/generated/feedback_layout.dart": """
+import 'package:demo/widgets/star_filled_widget.dart';
+import 'package:demo/widgets/tag_widget.dart';
+class FeedbackLayout extends StatelessWidget {
+  const FeedbackLayout({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [const StarFilledWidget(), const TagWidget()]);
+  }
+}
+""",
+    }
+    updated = repair_stale_widget_ctor_names_in_planned(planned)
+    body = updated["lib/generated/feedback_layout.dart"]
+    assert "StarFilledWidget()" not in body
+    assert "TagWidget()" not in body
+    assert "SizedBox.shrink()" in body
 
 
 def test_repair_stale_widget_ctor_rewrites_wrong_planned_class_in_same_file() -> None:

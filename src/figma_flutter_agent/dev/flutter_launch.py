@@ -480,6 +480,23 @@ def launch_flutter_app(
         if settings is not None
         else False
     )
+    from figma_flutter_agent.errors import PlannedDartGraphError
+    from figma_flutter_agent.generator.dart.static_contract_gates import (
+        gate_disk_widget_import_closure,
+    )
+
+    architecture = (
+        settings.agent.flutter.architecture if settings is not None else "feature_first"
+    )
+
+    try:
+        gate_disk_widget_import_closure(
+            project_dir,
+            feature_name=feature_name,
+            architecture=architecture,
+        )
+    except PlannedDartGraphError as exc:
+        raise FlutterProjectError(str(exc)) from exc
     reap_stale_flutter_web_processes()
     flutter = require_flutter_executable(sdk_root=flutter_sdk)
     logger.info("Running flutter pub get in {}", project_dir.as_posix())

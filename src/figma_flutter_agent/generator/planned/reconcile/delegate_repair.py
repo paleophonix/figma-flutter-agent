@@ -146,6 +146,10 @@ def _try_inline_foreign_delegate_build(
     if not _is_foreign_delegate_widget_build(content, class_name):
         return None
     build = _widget_build_snippet(content, class_name=class_name, max_chars=4000)
+    from .class_inspect import _host_has_structural_chrome
+
+    if _host_has_structural_chrome(build, class_name):
+        return None
     target_class = _foreign_delegate_target_class(build, class_name)
     if target_class is None:
         return None
@@ -207,8 +211,9 @@ def _replace_self_referential_build(content: str, class_name: str) -> str:
 
 
 def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[str, str]:
-    """Rewrite ``build`` calls to missing or mismatched widget classes onto the declared file class."""
+    """Rewrite widget ctor calls that reference missing or mismatched ``lib/widgets`` classes."""
     from .class_inspect import _widget_stem_alias_ctor
+    from .imports import _consumer_paths_needing_widget_imports
 
     class_paths = _widget_class_paths(planned)
     updated = dict(planned)
@@ -256,6 +261,36 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
         if patched != content:
             logger.info(
                 "Rewrote stale widget ctor name(s) in {}: {}", path, ", ".join(sorted(stale))
+            )
+            updated[path] = patched
+
+    for path, content in list(updated.items()):
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith(".dart") or not _consumer_paths_needing_widget_imports(normalized):
+            continue
+        if normalized.startswith("lib/widgets/"):
+            continue
+        stale_names: set[str] = set()
+        for match in _WIDGET_CTOR_CALL_RE.finditer(content):
+            name = match.group(1)
+            if name in _FLUTTER_SDK_WIDGET_CTORS or not name.endswith("Widget"):
+                continue
+            if name not in class_paths:
+                stale_names.add(name)
+        if not stale_names:
+            continue
+        patched = content
+        for name in sorted(stale_names, key=len, reverse=True):
+            patched = re.sub(
+                rf"\b{re.escape(name)}\s*\(",
+                "SizedBox.shrink(",
+                patched,
+            )
+        if patched != content:
+            logger.info(
+                "Rewrote stale widget ctor name(s) in consumer {}: {}",
+                normalized,
+                ", ".join(sorted(stale_names)),
             )
             updated[path] = patched
     return updated

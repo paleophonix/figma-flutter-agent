@@ -77,6 +77,11 @@ def validate_planned_dart_graph(
         raise PlannedDartGraphError(str(exc)) from exc
     _ = package_name
     ensure_planned_widget_import_closure(planned)
+    from figma_flutter_agent.generator.dart.static_contract_gates import (
+        run_static_contract_gates,
+    )
+
+    run_static_contract_gates(planned)
 
 
 def finalize_planned_dart_graph(

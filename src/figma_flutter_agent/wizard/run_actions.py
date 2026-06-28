@@ -23,6 +23,16 @@ def report_plan_failure_stale_preview() -> None:
     )
 
 
+def report_launch_preflight_failure() -> None:
+    """Warn when generate succeeded but Flutter launch was blocked by pre-flight gates."""
+    console.print(
+        "[bold red]Launch blocked by pre-flight graph gate — Chrome preview is stale.[/bold red]"
+    )
+    console.print(
+        "[dim]plan: ok | writeback: ok | launch: blocked | served_preview: previous build[/dim]"
+    )
+
+
 def _wizard_run(ctx: typer.Context) -> None:
     """Launch Flutter after optional generate/asset-sync submenu selection."""
     from figma_flutter_agent.dev.project import ensure_project_config
@@ -207,8 +217,11 @@ def _wizard_sync_preview(
                 use_cached_ir=use_cached_ir,
             )
         )
-    except Exception:
-        report_plan_failure_stale_preview()
+    except Exception as exc:
+        if "pre_launch_stale_import_scan" in str(exc):
+            report_launch_preflight_failure()
+        else:
+            report_plan_failure_stale_preview()
         raise
     from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
 

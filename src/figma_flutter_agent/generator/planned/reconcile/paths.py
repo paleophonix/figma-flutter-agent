@@ -96,12 +96,20 @@ def _skips_typography_collapse(normalized_path: str) -> bool:
     return normalized_path.startswith(("lib/widgets/", "lib/generated/", "lib/theme/"))
 
 
-def _is_widget_consumer_entry_path(normalized_path: str) -> bool:
+def _is_widget_consumer_seed_path(normalized_path: str) -> bool:
+    """Return True for layout/screen roots that seed transitive widget reference walks."""
     if normalized_path.startswith("lib/features/") and normalized_path.endswith("_screen.dart"):
         return True
     if not normalized_path.startswith("lib/generated/"):
         return False
     return normalized_path.endswith("_layout.dart") or "_chunk_" in normalized_path
+
+
+def _is_widget_consumer_entry_path(normalized_path: str) -> bool:
+    """Return True when a Dart file may import or instantiate ``lib/widgets`` classes."""
+    if _is_widget_consumer_seed_path(normalized_path):
+        return True
+    return normalized_path.startswith("lib/widgets/") and normalized_path.endswith(".dart")
 
 
 def preferred_widget_path_for_class(class_name: str) -> str:
