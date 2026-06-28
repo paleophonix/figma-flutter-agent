@@ -1,8 +1,8 @@
 {
   "feature": "sign_up_version_9",
-  "pipeline_run_id": "f22f7937da9c",
-  "candidate_build_run_id": "f22f7937da9c",
-  "committed_build_run_id": "f22f7937da9c",
+  "pipeline_run_id": "637f73462f61",
+  "candidate_build_run_id": "637f73462f61",
+  "committed_build_run_id": "637f73462f61",
   "writeback": "committed",
   "written_files": [
     "lib/features/sign_up_version_9/sign_up_version_9_screen.dart",
@@ -22,5 +22,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-27T23:35:40.008382+00:00"
+  "captured_at": "2026-06-28T15:12:30.138656+00:00"
 }

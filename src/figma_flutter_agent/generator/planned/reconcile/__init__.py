@@ -622,6 +622,16 @@ def reconcile_planned_dart_files(
     updated = remediate_text_scaler_contract(updated)
     updated = sync_widget_consumer_imports(updated, skip_consolidate=True)
     ensure_planned_widget_import_closure(updated)
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        repair_nested_flex_parent_data_in_source,
+    )
+
+    updated = {
+        path: repair_nested_flex_parent_data_in_source(content)
+        if path.replace("\\", "/").endswith(".dart")
+        else content
+        for path, content in updated.items()
+    }
     from figma_flutter_agent.generator.dart.static_contract_gates import (
         run_static_contract_gates,
     )

@@ -60,6 +60,53 @@ class DemoLayout extends StatelessWidget {
         run_static_contract_gates(planned)
 
 
+def test_nested_flex_parent_data_gate_flags_flexible_expanded() -> None:
+    from figma_flutter_agent.generator.dart.static_contract_gates import (
+        find_nested_flex_parent_data_wrappers,
+    )
+
+    planned = {
+        "lib/widgets/header_widget.dart": """
+class HeaderWidget extends StatelessWidget {
+  const HeaderWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Flexible(fit: FlexFit.loose, flex: 0, child: Expanded(child: SizedBox(child: Text('x')))),
+    ]);
+  }
+}
+""",
+    }
+    violations = find_nested_flex_parent_data_wrappers(planned)
+    assert violations
+    with pytest.raises(
+        PlannedDartGraphError,
+        match="generated_dart_must_not_contain_nested_flex_parent_data_wrappers",
+    ):
+        run_static_contract_gates(planned)
+
+
+def test_reconcile_repairs_nested_flex_before_static_gate() -> None:
+    planned = {
+        "lib/widgets/header_widget.dart": """
+class HeaderWidget extends StatelessWidget {
+  const HeaderWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Flexible(fit: FlexFit.loose, flex: 0, child: Expanded(child: SizedBox(child: Text('x')))),
+    ]);
+  }
+}
+""",
+    }
+    updated = reconcile_planned_dart_files(planned, package_name="demo")
+    body = updated["lib/widgets/header_widget.dart"]
+    assert "Flexible(child: Expanded(" not in body
+    assert "Expanded(child: Flexible(" not in body
+
+
 def test_visible_extracted_must_not_emit_empty_shell() -> None:
     planned = {
         "lib/widgets/card_widget.dart": """

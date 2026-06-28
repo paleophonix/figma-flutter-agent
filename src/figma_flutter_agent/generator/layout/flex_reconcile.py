@@ -55,7 +55,13 @@ def _skip_flex_wrap_for_glyph_badge_child(
 
 
 def _snippet_already_wrapped(snippet: str, kind: FlexWrapKind) -> bool:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        _unwrap_flex_parent_data_wrapper,
+    )
+
     trimmed = snippet.strip()
+    if _unwrap_flex_parent_data_wrapper(trimmed) is not None:
+        return True
     if kind == FlexWrapKind.EXPANDED:
         return trimmed.startswith("Expanded(") or trimmed.startswith("const Expanded(")
     if kind == FlexWrapKind.FLEXIBLE_LOOSE:

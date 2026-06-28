@@ -476,7 +476,8 @@ def _apply_layout_slot_wraps(
         elif WrapKind.FLEXIBLE_LOOSE in slot.wraps:
             from figma_flutter_agent.generator.layout.flex_policy import emit_flexible_loose
 
-            working = emit_flexible_loose(working)
+            if _unwrap_flex_parent_data_wrapper(working) is None:
+                working = emit_flexible_loose(working)
         elif WrapKind.CROSS_STRETCH_WIDTH in slot.wraps and not _is_stretched_width_box(working):
             working = f"SizedBox(width: double.infinity, child: {working})"
         elif WrapKind.CROSS_STRETCH_HEIGHT in slot.wraps:

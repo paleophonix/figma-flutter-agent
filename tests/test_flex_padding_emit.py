@@ -373,6 +373,63 @@ def test_repair_flex_parent_data_order_hoists_nested_misorder() -> None:
     assert repaired.startswith("Expanded(child: SizedBox(")
 
 
+def test_repair_flex_parent_data_order_collapses_flexible_expanded() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = (
+        "Flexible(fit: FlexFit.loose, flex: 0, child: Expanded(child: "
+        "SizedBox(height: 24.0, child: Text('SECTION HEADER'))))"
+    )
+    repaired = repair_flex_parent_data_order(misordered)
+    assert "Flexible(" not in repaired or "Expanded(child: Flexible(" not in repaired
+    assert repaired.startswith("Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(")
+    assert "Expanded(child:" not in repaired
+
+
+def test_repair_flex_parent_data_order_collapses_expanded_flexible() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = (
+        "Expanded(child: Flexible(fit: FlexFit.loose, flex: 0, child: "
+        "SizedBox(width: 120.0, child: Text('Hi'))))"
+    )
+    repaired = repair_flex_parent_data_order(misordered)
+    assert repaired.startswith("Expanded(child: SizedBox(width: 120.0")
+    assert "Flexible(" not in repaired
+
+
+def test_repair_flex_parent_data_order_collapses_double_flexible() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = (
+        "Flexible(fit: FlexFit.loose, flex: 0, child: Flexible(fit: FlexFit.loose, flex: 0, "
+        "child: SizedBox(width: 74.0, child: const ClusterWidget())))"
+    )
+    repaired = repair_flex_parent_data_order(misordered)
+    assert repaired.count("Flexible(") == 1
+    assert repaired.startswith("Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(")
+
+
+def test_repair_nested_flex_parent_data_in_source_repairs_row_child() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        repair_nested_flex_parent_data_in_source,
+    )
+
+    source = """
+class HeaderWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Flexible(fit: FlexFit.loose, flex: 0, child: Expanded(child: SizedBox(child: Text('x')))),
+    ]);
+  }
+}
+"""
+    repaired = repair_nested_flex_parent_data_in_source(source)
+    assert "Flexible(child: Expanded(" not in repaired
+    assert "Expanded(child: Flexible(" not in repaired
+
+
 def test_layout_slot_repaint_boundary_keeps_expanded_outside() -> None:
     from figma_flutter_agent.generator.layout.widgets import _apply_layout_slot_wraps
     from figma_flutter_agent.schemas import LayoutSlotIr, WrapKind

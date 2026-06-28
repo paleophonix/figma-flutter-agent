@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from enum import StrEnum
 
@@ -266,7 +267,7 @@ def repair_flex_parent_data_order(widget: str) -> str:
 
 
 def _collapse_adjacent_flex_parent_data(widget: str) -> str:
-    """Collapse ``Expanded(Expanded(...))`` chains left by nested hoisting."""
+    """Collapse nested ``Expanded``/``Flexible`` parent-data wrappers to one layer."""
     flex = _unwrap_flex_parent_data_wrapper(widget)
     if flex is None:
         return widget
@@ -274,10 +275,45 @@ def _collapse_adjacent_flex_parent_data(widget: str) -> str:
     inner_flex = _unwrap_flex_parent_data_wrapper(inner)
     if inner_flex is None:
         return widget
-    inner_marker, innermost = inner_flex
-    if "Expanded(" in marker and "Expanded(" in inner_marker:
-        return f"{marker}{innermost})"
-    return widget
+    _, innermost = inner_flex
+    return f"{marker}{innermost})"
+
+
+_FLEX_PARENT_DATA_START_RE = re.compile(r"\b(?:const\s+)?(?:Expanded|Flexible)\s*\(")
+
+
+def repair_nested_flex_parent_data_in_source(source: str) -> str:
+    """Strip nested ``Expanded``/``Flexible`` wrappers anywhere in a Dart source."""
+    from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
+        _find_matching_paren,
+    )
+
+    updated = source
+    pos = 0
+    while pos < len(updated):
+        match = _FLEX_PARENT_DATA_START_RE.search(updated, pos)
+        if match is None:
+            break
+        start = match.start()
+        if start >= 6 and updated[start - 6 : start] == "const ":
+            start -= 6
+        open_paren = updated.find("(", start)
+        if open_paren < 0:
+            pos = match.end()
+            continue
+        end = _find_matching_paren(updated, open_paren)
+        if end is None:
+            pos = match.end()
+            continue
+        expr = updated[start : end + 1]
+        outer = _unwrap_flex_parent_data_wrapper(expr.strip())
+        if outer is not None and _unwrap_flex_parent_data_wrapper(outer[1].strip()) is not None:
+            repaired = repair_flex_parent_data_order(expr.strip())
+            updated = updated[:start] + repaired + updated[end + 1 :]
+            pos = start + len(repaired)
+            continue
+        pos = end + 1
+    return updated
 
 
 def _repair_flex_parent_data_descend(widget: str) -> str:
@@ -560,6 +596,8 @@ def apply_flex_wrap_to_widget(
     if kind == FlexWrapKind.NONE:
         return widget
     if kind == FlexWrapKind.EXPANDED:
+        if _unwrap_flex_parent_data_wrapper(widget.lstrip()) is not None:
+            return widget
         widget = _coerce_column_cross_stretch_for_row_expand(
             widget,
             parent_type=parent_type,
@@ -567,6 +605,8 @@ def apply_flex_wrap_to_widget(
         )
         return f"Expanded(child: {widget})"
     if kind == FlexWrapKind.FLEXIBLE_LOOSE:
+        if _unwrap_flex_parent_data_wrapper(widget.lstrip()) is not None:
+            return widget
         return emit_flexible_loose(widget)
     if kind == FlexWrapKind.SIZED_BOX_WIDTH:
         if node.type == NodeType.STACK and _planner_slot_handles_stack_bounds(node):

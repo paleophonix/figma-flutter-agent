@@ -375,10 +375,10 @@
   "rejectedByInvariant": [
     {
       "figmaId": "49:1665",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "VECTOR": 1
