@@ -421,19 +421,14 @@
                       "children": [
                         {
                           "figmaId": "I3212:20786;257:6602;3016:10288",
-                          "kind": "button_filled",
+                          "kind": "row",
                           "children": [
                             {
                               "figmaId": "I3212:20786;257:6602;3016:10288;3016:10138",
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "button_filled"
-                          },
-                          "fidelityTier": "native_verified",
-                          "tierSource": "manifest"
+                          ]
                         }
                       ]
                     }
@@ -592,19 +587,14 @@
                       "children": [
                         {
                           "figmaId": "I3212:20175;257:6602;3016:10288",
-                          "kind": "button_filled",
+                          "kind": "row",
                           "children": [
                             {
                               "figmaId": "I3212:20175;257:6602;3016:10288;3016:10138",
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "button_filled"
-                          },
-                          "fidelityTier": "native_verified",
-                          "tierSource": "manifest"
+                          ]
                         }
                       ]
                     }

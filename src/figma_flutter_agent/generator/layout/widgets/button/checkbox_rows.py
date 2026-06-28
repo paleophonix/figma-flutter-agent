@@ -20,6 +20,23 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from ..layout import _flex_spacing_field
 
 
+def _wrap_primary_cta_text(widget: str, *, node_id: str) -> str:
+    """Wrap primary CTA label text with a custom-code interaction slot."""
+    from figma_flutter_agent.generator.custom_code_zones import (
+        custom_code_zone_id,
+        inline_custom_code_comment,
+    )
+
+    zone = inline_custom_code_comment(custom_code_zone_id(node_id, "button-action"))
+    return (
+        "MouseRegion("
+        "cursor: SystemMouseCursors.click, "
+        f"child: GestureDetector(onTap: () {{ {zone} }}, "
+        f"behavior: HitTestBehavior.opaque, child: {widget})"
+        ")"
+    )
+
+
 def _wrap_link_text(widget: str) -> str:
     """Wrap a text widget with a tappable link affordance."""
     return (
@@ -196,4 +213,5 @@ __all__ = [
     "_try_render_consent_checkbox_row",
     "_wrap_compact_checkbox_control",
     "_wrap_link_text",
+    "_wrap_primary_cta_text",
 ]

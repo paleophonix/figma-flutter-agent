@@ -172,6 +172,22 @@ def render_node_body(
             text_theme_size_slots=text_theme_size_slots,
         )
 
+    if node.type == NodeType.COLUMN:
+        from ..input.inline_hosts import try_render_inline_input_field_host
+
+        inline_input = try_render_inline_input_field_host(
+            node,
+            theme_variant=theme_variant,
+            parent_type=parent_type,
+            uses_svg=uses_svg,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        if inline_input is not None:
+            return inline_input
+
     if node.type == NodeType.STACK:
         from figma_flutter_agent.generator.layout.flex_policy.stack import (
             layout_fact_icon_badge_stack,

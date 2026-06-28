@@ -68,8 +68,17 @@ def _flex_input_content_padding(
     if pad is not None and pad.right is not None and float(pad.right) >= 1.0:
         right = float(pad.right)
     if pad is not None and ((pad.top or 0) > 0 or (pad.bottom or 0) > 0):
-        top = pad.top or 0.0
-        bottom = pad.bottom or 0.0
+        top = float(pad.top or 0.0)
+        bottom = float(pad.bottom or 0.0)
+        if top + bottom > float(field_height) - 1.0:
+            value_node = input_value_style_node(node)
+            style_ref = value_node or hint_node
+            text_height = _input_style_line_box_height(style_ref)
+            top = max(0.0, (float(field_height) - float(text_height)) / 2.0)
+            bottom = max(0.0, float(field_height) - top - float(text_height))
+        else:
+            top = float(pad.top or 0.0)
+            bottom = float(pad.bottom or 0.0)
         return f"contentPadding: EdgeInsets.fromLTRB({left}, {top}, {right}, {bottom})"
     value_node = input_value_style_node(node)
     style_ref = value_node or hint_node
@@ -267,8 +276,13 @@ def _stack_input_decoration(
         if padding is None and not vertical_center:
             padding = _input_content_padding(surface, hint_node, effective_field_height)
         if padding is None and host_node is not None and not vertical_center:
+            padding_host = (
+                surface
+                if surface is not None and surface.padding is not None
+                else host_node
+            )
             padding = _flex_input_content_padding(
-                host_node,
+                padding_host,
                 hint_node,
                 effective_field_height,
             )

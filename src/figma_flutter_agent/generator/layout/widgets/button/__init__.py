@@ -10,6 +10,7 @@ from .checkbox_rows import (
     _try_render_consent_checkbox_row,
     _wrap_compact_checkbox_control,
     _wrap_link_text,
+    _wrap_primary_cta_text,
 )
 from .core import (
     _button_ink_surface_params,
@@ -30,4 +31,5 @@ __all__ = [
     "_wrap_button_stack",
     "_wrap_compact_checkbox_control",
     "_wrap_link_text",
+    "_wrap_primary_cta_text",
 ]

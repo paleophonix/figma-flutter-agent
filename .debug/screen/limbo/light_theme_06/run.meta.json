@@ -1,12 +1,11 @@
 {
   "feature": "light_theme_06",
-  "pipeline_run_id": "b1d734d57414",
-  "candidate_build_run_id": "b1d734d57414",
-  "committed_build_run_id": "b1d734d57414",
+  "pipeline_run_id": "5069134dca0e",
+  "candidate_build_run_id": "5069134dca0e",
+  "committed_build_run_id": "5069134dca0e",
   "writeback": "committed",
   "written_files": [
     "lib/features/light_theme_06/light_theme_06_screen.dart",
-    "lib/generated/light_theme_06_layout.dart",
     "lib/main.dart",
     "lib/theme/app_colors.dart",
     "lib/theme/app_edge_insets.dart",
@@ -16,6 +15,8 @@
     "lib/theme/app_spacing.dart",
     "lib/theme/app_theme.dart",
     "lib/theme/app_typography.dart",
+    "lib/widgets/cluster10287_widget.dart",
+    "lib/widgets/clusterd2e87d01_widget.dart",
     "lib/widgets/content_widget.dart",
     "lib/widgets/copy_widget.dart",
     "lib/widgets/footer_widget.dart",
@@ -27,5 +28,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-27T23:08:57.687494+00:00"
+  "captured_at": "2026-06-28T00:04:09.024972+00:00"
 }

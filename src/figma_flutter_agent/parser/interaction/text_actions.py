@@ -60,6 +60,30 @@ def layout_fact_actionable_accent_text_node(node: CleanDesignTreeNode) -> bool:
     return red > green + 40 and red > blue + 40
 
 
+def layout_fact_primary_cta_label_in_painted_shell(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """Return True when short CTA copy sits inside a painted primary button shell."""
+    if node.type != NodeType.TEXT or parent_node is None:
+        return False
+    if parent_node.type not in {NodeType.ROW, NodeType.COLUMN, NodeType.CONTAINER}:
+        return False
+    label = (node.text or "").strip()
+    if not label or len(label) > 32:
+        return False
+    height = parent_node.sizing.height
+    if height is None or not (40.0 <= float(height) <= 64.0):
+        return False
+    if parent_node.style.gradient is not None:
+        return True
+    channels = _argb_rgb_channels(parent_node.style.background_color)
+    if channels is None:
+        return False
+    red, green, blue = channels
+    return blue >= 120 and red <= 140 and green <= 160
+
+
 def subtree_has_actionable_accent_text(node: CleanDesignTreeNode, *, max_depth: int = 12) -> bool:
     """Return True when any descendant is accent inline action text."""
     if max_depth < 0:

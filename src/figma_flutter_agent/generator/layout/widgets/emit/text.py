@@ -27,7 +27,7 @@ from figma_flutter_agent.parser.interaction import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
-from ..button import _wrap_link_text
+from ..button import _wrap_link_text, _wrap_primary_cta_text
 from ..finalize import _finalize_widget, _wrap_accessibility
 from ..layout import _positioned_fields, positioned_fields_for_stack_center_fill
 from ..position import _ensure_positioned_stack_bounds
@@ -356,13 +356,20 @@ def render_text_node(
     if text_preserves_intrinsic_wrap_width(node) and parent_type == NodeType.COLUMN:
         widget = f"Align(alignment: Alignment.centerLeft, child: {widget})"
     from figma_flutter_agent.parser.interaction.text_actions import (
+        _argb_rgb_channels,
         layout_fact_actionable_accent_text_node,
+        layout_fact_primary_cta_label_in_painted_shell,
     )
 
-    if (
-        parent_type != NodeType.BUTTON
-        and (is_link_text(node.text) or layout_fact_actionable_accent_text_node(node))
-    ):
+    if layout_fact_primary_cta_label_in_painted_shell(node, parent_node):
+        widget = _wrap_primary_cta_text(widget, node_id=node.id)
+    elif parent_type != NodeType.BUTTON and is_link_text(node.text):
+        channels = _argb_rgb_channels(node.style.text_color)
+        if channels is not None and min(channels) >= 240:
+            widget = _wrap_primary_cta_text(widget, node_id=node.id)
+        else:
+            widget = _wrap_link_text(widget)
+    elif parent_type != NodeType.BUTTON and layout_fact_actionable_accent_text_node(node):
         widget = _wrap_link_text(widget)
     from figma_flutter_agent.generator.layout.navigation.items import (
         layout_fact_stack_bottom_nav_active_tab_pill,

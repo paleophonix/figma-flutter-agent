@@ -906,6 +906,26 @@ def stack_has_non_sequential_raster_overlay(stack: CleanDesignTreeNode) -> bool:
     return False
 
 
+def stack_has_absolute_overlay_form_slots(stack: CleanDesignTreeNode) -> bool:
+    """Return True when absolute hero/card overlays must stay in ``Stack``, not flow ``Column``."""
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        is_bottom_docked_stack_child,
+    )
+
+    if stack.type != NodeType.STACK:
+        return False
+    body_children = [
+        child
+        for child in stack.children
+        if not is_viewport_chrome_band(child) and not is_bottom_docked_stack_child(child)
+    ]
+    growable = [child for child in body_children if stack_child_is_growable_panel(child)]
+    overlays = [child for child in body_children if child not in growable]
+    if not growable or not overlays:
+        return False
+    return any(child.stack_placement is not None for child in overlays)
+
+
 def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     """True when vertically stacked panels should grow in a ``Column`` instead of ``Stack``."""
     from figma_flutter_agent.generator.layout.navigation.items import (
@@ -923,6 +943,9 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
         return True
 
     if stack_has_non_sequential_raster_overlay(stack):
+        return False
+
+    if stack_has_absolute_overlay_form_slots(stack):
         return False
 
     if is_tag_option_chip_group(stack) or stack_should_preserve_absolute_tag_chips(

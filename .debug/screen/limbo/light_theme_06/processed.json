@@ -3038,7 +3038,7 @@
                       {
                         "id": "I3212:20786;257:6602;3016:10288",
                         "name": ".base button",
-                        "type": "BUTTON",
+                        "type": "ROW",
                         "padding": {
                           "top": 8.0,
                           "bottom": 8.0,
@@ -3063,8 +3063,6 @@
                         },
                         "componentRef": "3016:10135",
                         "clusterId": "component_3016_10135_d2e87d01",
-                        "accessibilityLabel": "View all",
-                        "accessibilityHint": ".base button",
                         "variant": {
                           "componentId": "3016:10135",
                           "componentName": ".base button",

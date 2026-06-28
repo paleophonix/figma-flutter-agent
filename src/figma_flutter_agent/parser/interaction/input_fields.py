@@ -160,6 +160,11 @@ def input_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     surface = primary_surface_node(node)
     if surface is not None:
         return surface
+    from .inline_input_hosts import layout_fact_flex_painted_input_surface
+
+    for candidate in _local_nodes(node, _MAX_LOCAL_DEPTH):
+        if layout_fact_flex_painted_input_surface(candidate):
+            return candidate
     if node.type == NodeType.INPUT and (
         node.style.background_color is not None or node.style.border_radius is not None
     ):

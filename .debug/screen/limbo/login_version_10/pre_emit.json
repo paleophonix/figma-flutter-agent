@@ -138,21 +138,12 @@
             },
             {
               "figmaId": "55:2044",
-              "kind": "input_text_field",
+              "kind": "stack",
               "children": [
-                {
-                  "figmaId": "56:2126",
-                  "kind": "auto",
-                  "children": [],
-                  "fidelityTier": "png_baked",
-                  "tierSource": "policy_fallback"
-                },
                 {
                   "figmaId": "55:2096",
                   "kind": "auto",
-                  "children": [],
-                  "fidelityTier": "native_unverified",
-                  "tierSource": "policy_fallback"
+                  "children": []
                 },
                 {
                   "figmaId": "55:2045",
@@ -208,11 +199,11 @@
                       "children": [
                         {
                           "figmaId": "55:2051",
-                          "kind": "input_text_field",
+                          "kind": "column",
                           "children": [
                             {
                               "figmaId": "I55:2051;3:6011",
-                              "kind": "input_text_field",
+                              "kind": "row",
                               "children": [
                                 {
                                   "figmaId": "I55:2051;3:6012",
@@ -226,14 +217,7 @@
                                     }
                                   ]
                                 }
-                              ],
-                              "isMultiline": false,
-                              "payload": {
-                                "payloadKind": "input_text_field",
-                                "isMultiline": false
-                              },
-                              "fidelityTier": "native_unverified",
-                              "tierSource": "manifest"
+                              ]
                             }
                           ],
                           "hintText": "Email",
@@ -255,11 +239,11 @@
                         },
                         {
                           "figmaId": "55:2052",
-                          "kind": "input_text_field",
+                          "kind": "column",
                           "children": [
                             {
                               "figmaId": "I55:2052;3:6011",
-                              "kind": "input_text_field",
+                              "kind": "row",
                               "children": [
                                 {
                                   "figmaId": "I55:2052;3:6012",
@@ -284,14 +268,7 @@
                                     }
                                   ]
                                 }
-                              ],
-                              "isMultiline": false,
-                              "payload": {
-                                "payloadKind": "input_text_field",
-                                "isMultiline": false
-                              },
-                              "fidelityTier": "native_unverified",
-                              "tierSource": "manifest"
+                              ]
                             }
                           ],
                           "hintText": "Password",
@@ -395,11 +372,11 @@
                 },
                 {
                   "figmaId": "55:2058",
-                  "kind": "column",
+                  "kind": "container_accordion",
                   "children": [
                     {
                       "figmaId": "55:2059",
-                      "kind": "button_filled",
+                      "kind": "row",
                       "children": [
                         {
                           "figmaId": "I55:2059;3:6045",
@@ -411,6 +388,7 @@
                             "textColor": "0xFFFFFFFF",
                             "fontSize": 14.0
                           },
+                          "wrap": "flexibleLoose",
                           "fidelityTier": "native_verified",
                           "tierSource": "policy_fallback"
                         }
@@ -480,7 +458,7 @@
                     },
                     {
                       "figmaId": "56:2102",
-                      "kind": "auto",
+                      "kind": "row",
                       "children": [
                         {
                           "figmaId": "56:2103",
@@ -664,6 +642,9 @@
                       "tierSource": "policy_fallback"
                     }
                   ],
+                  "payload": {
+                    "payloadKind": "container_accordion"
+                  },
                   "fidelityTier": "native_unverified",
                   "tierSource": "policy_fallback"
                 },
@@ -713,16 +694,16 @@
                   },
                   "fidelityTier": "native_unverified",
                   "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "56:2126",
+                  "kind": "auto",
+                  "children": []
                 }
               ],
               "overrides": {
                 "accessibilityLabel": "Input",
                 "backgroundColor": "0xFFFFFFFF"
-              },
-              "isMultiline": false,
-              "payload": {
-                "payloadKind": "input_text_field",
-                "isMultiline": false
               },
               "classificationHint": {
                 "suggestedKind": "container_card",
@@ -1268,34 +1249,7 @@
     },
     {
       "widgetName": "NativeStatusBarWidget",
-      "widgetIr": {
-        "figmaId": "53:1983",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I53:1983;3:6767",
-            "kind": "auto",
-            "children": [],
-            "overrides": {
-              "text": "9:41",
-              "accessibilityLabel": "9:41",
-              "textColor": "0xFF021433",
-              "fontSize": 16.0
-            },
-            "fidelityTier": "native_verified",
-            "tierSource": "policy_fallback"
-          },
-          {
-            "figmaId": "I53:1983;3:6768",
-            "kind": "auto",
-            "children": [],
-            "fidelityTier": "svg_baked",
-            "tierSource": "manual_override"
-          }
-        ],
-        "fidelityTier": "native_verified",
-        "tierSource": "manual_override"
-      }
+      "code": "// <custom-code>\n// </custom-code>\n\n// <custom-code>\n// </custom-code>\n\nclass NativeStatusBarWidget extends StatelessWidget {\n  const NativeStatusBarWidget({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    final textScaler = MediaQuery.textScalerOf(context);\n    return Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 220.0, children: [Flexible(fit: FlexFit.loose, flex: 0, child: Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(height: 16.0, child: Semantics(label: '9:41', child: Text('9:41', style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: const Color(0xFF021433), fontSize: 16.0, fontWeight: FontWeight.w500, letterSpacing: 0), textScaler: textScaler, strutStyle: StrutStyle(fontSize: 16, height: 1, forceStrutHeight: true), textAlign: TextAlign.left))))), SizedBox(height: 13.0, child: Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, spacing: 5.0, children: [SizedBox(width: 18.0, height: 10.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 18.0, height: 10.0, key: ValueKey('figma-I53_1983_3_6770'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 10.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(right: 15.0, width: 3.0, top: 3.0, height: 4.0, key: ValueKey('figma-I53_1983_3_6771'), child: Semantics(label: 'Cellular_Connection-path', child: SvgPicture.asset('assets/icons/cellular_connection-path_I53_1983;3_6771.svg', width: 3.0, height: 4.0, fit: BoxFit.contain))), Positioned(right: 10.0, bottom: 2.0, width: 3.0, height: 6.0, key: ValueKey('figma-I53_1983_3_6772'), child: Semantics(label: 'Cellular_Connection-path', child: SvgPicture.asset('assets/icons/cellular_connection-path_I53_1983;3_6772.svg', width: 3.0, height: 6.0, fit: BoxFit.contain))), Positioned(right: 5.0, bottom: 1.0, width: 3.0, height: 8.0, key: ValueKey('figma-I53_1983_3_6773'), child: Semantics(label: 'Cellular_Connection-path', child: SvgPicture.asset('assets/icons/cellular_connection-path_I53_1983;3_6773.svg', width: 3.0, height: 8.0, fit: BoxFit.contain))), Positioned(right: 0.0, bottom: 0.0, width: 3.0, height: 10.0, key: ValueKey('figma-I53_1983_3_6774'), child: Semantics(label: 'Cellular_Connection-path', child: SvgPicture.asset('assets/icons/cellular_connection-path_I53_1983;3_6774.svg', width: 3.0, height: 10.0, fit: BoxFit.contain)))])))))])), SizedBox(width: 15.3, height: 11.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 15.3, height: 11.0, key: ValueKey('figma-I53_1983_3_6776'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 11.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(right: 0.0, width: 15.3, top: 3.1, height: 4.7, key: ValueKey('figma-I53_1983_3_6777'), child: Semantics(label: 'Wifi-path', child: SvgPicture.asset('assets/icons/wifi-path_I53_1983;3_6777.svg', width: 15.3, height: 4.7, fit: BoxFit.contain))), Positioned(right: 2.7, width: 9.9, top: 3.7, height: 3.6, key: ValueKey('figma-I53_1983_3_6778'), child: Semantics(label: 'Wifi-path', child: SvgPicture.asset('assets/icons/wifi-path_I53_1983;3_6778.svg', width: 9.9, height: 3.6, fit: BoxFit.contain))), Positioned(right: 5.3, width: 4.6, top: 3.8, height: 3.4, key: ValueKey('figma-I53_1983_3_6779'), child: Semantics(label: 'Wifi-path', child: SvgPicture.asset('assets/icons/wifi-path_I53_1983;3_6779.svg', width: 4.6, height: 3.4, fit: BoxFit.contain)))])))))])), SizedBox(width: 27.0, height: 13.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 27.0, height: 13.0, key: ValueKey('figma-I53_1983_3_6781'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 13.0, child: SvgPicture.asset('assets/icons/battery_I53_1983;3_6781.svg', width: 27.0, height: 13.0, fit: BoxFit.contain)))))]))]))]);\n  }\n}"
     }
   ],
   "emitterVersion": "2026.06.2"

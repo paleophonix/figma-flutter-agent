@@ -154,36 +154,6 @@
         "variant.state": "default"
       },
       "rejectReason": null
-    },
-    {
-      "figmaId": "I3212:20786;257:6602;3016:10288",
-      "kind": "button_filled",
-      "confidence": 0.86,
-      "evidence": {
-        "button_filled": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "3016:10135"
-      },
-      "rejectReason": null
-    },
-    {
-      "figmaId": "I3212:20175;257:6602;3016:10288",
-      "kind": "button_filled",
-      "confidence": 0.86,
-      "evidence": {
-        "button_filled": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "3016:10135"
-      },
-      "rejectReason": null
     }
   ],
   "rejectedBelowThreshold": [
@@ -680,10 +650,10 @@
   "rejectedByInvariant": [
     {
       "figmaId": "3212:20182",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 1,
@@ -696,10 +666,10 @@
     },
     {
       "figmaId": "3212:20183",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
         "child_type_counts": {
           "CONTAINER": 1
@@ -722,6 +692,6 @@
     "3212:20179"
   ],
   "llmAnnotationUsed": [],
-  "acceptedCount": 13,
-  "totalDecisions": 52
+  "acceptedCount": 11,
+  "totalDecisions": 50
 }

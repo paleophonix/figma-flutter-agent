@@ -425,12 +425,18 @@ def input_trailing_chrome_implies_obscure_text(node: CleanDesignTreeNode) -> boo
 
 
 def _is_nested_input_surface_host(node: CleanDesignTreeNode) -> bool:
-    """Return True when a nested ``INPUT`` only wraps the painted field surface.
+    """Return True when a nested host only wraps the painted field surface.
 
     Figma decomposes flex form fields into an outer ``INPUT`` (label + spacing) and an
-    inner ``INPUT`` named ``Input Area`` that hosts the bordered surface. The inner host
-    is presentational chrome, not a second form control.
+    inner painted surface row that hosts the bordered field chrome. The inner host is
+    presentational chrome, not a second form control.
     """
+    if node.type not in {NodeType.INPUT, NodeType.ROW}:
+        return False
+    from .inline_input_hosts import layout_fact_flex_painted_input_surface
+
+    if node.type == NodeType.ROW and layout_fact_flex_painted_input_surface(node):
+        return True
     if node.type != NodeType.INPUT:
         return False
     from .input_fields import input_surface_node

@@ -449,42 +449,6 @@
       "policy": "manifest"
     },
     {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I3212:20786;257:6602;3016:10288",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I3212:20786;257:6602;3016:10288",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I3212:20175;257:6602;3016:10288",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I3212:20175;257:6602;3016:10288",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
       "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
       "nodeId": "I3212:20180;0:580",
@@ -718,34 +682,6 @@
         "container_surface": "card",
         "component_id": "348:22",
         "variant.state": "default"
-      }
-    },
-    {
-      "nodeId": "I3212:20786;257:6602;3016:10288",
-      "kind": "button_filled",
-      "confidence": 0.86,
-      "evidence": {
-        "button_filled": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "3016:10135"
-      }
-    },
-    {
-      "nodeId": "I3212:20175;257:6602;3016:10288",
-      "kind": "button_filled",
-      "confidence": 0.86,
-      "evidence": {
-        "button_filled": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "3016:10135"
       }
     }
   ],

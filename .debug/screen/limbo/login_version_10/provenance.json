@@ -13,6 +13,33 @@
   "mutations": [
     {
       "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I55:2051;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I55:2052;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I55:2059;3:6045",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
       "transform": "viewport_clamp_guard",
       "nodeId": "53:1984",
       "field": "stack_placement",
@@ -171,24 +198,6 @@
       "policy": null
     },
     {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I55:2051;3:6014",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I55:2052;3:6014",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
       "checkpoint": "CP2_ir_passes",
       "transform": "sectionize",
       "nodeId": "53:1896",
@@ -219,42 +228,6 @@
       "old": 5,
       "new": 4,
       "policy": null
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I55:2051;3:6011",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I55:2051;3:6011",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I55:2052;3:6011",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I55:2052;3:6011",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -318,89 +291,15 @@
       }
     },
     {
-      "nodeId": "55:2044",
-      "kind": "input_text_field",
-      "confidence": 0.88,
+      "nodeId": "55:2058",
+      "kind": "container_accordion",
+      "confidence": 0.82,
       "evidence": {
-        "input_text_field": true,
+        "container_accordion": true,
         "child_type_counts": {
-          "VECTOR": 2,
-          "COLUMN": 3,
-          "ROW": 1
+          "ROW": 3
         },
-        "child_count": 6,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "55:2051",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "INPUT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "input",
-        "component_id": "3:6008",
-        "variant.state": "Inputed"
-      }
-    },
-    {
-      "nodeId": "I55:2051;3:6011",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "55:2052",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "INPUT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "input",
-        "component_id": "3:6008",
-        "variant.state": "Inputed"
-      }
-    },
-    {
-      "nodeId": "I55:2052;3:6011",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "STACK": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "55:2059",
-      "kind": "button_filled",
-      "confidence": 0.86,
-      "evidence": {
-        "button_filled": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "3:6043"
+        "child_count": 3
       }
     },
     {
