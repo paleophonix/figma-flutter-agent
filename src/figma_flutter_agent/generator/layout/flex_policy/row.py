@@ -422,6 +422,28 @@ def _row_hosts_title_text(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def layout_fact_row_title_with_trailing_action(
+    node: CleanDesignTreeNode,
+    *,
+    parent_row: CleanDesignTreeNode | None,
+) -> bool:
+    """True when a fill-width title shares a row with a trailing action control."""
+    if parent_row is None or parent_row.type != NodeType.ROW:
+        return False
+    if node.type != NodeType.TEXT or node.sizing.width_mode != SizingMode.FILL:
+        return False
+    from figma_flutter_agent.parser.interaction import stack_interaction_kind
+
+    for sibling in parent_row.children:
+        if sibling.id == node.id:
+            continue
+        if sibling.type in {NodeType.BUTTON, NodeType.ROW, NodeType.COLUMN}:
+            return True
+        if stack_interaction_kind(sibling) == "button":
+            return True
+    return False
+
+
 def _row_hosts_compact_icon_with_text(node: CleanDesignTreeNode) -> bool:
     """Return True when a header ``Row`` mixes a circular icon button with title copy."""
     from figma_flutter_agent.parser.interaction import (

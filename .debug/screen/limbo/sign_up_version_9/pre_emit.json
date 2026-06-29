@@ -579,10 +579,6 @@
                                           ]
                                         }
                                       ],
-                                      "ref": {
-                                        "widgetName": "CountriesUnitedKingdomWidget",
-                                        "namedArgs": {}
-                                      },
                                       "fidelityTier": "native_verified",
                                       "tierSource": "manual_override"
                                     },
@@ -616,10 +612,6 @@
                                               ]
                                             }
                                           ],
-                                          "ref": {
-                                            "widgetName": "VuesaxLinearArrowDownWidget",
-                                            "namedArgs": {}
-                                          },
                                           "fidelityTier": "native_verified",
                                           "tierSource": "manual_override"
                                         }

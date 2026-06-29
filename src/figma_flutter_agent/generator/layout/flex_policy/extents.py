@@ -210,6 +210,7 @@ def bind_row_cross_axis_height(
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         layout_fact_row_status_pill_badge,
+        layout_fact_row_title_with_trailing_action,
     )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         layout_fact_stack_card_metadata_host,
@@ -336,6 +337,15 @@ def bind_row_cross_axis_height(
         and parent_row.sizing.height_mode == SizingMode.HUG
         and node.type == NodeType.COLUMN
     ):
+        return hoist_flex_parent_data(
+            lambda inner: (
+                f"ConstrainedBox("
+                f"constraints: BoxConstraints(minHeight: {height_lit}), "
+                f"child: {inner})"
+            ),
+            widget,
+        )
+    if layout_fact_row_title_with_trailing_action(node, parent_row=parent_row):
         return hoist_flex_parent_data(
             lambda inner: (
                 f"ConstrainedBox("

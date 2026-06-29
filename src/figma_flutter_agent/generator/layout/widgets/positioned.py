@@ -20,6 +20,8 @@ from figma_flutter_agent.schemas import (
 from .flex_sizing import _unwrap_flex_parent_data_wrapper
 from .shared import _snap_device_pixels_ctx
 
+_DOCKED_BOTTOM_OVERFLOW_TOLERANCE_PX = 8.0
+
 
 def _stack_has_bottom_anchored_child(node: CleanDesignTreeNode) -> bool:
     """Return True when the stack pins chrome to the bottom edge (FID-21)."""
@@ -65,7 +67,11 @@ def _should_pin_bottom(
         and placement.height is not None
         and placement.height > 0
     ):
-        return placement.top + placement.height >= parent_height - 2.0
+        bottom_edge = float(placement.top) + float(placement.height)
+        if bottom_edge < float(parent_height) - 2.0:
+            return False
+        overflow = bottom_edge - float(parent_height)
+        return overflow <= _DOCKED_BOTTOM_OVERFLOW_TOLERANCE_PX
     return False
 
 
