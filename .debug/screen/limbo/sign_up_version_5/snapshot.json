@@ -2,7 +2,7 @@
   "file_key": "nJBqmuLJ1KXSA23yNouMOR",
   "node_id": "42:2281",
   "feature_name": "sign_up_version_5",
-  "tree_hash": "491973d70227219de9f7586ec92896e17ab41692d0a02f448644efaf05d2d68f",
+  "tree_hash": "9855eeb9ca4db0638ac10ac082b7af96a6ec1957b47ef6759ea1cfe102a992f4",
   "colors_hash": "a155b9015dc9c43f572c1b70ea2740fd5e331279d03d691acefae196800b1449",
   "typography_hash": "97c96557bf0d02fccc98b84a64caef6022527811116b0834b727b4906433fe24",
   "spacing_hash": "16f2ae60c47ed6c7261e52a2485a434aef0fc5c8485460db4ac53404a9c21716",
@@ -16,7 +16,7 @@
     "lib/theme/app_edge_insets.dart": "a94850dc6a4b53088c5fc4f1f826fb88be659fd111ba3148c95229ad991748d7",
     "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
     "lib/theme/app_theme.dart": "9ed229ee97f47227764c8c81a49b619178f5e072a727def8a98f6f4d899a81ef",
-    "lib/generated/sign_up_version_5_layout.dart": "2635b9265e2935af8a7f9b153f5b7dc8a3707cb97be174cb8ba6163a7422a0df",
+    "lib/generated/sign_up_version_5_layout.dart": "744527a067db76e7524bdc5a50e227028bf74ef3f99ed9cef2e28754fe00d0cc",
     "lib/features/sign_up_version_5/sign_up_version_5_screen.dart": "5a03ff79f76bb66ab55748eaf01938ccbc464875a1a6063f2b5ed66465fd44b7",
     "test/golden/sign_up_version_5_screen_test.dart": "6398343fe554d1df43672a0d6d282417c00b2e49d5a845cafa095ac442ae9d8e",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -24,14 +24,14 @@
   },
   "layout_region_hash": "d8fd4833fdd63338d8e10d1d845b1d716ca022bf29a19d1298fca0b5f135b262",
   "cluster_hashes": {
-    "component_3_6008_01024e72": "4b635d3105394442650c6cb74f34657ce5b5c09b0e3010be70a028b4fbaff88b",
-    "component_3_6008_1e718b17": "bb851c3f7424fb8b403eb3e807948c4994eb2595509f737b664c5d7bfc01d0c7",
-    "component_3_6008_c0609f94": "7813bf2c28d5e74cc98e16aa4090dcdedefaf1895a3f1a111cdf70efe7ba7353",
-    "component_3_6008_f49bc82d": "cf9064fc0f8d303735edffe3ccb4d6648386e03f83d695f168f2665e7915f2de",
-    "component_3_6008_f5c2a942": "964335c30886c73ffe613683e4cf4cfa053c4532bb6b7cf4ed635e977c0d0612"
+    "component_3_6008_01024e72": "58591d04b60dff99b3fd572adca4f3ffded1bc64e0ccae2ea29ca040bf9a81ec",
+    "component_3_6008_1e718b17": "f742cb2e00e8b981541180be3c0acc1a2a7327b104514b6ea1d7f87348d24922",
+    "component_3_6008_c0609f94": "5117ed340a0915a60a091c4471112c0ab7e8a59ebd319156eb4570a650dca1e1",
+    "component_3_6008_f49bc82d": "9ea2b6666258761b67dbad6654e3b69f4e199ee624d1a65d3b90b65c9f77fceb",
+    "component_3_6008_f5c2a942": "0ed327dad05907403d325f3726eb28c37a30d3191fbe4771bd45f0d45b42902a"
   },
   "reference_image_hash": null,
   "emitter_version": "2026.06.2",
-  "version": 6,
-  "updated_at": "2026-06-29T20:47:19.875484+00:00"
+  "version": 7,
+  "updated_at": "2026-06-29T22:08:07.007806+00:00"
 }

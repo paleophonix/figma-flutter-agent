@@ -15,8 +15,10 @@ from figma_flutter_agent.generator.layout.style import (
 )
 from figma_flutter_agent.parser.interaction.inline_input_hosts import (
     coerce_inline_input_field_host,
+    coerce_single_surface_input_field_host,
     layout_fact_inline_labeled_input_field_host,
     layout_fact_phone_composite_field_host,
+    layout_fact_single_surface_input_field_column,
     phone_composite_prefix_node,
     phone_composite_value_node,
 )
@@ -284,5 +286,32 @@ def try_render_inline_input_field_host(
             dart_weight_overrides_by_family=dart_weight_overrides_by_family,
             text_theme_slot_by_style_name=text_theme_slot_by_style_name,
             text_theme_size_slots=text_theme_size_slots,
+        )
+    if layout_fact_single_surface_input_field_column(node):
+        from figma_flutter_agent.parser.interaction.input_fields import input_trailing_chrome_nodes
+
+        host = coerce_single_surface_input_field_host(node)
+        trailing = input_trailing_chrome_nodes(host)
+        if trailing:
+            return _render_flex_input_with_trailing_chrome(
+                host,
+                trailing,
+                theme_variant=theme_variant,
+                parent_type=parent_type,
+                uses_svg=uses_svg,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            )
+        return _render_stack_input(
+            host,
+            theme_variant=theme_variant,
+            parent_type=parent_type,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+            uses_svg=uses_svg,
         )
     return None

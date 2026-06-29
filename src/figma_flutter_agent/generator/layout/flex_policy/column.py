@@ -656,3 +656,45 @@ def _flex_column_open_index(widget: str) -> int | None:
 
     match = _re.search(r"\bColumn\(", widget)
     return match.start() if match else None
+
+
+_FLEX_STRUT_METRIC_DRIFT_TOLERANCE_PX = 2.0
+
+
+def stack_inflow_column_loose_max_height(stack: CleanDesignTreeNode) -> float | None:
+    """Return a loosened vertical budget for fixed card inflow columns."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_should_emit_mixed_inflow_column_overlay,
+    )
+    from figma_flutter_agent.generator.layout.scroll import _host_stroke_inset
+
+    if not stack_should_emit_mixed_inflow_column_overlay(stack):
+        return None
+    height = stack.sizing.height
+    if height is None or float(height) <= 0:
+        return None
+    padding = stack.padding
+    stroke = _host_stroke_inset(stack)
+    inner = (
+        float(height)
+        - float(padding.top)
+        - float(padding.bottom)
+        - 2.0 * stroke
+        + _FLEX_STRUT_METRIC_DRIFT_TOLERANCE_PX
+    )
+    if inner <= 0:
+        return None
+    return inner
+
+
+def wrap_fixed_card_inflow_column(stack: CleanDesignTreeNode, column_widget: str) -> str:
+    """Loosen inflow ``Column`` height inside padded stroked card hosts."""
+    max_height = stack_inflow_column_loose_max_height(stack)
+    if max_height is None:
+        return column_widget
+    height_lit = format_geometry_literal(max_height)
+    return (
+        f"Align(alignment: Alignment.topCenter, child: "
+        f"OverflowBox(alignment: Alignment.topCenter, maxHeight: {height_lit}, "
+        f"child: {column_widget}))"
+    )

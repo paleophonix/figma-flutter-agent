@@ -62,6 +62,29 @@ def layout_fact_flex_painted_input_surface(node: CleanDesignTreeNode) -> bool:
     return True
 
 
+def layout_fact_single_surface_input_field_column(node: CleanDesignTreeNode) -> bool:
+    """Return True for one painted input-area column (component field without external label)."""
+    if node.type != NodeType.COLUMN or len(node.children) != 1:
+        return False
+    if layout_fact_phone_composite_field_host(node):
+        return False
+    surface = node.children[0]
+    if not layout_fact_flex_painted_input_surface(surface):
+        return False
+    return input_flex_value_text(node) is not None or input_flex_value_text(surface) is not None
+
+
+def coerce_single_surface_input_field_host(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+    """Shape a single-surface input column as an ``INPUT`` host for the shared field emitter."""
+    surface = node.children[0]
+    return node.model_copy(
+        update={
+            "type": NodeType.INPUT,
+            "children": [surface],
+        },
+    )
+
+
 def layout_fact_inline_labeled_input_field_host(node: CleanDesignTreeNode) -> bool:
     """Return True for label + painted input-area columns emitted as one TextField."""
     if node.type != NodeType.COLUMN:

@@ -810,6 +810,11 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 f"children: [{inflow_body}]"
                 ")"
             )
+            from figma_flutter_agent.generator.layout.flex_policy.column import (
+                wrap_fixed_card_inflow_column,
+            )
+
+            inflow_column = wrap_fixed_card_inflow_column(node, inflow_column)
         else:
             inflow_column = ""
 

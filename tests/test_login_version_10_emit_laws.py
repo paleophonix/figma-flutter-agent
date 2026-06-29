@@ -385,9 +385,9 @@ def test_decomposed_layout_paints_partitioned_wallpaper() -> None:
     layout = render_layout_file(root, feature_name="login_wallpaper_shell", uses_svg=False)[
         "lib/generated/login_wallpaper_shell_layout.dart"
     ]
-    assert "Positioned.fill(" in layout
-    assert "FittedBox(" in layout
-    assert "color: Color(0xFFFFFFFF)" not in layout.split("Stack(clipBehavior: Clip.none")[0]
+    assert "_buildBackground" in layout
+    assert "54_2043" in layout
+    assert "Image.asset(" in layout or "ImageFiltered(" in layout
 
 
 def test_login_version_10_card_stack_emits_coalesced_inflow_column() -> None:
@@ -625,3 +625,139 @@ def test_login_version_10_in_card_blur_not_duplicated_on_wallpaper() -> None:
     bg = layout.split("Widget _buildBackground")[1][:2500] if "_buildBackground" in layout else ""
     if bg:
         assert "figma-56_2126" not in bg
+
+
+def _single_surface_input_field_column() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="55:2051",
+        name="Input Field",
+        type=NodeType.COLUMN,
+        spacing=2.0,
+        sizing=Sizing(width=295.0, height=46.0),
+        children=[
+            CleanDesignTreeNode(
+                id="I55:2051;3:6011",
+                name="Input Area",
+                type=NodeType.ROW,
+                padding=Padding(top=11.5, bottom=11.5, left=13.0, right=13.0),
+                sizing=Sizing(width=295.0, height=46.0),
+                style=NodeStyle(
+                    background_color="0xFFFFFFFF",
+                    border_color="0xFFEDF1F3",
+                    border_radius=10.0,
+                    border_width=1.0,
+                ),
+                children=[
+                    CleanDesignTreeNode(
+                        id="I55:2051;3:6014",
+                        name="Value",
+                        type=NodeType.TEXT,
+                        text="Loisbecket@gmail.com",
+                        sizing=Sizing(width=207.0, height=21.0),
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def test_single_surface_input_field_column_emits_text_form_field() -> None:
+    """Law: input_text_field_contract_must_emit_text_form_field_not_static_container."""
+    from figma_flutter_agent.parser.interaction.inline_input_hosts import (
+        layout_fact_single_surface_input_field_column,
+    )
+
+    node = _single_surface_input_field_column()
+    assert layout_fact_single_surface_input_field_column(node)
+    body = render_node_body(node, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "TextFormField(" in compact
+    assert "initialValue: 'Loisbecket@gmail.com'" in compact
+    assert "Text('Loisbecket@gmail.com'" not in compact
+
+
+def test_row_social_auth_cluster_wraps_inkwell_per_child() -> None:
+    """Law: social_login_button_surface_must_be_clickable."""
+    host = CleanDesignTreeNode(
+        id="56:2102",
+        name="Button",
+        type=NodeType.ROW,
+        spacing=15.0,
+        sizing=Sizing(width=295.0, height=48.0),
+        children=[
+            _icon_only_social_row("56:2103", left=0.0),
+            _icon_only_social_row("56:2104", left=77.5),
+            _icon_only_social_row("56:2105", left=155.0),
+            _icon_only_social_row("56:2106", left=232.5),
+        ],
+    )
+    body = render_node_body(host, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert compact.count("InkWell(") >= 4
+
+
+def test_login_version_10_card_inflow_column_has_loose_height_budget() -> None:
+    """Law: card_host_height_conserves_content."""
+    root = _load_processed_root()
+    layout = render_layout_file(root, feature_name="login_version_10_overflow", uses_svg=False)[
+        "lib/generated/login_version_10_overflow_layout.dart"
+    ]
+    chunk = _layout_chunk_for_node(layout, "55_2044")
+    assert "OverflowBox(alignment: Alignment.topCenter, maxHeight: 513.0" in chunk
+
+
+def test_ambient_blurred_vector_prefers_native_blur_emit() -> None:
+    """Law: ambient_blurred_fill_covers_base."""
+    node = _ambient_wallpaper_ellipse("54:2042", "Ellipse 1")
+    node = node.model_copy(
+        update={"style": node.style.model_copy(update={"layer_blur": 368.0})},
+    )
+    body = render_node_body(node, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "ImageFiltered(" in compact
+    assert "Image.asset(" not in compact
+
+
+def test_decorative_raster_blur_wraps_image_filtered() -> None:
+    """Law: decorative_blur_child_must_preserve_source_blur_not_flat_white_bloom."""
+    node = CleanDesignTreeNode(
+        id="56:2126",
+        name="Ellipse 1",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=320.5, height=320.5),
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(left=192.0, top=-170.5, width=320.5, height=320.5),
+        image_asset_key="assets/images/ellipse_1_56_2126.png",
+        style=NodeStyle(background_color="0xFFFFFFFF", layer_blur=130.0),
+    )
+    body = render_node_body(node, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "ImageFiltered(" in compact
+    assert "Image.asset(" not in compact
+
+
+def test_stroked_checkbox_emits_visual_scale() -> None:
+    """Law: checkbox_control_must_preserve_source_visual_size_not_native_default."""
+    node = CleanDesignTreeNode(
+        id="55:2055",
+        name="player-stop",
+        type=NodeType.STACK,
+        sizing=Sizing(width=19.0, height=19.0),
+        children=[
+            CleanDesignTreeNode(
+                id="I55:2055;3:13302",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=11.1, height=11.1),
+                style=NodeStyle(
+                    has_stroke=True,
+                    border_width=1.5,
+                    border_color="0xFF6C7278",
+                ),
+            ),
+        ],
+    )
+    from figma_flutter_agent.generator.layout.form import render_checkbox
+
+    body = render_checkbox(node, theme_variant="material_3")
+    assert "visualScale:" in body

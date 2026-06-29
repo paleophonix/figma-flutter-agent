@@ -82,9 +82,33 @@ def render_row(
         row_hosts_compact_nav_tabs,
     )
     from figma_flutter_agent.generator.layout.widgets.button import _wrap_button_stack
+    from figma_flutter_agent.parser.geometry import (
+        auth_button_confidence,
+        social_auth_icon_button_confidence,
+        social_auth_row_confidence,
+    )
+    from figma_flutter_agent.parser.interaction import (
+        button_hosts_horizontal_social_auth_icon_cluster,
+    )
     from figma_flutter_agent.parser.interaction.text_actions import (
         layout_fact_primary_cta_painted_row_shell,
     )
+
+    if button_hosts_horizontal_social_auth_icon_cluster(node) and child_widgets:
+        wrapped: list[str] = []
+        for child, widget in zip(node.children, child_widgets, strict=True):
+            if (
+                social_auth_row_confidence(child) >= 0.65
+                or auth_button_confidence(child) >= 0.5
+                or social_auth_icon_button_confidence(child) >= 0.65
+            ):
+                widget = _wrap_button_stack(
+                    widget,
+                    child,
+                    theme_variant=theme_variant,
+                )
+            wrapped.append(widget)
+        child_widgets = wrapped
 
     if layout_fact_primary_cta_painted_row_shell(node) and child_widgets:
         from figma_flutter_agent.generator.layout.flex_policy import (

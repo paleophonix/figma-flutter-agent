@@ -16,7 +16,8 @@
     "style": {
       "backgroundColor": "0xFFFFFFFF",
       "borderRadius": 9.0,
-      "strokeAlign": "INSIDE"
+      "strokeAlign": "INSIDE",
+      "clipsContent": true
     },
     "children": [
       {
@@ -342,7 +343,8 @@
                   "color": "0x05000000"
                 }
               ],
-              "hasStroke": true
+              "hasStroke": true,
+              "clipsContent": true
             },
             "children": [
               {
@@ -368,7 +370,8 @@
                 },
                 "style": {
                   "borderRadius": 7.0,
-                  "strokeAlign": "INSIDE"
+                  "strokeAlign": "INSIDE",
+                  "clipsContent": true
                 },
                 "children": [
                   {
@@ -530,7 +533,8 @@
                     "left": 2.0,
                     "right": 2.0
                   },
-                  "hasStroke": true
+                  "hasStroke": true,
+                  "clipsContent": true
                 },
                 "children": [
                   {
@@ -953,7 +957,8 @@
                                 "left": 2.0,
                                 "right": 2.0
                               },
-                              "hasStroke": true
+                              "hasStroke": true,
+                              "clipsContent": true
                             },
                             "children": [
                               {
@@ -1346,7 +1351,8 @@
                                 "left": 2.0,
                                 "right": 2.0
                               },
-                              "hasStroke": true
+                              "hasStroke": true,
+                              "clipsContent": true
                             },
                             "children": [
                               {
@@ -1776,7 +1782,8 @@
                             "left": 2.0,
                             "right": 2.0
                           },
-                          "hasStroke": true
+                          "hasStroke": true,
+                          "clipsContent": true
                         },
                         "children": [
                           {
@@ -2176,7 +2183,8 @@
                             "left": 2.0,
                             "right": 2.0
                           },
-                          "hasStroke": true
+                          "hasStroke": true,
+                          "clipsContent": true
                         },
                         "children": [
                           {
@@ -2713,7 +2721,8 @@
                             "left": 2.0,
                             "right": 2.0
                           },
-                          "hasStroke": true
+                          "hasStroke": true,
+                          "clipsContent": true
                         },
                         "children": [
                           {
@@ -2741,7 +2750,8 @@
                               "strokeAlign": "INSIDE",
                               "borderWidth": 1.0,
                               "borderColor": "0xFFEDF1F3",
-                              "hasStroke": true
+                              "hasStroke": true,
+                              "clipsContent": true
                             },
                             "children": [
                               {
@@ -2758,7 +2768,8 @@
                                   "cross": "stretch"
                                 },
                                 "style": {
-                                  "strokeAlign": "INSIDE"
+                                  "strokeAlign": "INSIDE",
+                                  "clipsContent": true
                                 },
                                 "componentRef": "3:7037",
                                 "variant": {
@@ -3266,7 +3277,8 @@
                                           "cross": "stretch"
                                         },
                                         "style": {
-                                          "strokeAlign": "INSIDE"
+                                          "strokeAlign": "INSIDE",
+                                          "clipsContent": true
                                         },
                                         "componentRef": "3:4536",
                                         "variant": {
@@ -4190,7 +4202,8 @@
                             "left": 2.0,
                             "right": 2.0
                           },
-                          "hasStroke": true
+                          "hasStroke": true,
+                          "clipsContent": true
                         },
                         "children": [
                           {
@@ -4328,7 +4341,8 @@
                               "cross": "stretch"
                             },
                             "style": {
-                              "strokeAlign": "INSIDE"
+                              "strokeAlign": "INSIDE",
+                              "clipsContent": true
                             },
                             "componentRef": "3:4359",
                             "variant": {
@@ -4619,7 +4633,8 @@
                     "bottom": 3.0,
                     "left": 2.0,
                     "right": 2.0
-                  }
+                  },
+                  "clipsContent": true
                 },
                 "componentRef": "3:6043",
                 "variant": {
@@ -4800,13 +4815,14 @@
               "cross": "stretch"
             },
             "style": {
-              "strokeAlign": "INSIDE"
+              "strokeAlign": "INSIDE",
+              "clipsContent": true
             },
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
               "horizontal": "CENTER",
-              "left": -24.0,
-              "top": 224.5,
+              "left": -5.0,
+              "top": -38.0,
               "right": -43.0,
               "width": 375.0,
               "height": 257.0
@@ -4883,12 +4899,12 @@
                 "height": 257.0
               },
               "placementOrigin": {
-                "x": -24.0,
-                "y": 224.5
+                "x": -5.0,
+                "y": -38.0
               },
               "placementAabb": {
-                "x": -24.0,
-                "y": 224.5,
+                "x": -5.0,
+                "y": -38.0,
                 "width": 375.0,
                 "height": 257.0
               },

@@ -10,6 +10,9 @@ from figma_flutter_agent.generator.geometry.affine import (
     requires_raster_tier,
 )
 from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.render_units import (
+    format_figma_blur_sigma_literal,
+)
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
@@ -271,6 +274,19 @@ def _vector_needs_baked_raster(node: CleanDesignTreeNode) -> bool:
     return len(node.children) > 1 and node.vector_asset_key is None
 
 
+def _wrap_raster_layer_blur(node: CleanDesignTreeNode, widget: str) -> str:
+    """Apply ``ImageFiltered`` bloom to baked raster exports that carry ``LAYER_BLUR``."""
+    blur = node.style.layer_blur
+    if blur is None or blur <= 0:
+        return widget
+    sigma = format_figma_blur_sigma_literal(blur)
+    return (
+        f"ImageFiltered("
+        f"imageFilter: ImageFilter.blur(sigmaX: {sigma}, sigmaY: {sigma}), "
+        f"child: {widget})"
+    )
+
+
 def _wrap_paint_overflow_export(
     node: CleanDesignTreeNode,
     asset_expr: str,
@@ -358,9 +374,12 @@ def _render_exported_vector(
         if height is not None and height > 0:
             params.append(f"height: {height}")
         params.append(f"fit: {image_fit}")
+        asset_widget = f"Image.asset({', '.join(params)})"
+        if node.style.layer_blur and float(node.style.layer_blur) > 0:
+            asset_widget = _wrap_raster_layer_blur(node, asset_widget)
         return _wrap_paint_overflow_export(
             node,
-            f"Image.asset({', '.join(params)})",
+            asset_widget,
         )
 
     if node.vector_asset_key and uses_svg and node.vector_asset_key.endswith(".svg"):

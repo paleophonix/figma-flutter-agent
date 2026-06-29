@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..finalize import _finalize_widget
 from ..playback import _render_native_blur_vector, _render_svg_picture_variant
@@ -12,6 +12,18 @@ from ..svg import (
     _wrap_centered_stack_child,
 )
 
+_AMBIENT_LAYER_BLUR_MIN = 80.0
+
+
+def _vector_should_emit_native_ambient_blur(node: CleanDesignTreeNode) -> bool:
+    """Large blurred color blobs should bloom from fill color, not flat PNG tiles."""
+    blur = node.style.layer_blur
+    if blur is None or float(blur) < _AMBIENT_LAYER_BLUR_MIN:
+        return False
+    if node.type != NodeType.VECTOR:
+        return False
+    return node.style.background_color is not None
+
 
 def render_image_or_vector(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str | None:
     """Render NodeType.IMAGE / NodeType.VECTOR nodes. Returns None if no branch matches."""
@@ -20,6 +32,20 @@ def render_image_or_vector(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
     scroll_content_root = flow["scroll_content_root"]
     uses_svg = ctx["uses_svg"]
     cluster_vector_variant = ctx["cluster_vector_variant"]
+
+    if _vector_should_emit_native_ambient_blur(node):
+        widget = _render_native_blur_vector(node)
+        fill_parent = _should_center_in_parent_stack(node, parent_node)
+        if fill_parent:
+            widget = _wrap_centered_stack_child(node, widget)
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            fill_parent=fill_parent,
+            scroll_content_root=scroll_content_root,
+        )
 
     if node.vector_asset_key:
         raw_asset = node.vector_asset_key
