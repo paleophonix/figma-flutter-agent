@@ -16,7 +16,7 @@
     "lib/theme/app_edge_insets.dart": "38f188dd39f45b686e5059a758e67b1e58565aa6015afec8446836a607e563ec",
     "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
     "lib/theme/app_theme.dart": "ddc8a61524f9ef3afa1e0dd537982f42172fa1528b7cc9adf635163836ca15ff",
-    "lib/generated/sign_up_version_9_layout.dart": "3492c09b264bb4b3c56c9433991daf9ddb75e57c0d07db55007b4e0b997451c4",
+    "lib/generated/sign_up_version_9_layout.dart": "d14dee435c47e90c0b6ac936551e78b4aedd0c7067f5f7bb3821c0c901176ad9",
     "lib/features/sign_up_version_9/sign_up_version_9_screen.dart": "2ff03ae5c08d12533773a87c916110ec2c2a89ba04b5a52f112845ba2a7853b3",
     "test/golden/sign_up_version_9_screen_test.dart": "bfbed12a5e293d8c3ce9b79c29937cf118f2f201ba8610e4db6ac5f219bf3bd2",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -32,6 +32,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.06.2",
-  "version": 10,
-  "updated_at": "2026-06-29T13:36:36.233393+00:00"
+  "version": 11,
+  "updated_at": "2026-06-29T15:56:14.625256+00:00"
 }

@@ -1100,6 +1100,9 @@ def stack_flow_child_horizontal_wrap(
         layout_fact_stack_bottom_nav_tab_glyph_column,
     )
 
+    if stack_child_is_absolute_overlay(child):
+        return widget
+
     if parent_node is not None and layout_fact_stack_bottom_nav_tab_glyph_column(
         parent_node
     ):

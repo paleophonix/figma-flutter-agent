@@ -1,22 +1,22 @@
 
---- dart format @ 2026-06-29T13:48:23.132972+00:00 ---
+--- dart format @ 2026-06-29T16:01:28.125356+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\test\golden\sign_up_version_5_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b16va8dg\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3h28w4_p\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.06 seconds.
 
---- pub get --offline @ 2026-06-29T13:48:26.295674+00:00 ---
+--- pub get --offline @ 2026-06-29T16:01:31.051178+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -29,12 +29,12 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-29T13:48:28.564962+00:00 ---
+--- dart analyze (generated) @ 2026-06-29T16:01:33.422677+00:00 ---
 exit_code=0
 Analyzing native_status_bar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (1/3) @ 2026-06-29T13:48:31.359025+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-29T16:01:36.001274+00:00 ---
 exit_code=0
 Analyzing sign_up_version_5_screen.dart, sign_up_version_5_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -51,24 +51,24 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
    info - lib\generated\sign_up_version_5_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\sign_up_version_5_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\sign_up_version_5_layout.dart:70:3510 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:2227 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:3806 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:5438 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:7096 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:8986 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:14158 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:15665 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:16326 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:16373 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:2186 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:3765 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:5397 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:7055 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:8945 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:14077 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:15584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:16245 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:16292 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 22 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-29T13:48:33.614105+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-29T16:01:38.399213+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, native_status_bar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-29T13:48:36.011465+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-29T16:01:41.381497+00:00 ---
 exit_code=0
 Analyzing sign_up_version_5_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -76,58 +76,58 @@ Analyzing sign_up_version_5_screen_test.dart, element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-06-29T13:48:37.752035+00:00 ---
+--- dart format @ 2026-06-29T16:01:43.298374+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\test\golden\sign_up_version_5_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nizex_sq\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s21g5vr5\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.06 seconds.
 
---- dart format @ 2026-06-29T13:48:39.559361+00:00 ---
+--- dart format @ 2026-06-29T16:01:45.020553+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\test\golden\sign_up_version_5_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-49yb6jeg\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-buytlo8y\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.06 seconds.
 
---- dart format @ 2026-06-29T13:48:41.596158+00:00 ---
+--- dart format @ 2026-06-29T16:01:46.983916+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\test\golden\sign_up_version_5_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yftmnplq\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0vnjh1y0\analyze_check\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.06 seconds.
 
---- pub get --offline @ 2026-06-29T13:48:43.998312+00:00 ---
+--- pub get --offline @ 2026-06-29T16:01:49.496001+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -140,7 +140,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-29T13:48:46.772575+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-29T16:01:52.204313+00:00 ---
 exit_code=0
 Analyzing sign_up_version_5_screen.dart, sign_up_version_5_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -157,24 +157,24 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
    info - lib\generated\sign_up_version_5_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\sign_up_version_5_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\sign_up_version_5_layout.dart:70:3510 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:2227 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:3806 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:5438 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:7096 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:8986 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:14158 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:15665 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:16326 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:16373 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:2186 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:3765 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:5397 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:7055 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:8945 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:14077 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:15584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:16245 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:71:16292 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 22 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-29T13:48:49.162831+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-29T16:01:54.569992+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, native_status_bar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-29T13:48:51.790438+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-29T16:01:57.148866+00:00 ---
 exit_code=0
 Analyzing sign_up_version_5_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -182,25 +182,17 @@ Analyzing sign_up_version_5_screen_test.dart, element_coordinate_mapper.dart...
 
 1 issue found.
 
---- flutter pub get @ 2026-06-29T13:48:54.963038+00:00 ---
+--- flutter pub get @ 2026-06-29T16:02:00.343839+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
   matcher 0.12.19 (0.12.20 available)
   meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
+  test_api 0.7.11 (0.7.13 available)
   vector_graphics_compiler 1.2.5 (1.2.6 available)
   vector_math 2.2.0 (2.4.0 available)
 Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-29T13:48:54.965038+00:00 ---
-══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
-The following assertion was thrown while applying parent data.:
-257.0) wants to apply ParentData of type StackParentData to a RenderObject, which has been set up to
-Usually, this means that the Positioned widget has the wrong ancestor RenderObjectWidget. Typically,
-The ownership chain for the RenderObject that received the incompatible parent data was:
-When the exception was thrown, this was the stack:
-package:flutter/src/widgets/framework.dart 6945:7                            attachRenderObject
-════════════════════════════════════════════════════════════════════════════════════════════════════
+--- flutter render errors @ 2026-06-29T16:02:00.344868+00:00 ---

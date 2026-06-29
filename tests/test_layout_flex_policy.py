@@ -1833,7 +1833,13 @@ def test_mixed_inflow_absolute_stack_emits_column_plus_positioned_overlay() -> N
         name="Pattern",
         type=NodeType.STACK,
         layout_positioning="ABSOLUTE",
-        stack_placement=StackPlacement(left=-5.0, top=-38.0, width=375.0, height=257.0),
+        stack_placement=StackPlacement(
+            left=-5.0,
+            top=-38.0,
+            right=-5.0,
+            width=375.0,
+            height=257.0,
+        ),
         sizing=Sizing(width=375.0, height=257.0),
         children=[],
     )
@@ -1855,3 +1861,47 @@ def test_mixed_inflow_absolute_stack_emits_column_plus_positioned_overlay() -> N
     assert "Positioned(" in compact
     assert "top: -38.0" in compact
     assert "Get Started now" in compact
+    assert "SizedBox(width: double.infinity, child: Positioned(" not in compact
+
+
+def test_absolute_stack_overlay_skips_flow_horizontal_stretch_wrap() -> None:
+    """Law: absolute_stack_overlay_must_not_receive_flow_horizontal_stretch_wrap."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_flow_child_horizontal_wrap,
+    )
+    from figma_flutter_agent.schemas.geometry import GeometryFrame, GeomRect
+
+    overlay = CleanDesignTreeNode(
+        id="decor",
+        name="Decor",
+        type=NodeType.STACK,
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(left=0.0, top=0.0, right=0.0, width=100.0, height=50.0),
+        sizing=Sizing(width=100.0, height=50.0),
+        children=[],
+    )
+    inflow = CleanDesignTreeNode(
+        id="title",
+        name="Title",
+        type=NodeType.TEXT,
+        text="Hello",
+        sizing=Sizing(width=80.0, height=20.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=10.0, width=80.0, height=20.0),
+            placement_origin=GeomRect(y=10.0),
+        ),
+    )
+    host = CleanDesignTreeNode(
+        id="host",
+        name="Host",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=100.0),
+        children=[inflow, overlay],
+    )
+    wrapped = stack_flow_child_horizontal_wrap(
+        overlay,
+        "Positioned(left: 0.0, top: 0.0, child: const SizedBox.shrink())",
+        parent_node=host,
+    )
+    assert wrapped == "Positioned(left: 0.0, top: 0.0, child: const SizedBox.shrink())"
+    assert "SizedBox(width: double.infinity" not in wrapped
