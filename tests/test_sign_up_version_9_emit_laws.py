@@ -161,6 +161,43 @@ def test_phone_composite_field_host_fact_matches_country_prefix_column() -> None
     assert layout_fact_phone_composite_field_host(phone_form)
 
 
+def test_sign_up_pipeline_emit_preserves_back_nav_after_sectionize() -> None:
+    """Law: generate_emit_must_match_regression_render_path."""
+    from figma_flutter_agent.generator.ir.passes.planner import apply_layout_passes_for_layout_emit
+    from figma_flutter_agent.generator.normalize import (
+        clear_extracted_refs_for_inline_hosts,
+        normalize_clean_tree,
+        replan_geometry_after_layout_passes,
+    )
+    from figma_flutter_agent.schemas import ScreenIr
+
+    base = Path(".debug/screen/limbo/sign_up_version_9")
+    processed = json.loads((base / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((base / "pre_emit.json").read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    tree = normalize_clean_tree(
+        root,
+        screen_ir=screen_ir,
+        use_geometry_planner=True,
+        apply_render_safety=True,
+    )
+    tree = apply_layout_passes_for_layout_emit(tree, screen_ir=screen_ir)
+    tree = replan_geometry_after_layout_passes(tree, project_dir=None)
+    tree = clear_extracted_refs_for_inline_hosts(tree)
+    layout = render_layout_file(
+        tree,
+        feature_name="sign_up_version_9_pipeline",
+        uses_svg=True,
+        skip_layout_reconcile=True,
+        screen_ir=screen_ir,
+    )["lib/generated/sign_up_version_9_pipeline_layout.dart"]
+    assert "back-nav" in layout
+    assert "InkWell(" in layout
+    assert "vector_I49_1740;4_70829.svg', width: 14.0, height: 8.0" in layout
+    assert "SizedBox(width: 24.0, height: 24.0, child: SvgPicture" not in layout
+
+
 def test_sign_up_layout_emits_tappable_back_nav_and_bounded_phone_prefix() -> None:
     processed = json.loads(
         Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
@@ -174,9 +211,26 @@ def test_sign_up_layout_emits_tappable_back_nav_and_bounded_phone_prefix() -> No
     assert "vector_I49_1740;4_70829.svg', width: 14.0, height: 8.0" in layout
     assert "fromLTRB(14.0, 27.0" not in layout
     assert "fromLTRB(14.0, 23.5" not in layout
-    prefix = layout.split("prefix-dropdown")[1][:900]
+    prefix = layout.split("prefix-dropdown")[1][:1200]
     assert "11.5" in prefix
-    assert "spacing: 7.0" in prefix
+    assert "MainAxisAlignment.start" in prefix
+    assert "Center(child: Row(mainAxisSize: MainAxisSize.min" not in prefix
+
+
+def test_sign_up_heading_is_not_wrapped_as_button_surface() -> None:
+    """Law: control_surface_must_be_clickable_not_only_visual — static headings stay non-tappable."""
+    processed = json.loads(
+        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
+    )
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    layout = render_layout_file(root, feature_name="sign_up_version_9_heading_tap", uses_svg=True)[
+        "lib/generated/sign_up_version_9_heading_tap_layout.dart"
+    ]
+    sign_up_index = layout.index("Text('Sign Up'")
+    assert sign_up_index >= 0
+    heading_chunk = layout[max(0, sign_up_index - 400) : sign_up_index + 80]
+    assert "InkWell(" not in heading_chunk
+    assert "GestureDetector(" not in heading_chunk
 
 
 def test_sign_up_heading_emits_gradient_shader_not_theme_primary() -> None:

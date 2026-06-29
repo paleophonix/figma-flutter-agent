@@ -80,6 +80,44 @@ def test_is_figma_composite_icon_node_detects_nested_stack_layers() -> None:
     assert is_figma_composite_icon_node(node)
 
 
+def test_phone_prefix_country_row_is_not_composite_icon_parent() -> None:
+    """Law: compact_icon_renders_as_single_asset — prefix chrome with text is not one icon export."""
+    node = {
+        "id": "I49:1748;3:6099",
+        "type": "FRAME",
+        "visible": True,
+        "name": "Country",
+        "absoluteBoundingBox": {"width": 62.0, "height": 48.0},
+        "children": [
+            {
+                "id": "I49:1748;3:6100",
+                "type": "INSTANCE",
+                "visible": True,
+                "name": "Countries/United Kingdom",
+                "absoluteBoundingBox": {"width": 18.0, "height": 18.0},
+                "children": [
+                    {"id": "1:3", "type": "VECTOR", "visible": True},
+                    {"id": "1:4", "type": "VECTOR", "visible": True},
+                ],
+            },
+            {
+                "id": "I49:1748;3:6101",
+                "type": "TEXT",
+                "visible": True,
+                "name": "+44",
+                "characters": "+44",
+            },
+            {"id": "1:5", "type": "VECTOR", "visible": True},
+        ],
+    }
+    assert not is_figma_composite_icon_node(node)
+    parents, skip = collect_figma_composite_icon_groups(
+        {"id": "root", "type": "FRAME", "visible": True, "children": [node]}
+    )
+    assert "I49:1748;3:6099" not in parents
+    assert "I49:1748;3:6100" in parents
+
+
 def test_compact_multilayer_flag_emits_single_svg_not_overflow_stack() -> None:
     """Law: compact_icon_renders_as_single_asset."""
     from figma_flutter_agent.assets.composite_icons import is_composite_icon_export_node

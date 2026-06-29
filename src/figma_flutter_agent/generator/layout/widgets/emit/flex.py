@@ -274,44 +274,48 @@ def render_row(
             scroll_content_root=scroll_content_root,
         )
     if layout_fact_row_tight_horizontal_pill_label(node) and child_widgets:
+        from figma_flutter_agent.parser.interaction.inline_input_hosts import (
+            layout_fact_phone_prefix_chrome_row,
+        )
         from figma_flutter_agent.parser.interaction.chip_variant import (
             is_tag_component_chip_row,
         )
 
-        span = _row_usable_main_span(node)
-        width = float(span) if span is not None and span > 0 else node.sizing.width
-        if len(child_widgets) == 1:
-            inner = child_widgets[0]
-        else:
-            spacing_field = _flex_spacing_field(node)
-            inner = (
-                f"Row(mainAxisSize: MainAxisSize.min, "
-                "mainAxisAlignment: MainAxisAlignment.center, "
-                "crossAxisAlignment: CrossAxisAlignment.center, "
-                f"{spacing_field}children: [{', '.join(child_widgets)}])"
-            )
-        if width is not None and float(width) > 0 and not is_tag_component_chip_row(node):
-            if node.style.background_color:
-                body = f"Center(child: {inner})"
+        if not layout_fact_phone_prefix_chrome_row(node):
+            span = _row_usable_main_span(node)
+            width = float(span) if span is not None and span > 0 else node.sizing.width
+            if len(child_widgets) == 1:
+                inner = child_widgets[0]
             else:
-                width_lit = format_geometry_literal(float(width))
-                body = f"SizedBox(width: {width_lit}, child: Center(child: {inner}))"
-        else:
-            body = f"Center(child: {inner})"
-        widget = _wrap_widget_with_box_decoration(
-            node,
-            body,
-            responsive_enabled=responsive_enabled,
-            design_artboard_width=design_artboard_width,
-            parent_node=parent_node,
-        )
-        return _finalize_widget(
-            node,
-            widget,
-            parent_type=parent_type,
-            parent_node=parent_node,
-            scroll_content_root=scroll_content_root,
-        )
+                spacing_field = _flex_spacing_field(node)
+                inner = (
+                    f"Row(mainAxisSize: MainAxisSize.min, "
+                    "mainAxisAlignment: MainAxisAlignment.center, "
+                    "crossAxisAlignment: CrossAxisAlignment.center, "
+                    f"{spacing_field}children: [{', '.join(child_widgets)}])"
+                )
+            if width is not None and float(width) > 0 and not is_tag_component_chip_row(node):
+                if node.style.background_color:
+                    body = f"Center(child: {inner})"
+                else:
+                    width_lit = format_geometry_literal(float(width))
+                    body = f"SizedBox(width: {width_lit}, child: Center(child: {inner}))"
+            else:
+                body = f"Center(child: {inner})"
+            widget = _wrap_widget_with_box_decoration(
+                node,
+                body,
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
+                parent_node=parent_node,
+            )
+            return _finalize_widget(
+                node,
+                widget,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
     if layout_fact_row_status_pill_badge(node) and child_widgets:
         body = status_pill_badge_body(
             node,

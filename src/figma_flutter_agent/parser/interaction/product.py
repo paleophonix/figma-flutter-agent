@@ -199,8 +199,11 @@ def layout_fact_stack_hero_full_bleed_scrim(node: CleanDesignTreeNode) -> bool:
 
 def layout_fact_stack_product_recommendation_hero(node: CleanDesignTreeNode) -> bool:
     """Square product-card imagery hosts with optional badge and wishlist affordances."""
+    from figma_flutter_agent.generator.ir.passes.sectionize import is_sectionize_band_wrapper_id
     from .enrichment import find_raster_photo_leaf
 
+    if is_sectionize_band_wrapper_id(node.id):
+        return False
     if node.type != NodeType.STACK:
         return False
     width = node.sizing.width

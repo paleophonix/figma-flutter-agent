@@ -312,60 +312,6 @@
       "policy": null
     },
     {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I42:3661;3:6010",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I42:3661;3:6014",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I42:3662;3:6010",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I42:3662;3:6014",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I42:3663;3:6010",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I42:3663;3:6014",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
       "checkpoint": "CP2_ir_passes",
       "transform": "sectionize",
       "nodeId": "42:2281",

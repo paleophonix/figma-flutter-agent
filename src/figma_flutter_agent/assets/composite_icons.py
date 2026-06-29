@@ -47,10 +47,25 @@ def _figma_bbox_size(node: dict[str, Any]) -> tuple[float | None, float | None]:
     )
 
 
+def _figma_subtree_has_visible_text(node: dict[str, Any]) -> bool:
+    """Return True when a Figma subtree contains non-empty TEXT layers."""
+    if node.get("visible") is False:
+        return False
+    if node.get("type") == "TEXT":
+        characters = str(node.get("characters") or "").strip()
+        return bool(characters)
+    for child in node.get("children") or []:
+        if _figma_subtree_has_visible_text(child):
+            return True
+    return False
+
+
 def is_figma_composite_icon_node(node: dict[str, Any]) -> bool:
     """True when a Figma frame/group is a small multicolor vector icon (e.g. Google G)."""
     node_type = node.get("type")
     if node_type not in {"FRAME", "GROUP", "COMPONENT", "INSTANCE"}:
+        return False
+    if _figma_subtree_has_visible_text(node):
         return False
     if _count_figma_vectors(node) < _MIN_COMPOSITE_ICON_VECTORS:
         return False
@@ -176,6 +191,10 @@ def collect_figma_composite_icon_groups(
 
 def is_composite_icon_stack_shape(node: CleanDesignTreeNode) -> bool:
     """True when a stack matches a small multicolor icon group (with or without export)."""
+    from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
+
+    if subtree_has_text_descendant(node):
+        return False
     if node.type != NodeType.STACK:
         return False
     if _count_clean_tree_vectors(node) < _MIN_COMPOSITE_ICON_VECTORS:

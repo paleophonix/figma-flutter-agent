@@ -141,23 +141,41 @@
                   "figmaId": "42:2339",
                   "kind": "auto",
                   "children": [],
+                  "overrides": {
+                    "text": "Get Started now",
+                    "accessibilityLabel": "Get Started now",
+                    "textColor": "0xFF1A1C1E",
+                    "fontSize": 32.0
+                  },
                   "layoutHints": {
                     "heightFit": "min"
-                  }
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
                 },
                 {
                   "figmaId": "42:2340",
                   "kind": "auto",
                   "children": [],
+                  "overrides": {
+                    "text": "Create an account or log in to explore about our app",
+                    "accessibilityLabel": "Create an account or log in to explore about our app",
+                    "textColor": "0xFF6C7278",
+                    "fontSize": 12.0
+                  },
                   "layoutHints": {
                     "heightFit": "min"
-                  }
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
                 }
               ],
               "layoutHints": {
                 "minHeight": 90.0,
                 "heightFit": "min"
-              }
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
             },
             {
               "figmaId": "42:2341",
@@ -171,9 +189,29 @@
                       "figmaId": "42:2347",
                       "kind": "auto",
                       "children": [],
-                      "wrap": "flexibleLoose"
+                      "overrides": {
+                        "text": "Sign Up",
+                        "accessibilityLabel": "Sign Up",
+                        "textColor": "0xFF000000",
+                        "fontSize": 14.0
+                      },
+                      "wrap": "flexibleLoose",
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
                     }
-                  ]
+                  ],
+                  "isSelected": true,
+                  "payload": {
+                    "payloadKind": "chip_choice",
+                    "isSelected": true
+                  },
+                  "classificationHint": {
+                    "suggestedKind": "chip_choice",
+                    "confidence": 0.72,
+                    "rationale": "Segment option within auth tab switch; visually unselected but current screen context is sign up."
+                  },
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "policy_fallback"
                 },
                 {
                   "figmaId": "42:2342",
@@ -183,11 +221,45 @@
                       "figmaId": "42:2344",
                       "kind": "auto",
                       "children": [],
-                      "wrap": "flexibleLoose"
+                      "overrides": {
+                        "text": "Log In",
+                        "accessibilityLabel": "Log In",
+                        "textColor": "0xFF232447",
+                        "fontSize": 14.0
+                      },
+                      "wrap": "flexibleLoose",
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
                     }
-                  ]
+                  ],
+                  "isSelected": false,
+                  "payload": {
+                    "payloadKind": "chip_choice",
+                    "isSelected": false
+                  },
+                  "classificationHint": {
+                    "suggestedKind": "chip_choice",
+                    "confidence": 0.72,
+                    "rationale": "Second option in auth tab switch."
+                  },
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "policy_fallback"
                 }
-              ]
+              ],
+              "overrides": {
+                "accessibilityLabel": "Authentication tab switch",
+                "backgroundColor": "0xFFF5F6F9"
+              },
+              "payload": {
+                "payloadKind": "chip_choice"
+              },
+              "classificationHint": {
+                "suggestedKind": "control_segmented",
+                "confidence": 0.68,
+                "rationale": "Two mutually exclusive auth options in a rounded segmented container."
+              },
+              "fidelityTier": "native_unverified",
+              "tierSource": "policy_fallback"
             },
             {
               "figmaId": "42:3658",
@@ -235,7 +307,23 @@
                                 }
                               ]
                             }
-                          ]
+                          ],
+                          "hintText": "First Name",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "First Name",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_text_field",
+                            "confidence": 0.78,
+                            "rationale": "Reusable text field component instance with label First Name."
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "policy_fallback"
                         },
                         {
                           "figmaId": "42:3662",
@@ -271,9 +359,27 @@
                                 }
                               ]
                             }
-                          ]
+                          ],
+                          "hintText": "Last Name",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "Last Name",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_text_field",
+                            "confidence": 0.78,
+                            "rationale": "Reusable text field component instance with label Last Name."
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "policy_fallback"
                         }
-                      ]
+                      ],
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
                     },
                     {
                       "figmaId": "42:3663",
@@ -309,7 +415,23 @@
                             }
                           ]
                         }
-                      ]
+                      ],
+                      "hintText": "Email",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "Email",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_text_field",
+                        "confidence": 0.79,
+                        "rationale": "Reusable text field component instance with email content."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
                     },
                     {
                       "figmaId": "42:3664",
@@ -323,9 +445,19 @@
                               "figmaId": "I42:3664;3:6010",
                               "kind": "auto",
                               "children": [],
-                              "wrap": "flexibleLoose"
+                              "overrides": {
+                                "text": "Birth of date",
+                                "accessibilityLabel": "Birth of date",
+                                "textColor": "0xFF6C7278",
+                                "fontSize": 12.0
+                              },
+                              "wrap": "flexibleLoose",
+                              "fidelityTier": "native_verified",
+                              "tierSource": "policy_fallback"
                             }
-                          ]
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "policy_fallback"
                         },
                         {
                           "figmaId": "I42:3664;3:6011",
@@ -339,9 +471,19 @@
                                   "figmaId": "I42:3664;3:6014",
                                   "kind": "auto",
                                   "children": [],
-                                  "wrap": "flexibleLoose"
+                                  "overrides": {
+                                    "text": "18/03/2024",
+                                    "accessibilityLabel": "18/03/2024",
+                                    "textColor": "0xFF1A1C1E",
+                                    "fontSize": 14.0
+                                  },
+                                  "wrap": "flexibleLoose",
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "policy_fallback"
                                 }
-                              ]
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "policy_fallback"
                             },
                             {
                               "figmaId": "I42:3664;3:6015",
@@ -352,11 +494,54 @@
                                   "kind": "auto",
                                   "children": []
                                 }
-                              ]
+                              ],
+                              "classificationHint": {
+                                "suggestedKind": "input_picker_date",
+                                "confidence": 0.76,
+                                "rationale": "Calendar icon trailing affordance indicates date picker input."
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
                             }
-                          ]
+                          ],
+                          "overrides": {
+                            "accessibilityLabel": "Birth of date",
+                            "backgroundColor": "0xFFFFFFFF"
+                          },
+                          "hintText": "Birth of date",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "Birth of date",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_picker_date",
+                            "confidence": 0.78,
+                            "rationale": "Text input with trailing calendar icon and date-formatted value."
+                          },
+                          "fidelityTier": "native_unverified",
+                          "tierSource": "policy_fallback"
                         }
-                      ]
+                      ],
+                      "hintText": "Birth of date",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "Birth of date",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_picker_date",
+                        "confidence": 0.78,
+                        "rationale": "Date field container."
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "policy_fallback"
                     },
                     {
                       "figmaId": "42:3665",
@@ -370,9 +555,19 @@
                               "figmaId": "I42:3665;3:6097",
                               "kind": "auto",
                               "children": [],
-                              "wrap": "flexibleLoose"
+                              "overrides": {
+                                "text": "Phone Number",
+                                "accessibilityLabel": "Phone Number",
+                                "textColor": "0xFF6C7278",
+                                "fontSize": 12.0
+                              },
+                              "wrap": "flexibleLoose",
+                              "fidelityTier": "native_verified",
+                              "tierSource": "policy_fallback"
                             }
-                          ]
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "policy_fallback"
                         },
                         {
                           "figmaId": "I42:3665;3:6098",
@@ -441,7 +636,13 @@
                                         }
                                       ]
                                     }
-                                  ]
+                                  ],
+                                  "ref": {
+                                    "widgetName": "CountriesUnitedKingdomWidget",
+                                    "namedArgs": {}
+                                  },
+                                  "fidelityTier": "svg_baked",
+                                  "tierSource": "manifest"
                                 },
                                 {
                                   "figmaId": "I42:3665;3:6101",
@@ -472,21 +673,80 @@
                                             }
                                           ]
                                         }
-                                      ]
+                                      ],
+                                      "ref": {
+                                        "widgetName": "VuesaxLinearArrowDownWidget",
+                                        "namedArgs": {}
+                                      },
+                                      "fidelityTier": "svg_baked",
+                                      "tierSource": "manifest"
                                     }
-                                  ]
+                                  ],
+                                  "fidelityTier": "native_unverified",
+                                  "tierSource": "policy_fallback"
                                 }
-                              ]
+                              ],
+                              "classificationHint": {
+                                "suggestedKind": "input_dropdown",
+                                "confidence": 0.69,
+                                "rationale": "Country code selector preceding phone number input."
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
                             },
                             {
                               "figmaId": "I42:3665;3:6102",
                               "kind": "auto",
                               "children": [],
-                              "wrap": "flexibleLoose"
+                              "overrides": {
+                                "text": "(454) 726-0592",
+                                "accessibilityLabel": "(454) 726-0592",
+                                "textColor": "0xFF1A1C1E",
+                                "fontSize": 14.0
+                              },
+                              "wrap": "flexibleLoose",
+                              "fidelityTier": "native_verified",
+                              "tierSource": "policy_fallback"
                             }
-                          ]
+                          ],
+                          "overrides": {
+                            "accessibilityLabel": "Phone Number",
+                            "backgroundColor": "0xFFFFFFFF"
+                          },
+                          "hintText": "Phone Number",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "Phone Number",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_dropdown",
+                            "confidence": 0.67,
+                            "rationale": "Composite phone field with country selector and phone value."
+                          },
+                          "fidelityTier": "native_unverified",
+                          "tierSource": "policy_fallback"
                         }
-                      ]
+                      ],
+                      "hintText": "Phone Number",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "Phone Number",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_dropdown",
+                        "confidence": 0.67,
+                        "rationale": "Phone form composed of country dropdown and phone entry."
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "policy_fallback"
                     },
                     {
                       "figmaId": "42:3666",
@@ -500,9 +760,19 @@
                               "figmaId": "I42:3666;3:6010",
                               "kind": "auto",
                               "children": [],
-                              "wrap": "flexibleLoose"
+                              "overrides": {
+                                "text": "Set Password",
+                                "accessibilityLabel": "Set Password",
+                                "textColor": "0xFF6C7278",
+                                "fontSize": 12.0
+                              },
+                              "wrap": "flexibleLoose",
+                              "fidelityTier": "native_verified",
+                              "tierSource": "policy_fallback"
                             }
-                          ]
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "policy_fallback"
                         },
                         {
                           "figmaId": "I42:3666;3:6011",
@@ -516,9 +786,19 @@
                                   "figmaId": "I42:3666;3:6014",
                                   "kind": "auto",
                                   "children": [],
-                                  "wrap": "flexibleLoose"
+                                  "overrides": {
+                                    "text": "*******",
+                                    "accessibilityLabel": "*******",
+                                    "textColor": "0xFF1A1C1E",
+                                    "fontSize": 14.0
+                                  },
+                                  "wrap": "flexibleLoose",
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "policy_fallback"
                                 }
-                              ]
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "policy_fallback"
                             },
                             {
                               "figmaId": "I42:3666;3:6015",
@@ -529,13 +809,58 @@
                                   "kind": "auto",
                                   "children": []
                                 }
-                              ]
+                              ],
+                              "classificationHint": {
+                                "suggestedKind": "button_icon",
+                                "confidence": 0.64,
+                                "rationale": "Eye-off icon likely toggles password visibility."
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "policy_fallback"
                             }
-                          ]
+                          ],
+                          "overrides": {
+                            "accessibilityLabel": "Set Password",
+                            "backgroundColor": "0xFFFFFFFF"
+                          },
+                          "hintText": "Set Password",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "Set Password",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_text_field",
+                            "confidence": 0.79,
+                            "rationale": "Password field with eye-off trailing icon."
+                          },
+                          "fidelityTier": "native_unverified",
+                          "tierSource": "policy_fallback"
                         }
-                      ]
+                      ],
+                      "hintText": "Set Password",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "Set Password",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_text_field",
+                        "confidence": 0.79,
+                        "rationale": "Password input container."
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "policy_fallback"
                     }
-                  ]
+                  ],
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
                 },
                 {
                   "figmaId": "42:3667",
@@ -545,18 +870,56 @@
                       "figmaId": "I42:3667;3:6045",
                       "kind": "auto",
                       "children": [],
-                      "wrap": "flexibleLoose"
+                      "overrides": {
+                        "text": "Register",
+                        "accessibilityLabel": "Register",
+                        "textColor": "0xFFFFFFFF",
+                        "fontSize": 14.0
+                      },
+                      "wrap": "flexibleLoose",
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
                     }
-                  ]
+                  ],
+                  "overrides": {
+                    "accessibilityLabel": "Register",
+                    "backgroundColor": "0xFF1D61E7"
+                  },
+                  "payload": {
+                    "payloadKind": "button"
+                  },
+                  "classificationHint": {
+                    "suggestedKind": "button_filled",
+                    "confidence": 0.79,
+                    "rationale": "Primary call-to-action button with filled background."
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
                 }
-              ]
+              ],
+              "overrides": {
+                "accessibilityLabel": "Input"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
             },
             {
               "figmaId": "42:2283",
               "kind": "stack",
-              "children": []
+              "children": [],
+              "fidelityTier": "svg_baked",
+              "tierSource": "manifest"
             }
-          ]
+          ],
+          "layoutHints": {
+            "flexSpacing": 24.0,
+            "scrollAxis": "vertical",
+            "gapMode": "uniform",
+            "minHeight": 706.0,
+            "heightFit": "content"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
         },
         {
           "figmaId": "42:2369",
@@ -1103,7 +1466,6 @@
               "textColor": "0xFF021433",
               "fontSize": 16.0
             },
-            "wrap": "flexibleLoose",
             "fidelityTier": "native_verified",
             "tierSource": "policy_fallback"
           },
@@ -1121,7 +1483,13 @@
     },
     {
       "widgetName": "CountriesUnitedKingdomWidget",
-      "code": "// <custom-code>\n// </custom-code>\n\nclass CountriesUnitedKingdomWidget extends StatelessWidget {\n  const CountriesUnitedKingdomWidget({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 18.0, height: 18.0, key: ValueKey('figma-I42_3665_3_6100_3_7038'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 18.0, child: SvgPicture.asset('assets/icons/circle_george_cross_I42_3665;3_6100;3_7038.svg', width: 18.0, height: 18.0, fit: BoxFit.contain))))), Positioned(left: 0.0, bottom: 0.0, width: 18.0, height: 18.0, key: ValueKey('figma-I42_3665_3_6100_3_7039'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 18.0, child: Stack(clipBehavior: Clip.none, children: [Positioned.fill(child: Semantics(child: Center(child: SvgPicture.asset('assets/icons/canton_I42_3665;3_6100;3_7039;623_87474.svg', width: 9.0, height: 9.0, fit: BoxFit.contain))))]))))), Positioned(left: 0.9, top: 0.7, width: 6.0, height: 8.8, key: ValueKey('figma-I42_3665_3_6100_3_7040'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 8.8, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 6.0, height: 18.0, key: ValueKey('figma-I42_3665_3_6100_3_7041'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 18.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 18.0, height: 18.0, key: ValueKey('figma-I42_3665_3_6100_3_7041_623_87495'), child: Semantics(child: SvgPicture.asset('assets/icons/background_I42_3665;3_6100;3_7041;623_87495.svg', width: 18.0, height: 18.0, fit: BoxFit.contain)))]))))), Positioned(left: 0.0, bottom: 0.0, width: 6.0, height: 18.0, key: ValueKey('figma-I42_3665_3_6100_3_7042'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 18.0, child: Stack(clipBehavior: Clip.none, children: [Positioned.fill(child: Semantics(child: Center(child: SvgPicture.asset('assets/icons/vector_I42_3665;3_6100;3_7042;1_217.svg', width: 6.0, height: 8.8, fit: BoxFit.contain))))])))))])))))]);\n  }\n}"
+      "widgetIr": {
+        "figmaId": "I42:3665;3:6100",
+        "kind": "auto",
+        "children": [],
+        "fidelityTier": "svg_baked",
+        "tierSource": "manifest"
+      }
     },
     {
       "widgetName": "VuesaxLinearArrowDownWidget",

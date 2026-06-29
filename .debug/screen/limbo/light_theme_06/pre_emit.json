@@ -185,20 +185,6 @@
           }
         },
         {
-          "figmaId": "3212:20183",
-          "kind": "stack",
-          "children": [
-            {
-              "figmaId": "I3212:20183;0:420",
-              "kind": "auto",
-              "children": [],
-              "overrides": {
-                "backgroundColor": "0xFF1A1A1A"
-              }
-            }
-          ]
-        },
-        {
           "figmaId": "3212:20169",
           "kind": "container_accordion",
           "children": [
@@ -945,6 +931,20 @@
           },
           "fidelityTier": "native_unverified",
           "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "3212:20183",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I3212:20183;0:420",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "0xFF1A1A1A"
+              }
+            }
+          ]
         },
         {
           "figmaId": "3212:20180",

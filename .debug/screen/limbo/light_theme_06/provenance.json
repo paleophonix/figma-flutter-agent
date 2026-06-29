@@ -423,9 +423,9 @@
       "field": "layout_evidence",
       "old": null,
       "new": {
-        "sections": 1,
-        "bands": 1,
-        "bottom_chrome": 3,
+        "sections": 2,
+        "bands": 2,
+        "bottom_chrome": 2,
         "top_chrome": 1
       },
       "policy": null

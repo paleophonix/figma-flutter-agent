@@ -155,6 +155,25 @@ def layout_fact_phone_composite_field_host(node: CleanDesignTreeNode) -> bool:
     return len(labels) == 1
 
 
+def layout_fact_phone_prefix_chrome_row(node: CleanDesignTreeNode) -> bool:
+    """Return True when a row is country-prefix chrome inside a phone composite field."""
+    if node.type != NodeType.ROW:
+        return False
+    if node.name and "country" in node.name.lower():
+        return True
+    for child in node.children:
+        variant = child.variant
+        if variant is not None and "countries" in (variant.component_name or "").lower():
+            return True
+        for descendant in child.children:
+            descendant_variant = descendant.variant
+            if descendant_variant is not None and "countries" in (
+                descendant_variant.component_name or ""
+            ).lower():
+                return True
+    return False
+
+
 def coerce_inline_input_field_host(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
     """Shape a labeled input column as an ``INPUT`` host for the shared field emitter."""
     surface = next(child for child in node.children if layout_fact_flex_painted_input_surface(child))
