@@ -120,5 +120,6 @@ class NodeStyle(BaseModel):
     background_blur: float | None = Field(default=None, alias="backgroundBlur")
     render_bounds_expand: Padding | None = Field(default=None, alias="renderBoundsExpand")
     has_stroke: bool = Field(default=False, alias="hasStroke")
+    clips_content: bool = Field(default=False, alias="clipsContent")
     blend_mode: str | None = Field(default=None, alias="blendMode")
     css_properties: dict[str, str] = Field(default_factory=dict, alias="cssProperties")

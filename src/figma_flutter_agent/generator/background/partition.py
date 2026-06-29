@@ -7,6 +7,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from .detection import (
     _is_ambient_background_child,
+    in_card_decorative_overlay_should_stay,
     is_decorative_absolute_background_overlay,
     is_screen_wallpaper_node,
 )
@@ -22,6 +23,9 @@ def extract_nested_decorative_backgrounds(
         pruned_children: list[CleanDesignTreeNode] = []
         for child in node.children:
             if is_decorative_absolute_background_overlay(child):
+                if in_card_decorative_overlay_should_stay(node, child):
+                    pruned_children.append(prune(child))
+                    continue
                 extracted.append(child)
                 continue
             pruned_children.append(prune(child))
@@ -112,6 +116,8 @@ def collect_ambient_background_children(
         if is_screen_wallpaper_node(child, root):
             continue
         if not _is_ambient_background_child(child):
+            continue
+        if in_card_decorative_overlay_should_stay(root, child):
             continue
         ambient.append(child)
     return ambient

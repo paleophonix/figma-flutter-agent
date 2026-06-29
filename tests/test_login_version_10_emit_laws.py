@@ -17,6 +17,8 @@ from figma_flutter_agent.parser.interaction.buttons import (
 )
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    GradientFill,
+    GradientStop,
     LayoutSlotIr,
     NodeStyle,
     NodeType,
@@ -478,3 +480,148 @@ def test_decorative_blur_absolute_does_not_block_mixed_inflow() -> None:
     assert card is not None
     assert stack_has_non_sequential_raster_overlay(card) is False
     assert stack_should_emit_mixed_inflow_column_overlay(card) is True
+
+
+def _synthetic_bounded_card_stack() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="card:host",
+        name="Input",
+        type=NodeType.STACK,
+        padding=Padding(top=24.0, bottom=24.0, left=24.0, right=24.0),
+        spacing=24.0,
+        sizing=Sizing(width=343.0, height=561.0),
+        style=NodeStyle(
+            background_color="0x99FFFFFF",
+            border_radius=12.0,
+            border_color="0x99FFFFFF",
+            border_width=1.0,
+            has_stroke=True,
+            clips_content=True,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="card:logo",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=34.0, height=34.0),
+                vector_asset_key="assets/icons/vector_card_logo.svg",
+                style=NodeStyle(
+                    gradient=GradientFill(
+                        type="linear",
+                        stops=[
+                            GradientStop(position=0.0, color="0xFF6E8AFC"),
+                            GradientStop(position=1.0, color="0xFF375DFB"),
+                        ],
+                        angle=90.0,
+                    ),
+                ),
+            ),
+            CleanDesignTreeNode(
+                id="card:heading",
+                name="Login",
+                type=NodeType.TEXT,
+                text="Login",
+                sizing=Sizing(width=85.0, height=42.0),
+            ),
+            CleanDesignTreeNode(
+                id="card:field",
+                name="Email",
+                type=NodeType.INPUT,
+                sizing=Sizing(width=295.0, height=46.0),
+                children=[],
+            ),
+            CleanDesignTreeNode(
+                id="card:blur",
+                name="Ellipse 1",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=320.5, height=320.5),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    left=192.0,
+                    top=-170.5,
+                    width=320.5,
+                    height=320.5,
+                ),
+                vector_asset_key="assets/icons/ellipse_card_blur.svg",
+                image_asset_key="assets/images/ellipse_card_blur.png",
+                style=NodeStyle(layer_blur=130.0),
+            ),
+        ],
+    )
+
+
+def test_login_card_surface_emits_translucent_fill_and_padding() -> None:
+    """Law: solid_fill_paint_opacity + autolayout_stack_surface_must_apply_padding."""
+    root = _synthetic_bounded_card_stack()
+    layout = render_layout_file(root, feature_name="login_card_surface", uses_svg=True)[
+        "lib/generated/login_card_surface_layout.dart"
+    ]
+    assert "Color(0x99FFFFFF)" in layout
+    assert "EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0)" in layout
+    assert "Container(decoration: BoxDecoration(" in layout
+
+
+def test_login_card_clips_decorative_children_to_radius() -> None:
+    """Law: clips_content_surface_must_clip_children_to_border_radius."""
+    root = _synthetic_bounded_card_stack()
+    layout = render_layout_file(root, feature_name="login_card_clip", uses_svg=True)[
+        "lib/generated/login_card_clip_layout.dart"
+    ]
+    card_chunk = layout.split("card:host")[0]
+    assert "ClipRRect(borderRadius: BorderRadius.circular(12.0)" in layout
+
+
+def test_login_version_10_processed_card_emits_padding() -> None:
+    """Law: autolayout_stack_surface_must_apply_padding_to_painted_children."""
+    root = _load_processed_root()
+    layout = render_layout_file(root, feature_name="login_version_10_padding", uses_svg=True)[
+        "lib/generated/login_version_10_padding_layout.dart"
+    ]
+    assert "EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0)" in layout
+
+
+def test_login_version_10_processed_logo_uses_contain_fit() -> None:
+    """Law: vector_brand_glyph_must_preserve_intrinsic_aspect_ratio."""
+    root = _load_processed_root()
+    layout = render_layout_file(root, feature_name="login_version_10_logo", uses_svg=True)[
+        "lib/generated/login_version_10_logo_layout.dart"
+    ]
+    assert "vector_55_2096.svg" in layout
+    assert "fit: BoxFit.contain" in layout or "fit: BoxFit.scaleDown" in layout
+    assert "vector_55_2096.svg', width: 34.0, height: 34.0, fit: BoxFit.fill" not in layout
+
+
+def test_login_card_in_card_blur_not_hoisted_to_wallpaper() -> None:
+    """Law: in_card_decorative_absolute_must_paint_behind_inflow_without_wallpaper_duplicate."""
+    from figma_flutter_agent.generator.background import extract_nested_decorative_backgrounds
+
+    root = _synthetic_bounded_card_stack()
+    _, extracted = extract_nested_decorative_backgrounds(root)
+    assert not any(node.id == "card:blur" for node in extracted)
+    _, wallpaper_children, _ = partition_wallpaper_foreground_tree(root)
+    assert not any(child.id == "card:blur" for child in wallpaper_children)
+
+
+def test_login_card_logo_vector_uses_contain_fit() -> None:
+    """Law: vector_brand_glyph_must_preserve_intrinsic_aspect_ratio."""
+    root = _synthetic_bounded_card_stack()
+    layout = render_layout_file(root, feature_name="login_card_logo", uses_svg=True)[
+        "lib/generated/login_card_logo_layout.dart"
+    ]
+    assert "vector_card_logo.svg" in layout
+    assert "fit: BoxFit.contain" in layout
+    assert "vector_card_logo.svg', width: 34.0, height: 34.0, fit: BoxFit.fill" not in layout
+
+
+def test_login_version_10_in_card_blur_not_duplicated_on_wallpaper() -> None:
+    """Law: in_card_decorative_absolute_must_paint_behind_inflow_without_wallpaper_duplicate."""
+    root = _load_processed_root()
+    _, wallpaper_children, _ = partition_wallpaper_foreground_tree(root)
+    wallpaper_ids = {child.id for child in wallpaper_children}
+    assert "56:2126" not in wallpaper_ids
+    layout = render_layout_file(root, feature_name="login_version_10_wallpaper", uses_svg=True)[
+        "lib/generated/login_version_10_wallpaper_layout.dart"
+    ]
+    bg = layout.split("Widget _buildBackground")[1][:2500] if "_buildBackground" in layout else ""
+    if bg:
+        assert "figma-56_2126" not in bg

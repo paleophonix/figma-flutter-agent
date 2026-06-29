@@ -121,6 +121,49 @@ def _is_playback_chrome_stack(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def in_card_decorative_overlay_should_stay(
+    parent: CleanDesignTreeNode,
+    child: CleanDesignTreeNode,
+) -> bool:
+    """Keep decorative absolutes inside padded painted card stacks with inflow siblings."""
+    if parent.type != NodeType.STACK:
+        return False
+    if not parent.style.background_color or parent.style.border_radius is None:
+        return False
+    padding = parent.padding
+    if (
+        padding.top <= 0
+        and padding.bottom <= 0
+        and padding.left <= 0
+        and padding.right <= 0
+    ):
+        return False
+    for sibling in parent.children:
+        if sibling.id == child.id:
+            continue
+        if is_decorative_absolute_background_overlay(sibling):
+            continue
+        if sibling.layout_positioning == "ABSOLUTE" or sibling.stack_placement is not None:
+            continue
+        return True
+    return False
+
+
+def is_bounded_interactive_surface_host(node: CleanDesignTreeNode) -> bool:
+    """Return True when a stack paints a bounded card/sheet around interactive inflow."""
+    if node.type != NodeType.STACK:
+        return False
+    if not (node.style.background_color or node.style.border_radius is not None):
+        return False
+    padding = node.padding
+    has_padding = (
+        padding.top > 0 or padding.bottom > 0 or padding.left > 0 or padding.right > 0
+    )
+    if not has_padding:
+        return False
+    return _subtree_has_interactive_ui(node)
+
+
 def is_decorative_absolute_background_overlay(node: CleanDesignTreeNode) -> bool:
     """Return True when an absolute stack child is non-interactive decorative chrome."""
     if node.stack_placement is None and node.layout_positioning != "ABSOLUTE":

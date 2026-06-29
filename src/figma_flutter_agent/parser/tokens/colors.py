@@ -18,6 +18,23 @@ def rgba_to_argb_hex(color: dict[str, float]) -> str:
     return f"0x{alpha:02X}{red:02X}{green:02X}{blue:02X}"
 
 
+def solid_paint_to_argb_hex(
+    color: dict[str, float],
+    *,
+    paint_opacity: float = 1.0,
+) -> str:
+    """Compose Figma SOLID paint color and paint-level opacity into one ARGB hex."""
+    combined_alpha = float(color.get("a", 1.0)) * float(paint_opacity)
+    return rgba_to_argb_hex(
+        {
+            "r": color.get("r", 0.0),
+            "g": color.get("g", 0.0),
+            "b": color.get("b", 0.0),
+            "a": combined_alpha,
+        }
+    )
+
+
 def is_neutral_rgba(color: dict[str, float]) -> bool:
     """Return True when a color is near white or near black."""
     red = color.get("r", 0.0)

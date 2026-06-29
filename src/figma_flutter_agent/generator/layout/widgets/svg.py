@@ -198,6 +198,8 @@ def _svg_fit_mode(
         if width and height and (width < 4.0 or height < 4.0):
             return "BoxFit.fill"
         return "BoxFit.contain"
+    if node.style.gradient is not None and width and height:
+        return "BoxFit.contain"
     if (
         width
         and height

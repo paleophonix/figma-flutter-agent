@@ -973,6 +973,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_should_emit_surface_decoration,
     )
+    from figma_flutter_agent.generator.layout.scroll import wrap_flex_auto_layout_padding
 
     root_decoration = (
         box_decoration_expr(
@@ -984,6 +985,13 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         else None
     )
     if root_decoration is not None:
+        stack_widget = wrap_flex_auto_layout_padding(node, stack_widget)
+        if node.style.clips_content and (node.style.border_radius or 0) > 0:
+            radius_lit = format_geometry_literal(float(node.style.border_radius))
+            stack_widget = (
+                f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), "
+                f"child: {stack_widget})"
+            )
         stack_widget = f"Container(decoration: {root_decoration}, child: {stack_widget})"
     stack_widget = _wrap_root_stack_viewport(
         node,

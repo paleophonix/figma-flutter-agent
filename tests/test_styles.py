@@ -85,6 +85,28 @@ def test_extract_gradient_fill_applies_paint_opacity() -> None:
     assert "Color(0x00FFFFFF)" in expr
 
 
+def test_enrich_node_style_composes_solid_fill_paint_opacity() -> None:
+    """Law: solid_fill_paint_opacity_must_compose_into_emit_color."""
+    style = enrich_node_style(
+        {
+            "type": "FRAME",
+            "clipsContent": True,
+            "fills": [
+                {
+                    "type": "SOLID",
+                    "visible": True,
+                    "opacity": 0.6,
+                    "color": {"r": 1.0, "g": 1.0, "b": 1.0, "a": 1.0},
+                }
+            ],
+        },
+        NodeStyle(),
+    )
+
+    assert style.background_color == "0x99FFFFFF"
+    assert style.clips_content is True
+
+
 def test_enrich_node_style_populates_css_from_rest() -> None:
     """enrich_node_style now auto-builds css_properties from REST data."""
     style = enrich_node_style(

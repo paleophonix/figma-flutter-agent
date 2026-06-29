@@ -15,7 +15,7 @@ from figma_flutter_agent.parser.effects import (
 from figma_flutter_agent.parser.numeric_rounding import round_micro_style
 from figma_flutter_agent.parser.style_refs import resolve_style_name, style_reference_paints
 from figma_flutter_agent.parser.text_line_height import resolve_line_height
-from figma_flutter_agent.parser.tokens.colors import rgba_to_argb_hex
+from figma_flutter_agent.parser.tokens.colors import rgba_to_argb_hex, solid_paint_to_argb_hex
 from figma_flutter_agent.parser.typography import (
     resolve_font_family,
     resolve_font_style,
@@ -46,7 +46,10 @@ def enrich_node_style(
             if fill.get("visible") is False:
                 continue
             if fill.get("type") == "SOLID" and fill.get("color"):
-                style.background_color = rgba_to_argb_hex(fill["color"])
+                style.background_color = solid_paint_to_argb_hex(
+                    fill["color"],
+                    paint_opacity=float(fill.get("opacity", 1.0)),
+                )
                 break
 
     if node.get("type") == "TEXT":
@@ -70,6 +73,9 @@ def enrich_node_style(
 
     if node.get("opacity") is not None:
         style.opacity = round_micro_style(float(node["opacity"]))
+
+    if node.get("clipsContent") is True:
+        style.clips_content = True
 
     corner_radii = parse_corner_radii(node)
     if corner_radii is not None:
