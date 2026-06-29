@@ -143,7 +143,7 @@ def should_stretch_artboard_positioned_horizontal(
     ):
         return False
     left = placement.left if placement.left is not None else 0.0
-    return float(left) <= 1.5
+    return -1.5 <= float(left) <= 1.5
 
 
 def should_stretch_bottom_positioned_horizontal(placement: StackPlacement) -> bool:

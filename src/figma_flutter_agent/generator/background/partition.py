@@ -63,6 +63,17 @@ def split_screen_wallpaper_children(
     return wallpaper, foreground
 
 
+def split_wallpaper_emit_layers(
+    root: CleanDesignTreeNode,
+    wallpaper_children: list[CleanDesignTreeNode],
+) -> tuple[list[CleanDesignTreeNode], list[CleanDesignTreeNode]]:
+    """Split wallpaper into artboard-inline ambient vs host-level cover layers."""
+    cover = [child for child in wallpaper_children if is_screen_wallpaper_node(child, root)]
+    cover_ids = {child.id for child in cover}
+    ambient = [child for child in wallpaper_children if child.id not in cover_ids]
+    return ambient, cover
+
+
 def collect_ambient_background_children(
     root: CleanDesignTreeNode,
 ) -> list[CleanDesignTreeNode]:

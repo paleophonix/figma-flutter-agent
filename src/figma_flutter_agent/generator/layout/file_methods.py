@@ -110,6 +110,7 @@ def compose_decomposed_root_widget(
     responsive_enabled: bool,
     theme_variant: str = "material_3",
     suppress_root_fill: bool = False,
+    artboard_background_lead: str | None = None,
 ) -> str:
     """Compose the root widget expression from extracted builder methods."""
     pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(tree)
@@ -119,19 +120,19 @@ def compose_decomposed_root_widget(
     )
 
     bottom_padding = bottom_chrome_clearance_height(tree) if pin_bottom_chrome else 0.0
-    child_calls = (
-        ", ".join(
-            _stack_method_call_expr(
-                method,
-                pin_bottom_chrome=pin_bottom_chrome,
-                parent_stack=tree,
-                allow_outward_paint=allow_outward_paint,
-                bottom_padding=bottom_padding,
-            )
-            for method in methods
+    child_call_parts = [
+        _stack_method_call_expr(
+            method,
+            pin_bottom_chrome=pin_bottom_chrome,
+            parent_stack=tree,
+            allow_outward_paint=allow_outward_paint,
+            bottom_padding=bottom_padding,
         )
-        or "const SizedBox.shrink()"
-    )
+        for method in methods
+    ]
+    if artboard_background_lead:
+        child_call_parts.insert(0, artboard_background_lead)
+    child_calls = ", ".join(child_call_parts) or "const SizedBox.shrink()"
     if tree.type == NodeType.STACK:
         from figma_flutter_agent.generator.layout.flex_policy import (
             stack_child_ordinal_bottom,
@@ -289,7 +290,11 @@ def compose_decomposed_root_widget(
                         allow_outward_paint=allow_outward_paint,
                     )
                 )
-            stack_clip = "Clip.none" if stack_needs_soft_clip(tree) else "Clip.hardEdge"
+            stack_clip = (
+                "Clip.hardEdge"
+                if artboard_background_lead
+                else ("Clip.none" if stack_needs_soft_clip(tree) else "Clip.hardEdge")
+            )
             widget = f"Stack(clipBehavior: {stack_clip}, children: [{child_calls}])"
         root_decoration = box_decoration_expr(
             tree.style,

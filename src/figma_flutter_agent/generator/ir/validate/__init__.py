@@ -256,8 +256,14 @@ def _apply_ir_guards_inplace(
     if viewport is not None and not preserve_placement:
         viewport_width, viewport_height = viewport
         root_frame_id = root.id
+        from figma_flutter_agent.generator.background.detection import (
+            artboard_bleed_placement_exempt,
+        )
+
         for node_id, clean in tree_by_id.items():
             if parent_by_id.get(node_id) != root_frame_id:
+                continue
+            if artboard_bleed_placement_exempt(clean, root, root):
                 continue
             if _clamp_viewport_bounds(
                 clean,

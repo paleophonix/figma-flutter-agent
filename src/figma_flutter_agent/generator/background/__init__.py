@@ -8,12 +8,14 @@ from .detection import (
     _is_navigation_chrome_stack,
     _is_playback_chrome_stack,
     _subtree_has_interactive_ui,
+    artboard_bleed_placement_exempt,
     is_screen_wallpaper_node,
 )
 from .partition import (
     collect_ambient_background_children,
     partition_wallpaper_foreground_tree,
     split_screen_wallpaper_children,
+    split_wallpaper_emit_layers,
 )
 from .render import (
     _ambient_canvas_fill_expr,
@@ -22,6 +24,7 @@ from .render import (
     render_ambient_background_layer,
     render_ambient_decorative_node,
     render_screen_wallpaper_layer,
+    render_wallpaper_artboard_stack_body,
     resolve_screen_canvas_background_expr,
 )
 from .sync import (
@@ -41,6 +44,7 @@ from .sync import (
 )
 
 __all__ = [
+    "artboard_bleed_placement_exempt",
     "collect_ambient_background_children",
     "fix_ambient_background_responsiveness",
     "is_screen_wallpaper_node",
@@ -49,8 +53,10 @@ __all__ = [
     "render_ambient_background_layer",
     "render_ambient_decorative_node",
     "render_screen_wallpaper_layer",
+    "render_wallpaper_artboard_stack_body",
     "resolve_screen_canvas_background_expr",
     "split_screen_wallpaper_children",
+    "split_wallpaper_emit_layers",
     "ensure_centered_design_canvas",
     "sync_ambient_layer_with_foreground_scaling",
 ]

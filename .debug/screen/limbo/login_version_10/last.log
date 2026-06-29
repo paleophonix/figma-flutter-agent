@@ -1,127 +1,22 @@
 
---- dart format @ 2026-06-29T16:25:45.667017+00:00 ---
+--- dart format @ 2026-06-29T18:07:33.339986+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\features\login_version_10\login_version_10_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\test\golden\login_version_10_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hsbqi10s\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.07 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\features\login_version_10\login_version_10_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\generated\login_version_10_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\test\golden\login_version_10_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5qew2xrk\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 13 files (13 changed) in 0.03 seconds.
 
---- pub get --offline @ 2026-06-29T16:25:48.587337+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  flutter_lints 4.0.0 (6.0.0 available)
-  lints 4.0.0 (6.1.0 available)
-  meta 1.18.0 (1.18.2 available)
-  vector_graphics_compiler 1.2.3 (1.2.6 available)
-  xml 6.6.1 (7.0.1 available)
-Got dependencies!
-5 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- dart analyze (generated) @ 2026-06-29T16:25:51.627289+00:00 ---
-exit_code=0
-Analyzing native_status_bar_widget.dart...
-No issues found!
-
---- dart analyze (generated) (1/3) @ 2026-06-29T16:25:54.548049+00:00 ---
-exit_code=0
-Analyzing login_version_10_screen.dart, login_version_10_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
-
-warning - lib\features\login_version_10\login_version_10_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
-warning - lib\features\login_version_10\login_version_10_screen.dart:8:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\features\login_version_10\login_version_10_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
-warning - lib\features\login_version_10\login_version_10_screen.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_10_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_10_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_10_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_10_layout.dart:27:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
-   info - lib\generated\login_version_10_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\login_version_10_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\login_version_10_layout.dart:87:2592 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_10_layout.dart:88:119 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_10_layout.dart:88:3489 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_10_layout.dart:88:3536 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_10_layout.dart:88:3603 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-
-16 issues found.
-
---- dart analyze (generated) (2/3) @ 2026-06-29T16:25:57.527621+00:00 ---
-exit_code=0
-Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, native_status_bar_widget.dart...
-No issues found!
-
---- dart analyze (generated) (3/3) @ 2026-06-29T16:26:00.538859+00:00 ---
-exit_code=0
-Analyzing login_version_10_screen_test.dart, element_coordinate_mapper.dart...
-
-   info - test\harness\element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-
-1 issue found.
-
---- dart format @ 2026-06-29T16:26:02.689494+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\features\login_version_10\login_version_10_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\test\golden\login_version_10_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kkcerahd\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.06 seconds.
-
---- dart format @ 2026-06-29T16:26:04.773673+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\features\login_version_10\login_version_10_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\test\golden\login_version_10_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vukb8ffg\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.06 seconds.
-
---- dart format @ 2026-06-29T16:26:07.435743+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\features\login_version_10\login_version_10_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\test\golden\login_version_10_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-xyhrck67\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.07 seconds.
-
---- pub get --offline @ 2026-06-29T16:26:10.310842+00:00 ---
+--- pub get --offline @ 2026-06-29T18:07:36.431876+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -134,53 +29,124 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-29T16:26:13.391543+00:00 ---
-exit_code=0
-Analyzing login_version_10_screen.dart, login_version_10_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+--- dart analyze (generated) @ 2026-06-29T18:07:39.109448+00:00 ---
+exit_code=3
+Analyzing input_widget.dart, native_status_bar_widget.dart...
 
-warning - lib\features\login_version_10\login_version_10_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
-warning - lib\features\login_version_10\login_version_10_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\features\login_version_10\login_version_10_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
-warning - lib\features\login_version_10\login_version_10_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_10_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_10_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_10_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_10_layout.dart:27:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
-   info - lib\generated\login_version_10_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\login_version_10_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\login_version_10_layout.dart:87:2592 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_10_layout.dart:88:119 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_10_layout.dart:88:3489 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_10_layout.dart:88:3536 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_10_layout.dart:88:3603 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+  error - lib\widgets\input_widget.dart:54:5508 - The argument type 'Color' can't be assigned to the parameter type 'int'.  - argument_type_not_assignable
+warning - lib\widgets\input_widget.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+   info - lib\widgets\input_widget.dart:53:2350 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:53:3698 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:2981 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:3642 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:3689 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:5685 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-16 issues found.
+8 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-29T16:26:16.183114+00:00 ---
-exit_code=0
-Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, native_status_bar_widget.dart...
-No issues found!
+--- dart analyze (llm_repair) @ 2026-06-29T18:07:39.110448+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json
 
---- dart analyze (generated) (3/3) @ 2026-06-29T16:26:19.084310+00:00 ---
-exit_code=0
-Analyzing login_version_10_screen_test.dart, element_coordinate_mapper.dart...
-
-   info - test\harness\element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-
-1 issue found.
-
---- flutter pub get @ 2026-06-29T16:26:23.020040+00:00 ---
+--- pub get --offline @ 2026-06-29T18:07:53.817965+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.13 available)
-  vector_graphics_compiler 1.2.5 (1.2.6 available)
-  vector_math 2.2.0 (2.4.0 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
 Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-29T16:26:23.021041+00:00 ---
+--- dart analyze (generated) @ 2026-06-29T18:07:56.987214+00:00 ---
+exit_code=3
+Analyzing input_widget.dart, native_status_bar_widget.dart...
+
+  error - lib\widgets\input_widget.dart:54:5508 - The argument type 'Color' can't be assigned to the parameter type 'int'.  - argument_type_not_assignable
+warning - lib\widgets\input_widget.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\native_status_bar_widget.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\input_widget.dart:53:2350 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:53:3698 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:2981 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:3642 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:3689 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:5685 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+10 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-29T18:07:56.989224+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json
+
+--- pub get --offline @ 2026-06-29T18:09:14.232086+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) @ 2026-06-29T18:09:17.254865+00:00 ---
+exit_code=3
+Analyzing input_widget.dart, native_status_bar_widget.dart...
+
+  error - lib\widgets\input_widget.dart:54:5508 - The argument type 'Color' can't be assigned to the parameter type 'int'.  - argument_type_not_assignable
+warning - lib\widgets\input_widget.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\native_status_bar_widget.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\input_widget.dart:53:2350 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:53:3698 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:2981 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:3642 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:3689 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:5685 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+10 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-29T18:09:17.258866+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json
+
+--- dart format @ 2026-06-29T18:09:19.885478+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-2mcc1efj\analyze_check\lib\widgets\native_status_bar_widget.dart
+Formatted 1 file (1 changed) in 0.03 seconds.
+
+--- pub get --offline @ 2026-06-29T18:09:22.644217+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) @ 2026-06-29T18:09:25.630593+00:00 ---
+exit_code=3
+Analyzing input_widget.dart, native_status_bar_widget.dart...
+
+  error - lib\widgets\input_widget.dart:54:5508 - The argument type 'Color' can't be assigned to the parameter type 'int'.  - argument_type_not_assignable
+warning - lib\widgets\input_widget.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\native_status_bar_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\input_widget.dart:53:2350 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:53:3698 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:2981 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:3642 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:3689 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\input_widget.dart:54:5685 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+10 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-29T18:09:25.632593+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json

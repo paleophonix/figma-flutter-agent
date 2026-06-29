@@ -119,6 +119,27 @@ def patch_scaffold_background_from_tree(
     return screen_code[: scaffold_match.start(2)] + fill_expr + screen_code[scaffold_match.end(2) :]
 
 
+def render_wallpaper_artboard_stack_body(
+    wallpaper_children: list[CleanDesignTreeNode],
+    *,
+    uses_svg: bool,
+) -> str | None:
+    """Render ambient wallpaper as the bottom layer of a bounded artboard stack."""
+    bodies: list[str] = []
+    for child in wallpaper_children:
+        rendered = render_ambient_decorative_node(
+            child,
+            uses_svg=uses_svg,
+            parent_type=NodeType.STACK,
+        )
+        if rendered:
+            bodies.append(rendered)
+    if not bodies:
+        return None
+    inner = f"Stack(clipBehavior: Clip.none, children: [{', '.join(bodies)}])"
+    return f"IgnorePointer(child: RepaintBoundary(child: {inner}))"
+
+
 def render_screen_wallpaper_layer(
     root: CleanDesignTreeNode,
     wallpaper_children: list[CleanDesignTreeNode],

@@ -177,4 +177,7 @@ def test_wallpaper_partition_decomposed_methods_align_with_render_tree() -> None
     ]
     assert "Widget _build" in layout
     assert "SingleChildScrollView(" in layout
-    assert "Positioned.fill(" in layout
+    assert "_buildBackground(context)" in layout
+    assert "left: -200" in layout or "left: -200.0" in layout
+    host_stack = layout.split("LayoutBuilder(")[0]
+    assert "Positioned.fill(" not in host_stack

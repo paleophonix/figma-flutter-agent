@@ -31,6 +31,19 @@ def _subtree_has_interactive_ui(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def artboard_bleed_placement_exempt(
+    child: CleanDesignTreeNode,
+    parent: CleanDesignTreeNode,
+    root: CleanDesignTreeNode,
+) -> bool:
+    """Root wallpaper/ambient children may bleed past the artboard without clamping."""
+    if parent.id != root.id:
+        return False
+    if is_screen_wallpaper_node(child, root):
+        return True
+    return _is_ambient_background_child(child)
+
+
 def is_screen_wallpaper_node(node: CleanDesignTreeNode, root: CleanDesignTreeNode) -> bool:
     """Oversized collapsed illustration that must render as cover wallpaper only."""
     if not node.render_boundary or not node.vector_asset_key:

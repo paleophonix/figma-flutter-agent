@@ -264,6 +264,19 @@ def classify_clean_tree_responsive_tier(
     return "fixed"
 
 
+def _emit_uses_artboard_preview_branch(clean_tree: CleanDesignTreeNode) -> bool:
+    """Return True when emit wraps the root in an artboard preview LayoutBuilder."""
+    width = clean_tree.sizing.width
+    height = clean_tree.sizing.height
+    return (
+        clean_tree.type == NodeType.STACK
+        and width is not None
+        and height is not None
+        and width > 0
+        and height > 0
+    )
+
+
 def _scroll_contract_fields(
     clean_tree: CleanDesignTreeNode,
     *,
@@ -285,14 +298,26 @@ def _scroll_contract_fields(
     )
     preview_capture_scrollable = False
     preview_interactive_scrollable = bool(tree_scrollable or tall_content)
+    uses_artboard_preview = _emit_uses_artboard_preview_branch(clean_tree)
+    active_branch_interactive_dev = (
+        "preview_interactive" if uses_artboard_preview else "fallback"
+    )
+    active_branch_golden_capture = (
+        "preview_capture" if uses_artboard_preview else "fallback"
+    )
+    effective_scrollable = (
+        preview_interactive_scrollable
+        if active_branch_interactive_dev == "preview_interactive"
+        else fallback_scrollable
+    )
     return {
         "tall_content": tall_content,
         "fallback_scrollable": fallback_scrollable,
         "preview_capture_scrollable": preview_capture_scrollable,
         "preview_interactive_scrollable": preview_interactive_scrollable,
-        "active_branch_interactive_dev": "fallback",
-        "active_branch_golden_capture": "preview_capture",
-        "effective_scrollable": fallback_scrollable,
+        "active_branch_interactive_dev": active_branch_interactive_dev,
+        "active_branch_golden_capture": active_branch_golden_capture,
+        "effective_scrollable": effective_scrollable,
     }
 
 

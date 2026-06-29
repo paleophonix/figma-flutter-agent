@@ -108,24 +108,10 @@
               ]
             }
           ],
-          "ref": {
-            "widgetName": "NativeStatusBarWidget",
-            "namedArgs": {}
-          },
           "layoutHints": {
             "flexSpacing": 220.0,
             "gapMode": "uniform"
-          },
-          "payload": {
-            "payloadKind": "nav_app_bar"
-          },
-          "classificationHint": {
-            "suggestedKind": "nav_app_bar",
-            "confidence": 0.58,
-            "rationale": "Prebuilt native status bar system chrome."
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manual_override"
+          }
         },
         {
           "figmaId": "band-54:2042",
@@ -268,24 +254,26 @@
                                     }
                                   ]
                                 }
-                              ]
+                              ],
+                              "hintText": "Password",
+                              "isMultiline": false,
+                              "maxLines": 1,
+                              "payload": {
+                                "payloadKind": "input_text_field",
+                                "hintText": "Password",
+                                "isMultiline": false,
+                                "maxLines": 1
+                              },
+                              "classificationHint": {
+                                "suggestedKind": "input_text_field",
+                                "confidence": 0.79,
+                                "rationale": "Component variant indicates password input with trailing visibility icon."
+                              },
+                              "fidelityTier": "native_verified",
+                              "tierSource": "policy_fallback"
                             }
                           ],
-                          "hintText": "Password",
-                          "isMultiline": false,
-                          "maxLines": 1,
-                          "payload": {
-                            "payloadKind": "input_text_field",
-                            "hintText": "Password",
-                            "isMultiline": false,
-                            "maxLines": 1
-                          },
-                          "classificationHint": {
-                            "suggestedKind": "input_text_field",
-                            "confidence": 0.79,
-                            "rationale": "Component variant indicates password input with trailing visibility icon."
-                          },
-                          "fidelityTier": "native_verified",
+                          "fidelityTier": "native_unverified",
                           "tierSource": "policy_fallback"
                         }
                       ],
@@ -309,66 +297,25 @@
                                   "kind": "auto",
                                   "children": []
                                 }
-                              ],
-                              "isSelected": false,
-                              "payload": {
-                                "payloadKind": "control_checkbox"
-                              },
-                              "classificationHint": {
-                                "suggestedKind": "control_checkbox",
-                                "confidence": 0.72,
-                                "rationale": "Square check control next to 'Remember me' label."
-                              },
-                              "fidelityTier": "native_verified",
-                              "tierSource": "policy_fallback"
+                              ]
                             },
                             {
                               "figmaId": "55:2056",
                               "kind": "auto",
                               "children": [],
-                              "overrides": {
-                                "text": "Remember me",
-                                "accessibilityLabel": "Remember me",
-                                "textColor": "0xFF6C7278",
-                                "fontSize": 12.0
-                              },
-                              "wrap": "flexibleLoose",
-                              "fidelityTier": "native_verified",
-                              "tierSource": "policy_fallback"
+                              "wrap": "flexibleLoose"
                             }
-                          ],
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         },
                         {
                           "figmaId": "55:2057",
                           "kind": "auto",
                           "children": [],
-                          "overrides": {
-                            "text": "Forgot Password ?",
-                            "accessibilityLabel": "Forgot Password ?",
-                            "textColor": "0xFF000000",
-                            "fontSize": 12.0
-                          },
-                          "wrap": "flexibleLoose",
-                          "payload": {
-                            "payloadKind": "button_text"
-                          },
-                          "classificationHint": {
-                            "suggestedKind": "button_text",
-                            "confidence": 0.68,
-                            "rationale": "Standalone tappable text action for password recovery."
-                          },
-                          "fidelityTier": "native_verified",
-                          "tierSource": "policy_fallback"
+                          "wrap": "flexibleLoose"
                         }
-                      ],
-                      "fidelityTier": "native_unverified",
-                      "tierSource": "policy_fallback"
+                      ]
                     }
-                  ],
-                  "fidelityTier": "native_unverified",
-                  "tierSource": "policy_fallback"
+                  ]
                 },
                 {
                   "figmaId": "55:2058",
@@ -382,34 +329,9 @@
                           "figmaId": "I55:2059;3:6045",
                           "kind": "auto",
                           "children": [],
-                          "overrides": {
-                            "text": "Log In",
-                            "accessibilityLabel": "Log In",
-                            "textColor": "0xFFFFFFFF",
-                            "fontSize": 14.0
-                          },
-                          "wrap": "flexibleLoose",
-                          "fidelityTier": "native_verified",
-                          "tierSource": "policy_fallback"
+                          "wrap": "flexibleLoose"
                         }
-                      ],
-                      "overrides": {
-                        "text": "Log In",
-                        "accessibilityLabel": "Log In",
-                        "textColor": "0xFFFFFFFF",
-                        "backgroundColor": "0xFF1D61E7",
-                        "fontSize": 14.0
-                      },
-                      "payload": {
-                        "payloadKind": "button_filled"
-                      },
-                      "classificationHint": {
-                        "suggestedKind": "button_filled",
-                        "confidence": 0.79,
-                        "rationale": "Primary filled action button for login submission."
-                      },
-                      "fidelityTier": "native_verified",
-                      "tierSource": "policy_fallback"
+                      ]
                     },
                     {
                       "figmaId": "56:2098",
@@ -429,15 +351,7 @@
                           "figmaId": "56:2100",
                           "kind": "auto",
                           "children": [],
-                          "overrides": {
-                            "text": "Or login with",
-                            "accessibilityLabel": "Or login with",
-                            "textColor": "0xFF6C7278",
-                            "fontSize": 12.0
-                          },
-                          "wrap": "flexibleLoose",
-                          "fidelityTier": "native_verified",
-                          "tierSource": "policy_fallback"
+                          "wrap": "flexibleLoose"
                         },
                         {
                           "figmaId": "56:2101",
@@ -454,7 +368,7 @@
                         "payloadKind": "container_list_tile"
                       },
                       "fidelityTier": "native_unverified",
-                      "tierSource": "policy_fallback"
+                      "tierSource": "manifest"
                     },
                     {
                       "figmaId": "56:2102",
@@ -488,26 +402,9 @@
                                   "kind": "auto",
                                   "children": []
                                 }
-                              ],
-                              "fidelityTier": "svg_baked",
-                              "tierSource": "policy_fallback"
+                              ]
                             }
-                          ],
-                          "overrides": {
-                            "accessibilityLabel": "Google login",
-                            "backgroundColor": "0xFFFFFFFF"
-                          },
-                          "wrap": "expanded",
-                          "payload": {
-                            "payloadKind": "button_outlined"
-                          },
-                          "classificationHint": {
-                            "suggestedKind": "button_outlined",
-                            "confidence": 0.75,
-                            "rationale": "Social auth button with Google branding."
-                          },
-                          "fidelityTier": "native_verified",
-                          "tierSource": "policy_fallback"
+                          ]
                         },
                         {
                           "figmaId": "56:2104",
@@ -527,26 +424,9 @@
                                   "kind": "auto",
                                   "children": []
                                 }
-                              ],
-                              "fidelityTier": "svg_baked",
-                              "tierSource": "policy_fallback"
+                              ]
                             }
-                          ],
-                          "overrides": {
-                            "accessibilityLabel": "Facebook login",
-                            "backgroundColor": "0xFFFFFFFF"
-                          },
-                          "wrap": "expanded",
-                          "payload": {
-                            "payloadKind": "button_outlined"
-                          },
-                          "classificationHint": {
-                            "suggestedKind": "button_outlined",
-                            "confidence": 0.75,
-                            "rationale": "Social auth button with Facebook branding."
-                          },
-                          "fidelityTier": "native_verified",
-                          "tierSource": "policy_fallback"
+                          ]
                         },
                         {
                           "figmaId": "56:2105",
@@ -574,34 +454,13 @@
                                           "kind": "auto",
                                           "children": []
                                         }
-                                      ],
-                                      "fidelityTier": "svg_baked",
-                                      "tierSource": "policy_fallback"
+                                      ]
                                     }
-                                  ],
-                                  "fidelityTier": "svg_baked",
-                                  "tierSource": "policy_fallback"
+                                  ]
                                 }
-                              ],
-                              "fidelityTier": "svg_baked",
-                              "tierSource": "policy_fallback"
+                              ]
                             }
-                          ],
-                          "overrides": {
-                            "accessibilityLabel": "Apple login",
-                            "backgroundColor": "0xFFFFFFFF"
-                          },
-                          "wrap": "expanded",
-                          "payload": {
-                            "payloadKind": "button_outlined"
-                          },
-                          "classificationHint": {
-                            "suggestedKind": "button_outlined",
-                            "confidence": 0.75,
-                            "rationale": "Social auth button with Apple branding."
-                          },
-                          "fidelityTier": "native_verified",
-                          "tierSource": "policy_fallback"
+                          ]
                         },
                         {
                           "figmaId": "56:2106",
@@ -616,30 +475,11 @@
                                   "kind": "auto",
                                   "children": []
                                 }
-                              ],
-                              "fidelityTier": "native_unverified",
-                              "tierSource": "policy_fallback"
+                              ]
                             }
-                          ],
-                          "overrides": {
-                            "accessibilityLabel": "Phone Number login",
-                            "backgroundColor": "0xFFFFFFFF"
-                          },
-                          "wrap": "expanded",
-                          "payload": {
-                            "payloadKind": "button_outlined"
-                          },
-                          "classificationHint": {
-                            "suggestedKind": "button_outlined",
-                            "confidence": 0.75,
-                            "rationale": "Alternative auth button with phone icon."
-                          },
-                          "fidelityTier": "native_verified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
-                      ],
-                      "fidelityTier": "native_unverified",
-                      "tierSource": "policy_fallback"
+                      ]
                     }
                   ],
                   "payload": {
@@ -656,37 +496,13 @@
                       "figmaId": "56:2128",
                       "kind": "auto",
                       "children": [],
-                      "overrides": {
-                        "text": "Don’t have an account?",
-                        "accessibilityLabel": "Don’t have an account?",
-                        "textColor": "0xFF6C7278",
-                        "fontSize": 12.0
-                      },
-                      "wrap": "flexibleLoose",
-                      "fidelityTier": "native_verified",
-                      "tierSource": "policy_fallback"
+                      "wrap": "flexibleLoose"
                     },
                     {
                       "figmaId": "56:2129",
                       "kind": "auto",
                       "children": [],
-                      "overrides": {
-                        "text": "Sign Up",
-                        "accessibilityLabel": "Sign Up",
-                        "textColor": "0xFF000000",
-                        "fontSize": 12.0
-                      },
-                      "wrap": "flexibleLoose",
-                      "payload": {
-                        "payloadKind": "button_text"
-                      },
-                      "classificationHint": {
-                        "suggestedKind": "button_text",
-                        "confidence": 0.69,
-                        "rationale": "Inline signup call to action."
-                      },
-                      "fidelityTier": "native_verified",
-                      "tierSource": "policy_fallback"
+                      "wrap": "flexibleLoose"
                     }
                   ],
                   "payload": {
@@ -700,18 +516,7 @@
                   "kind": "auto",
                   "children": []
                 }
-              ],
-              "overrides": {
-                "accessibilityLabel": "Input",
-                "backgroundColor": "0xFFFFFFFF"
-              },
-              "classificationHint": {
-                "suggestedKind": "container_card",
-                "confidence": 0.63,
-                "rationale": "Card-like form container with grouped controls."
-              },
-              "fidelityTier": "native_unverified",
-              "tierSource": "policy_fallback"
+              ]
             },
             {
               "figmaId": "54:2043",
@@ -729,17 +534,7 @@
               "kind": "auto",
               "children": []
             }
-          ],
-          "payload": {
-            "payloadKind": "nav_bottom_bar"
-          },
-          "classificationHint": {
-            "suggestedKind": "nav_bottom_bar",
-            "confidence": 0.52,
-            "rationale": "Native home indicator system chrome."
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
+          ]
         }
       ],
       "layoutHints": {
@@ -749,7 +544,7 @@
         "payloadKind": "nav_scroll_host"
       },
       "fidelityTier": "native_unverified",
-      "tierSource": "policy_fallback"
+      "tierSource": "manifest"
     },
     "omitFigmaIds": [],
     "stackChildOrder": [
@@ -1249,34 +1044,7 @@
     },
     {
       "widgetName": "NativeStatusBarWidget",
-      "widgetIr": {
-        "figmaId": "53:1983",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I53:1983;3:6767",
-            "kind": "auto",
-            "children": [],
-            "overrides": {
-              "text": "9:41",
-              "accessibilityLabel": "9:41",
-              "textColor": "0xFF021433",
-              "fontSize": 16.0
-            },
-            "fidelityTier": "native_verified",
-            "tierSource": "policy_fallback"
-          },
-          {
-            "figmaId": "I53:1983;3:6768",
-            "kind": "auto",
-            "children": [],
-            "fidelityTier": "svg_baked",
-            "tierSource": "manual_override"
-          }
-        ],
-        "fidelityTier": "native_verified",
-        "tierSource": "manual_override"
-      }
+      "code": "// <custom-code>\n// </custom-code>\n\n// <custom-code>\n// </custom-code>\n\nclass NativeStatusBarWidget extends StatelessWidget {\n  const NativeStatusBarWidget({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    final textScaler = MediaQuery.textScalerOf(context);\n    return Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 220.0, children: [Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(height: 16.0, child: Semantics(label: '9:41', child: Text('9:41', style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: const Color(0xFF021433), fontSize: 16.0, fontWeight: FontWeight.w500, letterSpacing: 0), textScaler: textScaler, strutStyle: StrutStyle(fontSize: 16, height: 1, forceStrutHeight: true), textAlign: TextAlign.left)))), SizedBox(height: 13.0, child: Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, spacing: 5.0, children: [SizedBox(width: 18.0, height: 10.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 18.0, height: 10.0, key: ValueKey('figma-I53_1983_3_6770'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 10.0, child: Container(decoration: BoxDecoration(color: const Color(0xFF021433)), child: Stack(clipBehavior: Clip.none, children: [Positioned(right: 15.0, width: 3.0, top: 3.0, height: 4.0, key: ValueKey('figma-I53_1983_3_6771'), child: Semantics(label: 'Cellular_Connection-path', child: SvgPicture.asset('assets/icons/cellular_connection-path_I53_1983;3_6771.svg', width: 3.0, height: 4.0, fit: BoxFit.contain))), Positioned(right: 10.0, bottom: 2.0, width: 3.0, height: 6.0, key: ValueKey('figma-I53_1983_3_6772'), child: Semantics(label: 'Cellular_Connection-path', child: SvgPicture.asset('assets/icons/cellular_connection-path_I53_1983;3_6772.svg', width: 3.0, height: 6.0, fit: BoxFit.contain))), Positioned(right: 5.0, bottom: 1.0, width: 3.0, height: 8.0, key: ValueKey('figma-I53_1983_3_6773'), child: Semantics(label: 'Cellular_Connection-path', child: SvgPicture.asset('assets/icons/cellular_connection-path_I53_1983;3_6773.svg', width: 3.0, height: 8.0, fit: BoxFit.contain))), Positioned(right: 0.0, bottom: 0.0, width: 3.0, height: 10.0, key: ValueKey('figma-I53_1983_3_6774'), child: Semantics(label: 'Cellular_Connection-path', child: SvgPicture.asset('assets/icons/cellular_connection-path_I53_1983;3_6774.svg', width: 3.0, height: 10.0, fit: BoxFit.contain)))]))))))])), SizedBox(width: 15.3, height: 11.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 15.3, height: 11.0, key: ValueKey('figma-I53_1983_3_6776'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 11.0, child: Container(decoration: BoxDecoration(color: const Color(0xFF021433)), child: Stack(clipBehavior: Clip.none, children: [Positioned(right: 0.0, width: 15.3, top: 3.1, height: 4.7, key: ValueKey('figma-I53_1983_3_6777'), child: Semantics(label: 'Wifi-path', child: SvgPicture.asset('assets/icons/wifi-path_I53_1983;3_6777.svg', width: 15.3, height: 4.7, fit: BoxFit.contain))), Positioned(right: 2.7, width: 9.9, top: 3.7, height: 3.6, key: ValueKey('figma-I53_1983_3_6778'), child: Semantics(label: 'Wifi-path', child: SvgPicture.asset('assets/icons/wifi-path_I53_1983;3_6778.svg', width: 9.9, height: 3.6, fit: BoxFit.contain))), Positioned(right: 5.3, width: 4.6, top: 3.8, height: 3.4, key: ValueKey('figma-I53_1983_3_6779'), child: Semantics(label: 'Wifi-path', child: SvgPicture.asset('assets/icons/wifi-path_I53_1983;3_6779.svg', width: 4.6, height: 3.4, fit: BoxFit.contain)))]))))))])), SizedBox(width: 27.0, height: 13.0, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 27.0, height: 13.0, key: ValueKey('figma-I53_1983_3_6781'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 13.0, child: SvgPicture.asset('assets/icons/battery_I53_1983;3_6781.svg', width: 27.0, height: 13.0, fit: BoxFit.contain)))))]))]))]);\n  }\n}"
     }
   ],
   "emitterVersion": "2026.06.2"

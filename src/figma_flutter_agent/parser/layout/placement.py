@@ -191,6 +191,9 @@ def reconcile_stack_placements_in_tree(
     allow_clamp: bool = True,
 ) -> CleanDesignTreeNode:
     """Apply edge-based top reconciliation for STACK children across the tree."""
+    from figma_flutter_agent.generator.background.detection import (
+        artboard_bleed_placement_exempt,
+    )
 
     def walk(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
         parent_height = node.sizing.height
@@ -213,7 +216,12 @@ def reconcile_stack_placements_in_tree(
                         placement,
                         parent_height=parent_height,
                     )
-                if parent_width is not None and parent_width > 0 and allow_clamp:
+                if (
+                    parent_width is not None
+                    and parent_width > 0
+                    and allow_clamp
+                    and not artboard_bleed_placement_exempt(child, node, root)
+                ):
                     placement = clamp_stack_child_placement_to_parent(
                         placement,
                         float(parent_width),

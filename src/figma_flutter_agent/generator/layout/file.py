@@ -86,6 +86,8 @@ def render_layout_file(
     from figma_flutter_agent.generator.background import (
         partition_wallpaper_foreground_tree,
         render_screen_wallpaper_layer,
+        render_wallpaper_artboard_stack_body,
+        split_wallpaper_emit_layers,
     )
 
     if not skip_layout_reconcile:
@@ -130,6 +132,9 @@ def render_layout_file(
         partition_wallpaper_foreground_tree,
     )
 
+    ambient_wallpaper, cover_wallpaper = split_wallpaper_emit_layers(tree, wallpaper_children)
+    artboard_background_lead: str | None = None
+
     methods = plan_layout_methods(render_tree)
     method_defs = ""
     chunk_bodies: list[tuple[str, str]] = []
@@ -141,13 +146,6 @@ def render_layout_file(
         snap_device_pixels_scope(snap_device_pixels),
     ):
         if methods is not None:
-            layout_widget = compose_decomposed_root_widget(
-                render_tree,
-                methods,
-                responsive_enabled=responsive_enabled,
-                theme_variant=theme_variant,
-                suppress_root_fill=bool(wallpaper_children),
-            )
             blocks: list[str] = []
             decomposed_parent_type = render_tree.type
             pin_bottom_chrome = (
@@ -174,11 +172,31 @@ def render_layout_file(
                 blocks.append(
                     f"  Widget {method.name}(BuildContext context) {{\n{scaler}    return {body};\n  }}\n"
                 )
+            if ambient_wallpaper:
+                bg_body = render_wallpaper_artboard_stack_body(
+                    ambient_wallpaper,
+                    uses_svg=uses_svg,
+                )
+                if bg_body is not None:
+                    blocks.append(
+                        f"  Widget _buildBackground(BuildContext context) {{\n"
+                        f"    return {bg_body};\n"
+                        f"  }}\n"
+                    )
+                    artboard_background_lead = "_buildBackground(context)"
+            layout_widget = compose_decomposed_root_widget(
+                render_tree,
+                methods,
+                responsive_enabled=responsive_enabled,
+                theme_variant=theme_variant,
+                suppress_root_fill=bool(wallpaper_children),
+                artboard_background_lead=artboard_background_lead,
+            )
             method_defs = "\n" + "".join(blocks)
-            if wallpaper_children:
+            if cover_wallpaper:
                 wallpaper_layer = render_screen_wallpaper_layer(
                     tree,
-                    wallpaper_children,
+                    cover_wallpaper,
                     uses_svg=uses_svg,
                 )
                 if wallpaper_layer is not None:
@@ -187,15 +205,48 @@ def render_layout_file(
                         f"[{wallpaper_layer}, {layout_widget}])"
                     )
         else:
-            layout_widget = render_node_body(render_tree, is_layout_root=True, **render_kwargs)
-            if wallpaper_children:
+            if ambient_wallpaper:
+                from figma_flutter_agent.generator.layout.widgets import _wrap_root_stack_viewport
+
+                fg_body = render_node_body(
+                    render_tree,
+                    is_layout_root=False,
+                    **render_kwargs,
+                )
+                bg_body = render_wallpaper_artboard_stack_body(
+                    ambient_wallpaper,
+                    uses_svg=uses_svg,
+                )
+                if bg_body is not None:
+                    combined = (
+                        f"Stack(clipBehavior: Clip.hardEdge, children: [{bg_body}, {fg_body}])"
+                    )
+                    layout_widget = _wrap_root_stack_viewport(
+                        render_tree,
+                        combined,
+                        is_layout_root=True,
+                        responsive_enabled=responsive_enabled,
+                        theme_variant=theme_variant,
+                    )
+                else:
+                    layout_widget = render_node_body(
+                        render_tree,
+                        is_layout_root=True,
+                        **render_kwargs,
+                    )
+            else:
+                layout_widget = render_node_body(render_tree, is_layout_root=True, **render_kwargs)
+            if cover_wallpaper:
                 wallpaper_layer = render_screen_wallpaper_layer(
                     tree,
-                    wallpaper_children,
+                    cover_wallpaper,
                     uses_svg=uses_svg,
                 )
                 if wallpaper_layer is not None:
-                    layout_widget = f"Stack(clipBehavior: Clip.none, children: [{wallpaper_layer}, {layout_widget}])"
+                    layout_widget = (
+                        f"Stack(clipBehavior: Clip.none, children: "
+                        f"[{wallpaper_layer}, {layout_widget}])"
+                    )
         # Render extracted chunk subtrees inside the same pixel-snap scope.
         for _chunk_unit in chunking_result.chunks:
             _chunk_body = render_node_body(

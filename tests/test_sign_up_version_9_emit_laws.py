@@ -271,3 +271,60 @@ def test_sign_up_primary_cta_inkwell_covers_full_row_surface() -> None:
     assert "GestureDetector(" not in label_prefix
     assert "3_6045:button-action" not in label_prefix
     assert "onTap: () {}" not in layout.split("Register")[1][:400]
+
+
+def test_sign_up_ambient_background_shares_artboard_stack_with_content() -> None:
+    """Law: background_layers_must_share_the_same_artboard_stack_as_content."""
+    processed = json.loads(
+        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
+    )
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    layout = render_layout_file(
+        root,
+        feature_name="sign_up_version_9_artboard_bg",
+        uses_svg=True,
+        responsive_enabled=False,
+    )["lib/generated/sign_up_version_9_artboard_bg_layout.dart"]
+    assert "_buildBackground(context)" in layout
+    preview_branch = layout.split("if (_artboardPreviewWidth > 0")[1]
+    assert "_buildBackground(context)" in preview_branch
+    host_prefix = layout.split("LayoutBuilder(")[0]
+    assert "Positioned.fill(" not in host_prefix
+
+
+def test_sign_up_ambient_wallpaper_bleed_left_preserved() -> None:
+    """Law: ambient_wallpaper_bleed_must_bypass_artboard_placement_clamps."""
+    processed = json.loads(
+        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
+    )
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    from figma_flutter_agent.generator.normalize import reconcile_layout_tree
+
+    reconciled = reconcile_layout_tree(root)
+    from figma_flutter_agent.generator.background import collect_ambient_background_children
+
+    ambient = collect_ambient_background_children(reconciled)
+    assert ambient
+    ellipse = next(child for child in ambient if "ellipse" in (child.name or "").lower())
+    assert ellipse.stack_placement is not None
+    assert float(ellipse.stack_placement.left) < -200.0
+    layout = render_layout_file(
+        reconciled,
+        feature_name="sign_up_version_9_bleed",
+        uses_svg=True,
+        skip_layout_reconcile=True,
+    )["lib/generated/sign_up_version_9_bleed_layout.dart"]
+    assert "left: -233" in layout or "left: -233.0" in layout
+
+
+def test_sign_up_static_responsiveness_report_uses_preview_branch() -> None:
+    """Law: responsiveness_report_must_reflect_runtime_preview_branch."""
+    from figma_flutter_agent.generator.checks.layout import build_responsiveness_report
+
+    processed = json.loads(
+        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
+    )
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    report = build_responsiveness_report(root, responsive_enabled=False)
+    assert report["active_branch_interactive_dev"] == "preview_interactive"
+    assert report["active_branch_golden_capture"] == "preview_capture"
