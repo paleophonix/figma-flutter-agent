@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.style.colors import fill_luminance
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.parser.numeric_rounding import round_geometry
+from figma_flutter_agent.schemas import CleanDesignTreeNode, GeomRect, NodeType, StackPlacement
 
 from .detection import (
     _is_ambient_background_child,
@@ -11,6 +12,71 @@ from .detection import (
     is_decorative_absolute_background_overlay,
     is_screen_wallpaper_node,
 )
+
+
+def _translate_hoisted_wallpaper_placement(
+    child: CleanDesignTreeNode,
+    former_parent: CleanDesignTreeNode,
+) -> CleanDesignTreeNode:
+    """Map nested wallpaper placement from a host stack into artboard coordinates."""
+    parent_placement = former_parent.stack_placement
+    parent_left = float(parent_placement.left or 0.0) if parent_placement is not None else 0.0
+    parent_top = float(parent_placement.top or 0.0) if parent_placement is not None else 0.0
+    frame = child.geometry_frame
+    if frame is not None and frame.layout_rect is not None:
+        child_left = float(frame.layout_rect.x or 0.0)
+        child_top = float(frame.layout_rect.y or 0.0)
+        child_width = float(frame.layout_rect.width or child.sizing.width or 0.0)
+        child_height = float(frame.layout_rect.height or child.sizing.height or 0.0)
+    elif child.stack_placement is not None:
+        child_left = float(child.stack_placement.left or 0.0)
+        child_top = float(child.stack_placement.top or 0.0)
+        child_width = float(child.stack_placement.width or child.sizing.width or 0.0)
+        child_height = float(child.stack_placement.height or child.sizing.height or 0.0)
+    else:
+        return child
+    artboard_left = round_geometry(parent_left + child_left) or parent_left + child_left
+    artboard_top = round_geometry(parent_top + child_top) or parent_top + child_top
+    placement = child.stack_placement
+    if placement is None:
+        placement = StackPlacement(
+            horizontal="LEFT",
+            vertical="TOP",
+            left=artboard_left,
+            top=artboard_top,
+            width=child_width if child_width > 0 else None,
+            height=child_height if child_height > 0 else None,
+        )
+    else:
+        placement = placement.model_copy(
+            update={
+                "horizontal": "LEFT",
+                "vertical": "TOP",
+                "left": artboard_left,
+                "top": artboard_top,
+            }
+        )
+    geometry = frame
+    if geometry is not None and geometry.layout_rect is not None:
+        layout_rect = geometry.layout_rect
+        geometry = geometry.model_copy(
+            update={
+                "layout_rect": layout_rect.model_copy(
+                    update={
+                        "x": artboard_left,
+                        "y": artboard_top,
+                    }
+                ),
+                "placement_origin": GeomRect(x=artboard_left, y=artboard_top),
+                "placement_aabb": GeomRect(
+                    x=artboard_left,
+                    y=artboard_top,
+                    width=child_width if child_width > 0 else layout_rect.width,
+                    height=child_height if child_height > 0 else layout_rect.height,
+                ),
+            }
+        )
+    return child.model_copy(update={"stack_placement": placement, "geometry_frame": geometry})
 
 
 def extract_nested_decorative_backgrounds(
@@ -26,7 +92,7 @@ def extract_nested_decorative_backgrounds(
                 if in_card_decorative_overlay_should_stay(node, child):
                     pruned_children.append(prune(child))
                     continue
-                extracted.append(child)
+                extracted.append(_translate_hoisted_wallpaper_placement(child, node))
                 continue
             pruned_children.append(prune(child))
         if pruned_children == node.children:

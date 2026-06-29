@@ -2,12 +2,12 @@
   "file_key": "nJBqmuLJ1KXSA23yNouMOR",
   "node_id": "53:1896",
   "feature_name": "login_version_10",
-  "tree_hash": "c4381066d5adf5227a61922b48c37550053a0d91af79d4dab6e7f78857924eaf",
+  "tree_hash": "029a9065e39d5ff5b52565697ca6de7a447ca019632e4f9aecef68a7ca4025cd",
   "colors_hash": "2314b06b0362f379d866b331688a60ff530aa2da1f3dd80b422d2f2d0db29060",
   "typography_hash": "e99f8917e3e3e34e4c83326563ea7d4e42fad11203f49f15778f538e00fc80e1",
   "spacing_hash": "ff9059741264e390400b4d11e8a1e6ec7e11128ec3b7946e2b4213eafacbc071",
   "file_hashes": {
-    "lib/widgets/input_widget.dart": "ddb5869705d0cb7553ef1244adb411a3610fb974725e5b2b5fe84c687decd292",
+    "lib/widgets/input_widget.dart": "9c26bd294ac5fd87b33d7aca19a6e956ccd21f315b795334728e17bb6c4769c9",
     "lib/widgets/native_status_bar_widget.dart": "8da9a753f6e3d50e37cfb0104782521e34fd0b403845e1fe0a31096f6b8aeb4d",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "ab3fd6c0a97bce5c8f250bbe00df327e4014885b5af81f8d99709b95839bd04f",
@@ -17,7 +17,7 @@
     "lib/theme/app_edge_insets.dart": "7be53430ab5683153377e3bc288dde9d69a0e45e9aa0a6cab82c737d9a827f66",
     "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
     "lib/theme/app_theme.dart": "66d7e0281b3937a61f3f53703b2415ef8054d5a2d7c98db79fb94618060de79b",
-    "lib/generated/login_version_10_layout.dart": "ab055f803a4f57a2937f39c406263c1d4d12a3715ed8dae9959f5fee8ec15ef6",
+    "lib/generated/login_version_10_layout.dart": "6f67150e0f3f5fb5099967d1055f34aa05fa831546680bd20e191aebc566030b",
     "lib/features/login_version_10/login_version_10_screen.dart": "6d19f5d1d30160bb952f3d281c3b9e387265aedb420b86bbb1b284a8b5aefa89",
     "test/golden/login_version_10_screen_test.dart": "832978f5331f0d38b5a64e6b22703d9365f30bc77454d46762e03a60a993ba4f",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -25,11 +25,11 @@
   },
   "layout_region_hash": "2dcb69dcfe77a12f8f7701fa00073c2c65aa58d252722806003dbc3d18766012",
   "cluster_hashes": {
-    "component_3_6008_4eb6bf1b": "ae21ba453cc78cdeb384411d995205211c8dfea56c8d9c4222c7e77c2de5d861",
-    "component_3_6008_83328d66": "a37ab61e6cf2e7deb48eb8c80373d598e82cf19f818fae83c49e06f55e63cbd7"
+    "component_3_6008_4eb6bf1b": "91d4d5fce44992071298cca834e226fdde8c6b5606bdbcd2ff30214a16639c06",
+    "component_3_6008_83328d66": "716076bddcf7155c6f6e7047e2331927f7c704aab5ab46d65aed67c054d33008"
   },
   "reference_image_hash": null,
   "emitter_version": "2026.06.2",
-  "version": 4,
-  "updated_at": "2026-06-29T20:10:58.080904+00:00"
+  "version": 5,
+  "updated_at": "2026-06-29T21:41:37.249770+00:00"
 }

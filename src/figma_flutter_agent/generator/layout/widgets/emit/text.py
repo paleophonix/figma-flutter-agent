@@ -325,7 +325,21 @@ def render_text_node(
         NodeType.COLUMN,
         NodeType.STACK,
     }:
-        if nav_tab_column_parent and parent_node is not None:
+        centered_text_width = node.sizing.width
+        centered_text_height = node.sizing.height
+        centered_font_size = node.style.font_size
+        fixed_width_multiline = (
+            centered_text_width is not None
+            and centered_text_width > 0
+            and node.sizing.width_mode == SizingMode.FIXED
+            and centered_text_height is not None
+            and centered_font_size is not None
+            and float(centered_text_height) > float(centered_font_size) * 1.6
+        )
+        if fixed_width_multiline:
+            width_lit = format_geometry_literal(float(centered_text_width))
+            widget = f"SizedBox(width: {width_lit}, child: Center(child: {widget}))"
+        elif nav_tab_column_parent and parent_node is not None:
             parent_width = parent_node.sizing.width
             if parent_width is not None and float(parent_width) > 0:
                 width_lit = format_geometry_literal(float(parent_width))

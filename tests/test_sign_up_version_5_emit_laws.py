@@ -102,16 +102,68 @@ def test_sign_up_version_5_pattern_paints_behind_flow_column() -> None:
     assert bg_idx < content_idx
 
 
-def test_sign_up_version_5_pattern_uses_stack_placement_top() -> None:
-    """Law: absolute_stack_child_must_prefer_placement_origin_when_layout_rect_diverges."""
+def test_sign_up_version_5_pattern_uses_artboard_hoisted_placement() -> None:
+    """Law: hoisted_nested_decorative_must_emit_artboard_world_coordinates."""
     root = _load_root()
     layout = render_layout_file(
         root,
         feature_name="sign_up_version_5_placement",
         uses_svg=True,
+        responsive_enabled=False,
     )["lib/generated/sign_up_version_5_placement_layout.dart"]
-    assert "top: -38.0" not in layout
-    assert "top: 224.5" in layout or "top: 224" in layout
+    assert "top: 224.5" not in layout
+    assert "top: 30.0" in layout or "top: 30," in layout
+
+
+def test_sign_up_version_5_flow_gap_preserves_autolayout_spacing() -> None:
+    """Law: autolayout_item_spacing_preserved."""
+    root = _load_root()
+    layout = render_layout_file(
+        root,
+        feature_name="sign_up_version_5_flow_gap",
+        uses_svg=True,
+        responsive_enabled=False,
+    )["lib/generated/sign_up_version_5_flow_gap_layout.dart"]
+    compact = layout.replace("\n", "")
+    content_idx = compact.find("figma-42_2282")
+    assert content_idx >= 0
+    chunk = compact[content_idx : content_idx + 12000]
+    assert "SizedBox(height: 114" not in chunk
+    assert "SizedBox(height: 24.0)" in chunk or "SizedBox(height: 24)," in chunk
+
+
+def test_sign_up_version_5_logo_centered_in_content_column() -> None:
+    """Law: counter_axis_center_applies_to_all_children."""
+    root = _load_root()
+    layout = render_layout_file(
+        root,
+        feature_name="sign_up_version_5_logo_center",
+        uses_svg=True,
+        responsive_enabled=False,
+    )["lib/generated/sign_up_version_5_logo_center_layout.dart"]
+    compact = layout.replace("\n", "")
+    logo_idx = compact.find("vector_42_2337.svg")
+    assert logo_idx >= 0
+    prefix = compact[max(0, logo_idx - 220) : logo_idx]
+    assert "Alignment.centerLeft" not in prefix
+    assert "Alignment.center," in prefix or "Alignment.center)" in prefix
+
+
+def test_sign_up_version_5_subtitle_preserves_fixed_text_box_width() -> None:
+    """Law: fixed_text_width_preserved."""
+    root = _load_root()
+    layout = render_layout_file(
+        root,
+        feature_name="sign_up_version_5_subtitle_width",
+        uses_svg=True,
+        responsive_enabled=False,
+    )["lib/generated/sign_up_version_5_subtitle_width_layout.dart"]
+    compact = layout.replace("\n", "")
+    subtitle_idx = compact.find("Create an account or log in to explore about our app")
+    assert subtitle_idx >= 0
+    chunk = compact[subtitle_idx : subtitle_idx + 500]
+    assert "width: 222.0" in chunk
+    assert "width: double.infinity" not in chunk.split("Text('Create an account", 1)[0]
 
 
 def test_sign_up_version_5_static_root_skips_scroll_shell() -> None:

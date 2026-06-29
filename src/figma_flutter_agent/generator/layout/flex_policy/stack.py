@@ -735,9 +735,11 @@ def _geometry_frame_ordinal_top(child: CleanDesignTreeNode) -> float | None:
     frame = child.geometry_frame
     if frame is None:
         return None
+    if frame.layout_rect is not None and frame.layout_rect.y is not None:
+        return float(frame.layout_rect.y)
     if frame.placement_origin is not None:
         return float(frame.placement_origin.y)
-    return float(frame.layout_rect.y)
+    return None
 
 
 def stack_child_ordinal_top(child: CleanDesignTreeNode) -> float:
@@ -752,6 +754,13 @@ def stack_child_ordinal_top(child: CleanDesignTreeNode) -> float:
 
 def stack_child_ordinal_bottom(child: CleanDesignTreeNode) -> float:
     """Return a stack child's bottom edge from Figma placement or sizing."""
+    frame = child.geometry_frame
+    if frame is not None and frame.layout_rect is not None:
+        layout_rect = frame.layout_rect
+        layout_top = float(layout_rect.y or 0.0)
+        layout_height = float(layout_rect.height or 0.0)
+        if layout_height > 0:
+            return layout_top + layout_height
     top = stack_child_ordinal_top(child)
     height: float | None = None
     if child.stack_placement is not None and child.stack_placement.height is not None:
@@ -1210,6 +1219,22 @@ def stack_flow_child_vertical_extent_wrap(
         return widget
     height_lit = format_geometry_literal(height)
     align = "Alignment.centerLeft"
+    if (
+        parent_node is not None
+        and parent_node.type == NodeType.STACK
+        and (parent_node.alignment.cross or "").lower() in {"center", "centre"}
+        and child.type in {NodeType.VECTOR, NodeType.IMAGE}
+    ):
+        child_width = child.sizing.width
+        parent_width = parent_node.sizing.width
+        if (
+            child_width is not None
+            and parent_width is not None
+            and float(child_width) > 0
+            and float(parent_width) > 0
+            and float(child_width) < float(parent_width) - 1.0
+        ):
+            align = "Alignment.center"
     if child.type == NodeType.COLUMN and _column_is_text_primary(child):
         if all(
             item.type == NodeType.TEXT

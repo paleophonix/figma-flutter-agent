@@ -80,6 +80,30 @@ def test_fill_width_in_row_uses_expanded_not_in_column() -> None:
     assert row_layout.count("Expanded(child:") == 1
 
 
+def test_absolute_auto_layout_child_preserves_bbox_offset_over_center_constraint() -> None:
+    """Law: absolute_child_offset_preserved_over_constraint."""
+    parent = {
+        "id": "1:1",
+        "name": "Content",
+        "type": "FRAME",
+        "layoutMode": "VERTICAL",
+        "absoluteBoundingBox": {"x": 0.0, "y": 100.0, "width": 327.0, "height": 706.0},
+        "children": [],
+    }
+    child = {
+        "id": "1:2",
+        "name": "Pattern",
+        "type": "FRAME",
+        "layoutPositioning": "ABSOLUTE",
+        "constraints": {"vertical": "CENTER", "horizontal": "CENTER"},
+        "absoluteBoundingBox": {"x": -5.0, "y": 62.0, "width": 375.0, "height": 257.0},
+    }
+    placement = extract_stack_placement(child, parent)
+    assert placement is not None
+    assert placement.top == -38.0
+    assert placement.left == -5.0
+
+
 def test_classic_right_bottom_constraints_render_positioned_edges() -> None:
     root = json.loads(
         Path("tests/fixtures/figma_constraints_right_bottom_sample.json").read_text(

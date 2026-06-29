@@ -16,7 +16,8 @@
     "style": {
       "backgroundColor": "0xFFFFFFFF",
       "borderRadius": 9.0,
-      "strokeAlign": "INSIDE"
+      "strokeAlign": "INSIDE",
+      "clipsContent": true
     },
     "children": [
       {
@@ -201,12 +202,13 @@
           "cross": "center"
         },
         "style": {
-          "backgroundColor": "0xFFFFFFFF",
+          "backgroundColor": "0x99FFFFFF",
           "borderRadius": 12.0,
           "strokeAlign": "INSIDE",
           "borderWidth": 1.0,
           "borderColor": "0xFFFFFFFF",
-          "hasStroke": true
+          "hasStroke": true,
+          "clipsContent": true
         },
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
@@ -622,7 +624,8 @@
                             "left": 2.0,
                             "right": 2.0
                           },
-                          "hasStroke": true
+                          "hasStroke": true,
+                          "clipsContent": true
                         },
                         "children": [
                           {
@@ -890,7 +893,8 @@
                             "left": 2.0,
                             "right": 2.0
                           },
-                          "hasStroke": true
+                          "hasStroke": true,
+                          "clipsContent": true
                         },
                         "children": [
                           {
@@ -1028,7 +1032,8 @@
                               "cross": "stretch"
                             },
                             "style": {
-                              "strokeAlign": "INSIDE"
+                              "strokeAlign": "INSIDE",
+                              "clipsContent": true
                             },
                             "componentRef": "3:4359",
                             "variant": {
@@ -1304,7 +1309,8 @@
                           "cross": "stretch"
                         },
                         "style": {
-                          "strokeAlign": "INSIDE"
+                          "strokeAlign": "INSIDE",
+                          "clipsContent": true
                         },
                         "componentRef": "3:13301",
                         "variant": {
@@ -1755,7 +1761,8 @@
                     "bottom": 3.0,
                     "left": 2.0,
                     "right": 2.0
-                  }
+                  },
+                  "clipsContent": true
                 },
                 "componentRef": "3:6043",
                 "variant": {
@@ -2182,7 +2189,8 @@
                           "color": "0x99F4F5FA"
                         }
                       ],
-                      "hasStroke": true
+                      "hasStroke": true,
+                      "clipsContent": true
                     },
                     "componentRef": "3:6130",
                     "variant": {
@@ -2208,7 +2216,8 @@
                           "cross": "stretch"
                         },
                         "style": {
-                          "strokeAlign": "INSIDE"
+                          "strokeAlign": "INSIDE",
+                          "clipsContent": true
                         },
                         "vectorAssetKey": "assets/icons/google_I56_2103;3_6131.svg",
                         "vectorSvgPathCount": 4,
@@ -2611,7 +2620,8 @@
                           "color": "0x99F4F5FA"
                         }
                       ],
-                      "hasStroke": true
+                      "hasStroke": true,
+                      "clipsContent": true
                     },
                     "componentRef": "3:6133",
                     "variant": {
@@ -2637,7 +2647,8 @@
                           "cross": "stretch"
                         },
                         "style": {
-                          "strokeAlign": "INSIDE"
+                          "strokeAlign": "INSIDE",
+                          "clipsContent": true
                         },
                         "vectorAssetKey": "assets/icons/2021_facebook_icon_1_I56_2104;3_6134.svg",
                         "vectorSvgPathCount": 4,
@@ -2895,7 +2906,8 @@
                           "color": "0x99F4F5FA"
                         }
                       ],
-                      "hasStroke": true
+                      "hasStroke": true,
+                      "clipsContent": true
                     },
                     "componentRef": "3:6138",
                     "variant": {
@@ -2921,7 +2933,8 @@
                           "cross": "stretch"
                         },
                         "style": {
-                          "strokeAlign": "INSIDE"
+                          "strokeAlign": "INSIDE",
+                          "clipsContent": true
                         },
                         "children": [
                           {
@@ -3296,7 +3309,8 @@
                           "color": "0x99F4F5FA"
                         }
                       ],
-                      "hasStroke": true
+                      "hasStroke": true,
+                      "clipsContent": true
                     },
                     "componentRef": "3:6145",
                     "variant": {
@@ -3322,7 +3336,8 @@
                           "cross": "stretch"
                         },
                         "style": {
-                          "strokeAlign": "INSIDE"
+                          "strokeAlign": "INSIDE",
+                          "clipsContent": true
                         },
                         "componentRef": "3:4423",
                         "variant": {

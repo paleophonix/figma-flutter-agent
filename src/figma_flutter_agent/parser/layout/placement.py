@@ -57,10 +57,11 @@ def extract_stack_placement(
         allowed={"TOP", "BOTTOM", "CENTER", "TOP_BOTTOM", "SCALE"},
         default="TOP",
     )
-    if horizontal == "CENTER" and parent_width > 0:
-        left = (parent_width - node_width) / 2
-    if vertical == "CENTER" and parent_height > 0:
-        top = (parent_height - node_height) / 2
+    if not is_auto_absolute:
+        if horizontal == "CENTER" and parent_width > 0:
+            left = (parent_width - node_width) / 2
+        if vertical == "CENTER" and parent_height > 0:
+            top = (parent_height - node_height) / 2
 
     return round_stack_placement(
         StackPlacement(
@@ -185,6 +186,61 @@ def _sync_sizing_width_to_placement(
     )
 
 
+def sync_absolute_stack_placement_from_layout_rect(
+    child: CleanDesignTreeNode,
+) -> CleanDesignTreeNode:
+    """Restore absolute child offsets from conserved layout geometry."""
+    placement = child.stack_placement
+    frame = child.geometry_frame
+    if (
+        placement is None
+        or frame is None
+        or frame.layout_rect is None
+        or child.layout_positioning != "ABSOLUTE"
+    ):
+        return child
+    layout_rect = frame.layout_rect
+    layout_top = layout_rect.y
+    layout_left = layout_rect.x
+    if layout_top is None:
+        return child
+    placement_top = placement.top
+    if placement_top is None:
+        return child
+    vertical = (placement.vertical or "").upper()
+    horizontal = (placement.horizontal or "").upper()
+    top_drift = abs(float(placement_top) - float(layout_top)) > 8.0
+    left_drift = (
+        layout_left is not None
+        and placement.left is not None
+        and abs(float(placement.left) - float(layout_left)) > 8.0
+    )
+    if not top_drift and not left_drift:
+        return child
+    if not (
+        vertical == "CENTER"
+        or horizontal == "CENTER"
+        or top_drift
+        or left_drift
+    ):
+        return child
+    updates: dict[str, object] = {}
+    if top_drift:
+        rounded_top = round_geometry(float(layout_top))
+        updates["top"] = rounded_top if rounded_top is not None else float(layout_top)
+        updates["vertical"] = "TOP"
+    if left_drift and layout_left is not None:
+        rounded_left = round_geometry(float(layout_left))
+        updates["left"] = rounded_left if rounded_left is not None else float(layout_left)
+        if horizontal == "CENTER":
+            updates["horizontal"] = "LEFT"
+    if not updates:
+        return child
+    return child.model_copy(
+        update={"stack_placement": placement.model_copy(update=updates)}
+    )
+
+
 def reconcile_stack_placements_in_tree(
     root: CleanDesignTreeNode,
     *,
@@ -205,6 +261,8 @@ def reconcile_stack_placements_in_tree(
         children: list[CleanDesignTreeNode] = []
         for child in node.children:
             updated = child
+            if child.layout_positioning == "ABSOLUTE":
+                updated = sync_absolute_stack_placement_from_layout_rect(updated)
             if (
                 node.type == NodeType.STACK
                 and child.stack_placement is not None
