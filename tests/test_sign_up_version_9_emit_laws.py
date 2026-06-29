@@ -212,7 +212,8 @@ def test_sign_up_layout_emits_tappable_back_nav_and_bounded_phone_prefix() -> No
     assert "fromLTRB(14.0, 27.0" not in layout
     assert "fromLTRB(14.0, 23.5" not in layout
     prefix = layout.split("prefix-dropdown")[1][:1200]
-    assert "11.5" in prefix
+    assert "BorderRadius.horizontal(left: Radius.circular(10.0))" in prefix
+    assert "height: 46.0" in prefix
     assert "MainAxisAlignment.start" in prefix
     assert "Center(child: Row(mainAxisSize: MainAxisSize.min" not in prefix
 

@@ -102,9 +102,19 @@ def render_phone_composite_field_host(
     prefix = phone_composite_prefix_node(surface)
     value_node = phone_composite_value_node(surface)
     assert prefix is not None and value_node is not None
-    value_text = escape_dart_string((value_node.text or "").strip())
     width = surface.sizing.width
     height = surface.sizing.height
+    prefix_emit = prefix
+    prefix_updates: dict[str, object] = {}
+    if height is not None and float(height) > 0:
+        prefix_updates["sizing"] = prefix.sizing.model_copy(update={"height": float(height)})
+    if prefix.style.border_color is not None or prefix.style.border_width is not None:
+        prefix_updates["style"] = prefix.style.model_copy(
+            update={"border_color": None, "border_width": None, "has_stroke": False},
+        )
+    if prefix_updates:
+        prefix_emit = prefix.model_copy(update=prefix_updates)
+    value_text = escape_dart_string((value_node.text or "").strip())
     box_decoration = box_decoration_expr(
         surface.style,
         width=width,
@@ -140,7 +150,7 @@ def render_phone_composite_field_host(
     )
     field = wrap_material_input_child(field, theme_variant=theme_variant)
     prefix_body = render_node_body(
-        prefix,
+        prefix_emit,
         uses_svg=uses_svg,
         parent_type=NodeType.ROW,
         parent_node=surface,
@@ -153,12 +163,30 @@ def render_phone_composite_field_host(
     prefix_zone = inline_custom_code_comment(
         custom_code_zone_id(prefix.id, "prefix-dropdown"),
     )
+    outer_radius = float(surface.style.border_radius or 0.0)
+    radius_lit = format_geometry_literal(outer_radius) if outer_radius > 0 else "10.0"
+    prefix_width = prefix.sizing.width
+    prefix_width_lit = (
+        format_geometry_literal(float(prefix_width))
+        if prefix_width is not None and float(prefix_width) > 0
+        else "62.0"
+    )
+    prefix_height_lit = (
+        format_geometry_literal(float(height))
+        if height is not None and float(height) > 0
+        else "46.0"
+    )
     prefix_slot = (
         "Material("
         "color: Colors.transparent, "
         "child: InkWell("
         f"onTap: () {{ {prefix_zone} }}, "
+        "child: ClipRRect("
+        f"borderRadius: BorderRadius.horizontal(left: Radius.circular({radius_lit})), "
+        f"child: SizedBox(width: {prefix_width_lit}, height: {prefix_height_lit}, "
         f"child: {prefix_body}"
+        ")"
+        ")"
         ")"
         ")"
     )
@@ -181,6 +209,13 @@ def render_phone_composite_field_host(
             height=float(height),
             box_decoration=box_decoration,
         )
+        if outer_radius > 0:
+            row = (
+                f"ClipRRect("
+                f"borderRadius: BorderRadius.circular({radius_lit}), "
+                f"child: {row}"
+                ")"
+            )
     external_label = None
     for child in label.children:
         if child.type == NodeType.TEXT and (child.text or "").strip():

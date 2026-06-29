@@ -165,6 +165,19 @@ def placement_dual_horizontal_insets_overconstrain(
     return False
 
 
+def _placement_origin_edges(
+    node: CleanDesignTreeNode,
+) -> tuple[float | None, float | None]:
+    """Return stack placement origin edges when geometry conservation provides them."""
+    frame = node.geometry_frame
+    if frame is None or frame.placement_origin is None:
+        return None, None
+    origin = frame.placement_origin
+    left = float(origin.x) if origin.x is not None else None
+    top = float(origin.y) if origin.y is not None else None
+    return left, top
+
+
 def _resolved_positioned_left_top(
     node: CleanDesignTreeNode,
     placement: StackPlacement,
@@ -175,12 +188,25 @@ def _resolved_positioned_left_top(
     left = placement.left if placement.left is not None else node.offset_x
     top = placement.top if placement.top is not None else node.offset_y
     layout_left, layout_top = _layout_rect_edge_origin(node)
+    origin_left, origin_top = _placement_origin_edges(node)
+    placement_matches_origin = (
+        top is not None
+        and origin_top is not None
+        and abs(float(top) - origin_top) < 1.5
+    ) or (
+        left is not None
+        and origin_left is not None
+        and abs(float(left) - origin_left) < 1.5
+    )
     if layout_left is not None and (
         placement_dual_horizontal_insets_overconstrain(placement, parent_width)
         or (
             (placement.horizontal or "").upper() == "CENTER"
             and placement.left is not None
             and abs(float(placement.left) - layout_left) > 8.0
+            and not (
+                origin_left is not None and abs(float(placement.left) - origin_left) < 1.5
+            )
         )
     ):
         left = layout_left
@@ -188,6 +214,7 @@ def _resolved_positioned_left_top(
         layout_top is not None
         and top is not None
         and abs(float(top) - layout_top) > 8.0
+        and not placement_matches_origin
         and (placement.vertical or "").upper() in {"CENTER", "TOP"}
     ):
         top = layout_top
@@ -597,6 +624,29 @@ def _wrap_root_stack_viewport(
                 if is_mobile_artboard_width(width)
                 else "Alignment.topCenter"
             ),
+            bounded_child=True,
+        )
+        return wrap_artboard_preview_layout_builder(
+            preview_child=preview_child,
+            fallback=fallback,
+        )
+    if not responsive_enabled and not is_tall_mobile_artboard(width, height):
+        shell_alignment = (
+            "Alignment.topLeft"
+            if is_mobile_artboard_width(width)
+            else "Alignment.topCenter"
+        )
+        from figma_flutter_agent.generator.layout.common import static_artboard_viewport
+
+        fallback = static_artboard_viewport(
+            child=stack_widget,
+            width_token=width_token,
+            height_token=height_token,
+            alignment=shell_alignment,
+        )
+        preview_child = artboard_preview_sized_box(
+            child=stack_widget,
+            alignment=stack_alignment,
             bounded_child=True,
         )
         return wrap_artboard_preview_layout_builder(

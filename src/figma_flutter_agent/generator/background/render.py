@@ -26,6 +26,17 @@ def render_ambient_decorative_node(
 
     Ambient layers must not call ``render_node_body`` (buttons, theme tokens, inputs).
     """
+    if node.render_boundary and (node.vector_asset_key or node.flatten_figma_node_ids):
+        from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+        rendered = render_node_body(
+            node,
+            uses_svg=uses_svg,
+            parent_type=parent_type,
+        )
+        if rendered:
+            return rendered
+
     if node.render_boundary and node.vector_asset_key:
         widget = _render_exported_vector(node, uses_svg=uses_svg)
         if widget is None:

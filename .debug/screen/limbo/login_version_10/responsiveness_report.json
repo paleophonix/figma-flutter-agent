@@ -12,7 +12,7 @@
   "fallback_scrollable": true,
   "preview_capture_scrollable": false,
   "preview_interactive_scrollable": true,
-  "active_branch_interactive_dev": "fallback",
+  "active_branch_interactive_dev": "preview_interactive",
   "active_branch_golden_capture": "preview_capture",
   "effective_scrollable": true
 }

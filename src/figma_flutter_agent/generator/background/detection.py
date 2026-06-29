@@ -121,6 +121,25 @@ def _is_playback_chrome_stack(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def is_decorative_absolute_background_overlay(node: CleanDesignTreeNode) -> bool:
+    """Return True when an absolute stack child is non-interactive decorative chrome."""
+    if node.stack_placement is None and node.layout_positioning != "ABSOLUTE":
+        return False
+    if _subtree_has_interactive_ui(node):
+        return False
+    if any(descendant.type == NodeType.TEXT for descendant in _collect_all_nodes(node)):
+        return False
+    if _is_playback_chrome_stack(node):
+        return False
+    if _has_playback_timeline_markers(node):
+        return False
+    if _is_navigation_chrome_stack(node):
+        return False
+    if node.render_boundary and node.flatten_figma_node_ids:
+        return True
+    return _is_ambient_background_child(node)
+
+
 def _is_ambient_background_child(node: CleanDesignTreeNode) -> bool:
     if _subtree_has_interactive_ui(node):
         return False

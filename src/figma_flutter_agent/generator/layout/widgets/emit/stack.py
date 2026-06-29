@@ -788,6 +788,12 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
 
         segments: list[str] = []
         column_emitted = False
+        background_overlays: list[str] = []
+        foreground_overlays: list[str] = []
+        from figma_flutter_agent.generator.background.detection import (
+            is_decorative_absolute_background_overlay,
+        )
+
         if inflow_children:
             inflow_children.sort(key=stack_flow_column_child_sort_key)
             spacing_field = ""
@@ -809,10 +815,18 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
 
         for child in node.children:
             if stack_child_is_absolute_overlay(child):
-                segments.append(widget_by_child_id[child.id])
+                widget = widget_by_child_id[child.id]
+                if is_decorative_absolute_background_overlay(child):
+                    background_overlays.append(widget)
+                else:
+                    foreground_overlays.append(widget)
             elif not column_emitted and inflow_column:
-                segments.append(inflow_column)
                 column_emitted = True
+
+        segments = [*background_overlays]
+        if inflow_column:
+            segments.append(inflow_column)
+        segments.extend(foreground_overlays)
 
         body = ", ".join(segments) or "const SizedBox.shrink()"
         stack_clip = (

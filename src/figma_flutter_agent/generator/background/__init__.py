@@ -13,6 +13,7 @@ from .detection import (
 )
 from .partition import (
     collect_ambient_background_children,
+    extract_nested_decorative_backgrounds,
     partition_wallpaper_foreground_tree,
     split_screen_wallpaper_children,
     split_wallpaper_emit_layers,
@@ -46,6 +47,7 @@ from .sync import (
 __all__ = [
     "artboard_bleed_placement_exempt",
     "collect_ambient_background_children",
+    "extract_nested_decorative_backgrounds",
     "fix_ambient_background_responsiveness",
     "is_screen_wallpaper_node",
     "partition_wallpaper_foreground_tree",
