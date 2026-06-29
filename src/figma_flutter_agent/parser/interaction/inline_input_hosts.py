@@ -78,7 +78,10 @@ def layout_fact_inline_labeled_input_field_host(node: CleanDesignTreeNode) -> bo
         for child in node.children
         if child.id != surfaces[0].id and _hosts_external_field_label(child)
     ]
-    return len(labels) == 1
+    if len(labels) != 1:
+        return False
+    allowed = {surfaces[0].id, labels[0].id}
+    return all(child.id in allowed for child in node.children)
 
 
 def phone_composite_prefix_node(surface: CleanDesignTreeNode) -> CleanDesignTreeNode | None:

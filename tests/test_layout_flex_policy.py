@@ -1862,6 +1862,62 @@ def test_mixed_inflow_absolute_stack_emits_column_plus_positioned_overlay() -> N
     assert "top: -38.0" in compact
     assert "Get Started now" in compact
     assert "SizedBox(width: double.infinity, child: Positioned(" not in compact
+    assert compact.count(
+        "Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 24.0"
+    ) == 1
+
+
+def test_interleaved_absolute_does_not_split_flow_column() -> None:
+    """Law: stack_flow_children_coalesced_into_single_column."""
+    from figma_flutter_agent.schemas.geometry import GeometryFrame, GeomRect
+
+    header = CleanDesignTreeNode(
+        id="header",
+        name="Header",
+        type=NodeType.TEXT,
+        text="Header block",
+        sizing=Sizing(width=200.0, height=32.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=0.0, width=200.0, height=32.0),
+            placement_origin=GeomRect(y=0.0),
+        ),
+    )
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Footer",
+        type=NodeType.TEXT,
+        text="Footer block",
+        sizing=Sizing(width=200.0, height=32.0),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(y=120.0, width=200.0, height=32.0),
+            placement_origin=GeomRect(y=120.0),
+        ),
+    )
+    decor = CleanDesignTreeNode(
+        id="decor",
+        name="Decor",
+        type=NodeType.STACK,
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(left=0.0, top=60.0, width=100.0, height=40.0),
+        sizing=Sizing(width=100.0, height=40.0),
+        children=[],
+    )
+    host = CleanDesignTreeNode(
+        id="host",
+        name="Host",
+        type=NodeType.STACK,
+        spacing=12.0,
+        sizing=Sizing(width=200.0, height=200.0),
+        children=[header, decor, footer],
+    )
+    body = render_node_body(host, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert compact.count(
+        "Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12.0"
+    ) == 1
+    assert "Header block" in compact
+    assert "Footer block" in compact
+    assert "Positioned(" in compact
 
 
 def test_absolute_stack_overlay_skips_flow_horizontal_stretch_wrap() -> None:

@@ -78,6 +78,14 @@ def collect_figma_text_by_id(raw_node: dict[str, object]) -> dict[str, str]:
     return index
 
 
+def layout_fact_decorative_blur_absolute_overlay(node: CleanDesignTreeNode) -> bool:
+    """Return True when an absolute overlay is a decorative blur, not hero photography."""
+    if node.layout_positioning != "ABSOLUTE":
+        return False
+    blur = node.style.layer_blur
+    return blur is not None and float(blur) > 0.0
+
+
 def find_raster_photo_leaf(
     node: CleanDesignTreeNode,
     *,
@@ -87,8 +95,12 @@ def find_raster_photo_leaf(
     if depth > 6:
         return None
     if node.type == NodeType.IMAGE:
+        if layout_fact_decorative_blur_absolute_overlay(node):
+            return None
         return node
     if node.image_asset_key and _node_is_large_raster_photo_candidate(node):
+        if layout_fact_decorative_blur_absolute_overlay(node):
+            return None
         return node
     walk_types = {
         NodeType.STACK,

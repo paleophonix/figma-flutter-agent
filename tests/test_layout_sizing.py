@@ -1,6 +1,7 @@
 """Tests for Figma layoutGrow and sizing extraction."""
 
 from figma_flutter_agent.parser.layout import (
+    adjust_sizing_for_visible_children,
     enforce_fixed_sizing_for_stack_and_button,
     extract_sizing,
 )
@@ -51,6 +52,38 @@ def test_enforce_fixed_sizing_rewrites_stack_hug_modes() -> None:
     assert fixed.height_mode == SizingMode.FIXED
     assert fixed.width == 120.0
     assert fixed.height == 48.0
+
+
+def test_hug_vertical_extent_excludes_absolute_children() -> None:
+    """Law: absolute_children_must_not_contribute_to_flex_hug_extent."""
+    from figma_flutter_agent.parser.layout.sizing import adjust_sizing_for_visible_children
+
+    frame = {
+        "layoutMode": "VERTICAL",
+        "layoutSizingVertical": "HUG",
+        "paddingTop": 24.0,
+        "paddingBottom": 24.0,
+        "itemSpacing": 24.0,
+        "children": [
+            {
+                "visible": True,
+                "absoluteBoundingBox": {"height": 34.0},
+            },
+            {
+                "visible": True,
+                "absoluteBoundingBox": {"height": 71.0},
+            },
+            {
+                "visible": True,
+                "layoutPositioning": "ABSOLUTE",
+                "absoluteBoundingBox": {"height": 320.5},
+            },
+        ],
+    }
+    sizing = Sizing(width_mode=SizingMode.FIXED, height_mode=SizingMode.HUG)
+    adjusted = adjust_sizing_for_visible_children(frame, sizing)
+    assert adjusted.height == 177.0
+    assert adjusted.height_mode == SizingMode.FIXED
 
 
 def test_extract_sizing_min_max_from_figma_json() -> None:

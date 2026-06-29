@@ -114,6 +114,11 @@ def _visible_figma_children(node: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
+def _figma_child_is_absolute_in_flow(child: dict[str, Any]) -> bool:
+    """Return True when a Figma auto-layout child is absolutely positioned."""
+    return child.get("layoutPositioning") == "ABSOLUTE"
+
+
 def adjust_sizing_for_visible_children(
     node: dict[str, Any],
     sizing: Sizing,
@@ -143,12 +148,15 @@ def adjust_sizing_for_visible_children(
 
     if layout_mode == "VERTICAL" and sizing.height_mode == SizingMode.HUG:
         total = padding.top + padding.bottom
-        for index, child in enumerate(children):
+        flow_children = [
+            child for child in children if not _figma_child_is_absolute_in_flow(child)
+        ]
+        for index, child in enumerate(flow_children):
             bounds = child.get("absoluteBoundingBox") or {}
             height = bounds.get("height")
             if height is not None:
                 total += float(height)
-            if index < len(children) - 1:
+            if index < len(flow_children) - 1:
                 total += item_spacing
         if total > 0:
             updates["height"] = round_geometry(total)
@@ -156,12 +164,15 @@ def adjust_sizing_for_visible_children(
 
     if layout_mode == "HORIZONTAL" and sizing.width_mode == SizingMode.HUG:
         total = padding.left + padding.right
-        for index, child in enumerate(children):
+        flow_children = [
+            child for child in children if not _figma_child_is_absolute_in_flow(child)
+        ]
+        for index, child in enumerate(flow_children):
             bounds = child.get("absoluteBoundingBox") or {}
             width = bounds.get("width")
             if width is not None:
                 total += float(width)
-            if index < len(children) - 1:
+            if index < len(flow_children) - 1:
                 total += item_spacing
         if total > 0:
             updates["width"] = round_geometry(total)

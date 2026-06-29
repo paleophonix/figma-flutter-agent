@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from figma_flutter_agent.generator.background import partition_wallpaper_foreground_tree
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.file_methods import _tree_depth, plan_layout_methods
@@ -21,6 +24,30 @@ from figma_flutter_agent.schemas import (
     SizingMode,
     StackPlacement,
 )
+
+
+def _load_processed_root() -> CleanDesignTreeNode:
+    processed = json.loads(
+        Path(".debug/screen/limbo/login_version_10/processed.json").read_text(encoding="utf-8")
+    )
+    return CleanDesignTreeNode.model_validate(processed["cleanTree"])
+
+
+def _find_node(root: CleanDesignTreeNode, node_id: str) -> CleanDesignTreeNode | None:
+    if root.id == node_id:
+        return root
+    for child in root.children:
+        found = _find_node(child, node_id)
+        if found is not None:
+            return found
+    return None
+
+
+def _layout_chunk_for_node(layout: str, figma_token: str) -> str:
+    compact = layout.replace("\n", "")
+    idx = compact.find(f"figma-{figma_token}")
+    assert idx >= 0, f"missing figma-{figma_token} in layout"
+    return compact[idx : idx + 25000]
 
 
 def _deep_form_body(depth: int) -> CleanDesignTreeNode:
@@ -305,3 +332,95 @@ def test_decomposed_layout_paints_partitioned_wallpaper() -> None:
     assert "Positioned.fill(" in layout
     assert "FittedBox(" in layout
     assert "color: Color(0xFFFFFFFF)" not in layout.split("Stack(clipBehavior: Clip.none")[0]
+
+
+def test_login_version_10_card_stack_emits_coalesced_inflow_column() -> None:
+    """Law: stack_inflow_children_must_emit_under_flow_parent_not_bare_stack_siblings."""
+    root = _load_processed_root()
+    layout = render_layout_file(root, feature_name="login_version_10", uses_svg=False)[
+        "lib/generated/login_version_10_layout.dart"
+    ]
+    card = _find_node(root, "55:2044")
+    assert card is not None
+    chunk = _layout_chunk_for_node(layout, "55_2044")
+    assert "crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 24.0" in chunk
+    assert "Login" in chunk
+    assert "Log In" in chunk
+    assert "Loisbecket@gmail.com" in chunk
+    assert "Or login with" in chunk
+
+
+def test_login_version_10_card_stack_emits_surface_decoration() -> None:
+    """Law: styled_stack_host_must_emit_surface_decoration."""
+    root = _load_processed_root()
+    layout = render_layout_file(root, feature_name="login_version_10", uses_svg=False)[
+        "lib/generated/login_version_10_layout.dart"
+    ]
+    chunk = _layout_chunk_for_node(layout, "55_2044")
+    assert "Container(decoration: BoxDecoration(" in chunk
+    assert "borderRadius: BorderRadius.circular(12.0)" in chunk
+
+
+def test_login_version_10_buttons_column_not_inline_text_field() -> None:
+    """Law: inline_input_host_requires_exclusive_label_and_surface_children."""
+    root = _load_processed_root()
+    layout = render_layout_file(root, feature_name="login_version_10", uses_svg=False)[
+        "lib/generated/login_version_10_layout.dart"
+    ]
+    assert "initialValue: 'Log In'" not in layout
+    assert "initialValue: 'Get Started'" not in layout
+    assert "InkWell(" in layout
+    assert "Or login with" in layout
+    assert "56_2104" in layout
+
+
+def test_inline_labeled_input_host_rejects_extra_column_children() -> None:
+    """Law: inline_input_host_requires_exclusive_label_and_surface_children."""
+    from figma_flutter_agent.parser.interaction.inline_input_hosts import (
+        layout_fact_inline_labeled_input_field_host,
+    )
+
+    label = CleanDesignTreeNode(
+        id="col:label",
+        name="Email",
+        type=NodeType.TEXT,
+        text="Email",
+    )
+    surface = CleanDesignTreeNode(
+        id="col:surface",
+        name="Input area",
+        type=NodeType.ROW,
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_color="0xFFEDF1F3",
+            border_radius=10.0,
+        ),
+        children=[],
+    )
+    button = CleanDesignTreeNode(
+        id="col:cta",
+        name="Log In",
+        type=NodeType.BUTTON,
+        children=[],
+    )
+    host = CleanDesignTreeNode(
+        id="col:host",
+        name="Buttons",
+        type=NodeType.COLUMN,
+        children=[surface, label, button],
+    )
+    assert layout_fact_inline_labeled_input_field_host(host) is False
+
+
+def test_decorative_blur_absolute_does_not_block_mixed_inflow() -> None:
+    """Law: decorative_absolute_raster_must_not_block_mixed_inflow_column."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_has_non_sequential_raster_overlay,
+        stack_should_emit_mixed_inflow_column_overlay,
+    )
+
+    root = _load_processed_root()
+    card = _find_node(root, "55:2044")
+    assert card is not None
+    assert stack_has_non_sequential_raster_overlay(card) is False
+    assert stack_should_emit_mixed_inflow_column_overlay(card) is True

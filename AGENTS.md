@@ -147,10 +147,10 @@ When this `AGENTS.md` conflicts with those files, prefer the newer `.cursor/rule
 
 ### Debug doctrine
 
-Screen artifacts live under **`<agent_repo>/.debug/<project>/<feature>/`** (project-scoped per-screen layout v9). Project metadata stays on the Flutter project root.
+Screen artifacts live under **`<agent_repo>/.debug/screen/<project>/<feature>/`** (project-scoped per-screen layout v9). Project metadata stays on the Flutter project root.
 
 ```text
-<agent-repo>/.debug/
+<agent-repo>/.debug/screen/
   <project>/
     <feature>/
       raw.json

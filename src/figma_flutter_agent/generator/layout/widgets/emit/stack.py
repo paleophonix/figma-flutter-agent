@@ -583,6 +583,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         stack_flow_child_horizontal_wrap,
         stack_flow_child_vertical_extent_wrap,
         stack_pill_button_wrap_spacing,
+        stack_should_emit_coalesced_inflow_fallback,
         stack_should_emit_mixed_inflow_column_overlay,
         stack_should_flow_as_centered_wrap,
         stack_should_flow_as_column,
@@ -755,10 +756,13 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         stack_widget = (
             f"Column({main_axis}crossAxisAlignment: CrossAxisAlignment.stretch, children: [{body}])"
         )
-    elif stack_should_emit_mixed_inflow_column_overlay(node):
+    elif stack_should_emit_mixed_inflow_column_overlay(
+        node
+    ) or stack_should_emit_coalesced_inflow_fallback(node):
         from figma_flutter_agent.generator.layout.flex_policy.stack import (
             stack_child_is_absolute_overlay,
             stack_flow_column_child_sort_key,
+            stack_should_emit_coalesced_inflow_fallback,
             stack_should_emit_mixed_inflow_column_overlay,
         )
         from figma_flutter_agent.generator.layout.flex_policy.wrap import (
@@ -769,17 +773,30 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             zip(sorted_children, stack_children, strict=True),
             key=lambda pair: stack_flow_column_child_sort_key(pair[0]),
         )
-        segments: list[str] = []
-        inflow_run: list[str] = []
+        widget_by_child_id: dict[str, str] = {}
+        inflow_children: list[CleanDesignTreeNode] = []
 
-        def flush_inflow_run() -> None:
-            if not inflow_run:
-                return
+        for child, widget in ordered_pairs:
+            if stack_child_is_absolute_overlay(child):
+                widget_by_child_id[child.id] = repair_flex_parent_data_order(widget)
+                continue
+            flow_widget = stack_flow_child_horizontal_wrap(child, widget, parent_node=node)
+            if column_child_should_center_hug(node, child):
+                flow_widget = column_center_hug_child_wrap(node, child, flow_widget)
+            widget_by_child_id[child.id] = repair_flex_parent_data_order(flow_widget)
+            inflow_children.append(child)
+
+        segments: list[str] = []
+        column_emitted = False
+        if inflow_children:
+            inflow_children.sort(key=stack_flow_column_child_sort_key)
             spacing_field = ""
-            if (node.spacing or 0.0) > 0.0 and len(inflow_run) >= 2:
+            if (node.spacing or 0.0) > 0.0 and len(inflow_children) >= 2:
                 spacing_field = f"spacing: {format_geometry_literal(node.spacing)}, "
-            inflow_body = ", ".join(inflow_run) or "const SizedBox.shrink()"
-            segments.append(
+            inflow_body = ", ".join(
+                widget_by_child_id[child.id] for child in inflow_children
+            ) or "const SizedBox.shrink()"
+            inflow_column = (
                 "Column("
                 "mainAxisSize: MainAxisSize.min, "
                 "crossAxisAlignment: CrossAxisAlignment.stretch, "
@@ -787,19 +804,16 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 f"children: [{inflow_body}]"
                 ")"
             )
-            inflow_run.clear()
+        else:
+            inflow_column = ""
 
-        for child, widget in ordered_pairs:
-            flow_widget = stack_flow_child_horizontal_wrap(child, widget, parent_node=node)
-            if column_child_should_center_hug(node, child):
-                flow_widget = column_center_hug_child_wrap(node, child, flow_widget)
-            flow_widget = repair_flex_parent_data_order(flow_widget)
+        for child in node.children:
             if stack_child_is_absolute_overlay(child):
-                flush_inflow_run()
-                segments.append(flow_widget)
-            else:
-                inflow_run.append(flow_widget)
-        flush_inflow_run()
+                segments.append(widget_by_child_id[child.id])
+            elif not column_emitted and inflow_column:
+                segments.append(inflow_column)
+                column_emitted = True
+
         body = ", ".join(segments) or "const SizedBox.shrink()"
         stack_clip = (
             "Clip.none" if not is_layout_root or stack_needs_soft_clip(node) else "Clip.hardEdge"
@@ -942,13 +956,17 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             stack_widget = (
                 f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), child: {stack_widget})"
             )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_should_emit_surface_decoration,
+    )
+
     root_decoration = (
         box_decoration_expr(
             node.style,
             width=node.sizing.width,
             height=node.sizing.height,
         )
-        if is_layout_root
+        if stack_should_emit_surface_decoration(node, is_layout_root=is_layout_root)
         else None
     )
     if root_decoration is not None:

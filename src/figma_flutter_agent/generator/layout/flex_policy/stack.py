@@ -900,6 +900,39 @@ def stack_should_emit_mixed_inflow_column_overlay(stack: CleanDesignTreeNode) ->
     return tree_children_are_vertically_sequential(inflow)
 
 
+def stack_should_emit_coalesced_inflow_fallback(stack: CleanDesignTreeNode) -> bool:
+    """Emit one inflow ``Column`` when absolute decor blocked mixed-inflow routing."""
+    if stack_should_emit_mixed_inflow_column_overlay(stack):
+        return False
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    inflow = [child for child in stack.children if not stack_child_is_absolute_overlay(child)]
+    absolute = [child for child in stack.children if stack_child_is_absolute_overlay(child)]
+    if not inflow or not absolute:
+        return False
+    if len(inflow) < 2 and (stack.spacing or 0.0) <= 0.0:
+        return False
+    return True
+
+
+def stack_should_emit_surface_decoration(
+    stack: CleanDesignTreeNode,
+    *,
+    is_layout_root: bool,
+) -> bool:
+    """Return True when a stack host should emit painted card/chrome decoration."""
+    if is_layout_root:
+        return True
+    style = stack.style
+    if style.background_color is not None:
+        return True
+    if style.border_radius is not None and float(style.border_radius) > 0.0:
+        return True
+    if style.border_color is not None:
+        return True
+    return False
+
+
 def stack_has_non_sequential_raster_overlay(stack: CleanDesignTreeNode) -> bool:
     """Return True when a raster photo overlaps siblings and blocks column flow."""
     from figma_flutter_agent.generator.ir.passes.geometry import (
@@ -909,6 +942,12 @@ def stack_has_non_sequential_raster_overlay(stack: CleanDesignTreeNode) -> bool:
 
     raster = find_raster_photo_leaf(stack)
     if raster is None:
+        return False
+    from figma_flutter_agent.parser.interaction.enrichment import (
+        layout_fact_decorative_blur_absolute_overlay,
+    )
+
+    if layout_fact_decorative_blur_absolute_overlay(raster):
         return False
     for child in stack.children:
         if child.id == raster.id:
