@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.file_methods import _tree_depth, plan_layout_methods
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.components import validate_semantic_type_for_node
+from figma_flutter_agent.parser.interaction import list_tile_leading_icon_slot
 from figma_flutter_agent.parser.interaction.buttons import (
     button_hosts_horizontal_social_auth_icon_cluster,
     button_hosts_multiple_auth_rows,
@@ -90,7 +91,7 @@ def _icon_only_social_row(row_id: str, *, left: float) -> CleanDesignTreeNode:
         type=NodeType.ROW,
         padding=Padding(top=10.0, bottom=10.0, left=24.0, right=24.0),
         sizing=Sizing(
-            width_mode=SizingMode.FIXED,
+            width_mode=SizingMode.FILL,
             height_mode=SizingMode.FIXED,
             width=62.5,
             height=48.0,
@@ -212,6 +213,59 @@ def test_horizontal_icon_only_social_cluster_emits_row() -> None:
     assert "spacing: 15.0" in compact
     assert compact.count("InkWell(") >= 4
     assert "Stack(fit: StackFit.loose" not in compact
+
+
+def test_list_tile_leading_icon_does_not_double_wrap_dart_color_expr() -> None:
+    """Law: dart_color_expr_must_not_be_double_wrapped_in_color_constructor."""
+    from figma_flutter_agent.generator.layout.widgets.emit.containers import render_misc
+
+    node = CleanDesignTreeNode(
+        id="social:chip",
+        name="Another Step login",
+        type=NodeType.ROW,
+        sizing=Sizing(width=62.5, height=48.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=10.0),
+        vector_asset_key="assets/icons/google.svg",
+    )
+    body = render_misc.list_tile_leading_icon(
+        node,
+        parent_node=None,
+        uses_svg=True,
+        cluster_id=None,
+        cluster_vector_variants=None,
+        parent_type=NodeType.ROW,
+    )
+    assert "Color(Color(" not in body
+    assert "color: Color(0xFFFFFFFF)" in body
+
+
+def test_social_auth_icon_chip_rejects_list_tile_leading_icon_slot() -> None:
+    """Law: social_auth_icon_chip_must_not_route_through_list_tile_leading_icon_slot."""
+    host = CleanDesignTreeNode(
+        id="56:2102",
+        name="Button",
+        type=NodeType.ROW,
+        spacing=15.0,
+        sizing=Sizing(width=295.0, height=48.0),
+        children=[
+            _icon_only_social_row("56:2103", left=0.0),
+            _icon_only_social_row("56:2104", left=77.5),
+            _icon_only_social_row("56:2105", left=155.0),
+            _icon_only_social_row("56:2106", left=232.5),
+        ],
+    )
+    assert button_hosts_horizontal_social_auth_icon_cluster(host)
+    chip = host.children[0]
+    assert not list_tile_leading_icon_slot(chip, host, parent_type=NodeType.ROW)
+
+
+def test_login_input_widget_emit_has_no_double_color_wrap() -> None:
+    """Law: dart_color_expr_must_not_be_double_wrapped_in_color_constructor (subtree)."""
+    root = _load_processed_root()
+    layout = render_layout_file(root, feature_name="login_version_10_color", uses_svg=True)[
+        "lib/generated/login_version_10_color_layout.dart"
+    ]
+    assert "Color(Color(" not in layout
 
 
 def test_decomposed_wallpaper_stack_root_preview_is_bounded() -> None:

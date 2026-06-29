@@ -589,7 +589,7 @@ class render_misc:
         return (
             f"Container(width: {format_geometry_literal(width)}, "
             f"height: {format_geometry_literal(height)}, "
-            f"decoration: BoxDecoration(color: Color({background}), "
+            f"decoration: BoxDecoration(color: {background}, "
             f"borderRadius: BorderRadius.circular({format_geometry_literal(radius)})), "
             "child: Row(mainAxisAlignment: MainAxisAlignment.center, "
             f"crossAxisAlignment: CrossAxisAlignment.center, children: [{glyph}]))"

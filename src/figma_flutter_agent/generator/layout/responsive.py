@@ -159,9 +159,9 @@ def should_stretch_bottom_positioned_horizontal(placement: StackPlacement) -> bo
     ):
         return False
     left = placement.left if placement.left is not None else 0.0
-    if left > 1.5:
+    if left > 1.5 or float(left) < -1.5:
         return False
-    if placement.vertical != "BOTTOM" and placement.bottom is None:
+    if placement.vertical != "BOTTOM":
         return False
     return placement.horizontal in {"LEFT", "LEFT_RIGHT", "SCALE", "CENTER"}
 

@@ -187,6 +187,10 @@ def list_tile_leading_icon_slot(
 
     if layout_fact_row_icon_stepper_control_row(row_host):
         return False
+    from .buttons import button_hosts_horizontal_social_auth_icon_cluster
+
+    if button_hosts_horizontal_social_auth_icon_cluster(row_host):
+        return False
     has_fill = any(child.sizing.width_mode == SizingMode.FILL for child in row_host.children)
     if not has_fill:
         return False
