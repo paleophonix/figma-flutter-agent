@@ -215,7 +215,7 @@
       "new": {
         "sections": 1,
         "bands": 1,
-        "bottom_chrome": 2,
+        "bottom_chrome": 1,
         "top_chrome": 1
       },
       "policy": null
@@ -226,7 +226,7 @@
       "nodeId": "53:1896",
       "field": "children_count",
       "old": 5,
-      "new": 4,
+      "new": 3,
       "policy": null
     },
     {
@@ -284,10 +284,9 @@
         "nav_scroll_host": true,
         "child_type_counts": {
           "ROW": 1,
-          "STACK": 2,
-          "VECTOR": 1
+          "STACK": 2
         },
-        "child_count": 4
+        "child_count": 3
       }
     },
     {
