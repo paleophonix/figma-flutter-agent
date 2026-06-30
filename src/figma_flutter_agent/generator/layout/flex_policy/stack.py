@@ -436,7 +436,24 @@ def layout_fact_stack_circular_option_glyph_host(node: CleanDesignTreeNode) -> b
     return has_surface
 
 
-_ICON_BADGE_STACK_MAX_EXTENT = 48.0
+_ICON_BADGE_STACK_MAX_EXTENT = 64.0
+
+
+def _icon_badge_stack_has_glyph(child: CleanDesignTreeNode) -> bool:
+    """Return True when a stack child carries an exportable vector glyph."""
+    if child.type in {NodeType.VECTOR, NodeType.IMAGE} and (
+        child.vector_asset_key or child.image_asset_key
+    ):
+        return True
+    if child.vector_asset_key or child.image_asset_key:
+        return True
+    from figma_flutter_agent.parser.interaction.icons import (
+        _BACK_NAV_DESCENDANT_DEPTH,
+        _descendant_nodes,
+        _stack_has_vector_icon,
+    )
+
+    return _stack_has_vector_icon(_descendant_nodes(child, _BACK_NAV_DESCENDANT_DEPTH))
 
 
 def layout_fact_icon_badge_stack(node: CleanDesignTreeNode) -> bool:
@@ -460,13 +477,13 @@ def layout_fact_icon_badge_stack(node: CleanDesignTreeNode) -> bool:
     for child in node.children:
         if child.type == NodeType.TEXT and (child.text or "").strip():
             text_labels += 1
-        if child.type == NodeType.CONTAINER and child.style.background_color:
-            has_fill_surface = True
-        if child.type in {NodeType.VECTOR, NodeType.IMAGE} and (
-            child.vector_asset_key or child.image_asset_key
+        if child.type == NodeType.CONTAINER and (
+            child.style.background_color or child.style.has_stroke
         ):
+            has_fill_surface = True
+        if _icon_badge_stack_has_glyph(child):
             has_glyph = True
-    if node.style.background_color:
+    if node.style.background_color or node.style.has_stroke:
         has_fill_surface = True
     return text_labels == 0 and has_fill_surface and has_glyph
 

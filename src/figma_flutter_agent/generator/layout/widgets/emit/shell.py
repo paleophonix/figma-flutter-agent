@@ -160,9 +160,14 @@ def prepare_layout_children(
                 if layout_fact_stack_hero_full_bleed_scrim(stack_child):
                     omit_child_ids.add(stack_child.id)
         if layout_fact_compact_icon_glyph_host(node):
-            for stack_child in sorted_children:
-                if layout_fact_icon_glyph_frame_placeholder(stack_child, parent=node):
-                    omit_child_ids.add(stack_child.id)
+            from figma_flutter_agent.generator.layout.flex_policy.stack import (
+                layout_fact_icon_badge_stack,
+            )
+
+            if not layout_fact_icon_badge_stack(node):
+                for stack_child in sorted_children:
+                    if layout_fact_icon_glyph_frame_placeholder(stack_child, parent=node):
+                        omit_child_ids.add(stack_child.id)
     return (
         sorted_children,
         metadata_column_host,

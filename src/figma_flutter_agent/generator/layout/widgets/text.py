@@ -43,7 +43,7 @@ from .position import (
     _child_needs_positioned_bounds,
     _ensure_positioned_stack_bounds,
 )
-from .shared import _node_layout_size
+from .shared import _node_layout_size, figma_positioned_dimensions
 from .svg import (
     _effective_svg_dimensions,
     _is_skip_control_stack,
@@ -221,6 +221,19 @@ def _apply_stack_position(
         )
     from figma_flutter_agent.generator.layout.widgets.position import (
         placement_dual_horizontal_insets_overconstrain,
+        positioned_text_prefers_explicit_width_pins,
+    )
+
+    width_hint, _ = figma_positioned_dimensions(node, placement) if placement is not None else (None, None)
+    prefer_fixed_width = (
+        placement is not None
+        and positioned_text_prefers_explicit_width_pins(
+            node,
+            placement,
+            parent_width=parent_width,
+            width=width_hint,
+            parent_node=parent_node,
+        )
     )
 
     if (
@@ -231,6 +244,7 @@ def _apply_stack_position(
         and float(placement.left) > 1.5
         and float(placement.right) > 1.5
         and not placement_dual_horizontal_insets_overconstrain(placement, parent_width)
+        and not prefer_fixed_width
     ):
 
         def _g_center(value: float) -> str:
@@ -254,6 +268,7 @@ def _apply_stack_position(
             parent_width=parent_width,
             parent_height=parent_height,
             prefer_top_pin=prefer_top_pin,
+            parent_node=parent_node,
         )
     from figma_flutter_agent.generator.layout.widgets.position import (
         top_navigation_bar_child_vertical_fields,
@@ -300,11 +315,20 @@ def _apply_stack_position(
         top_navigation_bar_title_should_screen_center,
     )
 
-    if node.type == NodeType.TEXT and (
-        placement_is_center_pinned_horizontal(placement)
-        if placement is not None
-        else False
-    ) or top_navigation_bar_title_should_screen_center(node, parent_node):
+    has_explicit_width_pin = any(field.startswith("width:") for field in fields)
+    if (
+        node.type == NodeType.TEXT
+        and not prefer_fixed_width
+        and not has_explicit_width_pin
+        and (
+            (
+                placement_is_center_pinned_horizontal(placement)
+                if placement is not None
+                else False
+            )
+            or top_navigation_bar_title_should_screen_center(node, parent_node)
+        )
+    ):
         child = f"SizedBox(width: double.infinity, child: Center(child: {child}))"
     slot_height = placement.height
     if (

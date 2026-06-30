@@ -1,0 +1,272 @@
+"""Regression tests for transaction-income icon badge and table-column emit laws."""
+
+from __future__ import annotations
+
+from figma_flutter_agent.generator.ir.extracted import (
+    _extracted_widget_needs_decoration_rematerialization,
+    _preserve_extracted_widget_decoration_shell,
+)
+from figma_flutter_agent.generator.layout.flex_policy.stack import layout_fact_icon_badge_stack
+from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_node_body
+from figma_flutter_agent.generator.layout.widgets.position import (
+    _ensure_positioned_stack_bounds,
+    positioned_text_prefers_explicit_width_pins,
+)
+from figma_flutter_agent.generator.layout.widgets.text import _positioned_fields
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    GeometryFrame,
+    GeomRect,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
+
+
+def _calendar_badge_stack() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="7043:3387",
+        name="Calender",
+        type=NodeType.STACK,
+        sizing=Sizing(width=32.3, height=30.0),
+        children=[
+            CleanDesignTreeNode(
+                id="I7043:3387;7043:3015",
+                name="Rectangle 269",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=32.3, height=30.0),
+                style=NodeStyle(background_color="0xFF00D09E", border_radius=12.5),
+            ),
+            CleanDesignTreeNode(
+                id="I7043:3387;7043:3017",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_calendar.svg",
+                sizing=Sizing(width=17.9, height=15.8),
+                stack_placement=StackPlacement(
+                    left=7.4,
+                    top=6.8,
+                    width=17.9,
+                    height=15.8,
+                ),
+            ),
+        ],
+    )
+
+
+def _salary_icon_stack() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="7110:1045",
+        name="Icon Salary",
+        type=NodeType.STACK,
+        sizing=Sizing(width=57.0, height=53.0),
+        children=[
+            CleanDesignTreeNode(
+                id="I7110:1045;7102:2847",
+                name="Rectangle 150",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=57.0, height=53.0),
+                style=NodeStyle(background_color="0xFF6DB6FE", border_radius=22.0),
+            ),
+            CleanDesignTreeNode(
+                id="I7110:1045;7102:1277",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_salary.svg",
+                sizing=Sizing(width=26.0, height=23.5),
+                stack_placement=StackPlacement(
+                    left=16.0,
+                    top=15.0,
+                    width=26.0,
+                    height=23.5,
+                ),
+            ),
+        ],
+    )
+
+
+def _arrow_chip_stack() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="I7110:3217;7110:3187",
+        name="Group 395",
+        type=NodeType.STACK,
+        sizing=Sizing(width=25.0, height=25.0),
+        children=[
+            CleanDesignTreeNode(
+                id="I7110:3217;7110:3188",
+                name="Rectangle 31",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=25.0, height=25.0),
+                style=NodeStyle(
+                    border_radius=6.3,
+                    border_width=2.08,
+                    border_color="0xFFF1FFF3",
+                    has_stroke=True,
+                ),
+            ),
+            CleanDesignTreeNode(
+                id="I7110:3217;7110:3189",
+                name="Arrow 1",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/arrow_1.svg",
+                sizing=Sizing(width=12.5, height=12.5),
+                stack_placement=StackPlacement(
+                    left=6.25,
+                    top=6.25,
+                    width=12.5,
+                    height=12.5,
+                ),
+            ),
+        ],
+    )
+
+
+def _monthly_category_text() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="7035:1284",
+        name="Monthly",
+        type=NodeType.TEXT,
+        text="Monthly",
+        sizing=Sizing(width=48.0, height=18.0),
+        style=NodeStyle(font_size=12.0, font_weight="w400", text_align="LEFT"),
+        stack_placement=StackPlacement(
+            horizontal="CENTER",
+            vertical="BOTTOM",
+            left=191.0,
+            top=426.0,
+            right=143.0,
+            bottom=488.0,
+            width=48.0,
+            height=18.0,
+        ),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(x=239.0, y=426.0, width=48.0, height=18.0),
+        ),
+    )
+
+
+def _amount_text() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="7035:1294",
+        name="$120,00",
+        type=NodeType.TEXT,
+        text="$120,00",
+        sizing=Sizing(width=56.0, height=23.0),
+        style=NodeStyle(font_size=15.0, font_weight="w500", text_align="RIGHT"),
+        stack_placement=StackPlacement(
+            horizontal="CENTER",
+            left=187.0,
+            top=501.0,
+            right=35.0,
+            bottom=408.0,
+            width=56.0,
+            height=23.0,
+        ),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(x=339.0, y=501.0, width=56.0, height=23.0),
+        ),
+    )
+
+
+def test_icon_badge_stack_detects_salary_and_notification_glyph_hosts() -> None:
+    salary = _salary_icon_stack()
+    assert layout_fact_icon_badge_stack(salary)
+    notification = CleanDesignTreeNode(
+        id="7253:3639",
+        name="Icon-Notification",
+        type=NodeType.STACK,
+        sizing=Sizing(width=30.0, height=30.0),
+        style=NodeStyle(background_color="0xFFDFF7E2", border_radius=25.7),
+        children=[
+            CleanDesignTreeNode(
+                id="I7253:3639;7043:3064",
+                name="Vector",
+                type=NodeType.STACK,
+                sizing=Sizing(width=14.6, height=18.9),
+                vector_asset_key="assets/icons/vector_bell.svg",
+                children=[],
+            )
+        ],
+    )
+    assert layout_fact_icon_badge_stack(notification)
+
+
+def test_icon_badge_stack_emits_substrate_and_intrinsic_glyph() -> None:
+    badge = _calendar_badge_stack()
+    emitted = render_node_body(badge, uses_svg=True, theme_variant="material_3")
+    assert "BoxDecoration(" in emitted
+    assert "Color(0xFF00D09E)" in emitted
+    assert "width: 17.9" in emitted
+    assert "SvgPicture" in emitted
+
+
+def test_icon_badge_stack_emits_stroke_frame_for_summary_arrow_chip() -> None:
+    chip = _arrow_chip_stack()
+    assert layout_fact_icon_badge_stack(chip)
+    emitted = render_node_body(chip, uses_svg=True, theme_variant="material_3")
+    assert "BoxDecoration(" in emitted
+    assert "Border.all" in emitted
+    assert "width: 12.5" in emitted
+
+
+def test_extracted_salary_widget_preserves_blue_substrate_shell() -> None:
+    salary = _salary_icon_stack()
+    wrapped = _preserve_extracted_widget_decoration_shell(
+        salary,
+        "SvgPicture.asset('assets/icons/vector_salary.svg', width: 26.0, height: 23.5, fit: BoxFit.contain)",
+    )
+    assert "Color(0xFF6DB6FE)" in wrapped
+    assert "width: 57.0" in wrapped
+    assert "width: 26.0" in wrapped
+
+
+def test_extracted_widget_missing_shell_triggers_rematerialization() -> None:
+    salary = _salary_icon_stack()
+    bare = (
+        "class IconSalaryWidget extends StatelessWidget {"
+        "@override Widget build(BuildContext context) {"
+        "return SvgPicture.asset('assets/icons/x.svg', width: 57.0, height: 53.0);"
+        "}}"
+    )
+    assert _extracted_widget_needs_decoration_rematerialization(salary, bare)
+
+
+def test_positioned_text_dual_pin_prefers_explicit_width_for_table_cells() -> None:
+    monthly = _monthly_category_text()
+    placement = monthly.stack_placement
+    assert placement is not None
+    assert positioned_text_prefers_explicit_width_pins(
+        monthly,
+        placement,
+        parent_width=430.0,
+        width=48.0,
+    )
+    fields = _positioned_fields(placement)
+    _ensure_positioned_stack_bounds(
+        fields,
+        monthly,
+        placement,
+        parent_width=430.0,
+        parent_height=932.0,
+    )
+    joined = ", ".join(fields)
+    assert "left: 239.0" in joined
+    assert "width: 48.0" in joined
+    assert "right:" not in joined
+
+    amount = _amount_text()
+    amount_placement = amount.stack_placement
+    assert amount_placement is not None
+    fields_amount = _positioned_fields(amount_placement)
+    _ensure_positioned_stack_bounds(
+        fields_amount,
+        amount,
+        amount_placement,
+        parent_width=430.0,
+        parent_height=932.0,
+    )
+    joined_amount = ", ".join(fields_amount)
+    assert "right: 35.0" in joined_amount
+    assert "width: 56.0" in joined_amount
+    assert "left: 187.0" not in joined_amount

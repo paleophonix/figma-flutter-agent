@@ -135,18 +135,23 @@ def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
         )
 
     if node.type == NodeType.CONTAINER and layout_fact_checkbox_control(node):
-        widget = render_checkbox(node, theme_variant=theme_variant)
-        width = node.sizing.width
-        height = node.sizing.height
-        if width is not None and height is not None and width > 0 and height > 0:
-            widget = f"SizedBox(width: {width}, height: {height}, child: {widget})"
-        return _finalize_widget(
-            node,
-            widget,
-            parent_type=parent_type,
-            parent_node=parent_node,
-            scroll_content_root=scroll_content_root,
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            layout_fact_icon_badge_stack,
         )
+
+        if parent_node is None or not layout_fact_icon_badge_stack(parent_node):
+            widget = render_checkbox(node, theme_variant=theme_variant)
+            width = node.sizing.width
+            height = node.sizing.height
+            if width is not None and height is not None and width > 0 and height > 0:
+                widget = f"SizedBox(width: {width}, height: {height}, child: {widget})"
+            return _finalize_widget(
+                node,
+                widget,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
 
     return None
 

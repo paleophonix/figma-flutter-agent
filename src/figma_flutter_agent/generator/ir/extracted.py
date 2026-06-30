@@ -301,23 +301,54 @@ def emit_extracted_widget_code_from_ir(
     return code
 
 
+def _extracted_widget_needs_decoration_rematerialization(
+    subtree: CleanDesignTreeNode,
+    existing_code: str,
+) -> bool:
+    """Return True when cached extracted widget code dropped a painted host shell."""
+    if "BoxDecoration(" in existing_code:
+        return False
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
+    from figma_flutter_agent.generator.layout.style import has_box_decoration
+    from figma_flutter_agent.parser.interaction.input_fields import primary_surface_node
+
+    if has_box_decoration(subtree.style):
+        return True
+    if layout_fact_icon_badge_stack(subtree):
+        return True
+    return primary_surface_node(subtree) is not None
+
+
 def _preserve_extracted_widget_decoration_shell(
     subtree: CleanDesignTreeNode,
     body: str,
 ) -> str:
     """Wrap shrink-only extracted bodies with the host stack's painted shell."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
     from figma_flutter_agent.generator.layout.style import (
         box_decoration_expr,
         has_box_decoration,
     )
+    from figma_flutter_agent.parser.interaction.input_fields import primary_surface_node
     from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 
-    if not has_box_decoration(subtree.style):
-        return body
     if "BoxDecoration(" in body:
         return body
+    style_source = subtree
+    if not has_box_decoration(subtree.style):
+        surface = primary_surface_node(subtree)
+        if surface is not None and layout_fact_icon_badge_stack(subtree):
+            style_source = surface
+        elif surface is not None and has_box_decoration(surface.style):
+            style_source = surface
+        else:
+            return body
     decoration = box_decoration_expr(
-        subtree.style,
+        style_source.style,
         width=subtree.sizing.width,
         height=subtree.sizing.height,
     )
@@ -367,10 +398,15 @@ def materialize_extracted_widgets(
             materialized.append(widget)
             continue
         existing = widget.resolved_code()
+        subtree = tree_by_id.get(widget.widget_ir.figma_id)
         if (
             prefer_existing_code
             and existing
             and not _is_shrink_only_widget_source(existing)
+            and not (
+                subtree is not None
+                and _extracted_widget_needs_decoration_rematerialization(subtree, existing)
+            )
         ):
             materialized.append(widget)
             continue

@@ -165,6 +165,65 @@ def placement_dual_horizontal_insets_overconstrain(
     return False
 
 
+def positioned_text_dual_pin_span(
+    placement: StackPlacement,
+    *,
+    parent_width: float | None,
+) -> float | None:
+    """Return the horizontal span implied by dual ``left``/``right`` pins."""
+    if placement.left is None or placement.right is None:
+        return None
+    if parent_width is None or parent_width <= 0:
+        return None
+    return float(parent_width) - float(placement.left) - float(placement.right)
+
+
+def positioned_text_prefers_explicit_width_pins(
+    node: CleanDesignTreeNode,
+    placement: StackPlacement,
+    *,
+    parent_width: float | None,
+    width: float | None,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """Prefer ``width`` pins over dual horizontal stretch for bounded table cells."""
+    if node.type != NodeType.TEXT:
+        return False
+    if width is None or width <= 0:
+        return False
+    if placement.left is None or placement.right is None:
+        return False
+    if top_navigation_bar_title_should_screen_center(node, parent_node):
+        return False
+    span = positioned_text_dual_pin_span(placement, parent_width=parent_width)
+    if span is None:
+        return False
+    return span > float(width) + 2.0
+
+
+def positioned_text_explicit_width_horizontal_fields(
+    node: CleanDesignTreeNode,
+    placement: StackPlacement,
+    *,
+    width: float,
+    left: float,
+) -> list[str]:
+    """Emit one horizontal pin plus explicit width for bounded text cells."""
+    width_token = format_geometry_literal(width)
+    text_align = (node.style.text_align or "").upper()
+    layout_left, _ = _layout_rect_edge_origin(node)
+    if text_align == "RIGHT" and placement.right is not None:
+        return [
+            f"right: {format_geometry_literal(placement.right)}",
+            f"width: {width_token}",
+        ]
+    left_pin = layout_left if layout_left is not None else left
+    return [
+        f"left: {format_geometry_literal(left_pin)}",
+        f"width: {width_token}",
+    ]
+
+
 def _placement_origin_edges(
     node: CleanDesignTreeNode,
 ) -> tuple[float | None, float | None]:
@@ -254,6 +313,7 @@ def _ensure_positioned_stack_bounds(
     parent_width: float | None = None,
     parent_height: float | None = None,
     prefer_top_pin: bool = False,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> None:
     """Add explicit ``Positioned`` width/height pins from Figma frame size."""
     from figma_flutter_agent.generator.geometry.affine import (
@@ -324,6 +384,13 @@ def _ensure_positioned_stack_bounds(
         width_token = format_geometry_literal(width)
         height_token = format_geometry_literal(height)
         horizontal = placement.horizontal
+        prefer_fixed_width = positioned_text_prefers_explicit_width_pins(
+            node,
+            placement,
+            parent_width=parent_width,
+            width=width,
+            parent_node=parent_node,
+        )
         if pin_bottom:
             bottom = _resolved_bottom_offset(placement, parent_height=parent_height)
             bottom_token = format_geometry_literal(bottom)
@@ -343,10 +410,21 @@ def _ensure_positioned_stack_bounds(
                         parent_width,
                     )
                 )
-            ):
+            ) and not prefer_fixed_width:
                 fields[:] = [
                     f"left: {format_geometry_literal(left)}",
                     f"right: {format_geometry_literal(placement.right)}",
+                    f"bottom: {bottom_token}",
+                    f"height: {height_token}",
+                ]
+            elif prefer_fixed_width:
+                fields[:] = [
+                    *positioned_text_explicit_width_horizontal_fields(
+                        node,
+                        placement,
+                        width=float(width),
+                        left=float(left),
+                    ),
                     f"bottom: {bottom_token}",
                     f"height: {height_token}",
                 ]
@@ -368,12 +446,24 @@ def _ensure_positioned_stack_bounds(
             placement_is_center_pinned_horizontal(placement)
             and not placement_dual_horizontal_insets_overconstrain(placement, parent_width)
         ):
-            fields[:] = [
-                f"left: {format_geometry_literal(left)}",
-                f"right: {format_geometry_literal(placement.right)}",
-                f"top: {format_geometry_literal(top)}",
-                f"height: {height_token}",
-            ]
+            if prefer_fixed_width:
+                fields[:] = [
+                    *positioned_text_explicit_width_horizontal_fields(
+                        node,
+                        placement,
+                        width=float(width),
+                        left=float(left),
+                    ),
+                    f"top: {format_geometry_literal(top)}",
+                    f"height: {height_token}",
+                ]
+            else:
+                fields[:] = [
+                    f"left: {format_geometry_literal(left)}",
+                    f"right: {format_geometry_literal(placement.right)}",
+                    f"top: {format_geometry_literal(top)}",
+                    f"height: {height_token}",
+                ]
         else:
             fields[:] = [
                 f"left: {format_geometry_literal(left)}",
