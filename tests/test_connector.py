@@ -1,4 +1,5 @@
 import time
+from unittest.mock import AsyncMock
 
 import httpx
 import pytest
@@ -7,7 +8,7 @@ from httpx import Response
 
 from figma_flutter_agent.errors import FigmaApiError
 from figma_flutter_agent.figma.client import FigmaConnector
-from figma_flutter_agent.figma.limits import BATCH_SIZE
+from figma_flutter_agent.figma.limits import BATCH_SIZE, MAX_RETRIES
 from figma_flutter_agent.figma.nodes import merge_figma_nodes_batch
 
 
@@ -147,15 +148,34 @@ async def test_request_retries_on_429() -> None:
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_fetch_image_urls_continue_on_rate_limit() -> None:
+async def test_fetch_image_urls_retries_batch_on_rate_limit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     node_ids = [f"{index}:1" for index in range(25)]
+    second_batch = node_ids[20:]
+    sleeps: list[float] = []
+
+    async def _fast_sleep(delay: float) -> None:
+        sleeps.append(delay)
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.figma.endpoints.images.asyncio.sleep",
+        _fast_sleep,
+    )
     route = respx.get(url__regex=r"https://api\.figma\.com/v1/images/abc.*").mock(
         side_effect=[
-            Response(200, json={"images": {node_ids[0]: "https://cdn/0.png"}}),
+            Response(
+                200,
+                json={"images": {node_id: f"https://cdn/{node_id}.png" for node_id in node_ids[:20]}},
+            ),
             Response(
                 429,
                 headers={"Retry-After": "382044", "X-Figma-Plan-Tier": "starter"},
                 text="rate limited",
+            ),
+            Response(
+                200,
+                json={"images": {node_id: f"https://cdn/{node_id}.png" for node_id in second_batch}},
             ),
         ]
     )
@@ -167,9 +187,41 @@ async def test_fetch_image_urls_continue_on_rate_limit() -> None:
             continue_on_rate_limit=True,
         )
 
-    assert route.call_count == 2
-    assert result.urls == {node_ids[0]: "https://cdn/0.png"}
-    assert set(result.failed_node_ids) == set(node_ids[20:])
+    assert route.call_count == 3
+    assert len(result.urls) == 25
+    assert result.failed_node_ids == ()
+    assert result.rate_limited is True
+    assert sleeps
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_fetch_image_urls_gives_up_after_rate_limit_retries(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    node_ids = ["1:1", "1:2"]
+    monkeypatch.setattr(
+        "figma_flutter_agent.figma.endpoints.images.asyncio.sleep",
+        AsyncMock(),
+    )
+    route = respx.get(url__regex=r"https://api\.figma\.com/v1/images/abc.*").mock(
+        return_value=Response(
+            429,
+            headers={"Retry-After": "3600"},
+            text="rate limited",
+        )
+    )
+
+    async with FigmaConnector("figd_test") as connector:
+        result = await connector.fetch_image_urls(
+            "abc",
+            node_ids,
+            continue_on_rate_limit=True,
+        )
+
+    assert route.call_count == MAX_RETRIES
+    assert result.urls == {}
+    assert set(result.failed_node_ids) == set(node_ids)
     assert result.rate_limited is True
 
 

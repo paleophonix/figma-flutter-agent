@@ -45,33 +45,60 @@ class ImagesEndpoint(FigmaEndpointBase):
 
         async def _fetch_batch(batch: list[str]) -> list[str]:
             nonlocal rate_limited
-            try:
-                response = await self._request(
-                    "GET",
-                    f"/v1/images/{file_key}",
-                    params={"ids": ",".join(batch), "format": fmt, "scale": scale},
-                )
-            except FigmaApiError as exc:
-                if continue_on_rate_limit and exc.status_code == 429:
-                    rate_limit_failed.extend(batch)
-                    rate_limited = True
-                    logger.warning(
-                        "Figma images API rate limit (429); skipping {} node(s) and continuing",
-                        len(batch),
+            last_error: FigmaApiError | None = None
+            for attempt in range(MAX_RETRIES):
+                try:
+                    response = await self._request(
+                        "GET",
+                        f"/v1/images/{file_key}",
+                        params={"ids": ",".join(batch), "format": fmt, "scale": scale},
                     )
-                    await asyncio.sleep(max(inter_batch_delay_sec, 5.0))
-                    return []
-                raise
-            payload = FigmaImagesResponse.model_validate(response.json())
-            batch_failed: list[str] = []
-            for node_id, image_url in payload.images.items():
-                if node_id not in batch:
-                    continue
-                if image_url:
-                    urls[node_id] = image_url
-                else:
-                    batch_failed.append(node_id)
-            return batch_failed
+                except FigmaApiError as exc:
+                    last_error = exc
+                    if (
+                        continue_on_rate_limit
+                        and exc.status_code == 429
+                        and attempt < MAX_RETRIES - 1
+                    ):
+                        rate_limited = True
+                        delay = min(
+                            max(inter_batch_delay_sec, 5.0) * (attempt + 1),
+                            MAX_AUTO_RETRY_DELAY_SEC,
+                        )
+                        logger.warning(
+                            "Figma images API rate limit (429); retry {} node(s) in {:.0f}s "
+                            "({}/{})",
+                            len(batch),
+                            delay,
+                            attempt + 2,
+                            MAX_RETRIES,
+                        )
+                        await asyncio.sleep(delay)
+                        continue
+                    if continue_on_rate_limit and exc.status_code == 429:
+                        rate_limit_failed.extend(batch)
+                        rate_limited = True
+                        logger.warning(
+                            "Figma images API rate limit (429); giving up on {} node(s) after "
+                            "{} attempts",
+                            len(batch),
+                            MAX_RETRIES,
+                        )
+                        return []
+                    raise
+                payload = FigmaImagesResponse.model_validate(response.json())
+                batch_failed: list[str] = []
+                for node_id, image_url in payload.images.items():
+                    if node_id not in batch:
+                        continue
+                    if image_url:
+                        urls[node_id] = image_url
+                    else:
+                        batch_failed.append(node_id)
+                return batch_failed
+            if last_error is not None:
+                raise last_error
+            return []
 
         async def _fetch_all(pending_ids: list[str]) -> list[str]:
             unresolved: list[str] = []
@@ -144,7 +171,12 @@ class ImagesEndpoint(FigmaEndpointBase):
                 if response.status_code in RETRYABLE_STATUS_CODES and attempt < MAX_RETRIES - 1:
                     delay = retry_delay(response, attempt)
                     if response.status_code == 429 and delay > MAX_AUTO_RETRY_DELAY_SEC:
-                        raise self._rate_limit_error(response, delay)
+                        logger.warning(
+                            "Asset CDN rate limit Retry-After {:.0f}s exceeds cap; retrying in {:.0f}s",
+                            delay,
+                            MAX_AUTO_RETRY_DELAY_SEC,
+                        )
+                        delay = MAX_AUTO_RETRY_DELAY_SEC
                     await asyncio.sleep(delay)
                     last_error = FigmaApiError(response.text, status_code=response.status_code)
                     continue

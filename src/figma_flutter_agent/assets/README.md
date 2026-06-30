@@ -19,4 +19,6 @@ Map manifest entries to `vectorAssetKey` / `imageAssetKey` on tree nodes. Filena
 
 Wizard **check** uses `assets/diagnostics.py`: `all-assets` lists on-disk files; `screen-assets` compares the active dump to exportable icons and render-boundary SVGs via `dev/wizard/asset_gap.py` (shows kind, expected path, and live-sync hints when files are missing).
 
+Failed exports log per-node warnings via `assets/reporting.py` and surface in the wizard console (never demoted by `quiet_expected_warnings`). Figma Images API batches retry on 429 before marking nodes failed.
+
 Screen-frame node ids (primary + prototype destinations) are never exported, never loaded from disk in dump mode, and are stripped from cleanTree before LLM codegen. See `assets/screen_frame.py`.

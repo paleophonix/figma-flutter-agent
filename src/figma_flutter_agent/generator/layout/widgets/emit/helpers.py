@@ -44,7 +44,7 @@ def _try_render_early_stack_special_case(
         from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
         if find_raster_photo_leaf(node) is not None:
-            compact_photo = try_render_compact_raster_photo_stack(node)
+            compact_photo = try_render_compact_raster_photo_stack(node, uses_svg=uses_svg)
             if compact_photo is not None:
                 return compact_photo, True
 

@@ -291,7 +291,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     if has_raster_photo_fill:
         compact_photo = try_render_media_avatar_stack(node, uses_svg=uses_svg)
         if compact_photo is None:
-            compact_photo = try_render_compact_raster_photo_stack(node)
+            compact_photo = try_render_compact_raster_photo_stack(node, uses_svg=uses_svg)
         if compact_photo is not None:
             return _finalize_widget(
                 node,

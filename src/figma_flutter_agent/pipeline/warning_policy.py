@@ -84,11 +84,29 @@ def skip_delegates_to_layout_warning(*, settings: Settings, use_cached_ir: bool)
     return use_cached_ir
 
 
+_ACTIONABLE_WARNING_PREFIXES = (
+    "Asset export",
+    "Render-boundary",
+)
+
+
+def is_actionable_user_warning(message: str) -> bool:
+    """Return True when a pipeline warning must not be demoted to info."""
+    stripped = message.strip()
+    return any(stripped.startswith(prefix) for prefix in _ACTIONABLE_WARNING_PREFIXES)
+
+
 def emit_user_warnings(warnings: list[str], *, settings: Settings) -> None:
     """Log pipeline user warnings at the configured severity."""
     from loguru import logger
 
-    log_fn = logger.info if quiet_expected_warnings(settings) else logger.warning
+    quiet = quiet_expected_warnings(settings)
     for message in warnings:
-        if message.strip():
-            log_fn("{}", message)
+        if not message.strip():
+            continue
+        if is_actionable_user_warning(message):
+            logger.warning("{}", message)
+        elif quiet:
+            logger.info("{}", message)
+        else:
+            logger.warning("{}", message)

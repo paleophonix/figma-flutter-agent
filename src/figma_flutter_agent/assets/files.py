@@ -5,7 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.assets.effects import write_webp_copy
-from figma_flutter_agent.assets.optimize import optimize_svg, svg_has_unsupported_filter, svg_is_well_formed
+from figma_flutter_agent.assets.optimize import (
+    optimize_svg,
+    svg_has_unsupported_filter,
+    svg_is_well_formed,
+)
 from figma_flutter_agent.schemas import AssetManifestEntry
 
 

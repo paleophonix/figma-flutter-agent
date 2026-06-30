@@ -13,7 +13,20 @@ from figma_flutter_agent.dev.wizard.models import ScreenPreflight
 from figma_flutter_agent.dev.wizard.preflight import build_run_plan, collect_screen_preflight
 from figma_flutter_agent.pipeline.result import PipelineResult
 from figma_flutter_agent.pipeline.run import run_pipeline
-from figma_flutter_agent.pipeline.warning_policy import emit_user_warnings
+from figma_flutter_agent.pipeline.warning_policy import (
+    emit_user_warnings,
+    is_actionable_user_warning,
+)
+
+
+def print_actionable_pipeline_warnings(warnings: list[str]) -> None:
+    """Print asset and boundary warnings to the wizard console (always visible)."""
+    from rich.console import Console
+
+    console = Console()
+    for message in warnings:
+        if is_actionable_user_warning(message):
+            console.print(f"[yellow]{message}[/yellow]")
 
 
 async def generate_screen_for_preview(
@@ -40,6 +53,7 @@ async def generate_screen_for_preview(
         force_live_fetch=live,
     )
     emit_user_warnings(result.warnings, settings=settings)
+    print_actionable_pipeline_warnings(result.warnings)
     logger.info(
         "Generated screen {} via {}",
         plan.screen.feature,

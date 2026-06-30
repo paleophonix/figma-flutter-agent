@@ -217,6 +217,53 @@ def _stroke_icon_vectors(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]
     ]
 
 
+_CHEVRON_GLYPH_MAX_WIDTH = 12.0
+_CHEVRON_GLYPH_MIN_HEIGHT = 6.0
+_CHEVRON_ACTION_SLOT_MAX = 28.0
+
+
+def layout_fact_stroke_chevron_vector(node: CleanDesignTreeNode) -> bool:
+    """Return True when a stroke vector is a narrow trailing chevron glyph."""
+    if node.type != NodeType.VECTOR or not node.style.has_stroke:
+        return False
+    width, height = _vector_paint_span(node)
+    if width <= 0 or height <= 0:
+        return False
+    return (
+        width <= _CHEVRON_GLYPH_MAX_WIDTH
+        and height >= _CHEVRON_GLYPH_MIN_HEIGHT
+        and height > width * 1.2
+    )
+
+
+def layout_fact_trailing_chevron_action_slot(node: CleanDesignTreeNode) -> bool:
+    """Compact trailing chevron host in a list-row action slot."""
+    if node.type not in {NodeType.STACK, NodeType.CONTAINER, NodeType.ROW}:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) > _CHEVRON_ACTION_SLOT_MAX or float(height) > _CHEVRON_ACTION_SLOT_MAX:
+        return False
+    normalized = (node.name or "").lower().replace(" ", "")
+    if "chevron" in normalized or normalized in {"icon/right", "iconright"}:
+        return True
+    return any(layout_fact_stroke_chevron_vector(vector) for vector in _stroke_icon_vectors(node))
+
+
+def trailing_chevron_glyph_paint_span(
+    node: CleanDesignTreeNode,
+) -> tuple[float, float] | None:
+    """Return intrinsic paint bounds for a trailing chevron glyph when known."""
+    if layout_fact_stroke_chevron_vector(node):
+        return _vector_paint_span(node)
+    for vector in _stroke_icon_vectors(node):
+        if layout_fact_stroke_chevron_vector(vector):
+            return _vector_paint_span(vector)
+    return None
+
+
 def _stroke_icon_size_expr(node: CleanDesignTreeNode) -> str:
     """Resolve Material icon size from a square icon button host."""
     from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
@@ -285,6 +332,8 @@ def passive_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
 def layout_fact_compact_icon_action_stack(node: CleanDesignTreeNode) -> bool:
     """Small Figma icon components (e.g. 24x24 ``arrow-narrow-left``) used as back/close."""
     if passive_decorative_icon_glyph(node):
+        return False
+    if layout_fact_trailing_chevron_action_slot(node):
         return False
     if node.type != NodeType.STACK:
         return False

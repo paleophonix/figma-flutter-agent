@@ -14,7 +14,9 @@ from figma_flutter_agent.assets.effects import index_figma_nodes, node_has_layer
 from figma_flutter_agent.assets.files import AssetFileDownloadMixin, rewrite_entries_to_webp
 from figma_flutter_agent.assets.models import AssetExportOutcome
 from figma_flutter_agent.assets.names import asset_filename
+from figma_flutter_agent.assets.reporting import log_failed_asset_exports
 from figma_flutter_agent.assets.optimize import (
+    optimize_svg,
     svg_has_unsupported_filter,
     svg_is_well_formed,
     svg_path_element_count,
@@ -140,6 +142,7 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                 if node_id not in icon_urls:
                     failed_node_ids.add(node_id)
                     svg_url_failed_ids.add(node_id)
+                    logger.warning("Figma returned no SVG image URL for node {}", node_id)
             icon_jobs: list[tuple[str, str, str, str, Path]] = []
             for node_id, name, kind in exportables:
                 if kind not in {"icon", "boundary_svg"} or node_id not in icon_urls:
@@ -162,7 +165,13 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                             optimize_svg_enabled=optimize_enabled,
                         )
                     except ValueError:
-                        logger.warning("Malformed SVG export for node {}; scheduling PNG fallback", node_id)
+                        logger.warning(
+                            "Malformed SVG export for node {}; scheduling PNG fallback",
+                            node_id,
+                        )
+                        return node_id, None
+                    except Exception as exc:
+                        logger.warning("SVG download failed for node {}: {}", node_id, exc)
                         return node_id, None
                     return node_id, has_filter
 
@@ -284,7 +293,15 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                     )
                 )
             if png_downloads:
-                await asyncio.gather(*png_downloads)
+                download_results = await asyncio.gather(*png_downloads, return_exceptions=True)
+                for node_id, outcome in zip(pending_blur_ids, download_results, strict=True):
+                    if isinstance(outcome, Exception):
+                        failed_node_ids.add(node_id)
+                        logger.warning(
+                            "PNG fallback download failed for node {}: {}",
+                            node_id,
+                            outcome,
+                        )
 
         if raster_enabled:
             for scale in scales:
@@ -322,7 +339,12 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                 for node_id in pending_raster_ids:
                     if node_id not in image_urls:
                         failed_node_ids.add(node_id)
-                image_downloads: list[Coroutine[Any, Any, Any]] = []
+                        logger.warning(
+                            "Figma returned no raster image URL for node {} at scale {}",
+                            node_id,
+                            scale,
+                        )
+                image_jobs: list[tuple[str, Coroutine[Any, Any, Any]]] = []
                 for node_id, name, kind in raster_exportables:
                     base_dir = illustrations_dir if kind == "illustration" else images_dir
                     scale_dir = base_dir if scale == 1 else base_dir / f"{scale}.0x"
@@ -332,9 +354,14 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                         continue
                     image_url = image_urls.get(node_id)
                     if image_url is None:
+                        logger.warning(
+                            "Raster export skipped for node {} at scale {} (no CDN URL)",
+                            node_id,
+                            scale,
+                        )
                         continue
                     scale_dir.mkdir(parents=True, exist_ok=True)
-                    image_downloads.append(self._download_to_file(image_url, target))
+                    image_jobs.append((node_id, self._download_to_file(image_url, target)))
                     if scale == 1:
                         asset_prefix = (
                             "assets/illustrations" if kind == "illustration" else "assets/images"
@@ -346,8 +373,20 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                                 kind=kind,
                             )
                         )
-                if image_downloads:
-                    await asyncio.gather(*image_downloads)
+                if image_jobs:
+                    download_results = await asyncio.gather(
+                        *(job for _node_id, job in image_jobs),
+                        return_exceptions=True,
+                    )
+                    for (node_id, _job), outcome in zip(image_jobs, download_results, strict=True):
+                        if isinstance(outcome, Exception):
+                            failed_node_ids.add(node_id)
+                            logger.warning(
+                                "Raster download failed for node {} at scale {}: {}",
+                                node_id,
+                                scale,
+                                outcome,
+                            )
 
         if webp_enabled:
             manifest.entries = rewrite_entries_to_webp(
@@ -359,6 +398,7 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
         unresolved_failures = frozenset(
             node_id for node_id in failed_node_ids if node_id not in exported_node_ids
         )
+        log_failed_asset_exports(unresolved_failures, rate_limited=rate_limited)
         return AssetExportOutcome(
             manifest=manifest,
             exported_node_ids=exported_node_ids,

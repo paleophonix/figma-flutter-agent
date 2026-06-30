@@ -643,6 +643,17 @@ def _intrinsic_glyph_svg_dimensions(
     height: float | None,
 ) -> tuple[float | None, float | None]:
     """Prefer vector intrinsic bounds when the layout host is materially larger."""
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_trailing_chevron_action_slot,
+        trailing_chevron_glyph_paint_span,
+    )
+
+    if layout_fact_trailing_chevron_action_slot(node):
+        glyph = trailing_chevron_glyph_paint_span(node)
+        if glyph is not None:
+            glyph_width, glyph_height = glyph
+            if glyph_width > 0 and glyph_height > 0:
+                return glyph_width, glyph_height
     frame = node.geometry_frame
     if frame is None or width is None or height is None:
         return width, height
@@ -653,6 +664,28 @@ def _intrinsic_glyph_svg_dimensions(
     if intrinsic_w >= float(width) - 1.0 and intrinsic_h >= float(height) - 1.0:
         return width, height
     return float(intrinsic_w), float(intrinsic_h)
+
+
+def _wrap_trailing_chevron_glyph_in_action_slot(
+    node: CleanDesignTreeNode,
+    widget: str,
+    *,
+    glyph_width: float,
+    glyph_height: float,
+    slot_width: float,
+    slot_height: float,
+) -> str:
+    """Center a small chevron glyph inside its trailing list-row action slot."""
+    if glyph_width >= slot_width - 0.5 and glyph_height >= slot_height - 0.5:
+        return widget
+    slot_w = format_geometry_literal(slot_width)
+    slot_h = format_geometry_literal(slot_height)
+    glyph_w = format_geometry_literal(glyph_width)
+    glyph_h = format_geometry_literal(glyph_height)
+    return (
+        f"SizedBox(width: {slot_w}, height: {slot_h}, "
+        f"child: Center(child: SizedBox(width: {glyph_w}, height: {glyph_h}, child: {widget})))"
+    )
 
 
 def _clamp_svg_dimensions_for_icon_rail(
@@ -679,6 +712,12 @@ def _preserve_full_frame_svg_dimensions(node: CleanDesignTreeNode) -> bool:
         is_back_navigation_icon_stack,
         layout_fact_back_nav_stack,
     )
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_trailing_chevron_action_slot,
+    )
+
+    if layout_fact_trailing_chevron_action_slot(node):
+        return False
 
     if layout_fact_compact_vector_icon_export_node(node):
         return True
@@ -696,19 +735,41 @@ def _preserve_full_frame_svg_dimensions(node: CleanDesignTreeNode) -> bool:
 
 def _render_svg_picture(node: CleanDesignTreeNode, asset: str) -> str:
     """Render a bundled SVG or raster asset with explicit bounds when Figma provides them."""
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_trailing_chevron_action_slot,
+    )
+
     if _is_raster_asset_path(asset):
         return _render_raster_asset_picture(node, asset)
-    width, height = _node_layout_size(node, node.stack_placement)
+    slot_width, slot_height = _node_layout_size(node, node.stack_placement)
+    width, height = slot_width, slot_height
     width, height = _effective_svg_dimensions(node, width, height)
     if not _preserve_full_frame_svg_dimensions(node):
         width, height = _intrinsic_glyph_svg_dimensions(node, width, height)
         width, height = _clamp_svg_dimensions_for_icon_rail(width, height)
     params = [f"'{asset}'"]
     if width is not None and width > 0:
-        params.append(f"width: {width}")
+        params.append(f"width: {format_geometry_literal(float(width))}")
     if height is not None and height > 0:
-        params.append(f"height: {height}")
+        params.append(f"height: {format_geometry_literal(float(height))}")
     fit = _svg_fit_mode(node, width, height)
     params.append(f"fit: {fit}")
     widget = f"SvgPicture.asset({', '.join(params)})"
+    if (
+        layout_fact_trailing_chevron_action_slot(node)
+        and slot_width is not None
+        and slot_height is not None
+        and width is not None
+        and height is not None
+        and slot_width > 0
+        and slot_height > 0
+    ):
+        widget = _wrap_trailing_chevron_glyph_in_action_slot(
+            node,
+            widget,
+            glyph_width=float(width),
+            glyph_height=float(height),
+            slot_width=float(slot_width),
+            slot_height=float(slot_height),
+        )
     return _apply_node_transform(node, widget)

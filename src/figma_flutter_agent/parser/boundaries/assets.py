@@ -18,6 +18,7 @@ def render_boundary_asset_path(node_id: str) -> str:
 def discover_asset_path_for_node(project_dir: Path, node_id: str) -> str | None:
     """Find an on-disk SVG/PNG export for a Figma node id (any filename suffix)."""
     suffix = node_id.replace(":", "_")
+    best: tuple[tuple[int, str], str] | None = None
     for folder in ("icons", "illustrations", "images"):
         asset_dir = project_dir / "assets" / folder
         if not asset_dir.is_dir():
@@ -27,10 +28,36 @@ def discover_asset_path_for_node(project_dir: Path, node_id: str) -> str | None:
             f"*_{suffix}.png",
             f"render_boundary_{suffix}.svg",
         ):
-            matches = sorted(asset_dir.glob(pattern))
-            if matches:
-                return f"assets/{folder}/{matches[0].name}"
-    return None
+            for match in asset_dir.glob(pattern):
+                rel = f"assets/{folder}/{match.name}".replace("\\", "/")
+                rank = _vector_asset_discovery_rank(rel)
+                if best is None or rank < best[0]:
+                    best = (rank, rel)
+    return best[1] if best is not None else None
+
+
+def _vector_asset_discovery_rank(asset_path: str) -> tuple[int, str]:
+    """Prefer component chevron exports over raw parent-bound vector dumps."""
+    lowered = asset_path.lower().replace("\\", "/")
+    if "chevron-right" in lowered or "chevron_right" in lowered:
+        return (0, lowered)
+    if "/vector_" in lowered or lowered.rsplit("/", maxsplit=1)[-1].startswith("vector_"):
+        return (2, lowered)
+    return (1, lowered)
+
+
+def _best_descendant_vector_asset(node: CleanDesignTreeNode) -> str | None:
+    """Pick the most component-faithful vector export under a compact icon host."""
+    from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
+
+    keys = [
+        item.vector_asset_key
+        for item in _descendant_nodes(node, 4)
+        if item.vector_asset_key
+    ]
+    if not keys:
+        return None
+    return min(keys, key=_vector_asset_discovery_rank)
 
 
 def _product_photo_stack_geometry(
@@ -307,19 +334,22 @@ def resolve_discovered_vector_asset_keys(
             walk(child)
         if node.vector_asset_key or not _node_eligible_for_vector_asset_discovery(node):
             return
+        candidates: list[str] = []
         for node_id in _vector_discovery_node_ids(node):
             discovered = discover_asset_path_for_node(project_dir, node_id)
             if discovered is not None:
-                node.vector_asset_key = discovered.replace("\\", "/")
-                return
+                candidates.append(discovered.replace("\\", "/"))
+        if candidates:
+            node.vector_asset_key = min(candidates, key=_vector_asset_discovery_rank)
+            return
         from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
 
         if subtree_has_text_descendant(node):
             return
-        for child in node.children:
-            if child.vector_asset_key:
-                node.vector_asset_key = child.vector_asset_key
-                return
+        promoted = _best_descendant_vector_asset(node)
+        if promoted is not None:
+            node.vector_asset_key = promoted
+            return
 
     walk(tree)
 

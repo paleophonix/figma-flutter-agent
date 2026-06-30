@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.layout.style import box_decoration_expr
 from figma_flutter_agent.generator.layout.style.facts import label_color_on_surface_expr
 from figma_flutter_agent.parser.interaction import (
     _descendant_nodes,
@@ -16,9 +17,77 @@ from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _MAX_COMPACT_PHOTO_STACK = 72.0
+_MAX_MEDIA_AVATAR_STACK = 120.0
+_AVATAR_SUBSTRATE_MIN_COVERAGE = 0.85
 
 
-def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | None:
+def _subtree_contains_node_id(node: CleanDesignTreeNode, node_id: str) -> bool:
+    """Return True when ``node_id`` appears anywhere under ``node``."""
+    if node.id == node_id:
+        return True
+    return any(_subtree_contains_node_id(child, node_id) for child in node.children)
+
+
+def find_media_avatar_paint_substrate(
+    host: CleanDesignTreeNode,
+    *,
+    photo: CleanDesignTreeNode,
+) -> CleanDesignTreeNode | None:
+    """Return a full-extent paint sibling that sits beneath a raster avatar mask."""
+    host_width = host.sizing.width
+    host_height = host.sizing.height
+    if host_width is None or host_height is None or float(host_width) <= 0 or float(host_height) <= 0:
+        return None
+    substrate: CleanDesignTreeNode | None = None
+    for child in host.children:
+        if _subtree_contains_node_id(child, photo.id):
+            continue
+        child_width = child.sizing.width
+        child_height = child.sizing.height
+        if child_width is None or child_height is None:
+            continue
+        if float(child_width) < float(host_width) * _AVATAR_SUBSTRATE_MIN_COVERAGE:
+            continue
+        if float(child_height) < float(host_height) * _AVATAR_SUBSTRATE_MIN_COVERAGE:
+            continue
+        has_paint = bool(child.style.background_color) or (
+            bool(child.vector_asset_key) and not child.image_asset_key
+        )
+        if not has_paint:
+            continue
+        substrate = child
+    return substrate
+
+
+def _render_avatar_paint_layer(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    width_lit: str,
+    height_lit: str,
+) -> str | None:
+    """Emit a circular paint layer for avatar substrate vectors or solid fills."""
+    if node.vector_asset_key and uses_svg and node.vector_asset_key.endswith(".svg"):
+        asset = escape_dart_string(node.vector_asset_key)
+        return (
+            f"SvgPicture.asset('{asset}', width: {width_lit}, height: {height_lit}, "
+            f"fit: BoxFit.cover)"
+        )
+    if node.style.background_color:
+        decoration = box_decoration_expr(node.style)
+        if decoration is None:
+            return None
+        return (
+            f"Container(width: {width_lit}, height: {height_lit}, decoration: {decoration})"
+        )
+    return None
+
+
+def try_render_compact_raster_photo_stack(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool = True,
+) -> str | None:
     """Clip a compact square stack to its raster photo fill (avatars, profile chips)."""
     if node.type != NodeType.STACK:
         return None
@@ -34,7 +103,9 @@ def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | No
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return None
-    if float(width) > _MAX_COMPACT_PHOTO_STACK or float(height) > _MAX_COMPACT_PHOTO_STACK:
+    substrate = find_media_avatar_paint_substrate(node, photo=photo)
+    max_extent = _MAX_MEDIA_AVATAR_STACK if substrate is not None else _MAX_COMPACT_PHOTO_STACK
+    if float(width) > max_extent or float(height) > max_extent:
         return None
     if abs(float(width) - float(height)) > max(4.0, min(float(width), float(height)) * 0.15):
         return None
@@ -42,6 +113,18 @@ def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | No
     height_lit = format_geometry_literal(float(height))
     asset = escape_dart_string(asset_key)
     image = f"Image.asset('{asset}', width: {width_lit}, height: {height_lit}, fit: BoxFit.cover)"
+    if substrate is not None:
+        paint_layer = _render_avatar_paint_layer(
+            substrate,
+            uses_svg=uses_svg,
+            width_lit=width_lit,
+            height_lit=height_lit,
+        )
+        if paint_layer is not None:
+            image = (
+                f"Stack(fit: StackFit.expand, clipBehavior: Clip.none, "
+                f"children: [{paint_layer}, {image}])"
+            )
     border_radius = node.style.border_radius
     if border_radius is not None and float(border_radius) > 0:
         max_radius = min(float(width), float(height)) / 2.0
@@ -76,14 +159,35 @@ def try_render_media_avatar_stack(
     photo = find_raster_photo_leaf(node)
     if photo is None:
         return None
-    compact = try_render_compact_raster_photo_stack(node)
+    compact = try_render_compact_raster_photo_stack(node, uses_svg=uses_svg)
     if compact is not None:
         return compact
+    substrate = find_media_avatar_paint_substrate(node, photo=photo)
+    if substrate is not None:
+        width = node.sizing.width
+        height = node.sizing.height
+        if width is not None and height is not None and float(width) > 0 and float(height) > 0:
+            width_lit = format_geometry_literal(float(width))
+            height_lit = format_geometry_literal(float(height))
+            paint_layer = _render_avatar_paint_layer(
+                substrate,
+                uses_svg=uses_svg,
+                width_lit=width_lit,
+                height_lit=height_lit,
+            )
+            if paint_layer is not None:
+                if abs(float(width) - float(height)) <= 2.0:
+                    return f"ClipOval(child: SizedBox(width: {width_lit}, height: {height_lit}, child: {paint_layer}))"
+                radius_lit = format_geometry_literal(min(float(width), float(height)) / 2.0)
+                return (
+                    f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), "
+                    f"child: SizedBox(width: {width_lit}, height: {height_lit}, child: {paint_layer}))"
+                )
     width = node.sizing.width
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return None
-    if float(width) > _MAX_COMPACT_PHOTO_STACK or float(height) > _MAX_COMPACT_PHOTO_STACK:
+    if float(width) > _MAX_MEDIA_AVATAR_STACK or float(height) > _MAX_MEDIA_AVATAR_STACK:
         return None
     if not node.vector_asset_key or not uses_svg:
         return None

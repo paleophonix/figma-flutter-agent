@@ -120,7 +120,7 @@ async def run_dump_fetch_parse_phase(
             figma_token = settings.figma_token()
         except Exception:
             figma_token = None
-        if figma_token and not offline_dump_mode:
+        if figma_token:
             with log_stage(log, "assets"):
                 async with pipeline_deps.figma_connector(
                     figma_token,
@@ -200,13 +200,19 @@ async def run_dump_fetch_parse_phase(
                             destination_node_ids=destination_node_ids,
                         )
                     if outcome.failed_node_ids:
-                        ctx.warnings.append(
-                            "Asset export could not fetch "
-                            f"{len(outcome.failed_node_ids)} node(s) from Figma Images API."
+                        from figma_flutter_agent.assets.reporting import (
+                            summarize_failed_asset_exports,
                         )
-                    if outcome.rate_limited:
+
+                        summary = summarize_failed_asset_exports(
+                            outcome.failed_node_ids,
+                            rate_limited=outcome.rate_limited,
+                        )
+                        if summary is not None:
+                            ctx.warnings.append(summary)
+                    if outcome.rate_limited and not outcome.failed_node_ids:
                         ctx.warnings.append(
-                            "Asset export hit Figma rate limits; retry list → assets later."
+                            "Asset export hit Figma rate limits; some batches were retried."
                         )
 
     with log_stage(log, "fonts"):
