@@ -190,6 +190,14 @@ def _svg_fit_mode(
 ) -> str:
     """Choose BoxFit for exported SVG assets."""
     if (
+        node.render_boundary
+        and node.flatten_figma_node_ids
+        and width
+        and height
+        and max(float(width), float(height)) > _ICON_MAX_BOX_FIT_CONTAIN
+    ):
+        return "BoxFit.contain"
+    if (
         node.style.has_stroke
         and width is not None
         and height is not None

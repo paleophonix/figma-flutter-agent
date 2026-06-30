@@ -696,6 +696,69 @@ def test_row_social_auth_cluster_wraps_inkwell_per_child() -> None:
     assert compact.count("InkWell(") >= 4
 
 
+def _assert_inkwell_hosts_no_flex_parent_data(compact: str) -> None:
+    """Fail when an ``InkWell``/``GestureDetector`` directly hosts ``Expanded``/``Flexible``."""
+    markers = ("InkWell(", "GestureDetector(")
+    for marker in markers:
+        index = 0
+        while True:
+            start = compact.find(marker, index)
+            if start < 0:
+                break
+            window = compact[start : start + 500]
+            assert "child: Expanded(" not in window
+            assert "child: Flexible(" not in window
+            index = start + len(marker)
+
+
+def test_social_auth_row_children_must_be_finite_flex_children() -> None:
+    """Law: social_button_row_children_must_be_finite_flex_children."""
+    host = CleanDesignTreeNode(
+        id="56:2102",
+        name="Button",
+        type=NodeType.ROW,
+        spacing=15.0,
+        sizing=Sizing(width=295.0, height=48.0),
+        children=[
+            _icon_only_social_row("56:2103", left=0.0),
+            _icon_only_social_row("56:2104", left=77.5),
+            _icon_only_social_row("56:2105", left=155.0),
+            _icon_only_social_row("56:2106", left=232.5),
+        ],
+    )
+    body = render_node_body(host, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Stack(fit: StackFit.passthrough, children: [Expanded" not in compact
+    assert "SizedBox(width: double.infinity, height: 48.0" not in compact
+    assert "SizedBox(, height:" not in compact
+    assert compact.count("Expanded(child:") >= 4
+    _assert_inkwell_hosts_no_flex_parent_data(compact)
+
+
+def test_login_version_10_full_emit_social_row_has_valid_flex_tree() -> None:
+    """Law: social_button_row_children_must_be_finite_flex_children (processed root)."""
+    root = _load_processed_root()
+    layout = render_layout_file(root, feature_name="login_version_10_flex", uses_svg=False)[
+        "lib/generated/login_version_10_flex_layout.dart"
+    ]
+    compact = layout.replace("\n", "")
+    assert "Stack(fit: StackFit.passthrough, children: [Expanded" not in compact
+    assert "SizedBox(, height:" not in compact
+    assert compact.count("InkWell(") >= 4
+    _assert_inkwell_hosts_no_flex_parent_data(compact)
+
+
+def test_checkbox_label_row_must_not_wrap_expanded_in_intrinsic_width() -> None:
+    """Law: intrinsic_width_row_must_not_wrap_expanded_flex_child."""
+    root = _load_processed_root()
+    remember_row = _find_node(root, "55:2054")
+    assert remember_row is not None
+    body = render_node_body(remember_row, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Remember me" in compact
+    assert "Expanded(child: Text('Remember me'" not in compact
+
+
 def test_login_version_10_card_inflow_column_has_loose_height_budget() -> None:
     """Law: card_host_height_conserves_content."""
     root = _load_processed_root()
@@ -733,7 +796,8 @@ def test_decorative_raster_blur_wraps_image_filtered() -> None:
     body = render_node_body(node, uses_svg=False)
     compact = body.replace("\n", "")
     assert "ImageFiltered(" in compact
-    assert "Image.asset(" not in compact
+    assert "Image.asset(" in compact
+    assert "withOpacity(0.55)" not in compact
 
 
 def test_stroked_checkbox_emits_visual_scale() -> None:
@@ -761,3 +825,122 @@ def test_stroked_checkbox_emits_visual_scale() -> None:
 
     body = render_checkbox(node, theme_variant="material_3")
     assert "visualScale:" in body
+
+
+def test_column_wallpaper_lead_has_bounded_main_axis_extent() -> None:
+    """Law: column_child_stack_must_have_bounded_main_axis_extent."""
+    from figma_flutter_agent.generator.layout.file_methods import (
+        LayoutMethod,
+        compose_decomposed_root_widget,
+    )
+
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        children=[],
+    )
+    section = CleanDesignTreeNode(
+        id="card",
+        name="Card",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=600.0),
+        children=[],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="root",
+        name="Login Version 10",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[status, section, home],
+    )
+    methods = [
+        LayoutMethod(name="_buildNativeStatusBar", node=status),
+        LayoutMethod(name="_buildCardSection", node=section),
+        LayoutMethod(name="_buildNativeHomeIndicator", node=home),
+    ]
+    layout = compose_decomposed_root_widget(
+        screen,
+        methods,
+        responsive_enabled=True,
+        artboard_background_lead="_buildBackground(context)",
+    )
+    compact = layout.replace("\n", "").replace(" ", "")
+    assert (
+        "SizedBox(width:double.infinity,height:812.0,child:_buildBackground(context))"
+        in compact
+    )
+    assert (
+        "SizedBox(height:44.0,child:Align(alignment:Alignment.topCenter,child:_buildNativeStatusBar(context))"
+        in compact
+    )
+
+
+def test_sectionized_column_root_wraps_viewport_chrome_and_viewport() -> None:
+    """Law: column_child_stack_must_have_bounded_main_axis_extent + responsive_column_root viewport."""
+    import json
+    from pathlib import Path
+
+    from figma_flutter_agent.generator.ir.passes.sectionize import (
+        _apply_sectionize_clean,
+        evaluate_root_sectionize,
+    )
+    from figma_flutter_agent.generator.layout import render_layout_file
+    from figma_flutter_agent.schemas import CleanDesignTreeNode
+
+    processed = json.loads(
+        Path(".debug/screen/limbo/login_version_10/processed.json").read_text(encoding="utf-8")
+    )
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    plan = evaluate_root_sectionize(root, responsive_reflow_enabled=True)
+    assert plan.activated
+    sectionized = _apply_sectionize_clean(root, plan)
+    layout = render_layout_file(
+        sectionized,
+        feature_name="login_sectionized_column",
+        uses_svg=False,
+        responsive_enabled=True,
+    )["lib/generated/login_sectionized_column_layout.dart"]
+    compact = layout.replace("\n", "").replace(" ", "")
+    assert "SizedBox(height:44.0,child:Align(alignment:Alignment.topCenter" in compact
+    assert "_artboardPreviewWidth" in layout
+    assert "LayoutBuilder" in layout
+
+
+def test_responsive_column_root_keeps_artboard_viewport_for_standard_phone() -> None:
+    """Law: responsive_column_root_must_not_drop_artboard_bounds."""
+    from figma_flutter_agent.generator.layout.file_methods import (
+        LayoutMethod,
+        compose_decomposed_root_widget,
+    )
+
+    body = CleanDesignTreeNode(
+        id="body",
+        name="Body",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=700.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[body],
+    )
+    methods = [LayoutMethod(name="_buildBody", node=body)]
+    layout = compose_decomposed_root_widget(
+        screen,
+        methods,
+        responsive_enabled=True,
+    )
+    assert "LayoutBuilder" in layout
+    assert "SizedBox(width: 375.0, height: 812.0" in layout or "constraints.maxWidth" in layout

@@ -1,0 +1,27 @@
+{
+  "feature": "9_3_1_b_transaction_income",
+  "pipeline_run_id": "c1500aeb3832",
+  "candidate_build_run_id": "c1500aeb3832",
+  "committed_build_run_id": "c1500aeb3832",
+  "writeback": "committed",
+  "written_files": [
+    "lib/features/9_3_1_b_transaction_income/9_3_1_b_transaction_income_screen.dart",
+    "lib/generated/9_3_1_b_transaction_income_layout.dart",
+    "lib/main.dart",
+    "lib/theme/app_colors.dart",
+    "lib/theme/app_edge_insets.dart",
+    "lib/theme/app_elevation.dart",
+    "lib/theme/app_layout.dart",
+    "lib/theme/app_radius.dart",
+    "lib/theme/app_spacing.dart",
+    "lib/theme/app_theme.dart",
+    "lib/theme/app_typography.dart",
+    "lib/widgets/frame3_widget.dart",
+    "lib/widgets/icon_notification_widget.dart",
+    "lib/widgets/icon_salary_widget.dart",
+    "test/golden/9_3_1_b_transaction_income_screen_test.dart",
+    "test/harness/element_coordinate_mapper.dart"
+  ],
+  "analyze_passed": null,
+  "captured_at": "2026-06-30T00:50:40.724588+00:00"
+}

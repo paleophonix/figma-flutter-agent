@@ -17,6 +17,51 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 MAX_INLINE_LAYOUT_DEPTH = 7
 
 
+def _bound_column_wallpaper_lead(
+    lead: str,
+    tree: CleanDesignTreeNode,
+) -> str:
+    """Bound wallpaper Stack height when it leads a column root.
+
+    A ``Column`` with ``mainAxisSize.min`` passes unbounded main-axis max extent
+    to non-flex children; wallpaper backgrounds are ``Stack`` hosts and require a
+    finite height before paint.
+    """
+    from figma_flutter_agent.generator.artboard import resolve_artboard_height
+
+    height = resolve_artboard_height(tree)
+    if height is None or height <= 0:
+        return lead
+    height_token = format_geometry_literal(height)
+    return f"SizedBox(width: double.infinity, height: {height_token}, child: {lead})"
+
+
+def _wrap_column_flow_child_call(
+    child: CleanDesignTreeNode,
+    call: str,
+    *,
+    parent_node: CleanDesignTreeNode,
+    responsive_enabled: bool,
+) -> str:
+    """Bound finite-height column slots before paint (chrome bands, stack sections)."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_flow_child_needs_vertical_extent_bind,
+        stack_flow_child_vertical_extent_wrap,
+    )
+
+    if stack_flow_child_needs_vertical_extent_bind(
+        child,
+        parent_node=parent_node,
+        responsive_enabled=responsive_enabled,
+    ):
+        call = stack_flow_child_vertical_extent_wrap(
+            child,
+            call,
+            parent_node=parent_node,
+        )
+    return call
+
+
 @dataclass(frozen=True)
 class LayoutMethod:
     """Private builder method extracted from a deep layout tree."""
@@ -120,18 +165,28 @@ def compose_decomposed_root_widget(
     )
 
     bottom_padding = bottom_chrome_clearance_height(tree) if pin_bottom_chrome else 0.0
-    child_call_parts = [
-        _stack_method_call_expr(
+    child_call_parts: list[str] = []
+    for child, method in zip(tree.children, methods, strict=True):
+        call = _stack_method_call_expr(
             method,
             pin_bottom_chrome=pin_bottom_chrome,
             parent_stack=tree,
             allow_outward_paint=allow_outward_paint,
             bottom_padding=bottom_padding,
         )
-        for method in methods
-    ]
+        if tree.type == NodeType.COLUMN:
+            call = _wrap_column_flow_child_call(
+                child,
+                call,
+                parent_node=tree,
+                responsive_enabled=responsive_enabled,
+            )
+        child_call_parts.append(call)
     if artboard_background_lead:
-        child_call_parts.insert(0, artboard_background_lead)
+        wallpaper_lead = artboard_background_lead
+        if tree.type == NodeType.COLUMN:
+            wallpaper_lead = _bound_column_wallpaper_lead(wallpaper_lead, tree)
+        child_call_parts.insert(0, wallpaper_lead)
     child_calls = ", ".join(child_call_parts) or "const SizedBox.shrink()"
     if tree.type == NodeType.STACK:
         from figma_flutter_agent.generator.layout.flex_policy import (
@@ -256,6 +311,11 @@ def compose_decomposed_root_widget(
                     )
                 )
             flow_parts.extend(trailing_parts)
+            if artboard_background_lead:
+                flow_parts.insert(
+                    0,
+                    _bound_column_wallpaper_lead(artboard_background_lead, tree),
+                )
             main_axis = (
                 "mainAxisSize: MainAxisSize.max, "
                 if (pin_bottom_chrome or is_phone_shell) and responsive_enabled
@@ -329,6 +389,12 @@ def compose_decomposed_root_widget(
             flow_parts: list[str] = []
             for child, method in zip(tree.children, methods, strict=True):
                 call = f"{method.name}(context)"
+                call = _wrap_column_flow_child_call(
+                    child,
+                    call,
+                    parent_node=tree,
+                    responsive_enabled=responsive_enabled,
+                )
                 if (
                     not is_viewport_chrome_band(child)
                     and stack_child_is_growable_panel(child)

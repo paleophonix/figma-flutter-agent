@@ -244,6 +244,43 @@ def hoist_flex_parent_data(wrapper: Callable[[str], str], widget: str) -> str:
     return f"{marker}{wrapper(inner)})"
 
 
+def strip_outer_infinite_width_sized_box(widget: str) -> str:
+    """Remove an outer ``SizedBox(width: double.infinity)`` wrapper for row siblings."""
+    trimmed = widget.lstrip()
+    prefix = widget[: len(widget) - len(trimmed)]
+    if not trimmed.startswith("SizedBox("):
+        return widget
+    child_marker = ", child: "
+    marker_idx = trimmed.find(child_marker)
+    if marker_idx < 0:
+        return widget
+    head = trimmed[:marker_idx]
+    if "width: double.infinity" not in head:
+        return widget
+    child = _extract_balanced_prefix_child(trimmed, marker_idx + len(child_marker))
+    if child is None:
+        return widget
+    height_field = ""
+    if ", height:" in head:
+        height_start = head.index(", height:")
+        height_part = head[height_start + 2 :].strip()
+        if height_part:
+            height_field = f"{height_part}, "
+    if height_field:
+        return f"{prefix}SizedBox({height_field}child: {child})"
+    return f"{prefix}{child}"
+
+
+def bind_equal_row_flex_child(widget: str) -> str:
+    """Wrap a horizontal row sibling with ``Expanded`` after stripping infinite width."""
+    finite = strip_outer_infinite_width_sized_box(widget)
+    unwrapped = _unwrap_flex_parent_data_wrapper(finite)
+    if unwrapped is not None:
+        marker, inner = unwrapped
+        return f"{marker}{inner})"
+    return f"Expanded(child: {finite})"
+
+
 _FLEX_HOIST_WRAPPER_MARKERS = (
     "Align(",
     "ConstrainedBox(",

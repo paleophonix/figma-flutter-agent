@@ -97,7 +97,9 @@ def test_responsive_config_preview_size_none_when_unset() -> None:
 
 
 def test_responsive_config_preview_size_requires_both_dimensions() -> None:
-    with pytest.raises(ValidationError, match="preview_width and responsive.preview_height"):
+    with pytest.raises(
+        ValidationError, match="preview_width and responsive.preview_height"
+    ):
         ResponsiveConfig(preview_width=390)
 
 
@@ -237,7 +239,9 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
     assert "--window-size=" not in " ".join(run_cmd)
 
 
-def test_launch_flutter_app_live_mode_omits_artboard_dart_defines(tmp_path: Path) -> None:
+def test_launch_flutter_app_live_mode_omits_artboard_dart_defines(
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     settings = Settings().model_copy(
@@ -531,4 +535,7 @@ def test_wait_for_tcp_listen_aborts_when_process_exits() -> None:
         stderr=subprocess.DEVNULL,
     )
     proc.wait(timeout=5)
-    assert wait_for_tcp_listen(CHROME_PREVIEW_WEB_HOST, 9, timeout_sec=1.0, proc=proc) is False
+    assert (
+        wait_for_tcp_listen(CHROME_PREVIEW_WEB_HOST, 9, timeout_sec=1.0, proc=proc)
+        is False
+    )

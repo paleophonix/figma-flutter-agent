@@ -1,0 +1,4072 @@
+{
+  "stage": "semantic_context_llm",
+  "featureName": "9_3_1_b_transaction_income",
+  "treeOutline": [
+    {
+      "id": "7035:1262",
+      "parent_id": null,
+      "depth": 0,
+      "name": "9.3.1 - B - Transaction/ Income",
+      "type": "STACK",
+      "children_count": 55,
+      "size": {
+        "width": 430.0,
+        "height": 932.0
+      }
+    },
+    {
+      "id": "7035:1265",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Rectangle 148",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 430.0,
+        "height": 599.0
+      }
+    },
+    {
+      "id": "7035:1270",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Rectangle 152",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      }
+    },
+    {
+      "id": "7035:1275",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Frame 25",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 125.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "7035:1276",
+      "parent_id": "7035:1275",
+      "depth": 2,
+      "name": "Transaction",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 125.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "7035:1278",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Salary",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 48.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1280",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "$4.000,00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 75.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1281",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "April",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 35.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1282",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "March",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 48.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1284",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Monthly",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 48.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1286",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "18:27 - April 30",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 88.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1288",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 11",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1290",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 12",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1292",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Others",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 51.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1293",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "$340,00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 61.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1294",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "$120,00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 56.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1295",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Upwork",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 45.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1296",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Payments",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 60.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1297",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "19:30 - March 31",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 96.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1298",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "17:00 - April 24",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 89.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1299",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 9",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1300",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 13",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1301",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 10",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1302",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 14",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1303",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Salary",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 48.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1304",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Salary",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 48.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1305",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "$4.000,00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 72.0,
+        "height": 21.0
+      }
+    },
+    {
+      "id": "7035:1306",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "$4.000,00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 75.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1307",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Monthly",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 48.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1308",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Monthly",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 48.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1309",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "18:39 - March 31",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 96.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1310",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "18:39 - March 31",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 96.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1311",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 3",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1312",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 15",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1313",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 4",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1314",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 16",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1451",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Frame 84",
+      "type": "STACK",
+      "children_count": 3,
+      "size": {
+        "width": 357.0,
+        "height": 75.0
+      }
+    },
+    {
+      "id": "7035:1452",
+      "parent_id": "7035:1451",
+      "depth": 2,
+      "name": "Rectangle 159",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 357.0,
+        "height": 75.0
+      }
+    },
+    {
+      "id": "7035:1453",
+      "parent_id": "7035:1451",
+      "depth": 2,
+      "name": "$7,783.00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 117.0,
+        "height": 36.0
+      }
+    },
+    {
+      "id": "7035:1454",
+      "parent_id": "7035:1451",
+      "depth": 2,
+      "name": "Total Balance",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 104.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7043:3117",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "bring back",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 19.000003814697266,
+        "height": 16.0
+      },
+      "componentName": "bring back"
+    },
+    {
+      "id": "I7043:3117;7043:3013",
+      "parent_id": "7043:3117",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 19.00000470487703,
+        "height": 16.000000461042873
+      }
+    },
+    {
+      "id": "7043:3387",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Calender",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 32.26415252685547,
+        "height": 30.0
+      },
+      "componentName": "Calender"
+    },
+    {
+      "id": "I7043:3387;7043:3015",
+      "parent_id": "7043:3387",
+      "depth": 2,
+      "name": "Rectangle 269",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 32.26415252685547,
+        "height": 30.0
+      }
+    },
+    {
+      "id": "I7043:3387;7043:3017",
+      "parent_id": "7043:3387",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 17.9256534576416,
+        "height": 15.849056243896484
+      }
+    },
+    {
+      "id": "7064:2572",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Frame 3",
+      "type": "STACK",
+      "children_count": 4,
+      "size": {
+        "width": 430.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "7064:2573",
+      "parent_id": "7064:2572",
+      "depth": 2,
+      "name": "16:04",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 30.0,
+        "height": 14.0
+      }
+    },
+    {
+      "id": "7064:2574",
+      "parent_id": "7064:2572",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 13.0,
+        "height": 11.0
+      }
+    },
+    {
+      "id": "7064:2575",
+      "parent_id": "7064:2572",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 15.0,
+        "height": 8.0
+      }
+    },
+    {
+      "id": "7064:2576",
+      "parent_id": "7064:2572",
+      "depth": 2,
+      "name": "Group 12",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 17.0,
+        "height": 9.0
+      }
+    },
+    {
+      "id": "7064:2577",
+      "parent_id": "7064:2576",
+      "depth": 3,
+      "name": "Vector (Stroke)",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 12.0,
+        "height": 7.0
+      }
+    },
+    {
+      "id": "7064:2578",
+      "parent_id": "7064:2576",
+      "depth": 3,
+      "name": "Vector (Stroke)",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 17.0,
+        "height": 9.0
+      }
+    },
+    {
+      "id": "7110:1045",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Icon Salary",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      },
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "I7110:1045;7102:2847",
+      "parent_id": "7110:1045",
+      "depth": 2,
+      "name": "Rectangle 150",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      }
+    },
+    {
+      "id": "I7110:1045;7102:1277",
+      "parent_id": "7110:1045",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 26.0,
+        "height": 23.483871459960938
+      }
+    },
+    {
+      "id": "7110:1051",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Icon Salary",
+      "type": "STACK",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      },
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7110:1057",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Icon Salary",
+      "type": "STACK",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      },
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7110:3217",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Income",
+      "type": "STACK",
+      "children_count": 4,
+      "size": {
+        "width": 171.0,
+        "height": 101.0
+      },
+      "componentName": "Income"
+    },
+    {
+      "id": "I7110:3217;7110:3184",
+      "parent_id": "7110:3217",
+      "depth": 2,
+      "name": "Rectangle 154",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 171.0,
+        "height": 101.0
+      }
+    },
+    {
+      "id": "I7110:3217;7110:3185",
+      "parent_id": "7110:3217",
+      "depth": 2,
+      "name": "Income",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 58.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7110:3217;7110:3186",
+      "parent_id": "7110:3217",
+      "depth": 2,
+      "name": "$4,120.00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 95.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "I7110:3217;7110:3187",
+      "parent_id": "7110:3217",
+      "depth": 2,
+      "name": "Group 395",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 25.00000300013346,
+        "height": 25.000003000133802
+      }
+    },
+    {
+      "id": "I7110:3217;7110:3188",
+      "parent_id": "I7110:3217;7110:3187",
+      "depth": 3,
+      "name": "Rectangle 31",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 25.00000300013346,
+        "height": 25.000003000133802
+      }
+    },
+    {
+      "id": "I7110:3217;7110:3189",
+      "parent_id": "I7110:3217;7110:3187",
+      "depth": 3,
+      "name": "Arrow 1",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 12.499998729206254,
+        "height": 12.500000836549589
+      }
+    },
+    {
+      "id": "7110:3218",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Expense",
+      "type": "STACK",
+      "children_count": 4,
+      "size": {
+        "width": 171.0,
+        "height": 101.0
+      },
+      "componentName": "Expense"
+    },
+    {
+      "id": "I7110:3218;7110:3170",
+      "parent_id": "7110:3218",
+      "depth": 2,
+      "name": "Rectangle 269",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 171.0,
+        "height": 101.0
+      }
+    },
+    {
+      "id": "I7110:3218;7110:3172",
+      "parent_id": "7110:3218",
+      "depth": 2,
+      "name": "Expense",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 62.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7110:3218;7110:3174",
+      "parent_id": "7110:3218",
+      "depth": 2,
+      "name": "$1.187.40",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 88.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "I7110:3218;7110:3178",
+      "parent_id": "7110:3218",
+      "depth": 2,
+      "name": "Group 396",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 25.000001907348633,
+        "height": 25.000001907348633
+      }
+    },
+    {
+      "id": "I7110:3218;7110:3179",
+      "parent_id": "I7110:3218;7110:3178",
+      "depth": 3,
+      "name": "Rectangle 31",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 25.000001907348633,
+        "height": 25.000001907348633
+      }
+    },
+    {
+      "id": "I7110:3218;7110:3180",
+      "parent_id": "I7110:3218;7110:3178",
+      "depth": 3,
+      "name": "Arrow 1",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 12.499999782877467,
+        "height": 12.499999782878149
+      }
+    },
+    {
+      "id": "7253:3639",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Icon-Notification",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 30.0,
+        "height": 30.0
+      },
+      "componentName": "Icon-Notification"
+    },
+    {
+      "id": "I7253:3639;7043:3064",
+      "parent_id": "7253:3639",
+      "depth": 2,
+      "name": "Vector",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 14.571428298950195,
+        "height": 18.85714340209961
+      }
+    },
+    {
+      "id": "I7253:3639;7043:3065",
+      "parent_id": "I7253:3639;7043:3064",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 14.571428298950195,
+        "height": 18.85714340209961
+      }
+    },
+    {
+      "id": "7035:1277",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Others",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 51.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1279",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "$340,00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 61.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1361",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "February",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 68.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7035:1283",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Upwork",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 45.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1285",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "9:30 - April 12",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 81.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7035:1287",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 7",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1289",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Line 8",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7035:1291",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Others",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 51.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7110:1060",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Icon Salary",
+      "type": "STACK",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      },
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7110:1069",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Icon Salary",
+      "type": "STACK",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      },
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7420:7339",
+      "parent_id": "7035:1262",
+      "depth": 1,
+      "name": "Bottom Navigation - Light Mode",
+      "type": "BOTTOM_NAV",
+      "children_count": 5,
+      "size": {
+        "width": 430.0,
+        "height": 108.0
+      },
+      "componentName": "Bottom Navigation - Light Mode"
+    },
+    {
+      "id": "I7420:7339;7045:344",
+      "parent_id": "7420:7339",
+      "depth": 2,
+      "name": "Home",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 25.0,
+        "height": 31.0
+      },
+      "componentName": "Home"
+    },
+    {
+      "id": "I7420:7339;7045:344;7045:313",
+      "parent_id": "I7420:7339;7045:344",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 25.0,
+        "height": 31.0
+      }
+    },
+    {
+      "id": "I7420:7339;7045:346",
+      "parent_id": "7420:7339",
+      "depth": 2,
+      "name": "Analysis",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 31.0,
+        "height": 30.0
+      },
+      "componentName": "Analysis"
+    },
+    {
+      "id": "I7420:7339;7045:346;7045:312",
+      "parent_id": "I7420:7339;7045:346",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 31.0,
+        "height": 30.0
+      }
+    },
+    {
+      "id": "I7420:7339;7045:348",
+      "parent_id": "7420:7339",
+      "depth": 2,
+      "name": "Transactions",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 33.0,
+        "height": 25.0
+      },
+      "componentName": "Transactions"
+    },
+    {
+      "id": "I7420:7339;7045:348;7045:335",
+      "parent_id": "I7420:7339;7045:348",
+      "depth": 3,
+      "name": "Rectangle 271",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      }
+    },
+    {
+      "id": "I7420:7339;7045:348;7045:334",
+      "parent_id": "I7420:7339;7045:348",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 33.0,
+        "height": 25.0
+      }
+    },
+    {
+      "id": "I7420:7339;7045:350",
+      "parent_id": "7420:7339",
+      "depth": 2,
+      "name": "Category",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 27.0,
+        "height": 23.0
+      },
+      "componentName": "Category"
+    },
+    {
+      "id": "I7420:7339;7045:350;7045:310",
+      "parent_id": "I7420:7339;7045:350",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 27.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7420:7339;7045:352",
+      "parent_id": "7420:7339",
+      "depth": 2,
+      "name": "Profile",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 22.0,
+        "height": 27.0
+      },
+      "componentName": "Profile"
+    },
+    {
+      "id": "I7420:7339;7045:352;7045:309",
+      "parent_id": "I7420:7339;7045:352",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 22.0,
+        "height": 27.0
+      }
+    }
+  ],
+  "textInventory": [
+    {
+      "id": "7064:2573",
+      "parent_id": "7064:2572",
+      "text": "16:04",
+      "name": "16:04",
+      "bounds": {
+        "left": 817.0,
+        "top": 16076.0,
+        "width": 30.0,
+        "height": 14.0
+      },
+      "accessibilityLabel": "16:04",
+      "style": {
+        "fontSize": 13.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "League Spartan"
+      }
+    },
+    {
+      "id": "7035:1276",
+      "parent_id": "7035:1275",
+      "text": "Transaction",
+      "name": "Transaction",
+      "bounds": {
+        "left": 933.0,
+        "top": 16131.0,
+        "width": 125.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "Transaction",
+      "style": {
+        "fontSize": 20.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1454",
+      "parent_id": "7035:1451",
+      "text": "Total Balance",
+      "name": "Total Balance",
+      "bounds": {
+        "left": 944.0,
+        "top": 16195.0,
+        "width": 104.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Total Balance",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1453",
+      "parent_id": "7035:1451",
+      "text": "$7,783.00",
+      "name": "$7,783.00",
+      "bounds": {
+        "left": 935.0,
+        "top": 16218.0,
+        "width": 117.0,
+        "height": 36.0
+      },
+      "accessibilityLabel": "$7,783.00",
+      "style": {
+        "fontSize": 24.0,
+        "fontWeight": "w700",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "I7110:3217;7110:3185",
+      "parent_id": "7110:3217",
+      "text": "Income",
+      "name": "Income",
+      "bounds": {
+        "left": 874.0,
+        "top": 16320.0,
+        "width": 58.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Income",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "I7110:3218;7110:3172",
+      "parent_id": "7110:3218",
+      "text": "Expense",
+      "name": "Expense",
+      "bounds": {
+        "left": 1057.0,
+        "top": 16320.0,
+        "width": 62.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Expense",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "I7110:3217;7110:3186",
+      "parent_id": "7110:3217",
+      "text": "$4,120.00",
+      "name": "$4,120.00",
+      "bounds": {
+        "left": 855.0,
+        "top": 16342.0,
+        "width": 95.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "$4,120.00",
+      "style": {
+        "fontSize": 20.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "I7110:3218;7110:3174",
+      "parent_id": "7110:3218",
+      "text": "$1.187.40",
+      "name": "$1.187.40",
+      "bounds": {
+        "left": 1044.0,
+        "top": 16343.0,
+        "width": 88.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "$1.187.40",
+      "style": {
+        "fontSize": 20.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1281",
+      "parent_id": "7035:1262",
+      "text": "April",
+      "name": "April",
+      "bounds": {
+        "left": 817.0,
+        "top": 16427.0,
+        "width": 35.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "April",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1278",
+      "parent_id": "7035:1262",
+      "text": "Salary",
+      "name": "Salary",
+      "bounds": {
+        "left": 889.0,
+        "top": 16474.0,
+        "width": 48.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Salary",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1280",
+      "parent_id": "7035:1262",
+      "text": "$4.000,00",
+      "name": "$4.000,00",
+      "bounds": {
+        "left": 1100.0,
+        "top": 16491.0,
+        "width": 75.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "$4.000,00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "RIGHT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1284",
+      "parent_id": "7035:1262",
+      "text": "Monthly",
+      "name": "Monthly",
+      "bounds": {
+        "left": 1019.0,
+        "top": 16493.0,
+        "width": 48.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Monthly",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1286",
+      "parent_id": "7035:1262",
+      "text": "18:27 - April 30",
+      "name": "18:27 - April 30",
+      "bounds": {
+        "left": 889.0,
+        "top": 16499.353515625,
+        "width": 88.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "18:27 - April 30",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1292",
+      "parent_id": "7035:1262",
+      "text": "Others",
+      "name": "Others",
+      "bounds": {
+        "left": 889.0,
+        "top": 16549.0,
+        "width": 51.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Others",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1294",
+      "parent_id": "7035:1262",
+      "text": "$120,00",
+      "name": "$120,00",
+      "bounds": {
+        "left": 1119.0,
+        "top": 16568.0,
+        "width": 56.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "$120,00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "RIGHT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1296",
+      "parent_id": "7035:1262",
+      "text": "Payments",
+      "name": "Payments",
+      "bounds": {
+        "left": 1013.0,
+        "top": 16570.0,
+        "width": 60.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Payments",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1298",
+      "parent_id": "7035:1262",
+      "text": "17:00 - April 24",
+      "name": "17:00 - April 24",
+      "bounds": {
+        "left": 889.0,
+        "top": 16574.353515625,
+        "width": 89.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "17:00 - April 24",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1282",
+      "parent_id": "7035:1262",
+      "text": "March",
+      "name": "March",
+      "bounds": {
+        "left": 817.0,
+        "top": 16626.0,
+        "width": 48.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "March",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1304",
+      "parent_id": "7035:1262",
+      "text": "Salary",
+      "name": "Salary",
+      "bounds": {
+        "left": 889.0,
+        "top": 16674.0,
+        "width": 48.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Salary",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1306",
+      "parent_id": "7035:1262",
+      "text": "$4.000,00",
+      "name": "$4.000,00",
+      "bounds": {
+        "left": 1100.0,
+        "top": 16691.0,
+        "width": 75.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "$4.000,00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "RIGHT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1308",
+      "parent_id": "7035:1262",
+      "text": "Monthly",
+      "name": "Monthly",
+      "bounds": {
+        "left": 1019.0,
+        "top": 16693.0,
+        "width": 48.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Monthly",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1310",
+      "parent_id": "7035:1262",
+      "text": "18:39 - March 31",
+      "name": "18:39 - March 31",
+      "bounds": {
+        "left": 889.0,
+        "top": 16699.353515625,
+        "width": 96.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "18:39 - March 31",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1277",
+      "parent_id": "7035:1262",
+      "text": "Others",
+      "name": "Others",
+      "bounds": {
+        "left": 890.0,
+        "top": 16743.0,
+        "width": 51.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Others",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1279",
+      "parent_id": "7035:1262",
+      "text": "$340,00",
+      "name": "$340,00",
+      "bounds": {
+        "left": 1114.0,
+        "top": 16758.0,
+        "width": 61.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "$340,00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "RIGHT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1283",
+      "parent_id": "7035:1262",
+      "text": "Upwork",
+      "name": "Upwork",
+      "bounds": {
+        "left": 1021.0,
+        "top": 16760.0,
+        "width": 45.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Upwork",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1285",
+      "parent_id": "7035:1262",
+      "text": "9:30 - April 12",
+      "name": "9:30 - April 12",
+      "bounds": {
+        "left": 890.0,
+        "top": 16768.353515625,
+        "width": 81.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "9:30 - April 12",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1361",
+      "parent_id": "7035:1262",
+      "text": "February",
+      "name": "February",
+      "bounds": {
+        "left": 817.0,
+        "top": 16812.0,
+        "width": 68.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "February",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1291",
+      "parent_id": "7035:1262",
+      "text": "Others",
+      "name": "Others",
+      "bounds": {
+        "left": 890.0,
+        "top": 16854.0,
+        "width": 51.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Others",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1293",
+      "parent_id": "7035:1262",
+      "text": "$340,00",
+      "name": "$340,00",
+      "bounds": {
+        "left": 1114.0,
+        "top": 16870.0,
+        "width": 61.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "$340,00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "RIGHT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1295",
+      "parent_id": "7035:1262",
+      "text": "Upwork",
+      "name": "Upwork",
+      "bounds": {
+        "left": 1021.0,
+        "top": 16872.0,
+        "width": 45.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Upwork",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1297",
+      "parent_id": "7035:1262",
+      "text": "19:30 - March 31",
+      "name": "19:30 - March 31",
+      "bounds": {
+        "left": 890.0,
+        "top": 16880.353515625,
+        "width": 96.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "19:30 - March 31",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1303",
+      "parent_id": "7035:1262",
+      "text": "Salary",
+      "name": "Salary",
+      "bounds": {
+        "left": 890.0,
+        "top": 16926.0,
+        "width": 48.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Salary",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1307",
+      "parent_id": "7035:1262",
+      "text": "Monthly",
+      "name": "Monthly",
+      "bounds": {
+        "left": 1019.0,
+        "top": 16945.26953125,
+        "width": 48.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Monthly",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1305",
+      "parent_id": "7035:1262",
+      "text": "$4.000,00",
+      "name": "$4.000,00",
+      "bounds": {
+        "left": 1103.0,
+        "top": 16946.0,
+        "width": 72.0,
+        "height": 21.0
+      },
+      "accessibilityLabel": "$4.000,00",
+      "style": {
+        "fontSize": 14.19774055480957,
+        "fontWeight": "w600",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7035:1309",
+      "parent_id": "7035:1262",
+      "text": "18:39 - March 31",
+      "name": "18:39 - March 31",
+      "bounds": {
+        "left": 890.0,
+        "top": 16951.353515625,
+        "width": 96.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "18:39 - March 31",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    }
+  ],
+  "componentInventory": [
+    {
+      "id": "7043:3117",
+      "parent_id": "7035:1262",
+      "name": "bring back",
+      "type": "STACK",
+      "bounds": {
+        "left": 818.0,
+        "top": 16136.0,
+        "width": 19.000003814697266,
+        "height": 16.0
+      },
+      "children_count": 1,
+      "componentRef": "7043:3014",
+      "componentName": "bring back"
+    },
+    {
+      "id": "7043:3387",
+      "parent_id": "7035:1262",
+      "name": "Calender",
+      "type": "STACK",
+      "bounds": {
+        "left": 1142.0,
+        "top": 16426.0,
+        "width": 32.26415252685547,
+        "height": 30.0
+      },
+      "children_count": 2,
+      "componentRef": "7043:3020",
+      "componentName": "Calender",
+      "variantProperties": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "7110:1045",
+      "parent_id": "7035:1262",
+      "name": "Icon Salary",
+      "type": "STACK",
+      "bounds": {
+        "left": 817.0,
+        "top": 16472.0,
+        "width": 57.0,
+        "height": 53.0
+      },
+      "children_count": 2,
+      "componentRef": "7102:2848",
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7110:1051",
+      "parent_id": "7035:1262",
+      "name": "Icon Salary",
+      "type": "STACK",
+      "bounds": {
+        "left": 817.0,
+        "top": 16545.0,
+        "width": 57.0,
+        "height": 53.0
+      },
+      "children_count": 0,
+      "componentRef": "7102:2848",
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7110:1057",
+      "parent_id": "7035:1262",
+      "name": "Icon Salary",
+      "type": "STACK",
+      "bounds": {
+        "left": 817.0,
+        "top": 16668.0,
+        "width": 57.0,
+        "height": 53.0
+      },
+      "children_count": 0,
+      "componentRef": "7102:2848",
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7110:3217",
+      "parent_id": "7035:1262",
+      "name": "Income",
+      "type": "STACK",
+      "bounds": {
+        "left": 817.0,
+        "top": 16276.0,
+        "width": 171.0,
+        "height": 101.0
+      },
+      "children_count": 4,
+      "componentRef": "7110:3183",
+      "componentName": "Income",
+      "variantProperties": {
+        "Property 1": "Variant2"
+      }
+    },
+    {
+      "id": "7110:3218",
+      "parent_id": "7035:1262",
+      "name": "Expense",
+      "type": "STACK",
+      "bounds": {
+        "left": 1003.0,
+        "top": 16276.0,
+        "width": 171.0,
+        "height": 101.0
+      },
+      "children_count": 4,
+      "componentRef": "7110:3192",
+      "componentName": "Expense",
+      "variantProperties": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "7253:3639",
+      "parent_id": "7035:1262",
+      "name": "Icon-Notification",
+      "type": "STACK",
+      "bounds": {
+        "left": 1144.0,
+        "top": 16128.0,
+        "width": 30.0,
+        "height": 30.0
+      },
+      "children_count": 1,
+      "componentRef": "7043:3066",
+      "componentName": "Icon-Notification",
+      "variantProperties": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "7110:1060",
+      "parent_id": "7035:1262",
+      "name": "Icon Salary",
+      "type": "STACK",
+      "bounds": {
+        "left": 817.0,
+        "top": 16743.0,
+        "width": 57.0,
+        "height": 53.0
+      },
+      "children_count": 0,
+      "componentRef": "7102:2848",
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7110:1069",
+      "parent_id": "7035:1262",
+      "name": "Icon Salary",
+      "type": "STACK",
+      "bounds": {
+        "left": 817.0,
+        "top": 16855.0,
+        "width": 57.0,
+        "height": 53.0
+      },
+      "children_count": 0,
+      "componentRef": "7102:2848",
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7420:7339",
+      "parent_id": "7035:1262",
+      "name": "Bottom Navigation - Light Mode",
+      "type": "BOTTOM_NAV",
+      "bounds": {
+        "left": 780.0,
+        "top": 16891.0,
+        "width": 430.0,
+        "height": 108.0
+      },
+      "children_count": 5,
+      "componentRef": "7041:1264",
+      "componentName": "Bottom Navigation - Light Mode"
+    },
+    {
+      "id": "I7420:7339;7045:344",
+      "parent_id": "7420:7339",
+      "name": "Home",
+      "type": "STACK",
+      "bounds": {
+        "left": 840.0,
+        "top": 16927.0,
+        "width": 25.0,
+        "height": 31.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:320",
+      "componentName": "Home",
+      "variantProperties": {
+        "Property 1": "Home-On"
+      }
+    },
+    {
+      "id": "I7420:7339;7045:346",
+      "parent_id": "7420:7339",
+      "name": "Analysis",
+      "type": "STACK",
+      "bounds": {
+        "left": 908.0,
+        "top": 16927.5,
+        "width": 31.0,
+        "height": 30.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:321",
+      "componentName": "Analysis",
+      "variantProperties": {
+        "Property 1": "Analysis-Off"
+      }
+    },
+    {
+      "id": "I7420:7339;7045:348",
+      "parent_id": "7420:7339",
+      "name": "Transactions",
+      "type": "STACK",
+      "bounds": {
+        "left": 982.0,
+        "top": 16930.0,
+        "width": 33.0,
+        "height": 25.0
+      },
+      "children_count": 2,
+      "componentRef": "7045:333",
+      "componentName": "Transactions",
+      "variantProperties": {
+        "Property 1": "Transactions-On"
+      }
+    },
+    {
+      "id": "I7420:7339;7045:350",
+      "parent_id": "7420:7339",
+      "name": "Category",
+      "type": "STACK",
+      "bounds": {
+        "left": 1058.0,
+        "top": 16931.0,
+        "width": 27.0,
+        "height": 23.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:323",
+      "componentName": "Category",
+      "variantProperties": {
+        "Property 1": "category-Off"
+      }
+    },
+    {
+      "id": "I7420:7339;7045:352",
+      "parent_id": "7420:7339",
+      "name": "Profile",
+      "type": "STACK",
+      "bounds": {
+        "left": 1128.0,
+        "top": 16929.0,
+        "width": 22.0,
+        "height": 27.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:324",
+      "componentName": "Profile",
+      "variantProperties": {
+        "Property 1": "Profile-Off"
+      }
+    }
+  ],
+  "relationshipHints": [
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1265",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1265",
+      "to_node_id": "7035:1270",
+      "relation": "next_sibling",
+      "distance_px": 288.72,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1270",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1270",
+      "to_node_id": "7035:1265",
+      "relation": "previous_sibling",
+      "distance_px": 288.72,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1270",
+      "to_node_id": "7035:1275",
+      "relation": "next_sibling",
+      "distance_px": 819.35,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1275",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1275",
+      "to_node_id": "7035:1270",
+      "relation": "previous_sibling",
+      "distance_px": 819.35,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1275",
+      "to_node_id": "7035:1278",
+      "relation": "next_sibling",
+      "distance_px": 353.27,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1275",
+      "to_node_id": "7035:1276",
+      "relation": "parent_child",
+      "parent_id": "7035:1275"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1278",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1278",
+      "to_node_id": "7035:1275",
+      "relation": "previous_sibling",
+      "distance_px": 353.27,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1278",
+      "to_node_id": "7035:1280",
+      "relation": "next_sibling",
+      "distance_px": 225.14,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1280",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1280",
+      "to_node_id": "7035:1278",
+      "relation": "previous_sibling",
+      "distance_px": 225.14,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1280",
+      "to_node_id": "7035:1281",
+      "relation": "next_sibling",
+      "distance_px": 309.69,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1281",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1281",
+      "to_node_id": "7035:1280",
+      "relation": "previous_sibling",
+      "distance_px": 309.69,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1281",
+      "to_node_id": "7035:1282",
+      "relation": "next_sibling",
+      "distance_px": 199.11,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1282",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1282",
+      "to_node_id": "7035:1281",
+      "relation": "previous_sibling",
+      "distance_px": 199.11,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1282",
+      "to_node_id": "7035:1284",
+      "relation": "next_sibling",
+      "distance_px": 243.24,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1284",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1284",
+      "to_node_id": "7035:1282",
+      "relation": "previous_sibling",
+      "distance_px": 243.24,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1284",
+      "to_node_id": "7035:1286",
+      "relation": "next_sibling",
+      "distance_px": 110.18,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1286",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1286",
+      "to_node_id": "7035:1284",
+      "relation": "previous_sibling",
+      "distance_px": 110.18,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1286",
+      "to_node_id": "7035:1288",
+      "relation": "next_sibling",
+      "distance_px": 63.03,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1288",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1288",
+      "to_node_id": "7035:1286",
+      "relation": "previous_sibling",
+      "distance_px": 63.03,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1288",
+      "to_node_id": "7035:1290",
+      "relation": "next_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1290",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1290",
+      "to_node_id": "7035:1288",
+      "relation": "previous_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1290",
+      "to_node_id": "7035:1292",
+      "relation": "next_sibling",
+      "distance_px": 184.63,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1292",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1292",
+      "to_node_id": "7035:1290",
+      "relation": "previous_sibling",
+      "distance_px": 184.63,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1292",
+      "to_node_id": "7035:1293",
+      "relation": "next_sibling",
+      "distance_px": 394.89,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1293",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1293",
+      "to_node_id": "7035:1292",
+      "relation": "previous_sibling",
+      "distance_px": 394.89,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1293",
+      "to_node_id": "7035:1294",
+      "relation": "next_sibling",
+      "distance_px": 302.01,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1294",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1294",
+      "to_node_id": "7035:1293",
+      "relation": "previous_sibling",
+      "distance_px": 302.01,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1294",
+      "to_node_id": "7035:1295",
+      "relation": "next_sibling",
+      "distance_px": 318.77,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1295",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1295",
+      "to_node_id": "7035:1294",
+      "relation": "previous_sibling",
+      "distance_px": 318.77,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1295",
+      "to_node_id": "7035:1296",
+      "relation": "next_sibling",
+      "distance_px": 302.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1296",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1296",
+      "to_node_id": "7035:1295",
+      "relation": "previous_sibling",
+      "distance_px": 302.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1296",
+      "to_node_id": "7035:1297",
+      "relation": "next_sibling",
+      "distance_px": 327.63,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1297",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1297",
+      "to_node_id": "7035:1296",
+      "relation": "previous_sibling",
+      "distance_px": 327.63,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1297",
+      "to_node_id": "7035:1298",
+      "relation": "next_sibling",
+      "distance_px": 306.03,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1298",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1298",
+      "to_node_id": "7035:1297",
+      "relation": "previous_sibling",
+      "distance_px": 306.03,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1298",
+      "to_node_id": "7035:1299",
+      "relation": "next_sibling",
+      "distance_px": 304.08,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1299",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1299",
+      "to_node_id": "7035:1298",
+      "relation": "previous_sibling",
+      "distance_px": 304.08,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1299",
+      "to_node_id": "7035:1300",
+      "relation": "next_sibling",
+      "distance_px": 306.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1300",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1300",
+      "to_node_id": "7035:1299",
+      "relation": "previous_sibling",
+      "distance_px": 306.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1300",
+      "to_node_id": "7035:1301",
+      "relation": "next_sibling",
+      "distance_px": 320.24,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1301",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1301",
+      "to_node_id": "7035:1300",
+      "relation": "previous_sibling",
+      "distance_px": 320.24,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1301",
+      "to_node_id": "7035:1302",
+      "relation": "next_sibling",
+      "distance_px": 306.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1302",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1302",
+      "to_node_id": "7035:1301",
+      "relation": "previous_sibling",
+      "distance_px": 306.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1302",
+      "to_node_id": "7035:1303",
+      "relation": "next_sibling",
+      "distance_px": 402.62,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1303",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1303",
+      "to_node_id": "7035:1302",
+      "relation": "previous_sibling",
+      "distance_px": 402.62,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1303",
+      "to_node_id": "7035:1304",
+      "relation": "next_sibling",
+      "distance_px": 252.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1304",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1304",
+      "to_node_id": "7035:1303",
+      "relation": "previous_sibling",
+      "distance_px": 252.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1304",
+      "to_node_id": "7035:1305",
+      "relation": "next_sibling",
+      "distance_px": 352.87,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1305",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1305",
+      "to_node_id": "7035:1304",
+      "relation": "previous_sibling",
+      "distance_px": 352.87,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1305",
+      "to_node_id": "7035:1306",
+      "relation": "next_sibling",
+      "distance_px": 254.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1306",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1306",
+      "to_node_id": "7035:1305",
+      "relation": "previous_sibling",
+      "distance_px": 254.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1306",
+      "to_node_id": "7035:1307",
+      "relation": "next_sibling",
+      "distance_px": 268.92,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1307",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1307",
+      "to_node_id": "7035:1306",
+      "relation": "previous_sibling",
+      "distance_px": 268.92,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1307",
+      "to_node_id": "7035:1308",
+      "relation": "next_sibling",
+      "distance_px": 252.27,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1308",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1308",
+      "to_node_id": "7035:1307",
+      "relation": "previous_sibling",
+      "distance_px": 252.27,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1308",
+      "to_node_id": "7035:1309",
+      "relation": "next_sibling",
+      "distance_px": 278.88,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1309",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1309",
+      "to_node_id": "7035:1308",
+      "relation": "previous_sibling",
+      "distance_px": 278.88,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1309",
+      "to_node_id": "7035:1310",
+      "relation": "next_sibling",
+      "distance_px": 252.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1310",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1310",
+      "to_node_id": "7035:1309",
+      "relation": "previous_sibling",
+      "distance_px": 252.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1310",
+      "to_node_id": "7035:1311",
+      "relation": "next_sibling",
+      "distance_px": 250.65,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1311",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1311",
+      "to_node_id": "7035:1310",
+      "relation": "previous_sibling",
+      "distance_px": 250.65,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1311",
+      "to_node_id": "7035:1312",
+      "relation": "next_sibling",
+      "distance_px": 252.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1312",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1312",
+      "to_node_id": "7035:1311",
+      "relation": "previous_sibling",
+      "distance_px": 252.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1312",
+      "to_node_id": "7035:1313",
+      "relation": "next_sibling",
+      "distance_px": 269.11,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1313",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1313",
+      "to_node_id": "7035:1312",
+      "relation": "previous_sibling",
+      "distance_px": 269.11,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1313",
+      "to_node_id": "7035:1314",
+      "relation": "next_sibling",
+      "distance_px": 252.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1314",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1314",
+      "to_node_id": "7035:1313",
+      "relation": "previous_sibling",
+      "distance_px": 252.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1314",
+      "to_node_id": "7035:1451",
+      "relation": "next_sibling",
+      "distance_px": 487.38,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1451",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1451",
+      "to_node_id": "7035:1314",
+      "relation": "previous_sibling",
+      "distance_px": 487.38,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1451",
+      "to_node_id": "7043:3117",
+      "relation": "next_sibling",
+      "distance_px": 185.01,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1451",
+      "to_node_id": "7035:1452",
+      "relation": "parent_child",
+      "parent_id": "7035:1451"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1452",
+      "to_node_id": "7035:1453",
+      "relation": "next_sibling",
+      "distance_px": 14.64,
+      "parent_id": "7035:1451"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1451",
+      "to_node_id": "7035:1453",
+      "relation": "parent_child",
+      "parent_id": "7035:1451"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1453",
+      "to_node_id": "7035:1452",
+      "relation": "previous_sibling",
+      "distance_px": 14.64,
+      "parent_id": "7035:1451"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1453",
+      "to_node_id": "7035:1454",
+      "relation": "next_sibling",
+      "distance_px": 29.61,
+      "parent_id": "7035:1451"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1451",
+      "to_node_id": "7035:1454",
+      "relation": "parent_child",
+      "parent_id": "7035:1451"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1454",
+      "to_node_id": "7035:1453",
+      "relation": "previous_sibling",
+      "distance_px": 29.61,
+      "parent_id": "7035:1451"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7043:3117",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7043:3117",
+      "to_node_id": "7035:1451",
+      "relation": "previous_sibling",
+      "distance_px": 185.01,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7043:3117",
+      "to_node_id": "7043:3387",
+      "relation": "next_sibling",
+      "distance_px": 444.44,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7043:3117",
+      "to_node_id": "I7043:3117;7043:3013",
+      "relation": "parent_child",
+      "parent_id": "7043:3117"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7043:3387",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7043:3387",
+      "to_node_id": "7043:3117",
+      "relation": "previous_sibling",
+      "distance_px": 444.44,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7043:3387",
+      "to_node_id": "7064:2572",
+      "relation": "next_sibling",
+      "distance_px": 393.42,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7043:3387",
+      "to_node_id": "I7043:3387;7043:3015",
+      "relation": "parent_child",
+      "parent_id": "7043:3387"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7043:3387;7043:3015",
+      "to_node_id": "I7043:3387;7043:3017",
+      "relation": "next_sibling",
+      "distance_px": 0.34,
+      "parent_id": "7043:3387"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7043:3387",
+      "to_node_id": "I7043:3387;7043:3017",
+      "relation": "parent_child",
+      "parent_id": "7043:3387"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7043:3387;7043:3017",
+      "to_node_id": "I7043:3387;7043:3015",
+      "relation": "previous_sibling",
+      "distance_px": 0.34,
+      "parent_id": "7043:3387"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7064:2572",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7064:2572",
+      "to_node_id": "7043:3387",
+      "relation": "previous_sibling",
+      "distance_px": 393.42,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7064:2572",
+      "to_node_id": "7110:1045",
+      "relation": "next_sibling",
+      "distance_px": 441.58,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7064:2572",
+      "to_node_id": "7064:2573",
+      "relation": "parent_child",
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7064:2573",
+      "to_node_id": "7064:2574",
+      "relation": "next_sibling",
+      "distance_px": 292.5,
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7064:2572",
+      "to_node_id": "7064:2574",
+      "relation": "parent_child",
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7064:2574",
+      "to_node_id": "7064:2573",
+      "relation": "previous_sibling",
+      "distance_px": 292.5,
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7064:2574",
+      "to_node_id": "7064:2575",
+      "relation": "next_sibling",
+      "distance_px": 19.01,
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7064:2572",
+      "to_node_id": "7064:2575",
+      "relation": "parent_child",
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7064:2575",
+      "to_node_id": "7064:2574",
+      "relation": "previous_sibling",
+      "distance_px": 19.01,
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7064:2575",
+      "to_node_id": "7064:2576",
+      "relation": "next_sibling",
+      "distance_px": 21.01,
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7064:2572",
+      "to_node_id": "7064:2576",
+      "relation": "parent_child",
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7064:2576",
+      "to_node_id": "7064:2575",
+      "relation": "previous_sibling",
+      "distance_px": 21.01,
+      "parent_id": "7064:2572"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7064:2576",
+      "to_node_id": "7064:2577",
+      "relation": "parent_child",
+      "parent_id": "7064:2576"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7064:2577",
+      "to_node_id": "7064:2578",
+      "relation": "next_sibling",
+      "distance_px": 1.5,
+      "parent_id": "7064:2576"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7064:2576",
+      "to_node_id": "7064:2578",
+      "relation": "parent_child",
+      "parent_id": "7064:2576"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7064:2578",
+      "to_node_id": "7064:2577",
+      "relation": "previous_sibling",
+      "distance_px": 1.5,
+      "parent_id": "7064:2576"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7110:1045",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7110:1045",
+      "to_node_id": "7064:2572",
+      "relation": "previous_sibling",
+      "distance_px": 441.58,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7110:1045",
+      "to_node_id": "7110:1051",
+      "relation": "next_sibling",
+      "distance_px": 73.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:1045",
+      "to_node_id": "I7110:1045;7102:2847",
+      "relation": "parent_child",
+      "parent_id": "7110:1045"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:1045;7102:2847",
+      "to_node_id": "I7110:1045;7102:1277",
+      "relation": "next_sibling",
+      "distance_px": 0.56,
+      "parent_id": "7110:1045"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:1045",
+      "to_node_id": "I7110:1045;7102:1277",
+      "relation": "parent_child",
+      "parent_id": "7110:1045"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:1045;7102:1277",
+      "to_node_id": "I7110:1045;7102:2847",
+      "relation": "previous_sibling",
+      "distance_px": 0.56,
+      "parent_id": "7110:1045"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7110:1051",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7110:1051",
+      "to_node_id": "7110:1045",
+      "relation": "previous_sibling",
+      "distance_px": 73.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7110:1051",
+      "to_node_id": "7110:1057",
+      "relation": "next_sibling",
+      "distance_px": 123.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7110:1057",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7110:1057",
+      "to_node_id": "7110:1051",
+      "relation": "previous_sibling",
+      "distance_px": 123.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7110:1057",
+      "to_node_id": "7110:3217",
+      "relation": "next_sibling",
+      "distance_px": 372.39,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7110:3217",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7110:3217",
+      "to_node_id": "7110:1057",
+      "relation": "previous_sibling",
+      "distance_px": 372.39,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7110:3217",
+      "to_node_id": "7110:3218",
+      "relation": "next_sibling",
+      "distance_px": 186.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:3217",
+      "to_node_id": "I7110:3217;7110:3184",
+      "relation": "parent_child",
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:3217;7110:3184",
+      "to_node_id": "I7110:3217;7110:3185",
+      "relation": "next_sibling",
+      "distance_px": 5.02,
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:3217",
+      "to_node_id": "I7110:3217;7110:3185",
+      "relation": "parent_child",
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:3217;7110:3185",
+      "to_node_id": "I7110:3217;7110:3184",
+      "relation": "previous_sibling",
+      "distance_px": 5.02,
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:3217;7110:3185",
+      "to_node_id": "I7110:3217;7110:3186",
+      "relation": "next_sibling",
+      "distance_px": 21.51,
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:3217",
+      "to_node_id": "I7110:3217;7110:3186",
+      "relation": "parent_child",
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:3217;7110:3186",
+      "to_node_id": "I7110:3217;7110:3185",
+      "relation": "previous_sibling",
+      "distance_px": 21.51,
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:3217;7110:3186",
+      "to_node_id": "I7110:3217;7110:3187",
+      "relation": "next_sibling",
+      "distance_px": 48.5,
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:3217",
+      "to_node_id": "I7110:3217;7110:3187",
+      "relation": "parent_child",
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:3217;7110:3187",
+      "to_node_id": "I7110:3217;7110:3186",
+      "relation": "previous_sibling",
+      "distance_px": 48.5,
+      "parent_id": "7110:3217"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7110:3217;7110:3187",
+      "to_node_id": "I7110:3217;7110:3188",
+      "relation": "parent_child",
+      "parent_id": "I7110:3217;7110:3187"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:3217;7110:3188",
+      "to_node_id": "I7110:3217;7110:3189",
+      "relation": "next_sibling",
+      "distance_px": 0.0,
+      "parent_id": "I7110:3217;7110:3187"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7110:3217;7110:3187",
+      "to_node_id": "I7110:3217;7110:3189",
+      "relation": "parent_child",
+      "parent_id": "I7110:3217;7110:3187"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:3217;7110:3189",
+      "to_node_id": "I7110:3217;7110:3188",
+      "relation": "previous_sibling",
+      "distance_px": 0.0,
+      "parent_id": "I7110:3217;7110:3187"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7110:3218",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7110:3218",
+      "to_node_id": "7110:3217",
+      "relation": "previous_sibling",
+      "distance_px": 186.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7110:3218",
+      "to_node_id": "7253:3639",
+      "relation": "next_sibling",
+      "distance_px": 196.58,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:3218",
+      "to_node_id": "I7110:3218;7110:3170",
+      "relation": "parent_child",
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:3218;7110:3170",
+      "to_node_id": "I7110:3218;7110:3172",
+      "relation": "next_sibling",
+      "distance_px": 5.02,
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:3218",
+      "to_node_id": "I7110:3218;7110:3172",
+      "relation": "parent_child",
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:3218;7110:3172",
+      "to_node_id": "I7110:3218;7110:3170",
+      "relation": "previous_sibling",
+      "distance_px": 5.02,
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:3218;7110:3172",
+      "to_node_id": "I7110:3218;7110:3174",
+      "relation": "next_sibling",
+      "distance_px": 22.5,
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:3218",
+      "to_node_id": "I7110:3218;7110:3174",
+      "relation": "parent_child",
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:3218;7110:3174",
+      "to_node_id": "I7110:3218;7110:3172",
+      "relation": "previous_sibling",
+      "distance_px": 22.5,
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:3218;7110:3174",
+      "to_node_id": "I7110:3218;7110:3178",
+      "relation": "next_sibling",
+      "distance_px": 50.5,
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7110:3218",
+      "to_node_id": "I7110:3218;7110:3178",
+      "relation": "parent_child",
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:3218;7110:3178",
+      "to_node_id": "I7110:3218;7110:3174",
+      "relation": "previous_sibling",
+      "distance_px": 50.5,
+      "parent_id": "7110:3218"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7110:3218;7110:3178",
+      "to_node_id": "I7110:3218;7110:3179",
+      "relation": "parent_child",
+      "parent_id": "I7110:3218;7110:3178"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7110:3218;7110:3179",
+      "to_node_id": "I7110:3218;7110:3180",
+      "relation": "next_sibling",
+      "distance_px": 0.0,
+      "parent_id": "I7110:3218;7110:3178"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7110:3218;7110:3178",
+      "to_node_id": "I7110:3218;7110:3180",
+      "relation": "parent_child",
+      "parent_id": "I7110:3218;7110:3178"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7110:3218;7110:3180",
+      "to_node_id": "I7110:3218;7110:3179",
+      "relation": "previous_sibling",
+      "distance_px": 0.0,
+      "parent_id": "I7110:3218;7110:3178"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7253:3639",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7253:3639",
+      "to_node_id": "7110:3218",
+      "relation": "previous_sibling",
+      "distance_px": 196.58,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7253:3639",
+      "to_node_id": "7035:1277",
+      "relation": "next_sibling",
+      "distance_px": 658.2,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7253:3639",
+      "to_node_id": "I7253:3639;7043:3064",
+      "relation": "parent_child",
+      "parent_id": "7253:3639"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7253:3639;7043:3064",
+      "to_node_id": "I7253:3639;7043:3065",
+      "relation": "parent_child",
+      "parent_id": "I7253:3639;7043:3064"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1277",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1277",
+      "to_node_id": "7253:3639",
+      "relation": "previous_sibling",
+      "distance_px": 658.2,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1277",
+      "to_node_id": "7035:1279",
+      "relation": "next_sibling",
+      "distance_px": 229.49,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1279",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1279",
+      "to_node_id": "7035:1277",
+      "relation": "previous_sibling",
+      "distance_px": 229.49,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1279",
+      "to_node_id": "7035:1361",
+      "relation": "next_sibling",
+      "distance_px": 298.43,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1361",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1361",
+      "to_node_id": "7035:1279",
+      "relation": "previous_sibling",
+      "distance_px": 298.43,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1361",
+      "to_node_id": "7035:1283",
+      "relation": "next_sibling",
+      "distance_px": 200.07,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1283",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1283",
+      "to_node_id": "7035:1361",
+      "relation": "previous_sibling",
+      "distance_px": 200.07,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1283",
+      "to_node_id": "7035:1285",
+      "relation": "next_sibling",
+      "distance_px": 113.31,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1285",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1285",
+      "to_node_id": "7035:1283",
+      "relation": "previous_sibling",
+      "distance_px": 113.31,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1285",
+      "to_node_id": "7035:1287",
+      "relation": "next_sibling",
+      "distance_px": 66.5,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1287",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1287",
+      "to_node_id": "7035:1285",
+      "relation": "previous_sibling",
+      "distance_px": 66.5,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1287",
+      "to_node_id": "7035:1289",
+      "relation": "next_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1289",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1289",
+      "to_node_id": "7035:1287",
+      "relation": "previous_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1289",
+      "to_node_id": "7035:1291",
+      "relation": "next_sibling",
+      "distance_px": 199.38,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7035:1291",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7035:1291",
+      "to_node_id": "7035:1289",
+      "relation": "previous_sibling",
+      "distance_px": 199.38,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7035:1291",
+      "to_node_id": "7110:1060",
+      "relation": "next_sibling",
+      "distance_px": 118.81,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7110:1060",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7110:1060",
+      "to_node_id": "7035:1291",
+      "relation": "previous_sibling",
+      "distance_px": 118.81,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7110:1060",
+      "to_node_id": "7110:1069",
+      "relation": "next_sibling",
+      "distance_px": 112.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7110:1069",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7110:1069",
+      "to_node_id": "7110:1060",
+      "relation": "previous_sibling",
+      "distance_px": 112.0,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7110:1069",
+      "to_node_id": "7420:7339",
+      "relation": "next_sibling",
+      "distance_px": 162.43,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7035:1262",
+      "to_node_id": "7420:7339",
+      "relation": "parent_child",
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7420:7339",
+      "to_node_id": "7110:1069",
+      "relation": "previous_sibling",
+      "distance_px": 162.43,
+      "parent_id": "7035:1262"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7420:7339",
+      "to_node_id": "I7420:7339;7045:344",
+      "relation": "parent_child",
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7420:7339;7045:344",
+      "to_node_id": "I7420:7339;7045:346",
+      "relation": "next_sibling",
+      "distance_px": 71.0,
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7420:7339;7045:344",
+      "to_node_id": "I7420:7339;7045:344;7045:313",
+      "relation": "parent_child",
+      "parent_id": "I7420:7339;7045:344"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7420:7339",
+      "to_node_id": "I7420:7339;7045:346",
+      "relation": "parent_child",
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7420:7339;7045:346",
+      "to_node_id": "I7420:7339;7045:344",
+      "relation": "previous_sibling",
+      "distance_px": 71.0,
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7420:7339;7045:346",
+      "to_node_id": "I7420:7339;7045:348",
+      "relation": "next_sibling",
+      "distance_px": 75.0,
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7420:7339;7045:346",
+      "to_node_id": "I7420:7339;7045:346;7045:312",
+      "relation": "parent_child",
+      "parent_id": "I7420:7339;7045:346"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7420:7339",
+      "to_node_id": "I7420:7339;7045:348",
+      "relation": "parent_child",
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7420:7339;7045:348",
+      "to_node_id": "I7420:7339;7045:346",
+      "relation": "previous_sibling",
+      "distance_px": 75.0,
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7420:7339;7045:348",
+      "to_node_id": "I7420:7339;7045:350",
+      "relation": "next_sibling",
+      "distance_px": 73.0,
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7420:7339;7045:348",
+      "to_node_id": "I7420:7339;7045:348;7045:335",
+      "relation": "parent_child",
+      "parent_id": "I7420:7339;7045:348"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7420:7339;7045:348;7045:335",
+      "to_node_id": "I7420:7339;7045:348;7045:334",
+      "relation": "next_sibling",
+      "distance_px": 1.0,
+      "parent_id": "I7420:7339;7045:348"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7420:7339;7045:348",
+      "to_node_id": "I7420:7339;7045:348;7045:334",
+      "relation": "parent_child",
+      "parent_id": "I7420:7339;7045:348"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7420:7339;7045:348;7045:334",
+      "to_node_id": "I7420:7339;7045:348;7045:335",
+      "relation": "previous_sibling",
+      "distance_px": 1.0,
+      "parent_id": "I7420:7339;7045:348"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7420:7339",
+      "to_node_id": "I7420:7339;7045:350",
+      "relation": "parent_child",
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7420:7339;7045:350",
+      "to_node_id": "I7420:7339;7045:348",
+      "relation": "previous_sibling",
+      "distance_px": 73.0,
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7420:7339;7045:350",
+      "to_node_id": "I7420:7339;7045:352",
+      "relation": "next_sibling",
+      "distance_px": 67.5,
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7420:7339;7045:350",
+      "to_node_id": "I7420:7339;7045:350;7045:310",
+      "relation": "parent_child",
+      "parent_id": "I7420:7339;7045:350"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7420:7339",
+      "to_node_id": "I7420:7339;7045:352",
+      "relation": "parent_child",
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7420:7339;7045:352",
+      "to_node_id": "I7420:7339;7045:350",
+      "relation": "previous_sibling",
+      "distance_px": 67.5,
+      "parent_id": "7420:7339"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7420:7339;7045:352",
+      "to_node_id": "I7420:7339;7045:352;7045:309",
+      "relation": "parent_child",
+      "parent_id": "I7420:7339;7045:352"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1045",
+      "to_node_id": "7110:1051",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1045",
+      "to_node_id": "7110:1057",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1045",
+      "to_node_id": "7110:1060",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1045",
+      "to_node_id": "7110:1069",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1051",
+      "to_node_id": "7110:1057",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1051",
+      "to_node_id": "7110:1060",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1051",
+      "to_node_id": "7110:1069",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1057",
+      "to_node_id": "7110:1060",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1057",
+      "to_node_id": "7110:1069",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7110:1060",
+      "to_node_id": "7110:1069",
+      "relation": "same_component_group"
+    }
+  ]
+}

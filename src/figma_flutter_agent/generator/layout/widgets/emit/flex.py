@@ -95,6 +95,10 @@ def render_row(
     )
 
     if button_hosts_horizontal_social_auth_icon_cluster(node) and child_widgets:
+        from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+            bind_equal_row_flex_child,
+        )
+
         wrapped: list[str] = []
         for child, widget in zip(node.children, child_widgets, strict=True):
             if (
@@ -107,6 +111,7 @@ def render_row(
                     child,
                     theme_variant=theme_variant,
                 )
+                widget = bind_equal_row_flex_child(widget)
             wrapped.append(widget)
         child_widgets = wrapped
 

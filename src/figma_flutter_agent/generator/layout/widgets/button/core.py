@@ -247,8 +247,12 @@ def _wrap_button_stack(
     band_height: float | None = None,
 ) -> str:
     """Wrap an interactive stack with a theme-appropriate tap target."""
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        strip_flex_parent_data_deep,
+    )
     from figma_flutter_agent.generator.layout.style.decoration import _resolved_border_radius
 
+    stack_widget = strip_flex_parent_data_deep(stack_widget)
     surface = interaction_surface_node(node)
     frame_height = band_height if band_height is not None else node.sizing.height
     radius = (

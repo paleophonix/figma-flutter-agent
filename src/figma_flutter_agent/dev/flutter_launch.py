@@ -38,7 +38,10 @@ from figma_flutter_agent.tools.process_run import (
 )
 
 if TYPE_CHECKING:
-    from figma_flutter_agent.config.models import ResponsiveConfig, ResponsivePreviewMode
+    from figma_flutter_agent.config.models import (
+        ResponsiveConfig,
+        ResponsivePreviewMode,
+    )
 
 _DUAL_PREVIEW_STATIC_DEVICE = "web-server"
 _DUAL_PREVIEW_STATIC_WEB_PORT = 7357
@@ -181,7 +184,9 @@ def _append_chrome_preview_flags(
     if preview_size is None or not is_chrome_device(device_id):
         return
     artboard_width, artboard_height = preview_size
-    adaptive = preview_kind == "responsive" and (responsive is not None and responsive.enabled)
+    adaptive = preview_kind == "responsive" and (
+        responsive is not None and responsive.enabled
+    )
     if adaptive and responsive is not None:
         width, height = resolve_chrome_preview_size(
             artboard_width=artboard_width,
@@ -213,7 +218,9 @@ def _append_chrome_preview_flags(
         )
         if preview_kind == "static":
             run_cmd.extend(chrome_preview_dart_defines(width, height))
-            logger.info("Chrome artboard preview {}x{} (1:1 golden frame)", width, height)
+            logger.info(
+                "Chrome artboard preview {}x{} (1:1 golden frame)", width, height
+            )
         else:
             logger.info(
                 "Chrome live preview artboard {}x{} (scroll fallback; no artboard dart-defines)",
@@ -561,7 +568,9 @@ def launch_flutter_app(
         finally:
             _terminate_background_flutter(static_proc)
 
-    preview_kind: LaunchPreviewKind = "static" if launch_mode == "static" else "responsive"
+    preview_kind: LaunchPreviewKind = (
+        "static" if launch_mode == "static" else "responsive"
+    )
     run_cmd = _build_flutter_run_cmd(
         flutter,
         device_id=device_id,

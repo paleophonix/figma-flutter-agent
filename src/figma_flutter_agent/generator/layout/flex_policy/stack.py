@@ -1354,7 +1354,7 @@ def _bound_stack_sized_box(
             if height is not None and height > 0:
                 height_lit = format_geometry_literal(height)
                 return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
-            return f"Expanded(child: {inner})"
+            return f"SizedBox(width: {width_lit}, child: {inner})"
         if height is not None and height > 0:
             height_lit = format_geometry_literal(height)
             return (

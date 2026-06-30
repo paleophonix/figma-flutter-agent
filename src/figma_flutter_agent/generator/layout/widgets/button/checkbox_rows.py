@@ -201,7 +201,7 @@ def _try_render_checkbox_label_row(
         "Row("
         "crossAxisAlignment: CrossAxisAlignment.center, "
         f"{spacing_field}"
-        f"children: [{checkbox_widget}, Expanded(child: {text_widget})]"
+        f"children: [{checkbox_widget}, {text_widget}]"
         ")"
     )
 

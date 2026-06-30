@@ -166,6 +166,23 @@ def test_sign_up_version_5_subtitle_preserves_fixed_text_box_width() -> None:
     assert "width: double.infinity" not in chunk.split("Text('Create an account", 1)[0]
 
 
+def test_sign_up_version_5_subtitle_center_aligned_in_parent() -> None:
+    """Law: center_aligned_fixed_width_multiline_text_must_center_in_parent."""
+    root = _load_root()
+    layout = render_layout_file(
+        root,
+        feature_name="sign_up_version_5_subtitle_center",
+        uses_svg=True,
+        responsive_enabled=False,
+    )["lib/generated/sign_up_version_5_subtitle_center_layout.dart"]
+    compact = layout.replace("\n", "")
+    subtitle_idx = compact.find("Create an account or log in to explore about our app")
+    assert subtitle_idx >= 0
+    chunk = compact[max(0, subtitle_idx - 400) : subtitle_idx + 350]
+    assert "Alignment.centerLeft" not in chunk
+    assert "SizedBox(width: 222.0, child: Center(child:" in chunk
+
+
 def test_sign_up_version_5_static_root_skips_scroll_shell() -> None:
     """Law: static_artboard_mode_must_not_use_scroll_shell_unless_source_requires_scroll."""
     root = _load_root()
@@ -195,6 +212,49 @@ def test_sign_up_version_5_phone_prefix_inherits_leading_radius_and_height() -> 
     prefix_slot = chunk.split("BorderRadius.horizontal(left: Radius.circular(10.0))", 1)[1][:2500]
     assert "height: 48.0" not in prefix_slot
     assert "height: 46.0" in prefix_slot
+
+
+def test_sign_up_version_5_phone_prefix_suppresses_redundant_inner_stroke() -> None:
+    """Law: composite_input_prefix_must_suppress_redundant_inner_stroke."""
+    root = _load_root()
+    layout = render_layout_file(
+        root,
+        feature_name="sign_up_version_5_phone_prefix_border",
+        uses_svg=True,
+        responsive_enabled=False,
+    )["lib/generated/sign_up_version_5_phone_prefix_border_layout.dart"]
+    compact = layout.replace("\n", "")
+    phone_idx = compact.find("prefix-dropdown")
+    assert phone_idx >= 0
+    prefix_slot = compact[phone_idx : phone_idx + 1200]
+    assert "Border.all(color: Color(0xFF000000)" not in prefix_slot
+    assert "border: Border.all" not in prefix_slot
+
+
+def test_sign_up_version_5_pattern_svg_uses_contain_not_fill() -> None:
+    """Law: decorative_render_boundary_svg_must_not_stretch_with_boxfit_fill."""
+    from figma_flutter_agent.generator.layout.widgets.svg import _svg_fit_mode
+
+    pattern = next(
+        child
+        for child in _load_root().children[0].children
+        if child.name == "Pattern"
+    )
+    assert pattern.render_boundary is True
+    assert pattern.flatten_figma_node_ids
+    width = float(pattern.sizing.width or 0.0)
+    height = float(pattern.sizing.height or 0.0)
+    assert _svg_fit_mode(pattern, width, height) == "BoxFit.contain"
+
+    root = _load_root()
+    layout = render_layout_file(
+        root,
+        feature_name="sign_up_version_5_pattern_fit",
+        uses_svg=True,
+        responsive_enabled=False,
+    )["lib/generated/sign_up_version_5_pattern_fit_layout.dart"]
+    bg_chunk = layout.split("figma-42_2283", 1)[-1][:400]
+    assert "BoxFit.fill" not in bg_chunk or "SizedBox.shrink()" in bg_chunk
 
 
 def test_sign_up_version_5_partition_collects_nested_pattern() -> None:

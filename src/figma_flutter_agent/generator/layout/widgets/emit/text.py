@@ -376,7 +376,11 @@ def render_text_node(
         text_preserves_intrinsic_wrap_width,
     )
 
-    if text_preserves_intrinsic_wrap_width(node) and parent_type == NodeType.COLUMN:
+    if (
+        text_preserves_intrinsic_wrap_width(node)
+        and parent_type == NodeType.COLUMN
+        and (node.style.text_align or "").upper() != "CENTER"
+    ):
         widget = f"Align(alignment: Alignment.centerLeft, child: {widget})"
     from figma_flutter_agent.parser.interaction.text_actions import (
         _argb_rgb_channels,

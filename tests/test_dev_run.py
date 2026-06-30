@@ -57,7 +57,8 @@ def test_plan_run_screen(tmp_path: Path) -> None:
     dump_dir.mkdir(parents=True)
     dump_path = dump_dir / "sign_in_layout.json"
     dump_path.write_text(
-        '{"id": "1:3570", "name": "SignIn", "type": "FRAME", "children": []}', encoding="utf-8"
+        '{"id": "1:3570", "name": "SignIn", "type": "FRAME", "children": []}',
+        encoding="utf-8",
     )
     (project / "screens.yaml").write_text(
         "\n".join(

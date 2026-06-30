@@ -47,7 +47,6 @@ def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
         node.style,
         fallback="Theme.of(context).colorScheme.surface",
     )
-    opacity = 0.55
     size_parts: list[str] = []
     if width is not None and width > 0:
         size_parts.append(f"width: {width}")
@@ -71,7 +70,7 @@ def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
     inner = (
         f"Container({size_prefix}"
         f"decoration: BoxDecoration({shape}"
-        f"color: {color_expr}.withOpacity({opacity})))"
+        f"color: {color_expr}))"
     )
     widget = (
         f"ImageFiltered("

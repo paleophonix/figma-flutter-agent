@@ -221,7 +221,12 @@ def wrap_with_inner_shadow_overlays(
     """Clip and stack non-interactive inset shadow bands above a painted surface."""
     if not overlays:
         return widget
-    stack = f"Stack(fit: StackFit.passthrough, children: [{widget}, {', '.join(overlays)}])"
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        strip_flex_parent_data_deep,
+    )
+
+    inner = strip_flex_parent_data_deep(widget)
+    stack = f"Stack(fit: StackFit.passthrough, children: [{inner}, {', '.join(overlays)}])"
     if border_radius_expr is not None:
         return f"ClipRRect(borderRadius: {border_radius_expr}, child: {stack})"
     return f"ClipRect(child: {stack})"

@@ -22,7 +22,13 @@ def _vector_should_emit_native_ambient_blur(node: CleanDesignTreeNode) -> bool:
         return False
     if node.type != NodeType.VECTOR:
         return False
-    return node.style.background_color is not None
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if node.style.background_color is None:
+        return False
+    return max(float(width), float(height)) >= 400.0
 
 
 def render_image_or_vector(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str | None:
@@ -47,12 +53,17 @@ def render_image_or_vector(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
             scroll_content_root=scroll_content_root,
         )
 
-    if node.vector_asset_key:
+    if node.vector_asset_key or node.image_asset_key:
         raw_asset = node.vector_asset_key
-        if cluster_vector_variant and raw_asset in {
-            cluster_vector_variant.forward_asset,
-            cluster_vector_variant.backward_asset,
-        }:
+        if (
+            raw_asset
+            and cluster_vector_variant
+            and raw_asset
+            in {
+                cluster_vector_variant.forward_asset,
+                cluster_vector_variant.backward_asset,
+            }
+        ):
             widget = _render_svg_picture_variant(
                 node,
                 forward_asset=cluster_vector_variant.forward_asset,
