@@ -25,6 +25,7 @@ from figma_flutter_agent.pipeline.dump import (
     _resolve_existing_raw_dump_path,
     resolve_frame_metadata_from_dump,
 )
+from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 from figma_flutter_agent.pipeline.helpers import (
     resolve_manifest_cached_dump,
     routing_enabled,
@@ -83,6 +84,7 @@ async def run_pipeline(
     deps: PipelineDependencies | None = None,
     pipeline_invocation: str = "default",
     llm_compare: bool = False,
+    dump_prefetch: ScreenDumpPrefetch | None = None,
 ) -> PipelineResult:
     """Execute the Figma to Flutter generation pipeline."""
     if verbose:
@@ -219,6 +221,7 @@ async def run_pipeline(
             dev_mode_dump=dev_mode_dump,
             dev_mode_css_override=dev_mode_css_override,
             parse_fn=parse_figma_frame,
+            dump_prefetch=dump_prefetch,
         )
     else:
         await run_live_fetch_parse_phase(

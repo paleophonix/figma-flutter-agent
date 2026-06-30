@@ -36,6 +36,7 @@ class IrEmitContext:
     strict_l10n: bool = False
     strict_a11y: bool = False
     strict_contrast: bool = False
+    skip_cluster_id: str | None = None
     policy: IrEmitPolicy = IrEmitPolicy()
 
 
@@ -44,6 +45,7 @@ def render_kwargs(ctx: IrEmitContext) -> dict[str, object]:
         "uses_svg": ctx.uses_svg,
         "cluster_classes": ctx.cluster_classes,
         "cluster_vector_variants": ctx.cluster_vector_variants,
+        "skip_cluster_id": ctx.skip_cluster_id,
         "theme_variant": ctx.theme_variant,
         "responsive_enabled": ctx.responsive_enabled,
         "bundled_font_families": ctx.bundled_font_families,

@@ -205,6 +205,7 @@ def _wizard_sync_preview(
         console.print(f"[dim]Screen:[/dim] {screen}")
     console.print(f"[dim]Device:[/dim] {device_label} ({preview_mode} Chrome preview)")
     console.print(f"[dim]Launching Flutter on {device_label} after sync…[/dim]")
+    console.print("[dim]Pipeline:[/dim] starting sync (preflight cached when possible)…")
     try:
         _, launched, pipeline_result = asyncio.run(
             sync_preview_workflow(
@@ -215,6 +216,7 @@ def _wizard_sync_preview(
                 settings=settings,
                 force_llm_regen=force_llm_regen,
                 use_cached_ir=use_cached_ir,
+                preflight=preflight,
             )
         )
     except Exception as exc:

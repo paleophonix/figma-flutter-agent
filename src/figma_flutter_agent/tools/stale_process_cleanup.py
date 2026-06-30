@@ -191,18 +191,32 @@ def _cleanup_unix() -> int:
     return killed
 
 
-def cleanup_stale_agent_processes(*, log: bool = True) -> int:
+_CLEANED_THIS_PROCESS = False
+
+
+def reset_stale_cleanup_session() -> None:
+    """Clear the once-per-process cleanup guard (tests only)."""
+    global _CLEANED_THIS_PROCESS
+    _CLEANED_THIS_PROCESS = False
+
+
+def cleanup_stale_agent_processes(*, log: bool = True, force: bool = False) -> int:
     """Kill hung AST sidecar (and related ``dart``) processes from prior agent runs.
 
     Skipped when ``FIGMA_FLUTTER_SKIP_STALE_CLEANUP`` is set to a truthy value.
     Does not terminate sidecars owned by another live ``figma-flutter`` session.
+    Runs at most once per Python process unless ``force=True``.
     """
+    global _CLEANED_THIS_PROCESS
     if _cleanup_disabled():
+        return 0
+    if _CLEANED_THIS_PROCESS and not force:
         return 0
     if sys.platform == "win32":
         killed = _cleanup_windows()
     else:
         killed = _cleanup_unix()
+    _CLEANED_THIS_PROCESS = True
     if log and killed:
         logger.info(
             "Terminated {} stale agent subprocess group(s) from a prior run",

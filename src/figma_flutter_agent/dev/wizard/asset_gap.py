@@ -13,13 +13,14 @@ from figma_flutter_agent.assets.names import expected_svg_export_rel_path
 from figma_flutter_agent.assets.screen_frame import build_screen_frame_exclude_ids
 from figma_flutter_agent.config import AssetsConfig
 from figma_flutter_agent.parser.boundaries.assets import (
+    build_asset_node_index,
     collect_render_boundary_asset_plan,
-    discover_asset_path_for_node,
+    lookup_asset_path_for_node,
 )
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.stages.fetch import FigmaFetchResult
-from figma_flutter_agent.stages.parse import parse_figma_frame
+from figma_flutter_agent.stages.parse import FigmaParseResult, parse_figma_frame
 
 SvgExportKind = Literal["icon", "boundary_svg"]
 
@@ -84,11 +85,17 @@ def exportable_icon_ids_for_tree(
     )
 
 
-def icon_ids_covered_on_disk(project_dir: Path, node_ids: frozenset[str]) -> frozenset[str]:
+def icon_ids_covered_on_disk(
+    project_dir: Path,
+    node_ids: frozenset[str],
+    *,
+    asset_index: dict[str, str] | None = None,
+) -> frozenset[str]:
     """Return the subset of ``node_ids`` with a resolvable asset file under ``project_dir``."""
+    index = asset_index if asset_index is not None else build_asset_node_index(project_dir)
     covered: set[str] = set()
     for node_id in node_ids:
-        if discover_asset_path_for_node(project_dir, node_id) is not None:
+        if lookup_asset_path_for_node(index, node_id) is not None:
             covered.add(node_id)
     return frozenset(covered)
 
@@ -118,28 +125,37 @@ def resolve_asset_export_entries_from_fetch(
     *,
     primary_node_id: str,
     assets: AssetsConfig,
+    parse_result: FigmaParseResult | None = None,
+    dev_mode_dump: object | None = None,
+    dev_mode_css_override: bool = False,
 ) -> tuple[ScreenSvgExportExpectation, ...]:
     """Return expected SVG exports for a parsed or fallback fetch payload."""
-    try:
-        parse_result = parse_figma_frame(fetch_result)
-    except Exception:
-        logger.exception("Preflight asset gap fell back to raw dump collect (parse failed)")
-        exclude_node_ids = build_screen_frame_exclude_ids(primary_node_id)
-        exportables = collect_exportable_nodes(
-            fetch_result.root,
-            illustrations_enabled=assets.illustrations,
-            exclude_node_ids=set(exclude_node_ids),
-        )
-        return tuple(
-            ScreenSvgExportExpectation(node_id=node_id, layer_name=name, kind="icon")
-            for node_id, name, kind in exportables
-            if kind == "icon"
-        )
+    parsed = parse_result
+    if parsed is None:
+        try:
+            parsed = parse_figma_frame(
+                fetch_result,
+                dev_mode_dump=dev_mode_dump,
+                dev_mode_css_override=dev_mode_css_override,
+            )
+        except Exception:
+            logger.exception("Preflight asset gap fell back to raw dump collect (parse failed)")
+            exclude_node_ids = build_screen_frame_exclude_ids(primary_node_id)
+            exportables = collect_exportable_nodes(
+                fetch_result.root,
+                illustrations_enabled=assets.illustrations,
+                exclude_node_ids=set(exclude_node_ids),
+            )
+            return tuple(
+                ScreenSvgExportExpectation(node_id=node_id, layer_name=name, kind="icon")
+                for node_id, name, kind in exportables
+                if kind == "icon"
+            )
 
     exclude_node_ids = build_screen_frame_exclude_ids(primary_node_id)
     return collect_screen_svg_export_entries(
         fetch_result.root,
-        parse_result.clean_tree,
+        parsed.clean_tree,
         exclude_node_ids=exclude_node_ids,
         illustrations_enabled=assets.illustrations,
     )
@@ -184,13 +200,20 @@ def resolve_asset_icon_gap_from_fetch(
     project_dir: Path,
     primary_node_id: str,
     assets: AssetsConfig,
+    parse_result: FigmaParseResult | None = None,
+    dev_mode_dump: object | None = None,
+    dev_mode_css_override: bool = False,
+    asset_index: dict[str, str] | None = None,
 ) -> tuple[frozenset[str], frozenset[str]]:
     """Compare expected vs on-disk icon exports for a parsed fetch payload."""
     entries = resolve_asset_export_entries_from_fetch(
         fetch_result,
         primary_node_id=primary_node_id,
         assets=assets,
+        parse_result=parse_result,
+        dev_mode_dump=dev_mode_dump,
+        dev_mode_css_override=dev_mode_css_override,
     )
     expected = frozenset(entry.node_id for entry in entries)
-    covered = icon_ids_covered_on_disk(project_dir, expected)
+    covered = icon_ids_covered_on_disk(project_dir, expected, asset_index=asset_index)
     return expected, covered

@@ -18,6 +18,7 @@ from figma_flutter_agent.figma.url import ParsedFigmaUrl
 from figma_flutter_agent.observability import log_stage
 from figma_flutter_agent.pipeline.deps import PipelineDependencies
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
+from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 from figma_flutter_agent.pipeline.helpers import resolve_feature_name
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 from figma_flutter_agent.pipeline_context import PipelineContext
@@ -42,6 +43,7 @@ async def run_dump_fetch_parse_phase(
     dev_mode_dump: Any,
     dev_mode_css_override: Any,
     parse_fn: Any,
+    dump_prefetch: ScreenDumpPrefetch | None = None,
 ) -> None:
     """Fetch, parse, and export assets/fonts when running from a cached dump.
 
@@ -59,23 +61,38 @@ async def run_dump_fetch_parse_phase(
         dev_mode_css_override: Optional Dev Mode CSS override payload.
         parse_fn: The ``parse_figma_frame`` callable (passed through so test
             patches on ``pipeline.run.core.parse_figma_frame`` take effect).
+        dump_prefetch: Optional wizard preflight snapshot for this dump path.
     """
+    reuse_prefetch = (
+        dump_prefetch is not None
+        and dump_prefetch.matches_dump(from_dump)
+    )
     with log_stage(log, "fetch"):
-        fetch_result = load_fetch_result_from_dump(
-            from_dump,
-            file_key=parsed.file_key,
-            node_id=parsed.node_id,
-        )
+        if reuse_prefetch:
+            fetch_result = dump_prefetch.fetch_result
+            log.info(
+                "Reused cached Figma dump from preflight ({})",
+                from_dump.as_posix(),
+            )
+        else:
+            fetch_result = load_fetch_result_from_dump(
+                from_dump,
+                file_key=parsed.file_key,
+                node_id=parsed.node_id,
+            )
+            log.info("Loaded cached Figma dump from {}", from_dump.as_posix())
         ctx.apply_fetch(fetch_result)
-        log.info("Loaded cached Figma dump from {}", from_dump.as_posix())
     with log_stage(log, "parse"):
-        ctx.apply_parse(
-            parse_fn(
+        if reuse_prefetch:
+            parse_result = dump_prefetch.parse_result
+            log.info("Reused cached parse from wizard preflight")
+        else:
+            parse_result = parse_fn(
                 fetch_result,
                 dev_mode_dump=dev_mode_dump,
                 dev_mode_css_override=dev_mode_css_override,
             )
-        )
+        ctx.apply_parse(parse_result)
         ctx.enforce_accessibility_gates()
         ctx.apply_accessibility_fixes()
 

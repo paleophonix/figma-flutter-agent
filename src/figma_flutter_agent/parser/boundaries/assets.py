@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from pathlib import Path
 
 from loguru import logger
 
 from figma_flutter_agent.schemas import AssetManifest, CleanDesignTreeNode
+
+_ASSET_SCAN_FOLDERS = ("icons", "illustrations", "images")
 
 
 def render_boundary_asset_path(node_id: str) -> str:
@@ -15,11 +18,69 @@ def render_boundary_asset_path(node_id: str) -> str:
     return f"assets/illustrations/render_boundary_{safe_id}.svg"
 
 
-def discover_asset_path_for_node(project_dir: Path, node_id: str) -> str | None:
+def _register_asset_index_entry(
+    entries: dict[str, list[tuple[tuple[int, str], str]]],
+    safe_id: str,
+    rel_path: str,
+) -> None:
+    rank = _vector_asset_discovery_rank(rel_path)
+    entries[safe_id].append((rank, rel_path))
+
+
+def build_asset_node_index(project_dir: Path) -> dict[str, str]:
+    """Scan ``assets/`` once and map Figma node safe ids to best on-disk export path."""
+    ranked: dict[str, list[tuple[tuple[int, str], str]]] = defaultdict(list)
+    for folder in _ASSET_SCAN_FOLDERS:
+        asset_dir = project_dir / "assets" / folder
+        if not asset_dir.is_dir():
+            continue
+        for path in asset_dir.iterdir():
+            if not path.is_file():
+                continue
+            suffix = path.suffix.lower()
+            if suffix not in {".svg", ".png", ".webp", ".jpg", ".jpeg"}:
+                continue
+            rel = f"assets/{folder}/{path.name}".replace("\\", "/")
+            stem = path.stem
+            if stem.startswith("render_boundary_"):
+                _register_asset_index_entry(
+                    ranked,
+                    stem.removeprefix("render_boundary_"),
+                    rel,
+                )
+                continue
+            parts = stem.split("_")
+            for index in range(len(parts)):
+                safe_id = "_".join(parts[index:])
+                if safe_id:
+                    _register_asset_index_entry(ranked, safe_id, rel)
+    return {
+        safe_id: min(paths, key=lambda item: item[0])[1]
+        for safe_id, paths in ranked.items()
+        if paths
+    }
+
+
+def lookup_asset_path_for_node(
+    asset_index: dict[str, str],
+    node_id: str,
+) -> str | None:
+    """Resolve one node id against a pre-built :func:`build_asset_node_index` map."""
+    return asset_index.get(node_id.replace(":", "_"))
+
+
+def discover_asset_path_for_node(
+    project_dir: Path,
+    node_id: str,
+    *,
+    asset_index: dict[str, str] | None = None,
+) -> str | None:
     """Find an on-disk SVG/PNG export for a Figma node id (any filename suffix)."""
+    if asset_index is not None:
+        return lookup_asset_path_for_node(asset_index, node_id)
     suffix = node_id.replace(":", "_")
     best: tuple[tuple[int, str], str] | None = None
-    for folder in ("icons", "illustrations", "images"):
+    for folder in _ASSET_SCAN_FOLDERS:
         asset_dir = project_dir / "assets" / folder
         if not asset_dir.is_dir():
             continue

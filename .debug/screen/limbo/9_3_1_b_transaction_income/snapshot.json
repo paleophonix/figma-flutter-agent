@@ -7,9 +7,13 @@
   "typography_hash": "f2c12d254f376d1f8c63824f9292764b5770a1ca967de08a6dbd929ebae07004",
   "spacing_hash": "c6e8975296055bd92141b9ead552ff33f51359035450ded8fb0098583976cd58",
   "file_hashes": {
-    "lib/widgets/icon_salary_widget.dart": "489d3cb2b09a47576c3a3b539ce5a4bf4050b8ab9f11046cbce395abae7339d2",
+    "lib/widgets/icon_salary_widget.dart": "505cc4719d6d013f71c4bbb8c3b8ed020e6f8cc5a219b8cb62f477ad3489c2b1",
     "lib/widgets/frame3_widget.dart": "38cf8a8f6b4a43572dd19ba7dd58df5f7cfb4e147b6bcb712fa77ffc2b14c748",
     "lib/widgets/icon_notification_widget.dart": "967f021183c8df87808691141174586c831fce73a031ad46d4bc91349b5a60bc",
+    "lib/widgets/icon_salary_widget2.dart": "77e9a5c1d8288afbc9f0ef4561f6a9ef62b4ba4f68c8cc494523b7cd6e976da2",
+    "lib/widgets/icon_salary_widget3.dart": "f02224470fabe499cb9da21dae73685472493bc3c00de5fd6f527cf2f91ce9bd",
+    "lib/widgets/icon_salary_widget4.dart": "e52d3d6641c52b42a117f04e7d9eca846a353018c0b6008717091bc7b9058836",
+    "lib/widgets/icon_salary_widget5.dart": "b62e4386a238ed0f913d1e084f1e5ca8752a6e700a97730a24ad00513330eba4",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "348cfba0d3be099a154b08145937ce11766181e400b5e24b2b460c92411019fa",
     "lib/theme/app_spacing.dart": "957fe8abca8d16d9943cb7bc3c79b001e9f11c5bd28f48cc2f7104a8f19575dd",
@@ -18,7 +22,7 @@
     "lib/theme/app_edge_insets.dart": "c3d857a9463905b4a00f9ef7c936aa21c79d10df33a9553f3a1700255efce7db",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "f97ff7adf8b9ea64711710c6e1f058a6b8d8b9288c12ad54f6b67e86b3276604",
-    "lib/generated/9_3_1_b_transaction_income_layout.dart": "a3aba7ede535bb8c9b5597bfb430a05592b201e41bb538096c6fe177b5730f73",
+    "lib/generated/9_3_1_b_transaction_income_layout.dart": "5551aed991e49b0f405da8e86094f13e5c496d359a8f15f66d09fd3be7e9cd15",
     "lib/features/9_3_1_b_transaction_income/9_3_1_b_transaction_income_screen.dart": "dd757ca66f450e4fcfe61897d3bc0c1fd399ebf0504f3a6e2673c93ffbd6e70a",
     "test/golden/9_3_1_b_transaction_income_screen_test.dart": "6fde0018134c792fdc46cfac744202ca3fdb9d33e05679b833e2ce206d1637fa",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -26,10 +30,10 @@
   },
   "layout_region_hash": "9c0be46580a2dfd23d26ded88760cda71005c9ca360c100ca6b2af1dc86a2c0d",
   "cluster_hashes": {
-    "component_7102_2848": "10209b01b10bac7319fd1913b591232a8449ec72ad286ab881dfd138dba864ab"
+    "component_7102_2848": "10b9985341588f1b528a931cfe63ce53ea007af2f424ea3d3ecad1d93cecd7c8"
   },
   "reference_image_hash": null,
   "emitter_version": "2026.06.2",
-  "version": 1,
-  "updated_at": "2026-06-30T00:50:40.674559+00:00"
+  "version": 2,
+  "updated_at": "2026-06-30T13:50:09.854024+00:00"
 }

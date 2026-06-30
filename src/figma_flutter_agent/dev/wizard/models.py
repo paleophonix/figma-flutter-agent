@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 
 
 @dataclass(frozen=True)
@@ -39,6 +43,7 @@ class ScreenPreflight:
     exportable_icons: int
     local_icons: int
     missing_asset_exports: int
+    dump_prefetch: ScreenDumpPrefetch | None = None
 
     @property
     def needs_live_sync(self) -> bool:

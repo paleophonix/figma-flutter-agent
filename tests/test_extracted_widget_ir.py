@@ -283,6 +283,63 @@ def test_extracted_widget_empty_ir_children_renders_visible_subtree() -> None:
     assert "home.svg" in code
 
 
+def test_extracted_widget_skips_cluster_delegate_for_own_cluster_root() -> None:
+    """Materializing an extracted widget must inline its cluster root, not self-delegate."""
+    root = CleanDesignTreeNode(
+        id="7110:1045",
+        name="Icon Salary",
+        type=NodeType.STACK,
+        cluster_id="component_7102_2848",
+        sizing=Sizing(width=57.0, height=53.0),
+        children=[
+            CleanDesignTreeNode(
+                id="I7110:1045;7102:2847",
+                name="Rectangle 150",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=57.0, height=53.0),
+                style=NodeStyle(background_color="0xFF6DB6FE", border_radius=22.0),
+            ),
+            CleanDesignTreeNode(
+                id="I7110:1045;7102:1277",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_salary.svg",
+                sizing=Sizing(width=26.0, height=23.5),
+                stack_placement=StackPlacement(
+                    left=16.0,
+                    top=15.0,
+                    width=26.0,
+                    height=23.5,
+                ),
+            ),
+        ],
+    )
+    widget_ir = WidgetIrNode(
+        figma_id="7110:1045",
+        kind=WidgetIrKind.AUTO,
+        children=[
+            WidgetIrNode(figma_id="I7110:1045;7102:2847", kind=WidgetIrKind.AUTO),
+            WidgetIrNode(figma_id="I7110:1045;7102:1277", kind=WidgetIrKind.AUTO),
+        ],
+    )
+    ctx = IrEmitContext(
+        uses_svg=True,
+        responsive_enabled=False,
+        is_layout_root=False,
+        cluster_classes={"component_7102_2848": "IconSalaryWidget"},
+    )
+    code = emit_extracted_widget_code_from_ir(
+        widget_ir,
+        clean_tree=root,
+        widget_name="IconSalaryWidget",
+        ctx=ctx,
+    )
+    build = code.split("Widget build", 1)[1]
+    assert "IconSalaryWidget(" not in build.replace("const IconSalaryWidget({super.key})", "")
+    assert "BoxDecoration(" in code
+    assert "0xFF6DB6FE" in code
+
+
 def test_materialize_refreshes_dimensional_shrink_shell() -> None:
     """Sized host shells with shrink-only bodies must be replaced when paint remains."""
     title = CleanDesignTreeNode(

@@ -11,6 +11,7 @@ from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.run import RunScreenPlan, launch_flutter_app
 from figma_flutter_agent.dev.wizard.models import ScreenPreflight
 from figma_flutter_agent.dev.wizard.preflight import build_run_plan, collect_screen_preflight
+from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 from figma_flutter_agent.pipeline.result import PipelineResult
 from figma_flutter_agent.pipeline.run import run_pipeline
 from figma_flutter_agent.pipeline.warning_policy import (
@@ -37,6 +38,7 @@ async def generate_screen_for_preview(
     verbose: bool = False,
     force_llm_regen: bool = False,
     use_cached_ir: bool = False,
+    dump_prefetch: ScreenDumpPrefetch | None = None,
 ) -> PipelineResult:
     """Generate one screen using offline dump or live Figma sync."""
     result = await run_pipeline(
@@ -51,6 +53,7 @@ async def generate_screen_for_preview(
         regenerate_templates=live,
         force_llm_regen=force_llm_regen,
         force_live_fetch=live,
+        dump_prefetch=None if live else dump_prefetch,
     )
     emit_user_warnings(result.warnings, settings=settings)
     print_actionable_pipeline_warnings(result.warnings)
@@ -102,10 +105,12 @@ async def sync_preview_workflow(
     settings: Settings | None = None,
     force_llm_regen: bool = False,
     use_cached_ir: bool = False,
+    preflight: ScreenPreflight | None = None,
 ) -> tuple[RunScreenPlan, bool | None, PipelineResult]:
     """Full sync-preview path: preflight -> generate -> optional ``flutter run``."""
     plan = build_run_plan(project_dir=project_dir, screen_name=screen_name)
-    preflight = collect_screen_preflight(plan)
+    if preflight is None:
+        preflight = collect_screen_preflight(plan)
 
     resolved_settings = settings or load_settings(plan.config_path)
     has_token = bool(resolved_settings.figma_token().strip())
@@ -141,6 +146,7 @@ async def sync_preview_workflow(
         verbose=verbose,
         force_llm_regen=force_llm_regen,
         use_cached_ir=use_cached_ir,
+        dump_prefetch=preflight.dump_prefetch,
     )
     if skip_launch:
         return plan, None, pipeline_result

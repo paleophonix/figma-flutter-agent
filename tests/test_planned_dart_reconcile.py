@@ -1726,6 +1726,26 @@ return Container(child: Padding(child: Column(children: [Text('x')))])) forceStr
     assert "lib/widgets/cluster0_widget.dart" not in updated
 
 
+def test_strip_nested_self_ctor_skips_repaint_boundary_delegate() -> None:
+    from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
+        _strip_nested_self_widget_ctors,
+    )
+
+    code = """
+import 'package:flutter/material.dart';
+class IconSalaryWidget extends StatelessWidget {
+  const IconSalaryWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(child: const IconSalaryWidget());
+  }
+}
+"""
+    patched = _strip_nested_self_widget_ctors(code, "IconSalaryWidget")
+    assert "const IconSalaryWidget()" in patched
+    assert "SizedBox.shrink" not in patched
+
+
 def test_repair_self_referential_replaces_single_path_ctor_stub() -> None:
     planned = {
         "lib/widgets/cluster1_widget.dart": """

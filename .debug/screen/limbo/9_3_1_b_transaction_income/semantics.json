@@ -242,6 +242,50 @@
       "rejectReason": "below_confidence_threshold"
     },
     {
+      "figmaId": "I7110:1051;7102:1277",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I7110:1057;7102:1277",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I7110:1060;7102:1277",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I7110:1069;7102:1277",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
       "figmaId": "I7420:7339;7045:346;7045:312",
       "kind": "media_avatar",
       "confidence": 0.7,
@@ -284,10 +328,10 @@
   "rejectedByInvariant": [
     {
       "figmaId": "band-7253:3639",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "STACK": 2,
@@ -316,10 +360,10 @@
     },
     {
       "figmaId": "band-7043:3387",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "STACK": 1,
@@ -340,5 +384,5 @@
   ],
   "llmAnnotationUsed": [],
   "acceptedCount": 8,
-  "totalDecisions": 23
+  "totalDecisions": 27
 }

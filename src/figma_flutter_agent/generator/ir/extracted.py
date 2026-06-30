@@ -201,6 +201,41 @@ def drop_extracted_widgets_for_inline_hosts(
     return kept
 
 
+def _extracted_widget_skip_cluster_id(
+    subtree: CleanDesignTreeNode,
+    widget_name: str,
+    ctx: IrEmitContext,
+) -> str | None:
+    """Block cluster delegate shortcut when materializing the widget's own cluster root."""
+    cluster_id = subtree.cluster_id
+    if not cluster_id or not ctx.cluster_classes:
+        return None
+    class_name = _canonical_widget_class_name(widget_name)
+    if ctx.cluster_classes.get(cluster_id) == class_name:
+        return cluster_id
+    return None
+
+
+def _render_extracted_widget_body(
+    node: CleanDesignTreeNode,
+    *,
+    widget_name: str,
+    ctx: IrEmitContext,
+) -> str:
+    """Render an extracted widget subtree without self-referential cluster delegation."""
+    from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+    return render_node_body(
+        node,
+        uses_svg=ctx.uses_svg,
+        is_layout_root=False,
+        responsive_enabled=ctx.responsive_enabled,
+        cluster_classes=ctx.cluster_classes,
+        cluster_vector_variants=ctx.cluster_vector_variants,
+        skip_cluster_id=_extracted_widget_skip_cluster_id(node, widget_name, ctx),
+    )
+
+
 def emit_extracted_widget_code_from_ir(
     widget_ir: WidgetIrNode,
     *,
@@ -237,6 +272,7 @@ def emit_extracted_widget_code_from_ir(
             widget_name: _canonical_widget_class_name(widget_name),
         },
     )
+    skip_cluster_id = _extracted_widget_skip_cluster_id(subtree, widget_name, ctx)
     widget_ctx = IrEmitContext(
         semantic_report_only=ctx.semantic_report_only,
         uses_svg=ctx.uses_svg,
@@ -249,17 +285,11 @@ def emit_extracted_widget_code_from_ir(
         dart_weight_overrides_by_family=ctx.dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=ctx.text_theme_slot_by_style_name,
         text_theme_size_slots=ctx.text_theme_size_slots,
+        skip_cluster_id=skip_cluster_id,
         policy=ctx.policy,
     )
     if should_render_extracted_widget_from_clean_tree(widget_ir, subtree):
-        from figma_flutter_agent.generator.layout.widgets import render_node_body
-
-        body = render_node_body(
-            merged,
-            uses_svg=ctx.uses_svg,
-            is_layout_root=False,
-            responsive_enabled=ctx.responsive_enabled,
-        )
+        body = _render_extracted_widget_body(merged, widget_name=widget_name, ctx=widget_ctx)
     else:
         body = emit_screen_body_from_ir(
             widget_ir_screen,
@@ -270,14 +300,7 @@ def emit_extracted_widget_code_from_ir(
             },
         )
         if subtree_has_visible_paint(subtree) and _is_shrink_only_emit_body(body):
-            from figma_flutter_agent.generator.layout.widgets import render_node_body
-
-            body = render_node_body(
-                merged,
-                uses_svg=ctx.uses_svg,
-                is_layout_root=False,
-                responsive_enabled=ctx.responsive_enabled,
-            )
+            body = _render_extracted_widget_body(merged, widget_name=widget_name, ctx=widget_ctx)
     from figma_flutter_agent.generator.layout.widget_roots import (
         strip_stack_parent_data_wrappers,
         validate_widget_build_has_no_parent_data_root,

@@ -7,11 +7,50 @@ from typing import TYPE_CHECKING
 
 from loguru import logger
 
+from figma_flutter_agent.config import Settings
+
 if TYPE_CHECKING:
-    from figma_flutter_agent.config import Settings
     from figma_flutter_agent.pipeline.deps import PipelineDependencies
     from figma_flutter_agent.pipeline_context import PipelineContext
     from figma_flutter_agent.schemas import FigmaParsedUrl
+
+
+def resolve_dev_mode_css_for_parse(
+    settings: Settings,
+) -> tuple[object | None, bool]:
+    """Load Dev Mode CSS dump synchronously for parse/preflight stages.
+
+    Args:
+        settings: Pipeline settings.
+
+    Returns:
+        Tuple of ``(dev_mode_dump, dev_mode_css_override)``.
+    """
+    _figma_cfg = settings.agent.figma
+    if not (
+        _figma_cfg.dev_mode.enabled
+        and _figma_cfg.dev_mode.inspect_css.mode == "plugin_dump"
+        and _figma_cfg.dev_mode.inspect_css.dump_path is not None
+    ):
+        return None, False
+
+    from figma_flutter_agent.parser.dev_mode_css import (
+        DevModeCssDumpError,
+        load_dev_mode_css_dump,
+    )
+
+    _dump_path = Path(_figma_cfg.dev_mode.inspect_css.dump_path)
+    if not _dump_path.is_absolute():
+        from figma_flutter_agent.config import agent_repo_root
+
+        _dump_path = agent_repo_root() / _dump_path
+
+    try:
+        dev_mode_dump = load_dev_mode_css_dump(_dump_path)
+    except DevModeCssDumpError:
+        return None, False
+    dev_mode_css_override = _figma_cfg.style_metadata.source == "dev_mode_inspect"
+    return dev_mode_dump, dev_mode_css_override
 
 
 async def load_dev_mode_css(
@@ -35,10 +74,7 @@ async def load_dev_mode_css(
     ):
         return None, False
 
-    from figma_flutter_agent.parser.dev_mode_css import (
-        DevModeCssDumpError,
-        load_dev_mode_css_dump,
-    )
+    from figma_flutter_agent.parser.dev_mode_css import DevModeCssDumpError
     from figma_flutter_agent.pipeline.warning_policy import log_dev_mode_css_load_failure
 
     _dump_path = Path(_figma_cfg.dev_mode.inspect_css.dump_path)
@@ -48,8 +84,9 @@ async def load_dev_mode_css(
         _dump_path = agent_repo_root() / _dump_path
 
     try:
-        dev_mode_dump = load_dev_mode_css_dump(_dump_path)
-        dev_mode_css_override = _figma_cfg.style_metadata.source == "dev_mode_inspect"
+        dev_mode_dump, dev_mode_css_override = resolve_dev_mode_css_for_parse(settings)
+        if dev_mode_dump is None:
+            raise DevModeCssDumpError(f"Dev Mode CSS dump missing or invalid at {_dump_path}")
         log.info(
             "Dev Mode CSS dump loaded: {} ({} node(s))",
             _dump_path.name,

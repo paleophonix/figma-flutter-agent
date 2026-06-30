@@ -9,8 +9,13 @@ from figma_flutter_agent.batch.run import _figma_url_for_screen, _resolve_dump
 from figma_flutter_agent.config import load_settings
 from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
 from figma_flutter_agent.dev.run import RunScreenPlan, detect_wired_screen_feature
-from figma_flutter_agent.dev.wizard.asset_gap import resolve_screen_asset_icon_gap
+from figma_flutter_agent.dev.wizard.asset_gap import resolve_asset_icon_gap_from_fetch
 from figma_flutter_agent.dev.wizard.models import ScreenPreflight
+from figma_flutter_agent.parser.boundaries.assets import build_asset_node_index
+from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
+from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
+from figma_flutter_agent.pipeline.run.fetch import resolve_dev_mode_css_for_parse
+from figma_flutter_agent.stages.parse import parse_figma_frame
 
 
 def build_run_plan(*, project_dir: Path, screen_name: str) -> RunScreenPlan:
@@ -36,16 +41,46 @@ def collect_screen_preflight(plan: RunScreenPlan) -> ScreenPreflight:
     exportable_icons = 0
     missing_asset_exports = 0
     local_icons = 0
+    dump_prefetch: ScreenDumpPrefetch | None = None
 
     if dump_exists:
         settings = load_settings(plan.config_path)
-        expected_ids, covered_ids = resolve_screen_asset_icon_gap(
-            dump_path=plan.dump_path,
-            project_dir=plan.project_dir,
+        fetch_result = load_fetch_result_from_dump(
+            plan.dump_path,
             file_key=plan.manifest.file_key,
-            primary_node_id=plan.screen.node_id,
-            assets=settings.agent.assets,
+            node_id=plan.screen.node_id,
         )
+        dev_mode_dump, dev_mode_css_override = resolve_dev_mode_css_for_parse(settings)
+        asset_index = build_asset_node_index(plan.project_dir)
+        try:
+            parse_result = parse_figma_frame(
+                fetch_result,
+                dev_mode_dump=dev_mode_dump,
+                dev_mode_css_override=dev_mode_css_override,
+            )
+            dump_prefetch = ScreenDumpPrefetch(
+                dump_path=plan.dump_path.resolve(),
+                fetch_result=fetch_result,
+                parse_result=parse_result,
+            )
+            expected_ids, covered_ids = resolve_asset_icon_gap_from_fetch(
+                fetch_result,
+                project_dir=plan.project_dir,
+                primary_node_id=plan.screen.node_id,
+                assets=settings.agent.assets,
+                parse_result=parse_result,
+                asset_index=asset_index,
+            )
+        except Exception:
+            expected_ids, covered_ids = resolve_asset_icon_gap_from_fetch(
+                fetch_result,
+                project_dir=plan.project_dir,
+                primary_node_id=plan.screen.node_id,
+                assets=settings.agent.assets,
+                dev_mode_dump=dev_mode_dump,
+                dev_mode_css_override=dev_mode_css_override,
+                asset_index=asset_index,
+            )
         exportable_icons = len(expected_ids)
         local_icons = len(covered_ids)
         missing_asset_exports = len(expected_ids - covered_ids)
@@ -59,6 +94,7 @@ def collect_screen_preflight(plan: RunScreenPlan) -> ScreenPreflight:
         exportable_icons=exportable_icons,
         local_icons=local_icons,
         missing_asset_exports=missing_asset_exports,
+        dump_prefetch=dump_prefetch,
     )
 
 

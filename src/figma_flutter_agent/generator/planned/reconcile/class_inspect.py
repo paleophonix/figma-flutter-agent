@@ -178,6 +178,10 @@ def _strip_would_collapse_substantive_widget(build_body: str, patched_build: str
         "SvgPicture.asset" in build_body
         or "Image.asset" in build_body
         or ("Stack(" in build_body and "Positioned(" in build_body)
+        or "BoxDecoration(" in build_body
+        or "Material(" in build_body
+        or "Ink(" in build_body
+        or "RepaintBoundary(" in build_body
     )
 
 

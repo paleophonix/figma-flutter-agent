@@ -75,19 +75,26 @@ def _should_hydrate_pruned_instance(node: CleanDesignTreeNode) -> bool:
     """Return True when a pruned duplicate should regain inline children."""
     if node.children:
         return False
+    if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
+        return False
     if (
         node.type == NodeType.CARD
         and node.flatten_figma_node_ids
         and node.cluster_id
     ):
         return True
+    if node.vector_asset_key or node.image_asset_key:
+        from figma_flutter_agent.generator.layout.widgets import _sizing_like_skip_control
+
+        if _sizing_like_skip_control(node):
+            return False
+    if node.cluster_id or node.component_ref:
+        return True
     if not node.flatten_figma_node_ids:
         return False
     if node.vector_asset_key or node.image_asset_key:
         return False
-    if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
-        return False
-    return bool(node.component_ref or node.cluster_id)
+    return False
 
 
 def hydrate_pruned_cluster_instances(root: CleanDesignTreeNode) -> None:
@@ -115,6 +122,9 @@ def hydrate_pruned_cluster_instances(root: CleanDesignTreeNode) -> None:
                 hydrated = _hydrate_component_instance_from_template(node, template)
                 node.children = hydrated.children
                 node.flatten_figma_node_ids = hydrated.flatten_figma_node_ids
+                if node.type == NodeType.CARD:
+                    node.vector_asset_key = hydrated.vector_asset_key
+                    node.image_asset_key = hydrated.image_asset_key
         for child in node.children:
             walk(child)
 

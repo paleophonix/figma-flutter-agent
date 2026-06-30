@@ -326,7 +326,18 @@
             {
               "figmaId": "7110:1051",
               "kind": "stack",
-              "children": [],
+              "children": [
+                {
+                  "figmaId": "I7110:1051;7102:2847",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I7110:1051;7102:1277",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
               "ref": {
                 "widgetName": "IconSalaryWidget",
                 "namedArgs": {}
@@ -393,7 +404,18 @@
             {
               "figmaId": "7110:1057",
               "kind": "stack",
-              "children": [],
+              "children": [
+                {
+                  "figmaId": "I7110:1057;7102:2847",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I7110:1057;7102:1277",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
               "ref": {
                 "widgetName": "IconSalaryWidget",
                 "namedArgs": {}
@@ -460,7 +482,18 @@
             {
               "figmaId": "7110:1060",
               "kind": "stack",
-              "children": [],
+              "children": [
+                {
+                  "figmaId": "I7110:1060;7102:2847",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I7110:1060;7102:1277",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
               "ref": {
                 "widgetName": "IconSalaryWidget",
                 "namedArgs": {}
@@ -515,7 +548,18 @@
             {
               "figmaId": "7110:1069",
               "kind": "stack",
-              "children": [],
+              "children": [
+                {
+                  "figmaId": "I7110:1069;7102:2847",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I7110:1069;7102:1277",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
               "ref": {
                 "widgetName": "IconSalaryWidget",
                 "namedArgs": {}

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.extracted import (
     _extracted_widget_needs_decoration_rematerialization,
     _preserve_extracted_widget_decoration_shell,
+    emit_extracted_widget_code_from_ir,
 )
 from figma_flutter_agent.generator.layout.flex_policy.stack import layout_fact_icon_badge_stack
 from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_node_body
@@ -21,6 +23,8 @@ from figma_flutter_agent.schemas import (
     NodeType,
     Sizing,
     StackPlacement,
+    WidgetIrKind,
+    WidgetIrNode,
 )
 
 
@@ -60,6 +64,7 @@ def _salary_icon_stack() -> CleanDesignTreeNode:
         id="7110:1045",
         name="Icon Salary",
         type=NodeType.STACK,
+        cluster_id="component_7102_2848",
         sizing=Sizing(width=57.0, height=53.0),
         children=[
             CleanDesignTreeNode(
@@ -230,6 +235,35 @@ def test_extracted_widget_missing_shell_triggers_rematerialization() -> None:
         "}}"
     )
     assert _extracted_widget_needs_decoration_rematerialization(salary, bare)
+
+
+def test_extracted_salary_widget_with_cluster_classes_preserves_substrate() -> None:
+    """Emit with cluster_classes must not self-delegate and must keep blue badge shell."""
+    root = _salary_icon_stack()
+    widget_ir = WidgetIrNode(
+        figma_id="7110:1045",
+        kind=WidgetIrKind.AUTO,
+        children=[
+            WidgetIrNode(figma_id="I7110:1045;7102:2847", kind=WidgetIrKind.AUTO),
+            WidgetIrNode(figma_id="I7110:1045;7102:1277", kind=WidgetIrKind.AUTO),
+        ],
+    )
+    ctx = IrEmitContext(
+        uses_svg=True,
+        responsive_enabled=False,
+        is_layout_root=False,
+        cluster_classes={"component_7102_2848": "IconSalaryWidget"},
+    )
+    code = emit_extracted_widget_code_from_ir(
+        widget_ir,
+        clean_tree=root,
+        widget_name="IconSalaryWidget",
+        ctx=ctx,
+    )
+    build = code.split("Widget build", 1)[1]
+    assert "IconSalaryWidget(" not in build.replace("const IconSalaryWidget({super.key})", "")
+    assert "0xFF6DB6FE" in code
+    assert "SvgPicture" in code
 
 
 def test_positioned_text_dual_pin_prefers_explicit_width_for_table_cells() -> None:
