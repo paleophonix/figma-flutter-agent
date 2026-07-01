@@ -62,6 +62,10 @@ from figma_flutter_agent.schemas import (
     NodeType,
     RepairCpiSupervisorResponse,
 )
+from figma_flutter_agent.schemas.reusable_candidates import (
+    ReusableWidgetCandidatesResponse,
+    WidgetEnrichResponse,
+)
 from figma_flutter_agent.validation.pixel.models import DiffBandRegion
 
 _LLM_DEFAULT_MAX_RETRIES = 3
@@ -309,6 +313,112 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
                 analyze_errors=analyze_errors,
                 clean_tree=clean_tree,
                 failed_attempts_history=failed_attempts_history,
+            )
+
+        return await self._run_with_retry_async(_attempt)
+
+    def _execute_reusable_candidates(
+        self,
+        *,
+        feature_name: str,
+        clean_tree: CleanDesignTreeNode,
+        cluster_summary: dict[str, int],
+        widget_hints: list[str],
+        max_candidates: int,
+    ) -> ReusableWidgetCandidatesResponse:
+        from figma_flutter_agent.llm.reusable_candidates import (
+            _REUSABLE_CANDIDATES_SYSTEM,
+            build_reusable_candidates_user_payload,
+        )
+        from figma_flutter_agent.llm.schema import reusable_candidates_output_spec
+
+        prompt = build_reusable_candidates_user_payload(
+            feature_name=feature_name,
+            clean_tree=clean_tree,
+            cluster_summary=cluster_summary,
+            widget_hints=widget_hints,
+            max_candidates=max_candidates,
+        )
+        output_spec = reusable_candidates_output_spec(strict=self._strict_json_schema)
+        raw_text = self._request_generation(
+            prompt,
+            system_prompt=_REUSABLE_CANDIDATES_SYSTEM,
+            figma_reference_png=None,
+            output_spec=output_spec,
+            analytics_span_name="reusable_candidates",
+        )
+        return self._parse_reusable_candidates_response(raw_text)
+
+    async def reusable_candidates_async(
+        self,
+        clean_tree: CleanDesignTreeNode,
+        *,
+        feature_name: str,
+        cluster_summary: dict[str, int],
+        widget_hints: list[str],
+        max_candidates: int,
+    ) -> ReusableWidgetCandidatesResponse:
+        """Propose reusable widget extraction candidates for a screen."""
+
+        async def _attempt() -> ReusableWidgetCandidatesResponse:
+            return await asyncio.to_thread(
+                self._execute_reusable_candidates,
+                feature_name=feature_name,
+                clean_tree=clean_tree,
+                cluster_summary=cluster_summary,
+                widget_hints=widget_hints,
+                max_candidates=max_candidates,
+            )
+
+        return await self._run_with_retry_async(_attempt)
+
+    def _execute_widget_enrich(
+        self,
+        *,
+        feature_name: str,
+        clean_tree: CleanDesignTreeNode,
+        entries: list[dict[str, object]],
+        widget_suffix: str,
+    ) -> WidgetEnrichResponse:
+        from figma_flutter_agent.llm.enrich_clusters import (
+            _WIDGET_ENRICH_SYSTEM,
+            build_widget_enrich_user_payload,
+        )
+        from figma_flutter_agent.llm.schema import widget_enrich_output_spec
+
+        prompt = build_widget_enrich_user_payload(
+            feature_name=feature_name,
+            clean_tree=clean_tree,
+            entries=entries,
+            widget_suffix=widget_suffix,
+        )
+        output_spec = widget_enrich_output_spec(strict=self._strict_json_schema)
+        raw_text = self._request_generation(
+            prompt,
+            system_prompt=_WIDGET_ENRICH_SYSTEM,
+            figma_reference_png=None,
+            output_spec=output_spec,
+            analytics_span_name="widget_enrich",
+        )
+        return self._parse_widget_enrich_response(raw_text)
+
+    async def widget_enrich_async(
+        self,
+        clean_tree: CleanDesignTreeNode,
+        *,
+        feature_name: str,
+        entries: list[dict[str, object]],
+        widget_suffix: str,
+    ) -> WidgetEnrichResponse:
+        """Suggest human-readable widget class names for cluster widgets."""
+
+        async def _attempt() -> WidgetEnrichResponse:
+            return await asyncio.to_thread(
+                self._execute_widget_enrich,
+                feature_name=feature_name,
+                clean_tree=clean_tree,
+                entries=entries,
+                widget_suffix=widget_suffix,
             )
 
         return await self._run_with_retry_async(_attempt)

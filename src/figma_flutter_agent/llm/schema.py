@@ -182,3 +182,43 @@ def cpi_supervisor_output_spec(*, strict: bool = True) -> StructuredOutputSpec:
             "Emit metacognitive analysis and a pattern-interrupt directive for a stuck repair loop."
         ),
     )
+
+
+def reusable_candidates_json_schema(*, strict: bool = True) -> dict[str, Any]:
+    """Return JSON schema for reusable widget candidate detection."""
+    from figma_flutter_agent.schemas.reusable_candidates import ReusableWidgetCandidatesResponse
+
+    schema = ReusableWidgetCandidatesResponse.model_json_schema()
+    if not strict:
+        return schema
+    return cast(dict[str, Any], _normalize_strict_schema(schema))
+
+
+def reusable_candidates_output_spec(*, strict: bool = True) -> StructuredOutputSpec:
+    """Return structured output spec for reusable widget candidate detection."""
+    return StructuredOutputSpec(
+        name="reusable_widget_candidates_response",
+        schema=reusable_candidates_json_schema(strict=strict),
+        anthropic_tool_name="emit_reusable_widget_candidates",
+        anthropic_tool_description="Propose reusable Flutter widget extraction candidates from a Figma screen.",
+    )
+
+
+def widget_enrich_json_schema(*, strict: bool = True) -> dict[str, Any]:
+    """Return JSON schema for cluster widget naming enrichment."""
+    from figma_flutter_agent.schemas.reusable_candidates import WidgetEnrichResponse
+
+    schema = WidgetEnrichResponse.model_json_schema()
+    if not strict:
+        return schema
+    return cast(dict[str, Any], _normalize_strict_schema(schema))
+
+
+def widget_enrich_output_spec(*, strict: bool = True) -> StructuredOutputSpec:
+    """Return structured output spec for cluster widget naming enrichment."""
+    return StructuredOutputSpec(
+        name="widget_enrich_response",
+        schema=widget_enrich_json_schema(strict=strict),
+        anthropic_tool_name="emit_widget_enrich",
+        anthropic_tool_description="Suggest human-readable widget class names and constructor param labels.",
+    )

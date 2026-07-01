@@ -1,0 +1,4142 @@
+{
+  "stage": "semantic_context_llm",
+  "featureName": "9_a_home_bottom_navigation",
+  "treeOutline": [
+    {
+      "id": "7342:2818",
+      "parent_id": null,
+      "depth": 0,
+      "name": "9 - A - Home - Bottom Navigation",
+      "type": "BOTTOM_NAV",
+      "children_count": 53,
+      "size": {
+        "width": 430.0,
+        "height": 932.0
+      }
+    },
+    {
+      "id": "7342:2819",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Rectangle 148",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 430.0,
+        "height": 640.0
+      }
+    },
+    {
+      "id": "7342:2820",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Rectangle 154",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 357.0,
+        "height": 152.0
+      }
+    },
+    {
+      "id": "7342:2821",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Frame 25",
+      "type": "COLUMN",
+      "children_count": 2,
+      "size": {
+        "width": 278.0,
+        "height": 35.0
+      }
+    },
+    {
+      "id": "7342:2822",
+      "parent_id": "7342:2821",
+      "depth": 2,
+      "name": "Hi, Welcome Back",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 278.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "7342:2823",
+      "parent_id": "7342:2821",
+      "depth": 2,
+      "name": "Good Morning",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 169.0,
+        "height": 13.0
+      }
+    },
+    {
+      "id": "7342:2824",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 5",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 4.720844913208566e-06,
+        "height": 108.0
+      }
+    },
+    {
+      "id": "7342:2825",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 6",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 161.0,
+        "height": 0.0
+      }
+    },
+    {
+      "id": "7342:2826",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Food Last Week",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 116.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2827",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Revenue Last Week",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 116.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2828",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "$4.000.00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 91.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2829",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "-$100.00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 91.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2830",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Salary",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 48.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7342:2831",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "$4.000,00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 71.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7342:2832",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Monthly",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 51.0,
+        "height": 15.0
+      }
+    },
+    {
+      "id": "7342:2833",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "18:27 - April 30",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 88.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2834",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 11",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7342:2835",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 12",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7342:2836",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Groceries",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 73.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7342:2837",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "-$100,00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 62.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7342:2838",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Pantry",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 41.0,
+        "height": 15.0
+      }
+    },
+    {
+      "id": "7342:2839",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "17:00 - April 24",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 89.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2840",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 13",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7342:2841",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 14",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7342:2842",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Rent",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 34.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7342:2843",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "-$674,40",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 65.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7342:2844",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Rent",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 29.0,
+        "height": 15.0
+      }
+    },
+    {
+      "id": "7342:2845",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "8:30 - April 15",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 82.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2846",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 15",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7342:2847",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 16",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.5515122413489735e-06,
+        "height": 35.49435043334961
+      }
+    },
+    {
+      "id": "7342:2848",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Icon-Notification",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 30.0,
+        "height": 30.0
+      },
+      "componentName": "Icon-Notification"
+    },
+    {
+      "id": "I7342:2848;7043:3064",
+      "parent_id": "7342:2848",
+      "depth": 2,
+      "name": "Vector",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 14.571428298950195,
+        "height": 18.85714340209961
+      }
+    },
+    {
+      "id": "I7342:2848;7043:3065",
+      "parent_id": "I7342:2848;7043:3064",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 14.571428298950195,
+        "height": 18.85714340209961
+      }
+    },
+    {
+      "id": "7342:2849",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Frame 3",
+      "type": "STACK",
+      "children_count": 4,
+      "size": {
+        "width": 430.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "7342:2850",
+      "parent_id": "7342:2849",
+      "depth": 2,
+      "name": "16:04",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 30.0,
+        "height": 14.0
+      }
+    },
+    {
+      "id": "7342:2851",
+      "parent_id": "7342:2849",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 13.0,
+        "height": 11.0
+      }
+    },
+    {
+      "id": "7342:2852",
+      "parent_id": "7342:2849",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 15.0,
+        "height": 8.0
+      }
+    },
+    {
+      "id": "7342:2853",
+      "parent_id": "7342:2849",
+      "depth": 2,
+      "name": "Group 12",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 17.0,
+        "height": 9.0
+      }
+    },
+    {
+      "id": "7342:2854",
+      "parent_id": "7342:2853",
+      "depth": 3,
+      "name": "Vector (Stroke)",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 12.0,
+        "height": 7.0
+      }
+    },
+    {
+      "id": "7342:2855",
+      "parent_id": "7342:2853",
+      "depth": 3,
+      "name": "Vector (Stroke)",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 17.0,
+        "height": 9.0
+      }
+    },
+    {
+      "id": "7342:2856",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Switch-2",
+      "type": "SWITCH",
+      "children_count": 3,
+      "size": {
+        "width": 358.0,
+        "height": 60.0
+      },
+      "componentName": "Switch-2"
+    },
+    {
+      "id": "I7342:2856;7065:2800",
+      "parent_id": "7342:2856",
+      "depth": 2,
+      "name": "Frame 85",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 95.0,
+        "height": 31.0
+      },
+      "componentName": "Frame 85"
+    },
+    {
+      "id": "I7342:2856;7065:2800;7045:2573",
+      "parent_id": "I7342:2856;7065:2800",
+      "depth": 3,
+      "name": "Group 280",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 84.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2800;7045:2574",
+      "parent_id": "I7342:2856;7065:2800;7045:2573",
+      "depth": 4,
+      "name": "General",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 84.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2801",
+      "parent_id": "7342:2856",
+      "depth": 2,
+      "name": "Frame 85",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 95.0,
+        "height": 31.0
+      },
+      "componentName": "Frame 85"
+    },
+    {
+      "id": "I7342:2856;7065:2801;7045:2573",
+      "parent_id": "I7342:2856;7065:2801",
+      "depth": 3,
+      "name": "Group 280",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 84.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2801;7045:2574",
+      "parent_id": "I7342:2856;7065:2801;7045:2573",
+      "depth": 4,
+      "name": "General",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 84.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2802",
+      "parent_id": "7342:2856",
+      "depth": 2,
+      "name": "Frame 85",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 95.0,
+        "height": 50.0
+      },
+      "componentName": "Frame 85"
+    },
+    {
+      "id": "I7342:2856;7065:2802;7045:2573",
+      "parent_id": "I7342:2856;7065:2802",
+      "depth": 3,
+      "name": "Group 280",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 84.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2802;7045:2574",
+      "parent_id": "I7342:2856;7065:2802;7045:2573",
+      "depth": 4,
+      "name": "General",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 84.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7342:2857",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Icon Salary",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      },
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "I7342:2857;7102:2847",
+      "parent_id": "7342:2857",
+      "depth": 2,
+      "name": "Rectangle 150",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      }
+    },
+    {
+      "id": "I7342:2857;7102:1277",
+      "parent_id": "7342:2857",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 26.0,
+        "height": 23.483871459960938
+      }
+    },
+    {
+      "id": "7342:2858",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Icon Groceries",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      },
+      "componentName": "Icon Groceries"
+    },
+    {
+      "id": "I7342:2858;7102:1245",
+      "parent_id": "7342:2858",
+      "depth": 2,
+      "name": "Rectangle 163",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      }
+    },
+    {
+      "id": "I7342:2858;7102:1254",
+      "parent_id": "7342:2858",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 16.755369186401367,
+        "height": 27.438142776489258
+      }
+    },
+    {
+      "id": "7342:2859",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Icon Rent",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      },
+      "componentName": "Icon Rent"
+    },
+    {
+      "id": "I7342:2859;7102:1246",
+      "parent_id": "7342:2859",
+      "depth": 2,
+      "name": "Rectangle 164",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      }
+    },
+    {
+      "id": "I7342:2859;7102:1256",
+      "parent_id": "7342:2859",
+      "depth": 2,
+      "name": "Group 390",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 28.373262405395508,
+        "height": 24.82164764404297
+      }
+    },
+    {
+      "id": "I7342:2859;7102:1257",
+      "parent_id": "I7342:2859;7102:1256",
+      "depth": 3,
+      "name": "Capa_1",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 28.373262405395508,
+        "height": 24.82164764404297
+      }
+    },
+    {
+      "id": "I7342:2859;7102:1258",
+      "parent_id": "I7342:2859;7102:1257",
+      "depth": 4,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 26.640722274780273,
+        "height": 23.0939998626709
+      }
+    },
+    {
+      "id": "I7342:2859;7102:1259",
+      "parent_id": "I7342:2859;7102:1257",
+      "depth": 4,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 2.447045087814331,
+        "height": 2.447045087814331
+      }
+    },
+    {
+      "id": "7342:2860",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Food",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 19.143598556518555,
+        "height": 34.05999755859375
+      },
+      "componentName": "Food"
+    },
+    {
+      "id": "I7342:2860;7102:2971",
+      "parent_id": "7342:2860",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 19.143598556518555,
+        "height": 34.05999755859375
+      }
+    },
+    {
+      "id": "7342:2861",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Salary",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 31.000001907348633,
+        "height": 28.000001907348633
+      },
+      "componentName": "Salary"
+    },
+    {
+      "id": "I7342:2861;7102:2995",
+      "parent_id": "7342:2861",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 31.000001907348633,
+        "height": 28.000001907348633
+      }
+    },
+    {
+      "id": "7342:2862",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Car",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 37.5716667175293,
+        "height": 21.752017974853516
+      },
+      "componentName": "Car"
+    },
+    {
+      "id": "I7342:2862;7105:3001",
+      "parent_id": "7342:2862",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 37.5716667175293,
+        "height": 21.752017974853516
+      }
+    },
+    {
+      "id": "7342:2863",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Ellipse 182",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 71.00021773962624,
+        "height": 71.00021773962726
+      }
+    },
+    {
+      "id": "7342:2864",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Ellipse 183",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 35.6201504558328,
+        "height": 67.74071602732329
+      }
+    },
+    {
+      "id": "7342:2865",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Savings on goals",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 63.0,
+        "height": 33.0
+      }
+    },
+    {
+      "id": "7342:2866",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Expense",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 12.0,
+        "height": 12.0
+      },
+      "componentName": "Expense"
+    },
+    {
+      "id": "I7342:2866;7110:3904",
+      "parent_id": "7342:2866",
+      "depth": 2,
+      "name": "Group 208",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 12.0,
+        "height": 12.0
+      }
+    },
+    {
+      "id": "I7342:2866;7110:3905",
+      "parent_id": "I7342:2866;7110:3904",
+      "depth": 3,
+      "name": "Rectangle 31",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 12.0,
+        "height": 12.0
+      }
+    },
+    {
+      "id": "I7342:2866;7110:3906",
+      "parent_id": "I7342:2866;7110:3904",
+      "depth": 3,
+      "name": "Arrow 1",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 5.999999626041358,
+        "height": 5.9999996260412445
+      }
+    },
+    {
+      "id": "7342:2867",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Income",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 12.000000953674316,
+        "height": 12.000000953674316
+      },
+      "componentName": "Income"
+    },
+    {
+      "id": "I7342:2867;7110:4418",
+      "parent_id": "7342:2867",
+      "depth": 2,
+      "name": "Income",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 12.000000524536631,
+        "height": 12.000000524536517
+      },
+      "componentName": "Income"
+    },
+    {
+      "id": "I7342:2867;7110:4418;7110:3904",
+      "parent_id": "I7342:2867;7110:4418",
+      "depth": 3,
+      "name": "Group 208",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 12.000000524536631,
+        "height": 12.000000524536517
+      }
+    },
+    {
+      "id": "I7342:2867;7110:4418;7110:3905",
+      "parent_id": "I7342:2867;7110:4418;7110:3904",
+      "depth": 4,
+      "name": "Rectangle 31",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 12.000000524536631,
+        "height": 12.000000524536517
+      }
+    },
+    {
+      "id": "I7342:2867;7110:4418;7110:3906",
+      "parent_id": "I7342:2867;7110:4418;7110:3904",
+      "depth": 4,
+      "name": "Arrow 1",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 5.999999120279199,
+        "height": 6.000000131803972
+      }
+    },
+    {
+      "id": "7342:2868",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "30% of your expenses, looks good.",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 254.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "7342:2869",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Rectangle 29",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 330.0,
+        "height": 27.0
+      }
+    },
+    {
+      "id": "7342:2870",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "30%",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 23.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2871",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Rectangle 157",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 261.0,
+        "height": 27.0
+      }
+    },
+    {
+      "id": "7342:2872",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "$20,000.00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 72.0,
+        "height": 20.0
+      }
+    },
+    {
+      "id": "7342:2873",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "$7,783.00",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 117.0,
+        "height": 36.0
+      }
+    },
+    {
+      "id": "7342:2874",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "-$1.187.40",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 120.0,
+        "height": 36.0
+      }
+    },
+    {
+      "id": "7342:2875",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Total Balance",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 82.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2876",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Line 2",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.835878606470942e-06,
+        "height": 42.0
+      }
+    },
+    {
+      "id": "7342:2877",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Total Expense",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 82.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "7342:2878",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "check",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 11.0,
+        "height": 11.0
+      },
+      "componentName": "check"
+    },
+    {
+      "id": "I7342:2878;7110:4437",
+      "parent_id": "7342:2878",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 11.0,
+        "height": 11.0
+      }
+    },
+    {
+      "id": "I7342:2878;7110:4438",
+      "parent_id": "7342:2878",
+      "depth": 2,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 6.0,
+        "height": 5.0
+      }
+    },
+    {
+      "id": "7342:2879",
+      "parent_id": "7342:2818",
+      "depth": 1,
+      "name": "Bottom Navigation - Light Mode",
+      "type": "BOTTOM_NAV",
+      "children_count": 5,
+      "size": {
+        "width": 430.0,
+        "height": 108.0
+      },
+      "componentName": "Bottom Navigation - Light Mode"
+    },
+    {
+      "id": "I7342:2879;7045:344",
+      "parent_id": "7342:2879",
+      "depth": 2,
+      "name": "Home",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 25.0,
+        "height": 31.0
+      },
+      "componentName": "Home"
+    },
+    {
+      "id": "I7342:2879;7045:344;7045:308",
+      "parent_id": "I7342:2879;7045:344",
+      "depth": 3,
+      "name": "Rectangle 269",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 57.0,
+        "height": 53.0
+      }
+    },
+    {
+      "id": "I7342:2879;7045:344;7045:327",
+      "parent_id": "I7342:2879;7045:344",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 25.0,
+        "height": 31.0
+      }
+    },
+    {
+      "id": "I7342:2879;7045:346",
+      "parent_id": "7342:2879",
+      "depth": 2,
+      "name": "Analysis",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 31.0,
+        "height": 30.0
+      },
+      "componentName": "Analysis"
+    },
+    {
+      "id": "I7342:2879;7045:346;7045:312",
+      "parent_id": "I7342:2879;7045:346",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 31.0,
+        "height": 30.0
+      }
+    },
+    {
+      "id": "I7342:2879;7045:348",
+      "parent_id": "7342:2879",
+      "depth": 2,
+      "name": "Transactions",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 33.0,
+        "height": 25.0
+      },
+      "componentName": "Transactions"
+    },
+    {
+      "id": "I7342:2879;7045:348;7045:311",
+      "parent_id": "I7342:2879;7045:348",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 33.0,
+        "height": 25.0
+      }
+    },
+    {
+      "id": "I7342:2879;7045:350",
+      "parent_id": "7342:2879",
+      "depth": 2,
+      "name": "Category",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 27.0,
+        "height": 23.0
+      },
+      "componentName": "Category"
+    },
+    {
+      "id": "I7342:2879;7045:350;7045:310",
+      "parent_id": "I7342:2879;7045:350",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 27.0,
+        "height": 23.0
+      }
+    },
+    {
+      "id": "I7342:2879;7045:352",
+      "parent_id": "7342:2879",
+      "depth": 2,
+      "name": "Profile",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 22.0,
+        "height": 27.0
+      },
+      "componentName": "Profile"
+    },
+    {
+      "id": "I7342:2879;7045:352;7045:309",
+      "parent_id": "I7342:2879;7045:352",
+      "depth": 3,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 22.0,
+        "height": 27.0
+      }
+    }
+  ],
+  "textInventory": [
+    {
+      "id": "7342:2850",
+      "parent_id": "7342:2849",
+      "text": "16:04",
+      "name": "16:04",
+      "bounds": {
+        "left": 301.0,
+        "top": 12543.0,
+        "width": 30.0,
+        "height": 14.0
+      },
+      "accessibilityLabel": "16:04",
+      "style": {
+        "fontSize": 13.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "League Spartan"
+      }
+    },
+    {
+      "id": "7342:2822",
+      "parent_id": "7342:2821",
+      "text": "Hi, Welcome Back",
+      "name": "Hi, Welcome Back",
+      "bounds": {
+        "left": 302.0,
+        "top": 12594.0,
+        "width": 278.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "Hi, Welcome Back",
+      "style": {
+        "fontSize": 20.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2823",
+      "parent_id": "7342:2821",
+      "text": "Good Morning",
+      "name": "Good Morning",
+      "bounds": {
+        "left": 302.0,
+        "top": 12616.0,
+        "width": 169.0,
+        "height": 13.0
+      },
+      "accessibilityLabel": "Good Morning",
+      "style": {
+        "fontSize": 14.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "League Spartan"
+      }
+    },
+    {
+      "id": "7342:2875",
+      "parent_id": "7342:2818",
+      "text": "Total Balance",
+      "name": "Total Balance",
+      "bounds": {
+        "left": 342.0,
+        "top": 12670.0,
+        "width": 82.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Total Balance",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2877",
+      "parent_id": "7342:2818",
+      "text": "Total Expense",
+      "name": "Total Expense",
+      "bounds": {
+        "left": 532.0,
+        "top": 12671.0,
+        "width": 82.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Total Expense",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF093030",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2873",
+      "parent_id": "7342:2818",
+      "text": "$7,783.00",
+      "name": "$7,783.00",
+      "bounds": {
+        "left": 324.0,
+        "top": 12686.0,
+        "width": 117.0,
+        "height": 36.0
+      },
+      "accessibilityLabel": "$7,783.00",
+      "style": {
+        "fontSize": 24.0,
+        "fontWeight": "w700",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2874",
+      "parent_id": "7342:2818",
+      "text": "-$1.187.40",
+      "name": "-$1.187.40",
+      "bounds": {
+        "left": 513.0,
+        "top": 12686.0,
+        "width": 120.0,
+        "height": 36.0
+      },
+      "accessibilityLabel": "-$1.187.40",
+      "style": {
+        "fontSize": 24.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2872",
+      "parent_id": "7342:2818",
+      "text": "$20,000.00",
+      "name": "$20,000.00",
+      "bounds": {
+        "left": 558.0,
+        "top": 12737.0,
+        "width": 72.0,
+        "height": 20.0
+      },
+      "accessibilityLabel": "$20,000.00",
+      "style": {
+        "fontSize": 13.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2870",
+      "parent_id": "7342:2818",
+      "text": "30%",
+      "name": "30%",
+      "bounds": {
+        "left": 335.0,
+        "top": 12739.0,
+        "width": 23.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "30%",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2868",
+      "parent_id": "7342:2818",
+      "text": "30% of your expenses, looks good.",
+      "name": "30% of your expenses, looks good.",
+      "bounds": {
+        "left": 345.0,
+        "top": 12771.0,
+        "width": 254.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "30% of your expenses, looks good.",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2827",
+      "parent_id": "7342:2818",
+      "text": "Revenue Last Week",
+      "name": "Revenue Last Week",
+      "bounds": {
+        "left": 504.0,
+        "top": 12884.0,
+        "width": 116.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Revenue Last Week",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2828",
+      "parent_id": "7342:2818",
+      "text": "$4.000.00",
+      "name": "$4.000.00",
+      "bounds": {
+        "left": 504.0,
+        "top": 12904.0,
+        "width": 91.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "$4.000.00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w700",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Inter"
+      }
+    },
+    {
+      "id": "7342:2826",
+      "parent_id": "7342:2818",
+      "text": "Food Last Week",
+      "name": "Food Last Week",
+      "bounds": {
+        "left": 504.0,
+        "top": 12946.0,
+        "width": 116.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "Food Last Week",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2865",
+      "parent_id": "7342:2818",
+      "text": "Savings on goals",
+      "name": "Savings on goals",
+      "bounds": {
+        "left": 341.0,
+        "top": 12956.0,
+        "width": 63.0,
+        "height": 33.0
+      },
+      "accessibilityLabel": "Savings on goals",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF093030",
+        "textAlign": "CENTER",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2829",
+      "parent_id": "7342:2818",
+      "text": "-$100.00",
+      "name": "-$100.00",
+      "bounds": {
+        "left": 504.0,
+        "top": 12966.0,
+        "width": 91.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "-$100.00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w700",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Inter"
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2800;7045:2574",
+      "parent_id": "I7342:2856;7065:2800;7045:2573",
+      "text": "Daily",
+      "name": "General",
+      "bounds": {
+        "left": 318.0,
+        "top": 13055.5,
+        "width": 84.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Daily",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "CENTER",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2801;7045:2574",
+      "parent_id": "I7342:2856;7065:2801;7045:2573",
+      "text": "Weekly",
+      "name": "General",
+      "bounds": {
+        "left": 437.0,
+        "top": 13055.5,
+        "width": 84.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Weekly",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "CENTER",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2802;7045:2574",
+      "parent_id": "I7342:2856;7065:2802;7045:2573",
+      "text": "Monthly",
+      "name": "General",
+      "bounds": {
+        "left": 556.0,
+        "top": 13055.5,
+        "width": 84.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Monthly",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w400",
+        "textColor": "0xFF052224",
+        "textAlign": "CENTER",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2830",
+      "parent_id": "7342:2818",
+      "text": "Salary",
+      "name": "Salary",
+      "bounds": {
+        "left": 374.0,
+        "top": 13125.0,
+        "width": 48.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Salary",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2831",
+      "parent_id": "7342:2818",
+      "text": "$4.000,00",
+      "name": "$4.000,00",
+      "bounds": {
+        "left": 585.0,
+        "top": 13143.0,
+        "width": 71.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "$4.000,00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2832",
+      "parent_id": "7342:2818",
+      "text": "Monthly",
+      "name": "Monthly",
+      "bounds": {
+        "left": 501.0,
+        "top": 13147.0,
+        "width": 51.0,
+        "height": 15.0
+      },
+      "accessibilityLabel": "Monthly",
+      "style": {
+        "fontSize": 13.0,
+        "fontWeight": "w300",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2833",
+      "parent_id": "7342:2818",
+      "text": "18:27 - April 30",
+      "name": "18:27 - April 30",
+      "bounds": {
+        "left": 374.0,
+        "top": 13150.353515625,
+        "width": 88.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "18:27 - April 30",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2836",
+      "parent_id": "7342:2818",
+      "text": "Groceries",
+      "name": "Groceries",
+      "bounds": {
+        "left": 374.0,
+        "top": 13200.0,
+        "width": 73.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Groceries",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2837",
+      "parent_id": "7342:2818",
+      "text": "-$100,00",
+      "name": "-$100,00",
+      "bounds": {
+        "left": 595.0,
+        "top": 13218.0,
+        "width": 62.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "-$100,00",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2838",
+      "parent_id": "7342:2818",
+      "text": "Pantry",
+      "name": "Pantry",
+      "bounds": {
+        "left": 506.0,
+        "top": 13222.0,
+        "width": 41.0,
+        "height": 15.0
+      },
+      "accessibilityLabel": "Pantry",
+      "style": {
+        "fontSize": 13.0,
+        "fontWeight": "w300",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2839",
+      "parent_id": "7342:2818",
+      "text": "17:00 - April 24",
+      "name": "17:00 - April 24",
+      "bounds": {
+        "left": 374.0,
+        "top": 13225.353515625,
+        "width": 89.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "17:00 - April 24",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2842",
+      "parent_id": "7342:2818",
+      "text": "Rent",
+      "name": "Rent",
+      "bounds": {
+        "left": 374.0,
+        "top": 13281.0,
+        "width": 34.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "Rent",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2843",
+      "parent_id": "7342:2818",
+      "text": "-$674,40",
+      "name": "-$674,40",
+      "bounds": {
+        "left": 592.0,
+        "top": 13297.0,
+        "width": 65.0,
+        "height": 23.0
+      },
+      "accessibilityLabel": "-$674,40",
+      "style": {
+        "fontSize": 15.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2844",
+      "parent_id": "7342:2818",
+      "text": "Rent",
+      "name": "Rent",
+      "bounds": {
+        "left": 512.0,
+        "top": 13301.0,
+        "width": 29.0,
+        "height": 15.0
+      },
+      "accessibilityLabel": "Rent",
+      "style": {
+        "fontSize": 13.0,
+        "fontWeight": "w300",
+        "textColor": "0xFF052224",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    },
+    {
+      "id": "7342:2845",
+      "parent_id": "7342:2818",
+      "text": "8:30 - April 15",
+      "name": "8:30 - April 15",
+      "bounds": {
+        "left": 374.0,
+        "top": 13306.353515625,
+        "width": 82.0,
+        "height": 18.0
+      },
+      "accessibilityLabel": "8:30 - April 15",
+      "style": {
+        "fontSize": 12.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "LEFT",
+        "fontFamily": "Poppins"
+      }
+    }
+  ],
+  "componentInventory": [
+    {
+      "id": "7342:2848",
+      "parent_id": "7342:2818",
+      "name": "Icon-Notification",
+      "type": "STACK",
+      "bounds": {
+        "left": 628.0,
+        "top": 12595.0,
+        "width": 30.0,
+        "height": 30.0
+      },
+      "children_count": 1,
+      "componentRef": "7043:3066",
+      "componentName": "Icon-Notification",
+      "variantProperties": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "7342:2856",
+      "parent_id": "7342:2818",
+      "name": "Switch-2",
+      "type": "SWITCH",
+      "bounds": {
+        "left": 300.0,
+        "top": 13037.0,
+        "width": 358.0,
+        "height": 60.0
+      },
+      "children_count": 3,
+      "componentRef": "7065:2799",
+      "componentName": "Switch-2",
+      "variantProperties": {
+        "Property 1": "Variant4"
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2800",
+      "parent_id": "7342:2856",
+      "name": "Frame 85",
+      "type": "ROW",
+      "bounds": {
+        "left": 312.5,
+        "top": 13051.5,
+        "width": 95.0,
+        "height": 31.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:2587",
+      "componentName": "Frame 85",
+      "variantProperties": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2801",
+      "parent_id": "7342:2856",
+      "name": "Frame 85",
+      "type": "ROW",
+      "bounds": {
+        "left": 431.5,
+        "top": 13051.5,
+        "width": 95.0,
+        "height": 31.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:2587",
+      "componentName": "Frame 85",
+      "variantProperties": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "I7342:2856;7065:2802",
+      "parent_id": "7342:2856",
+      "name": "Frame 85",
+      "type": "ROW",
+      "bounds": {
+        "left": 550.5,
+        "top": 13042.0,
+        "width": 95.0,
+        "height": 50.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:2587",
+      "componentName": "Frame 85",
+      "variantProperties": {
+        "Property 1": "Default"
+      }
+    },
+    {
+      "id": "7342:2857",
+      "parent_id": "7342:2818",
+      "name": "Icon Salary",
+      "type": "STACK",
+      "bounds": {
+        "left": 301.0,
+        "top": 13121.0,
+        "width": 57.0,
+        "height": 53.0
+      },
+      "children_count": 2,
+      "componentRef": "7102:2848",
+      "componentName": "Icon Salary"
+    },
+    {
+      "id": "7342:2858",
+      "parent_id": "7342:2818",
+      "name": "Icon Groceries",
+      "type": "STACK",
+      "bounds": {
+        "left": 301.0,
+        "top": 13198.0,
+        "width": 57.0,
+        "height": 53.0
+      },
+      "children_count": 2,
+      "componentRef": "7102:1265",
+      "componentName": "Icon Groceries"
+    },
+    {
+      "id": "7342:2859",
+      "parent_id": "7342:2818",
+      "name": "Icon Rent",
+      "type": "STACK",
+      "bounds": {
+        "left": 301.0,
+        "top": 13278.0,
+        "width": 57.0,
+        "height": 53.0
+      },
+      "children_count": 2,
+      "componentRef": "7102:1266",
+      "componentName": "Icon Rent"
+    },
+    {
+      "id": "7342:2860",
+      "parent_id": "7342:2818",
+      "name": "Food",
+      "type": "STACK",
+      "bounds": {
+        "left": 467.0,
+        "top": 12947.0,
+        "width": 19.143598556518555,
+        "height": 34.05999755859375
+      },
+      "children_count": 1,
+      "componentRef": "7102:2972",
+      "componentName": "Food"
+    },
+    {
+      "id": "7342:2861",
+      "parent_id": "7342:2818",
+      "name": "Salary",
+      "type": "STACK",
+      "bounds": {
+        "left": 461.0,
+        "top": 12889.0,
+        "width": 31.000001907348633,
+        "height": 28.000001907348633
+      },
+      "children_count": 1,
+      "componentRef": "7102:2996",
+      "componentName": "Salary"
+    },
+    {
+      "id": "7342:2862",
+      "parent_id": "7342:2818",
+      "name": "Car",
+      "type": "STACK",
+      "bounds": {
+        "left": 354.0,
+        "top": 12906.7890625,
+        "width": 37.5716667175293,
+        "height": 21.752017974853516
+      },
+      "children_count": 1,
+      "componentRef": "7105:3002",
+      "componentName": "Car"
+    },
+    {
+      "id": "7342:2866",
+      "parent_id": "7342:2818",
+      "name": "Expense",
+      "type": "STACK",
+      "bounds": {
+        "left": 513.0,
+        "top": 12673.0,
+        "width": 12.0,
+        "height": 12.0
+      },
+      "children_count": 1,
+      "componentRef": "7110:3929",
+      "componentName": "Expense"
+    },
+    {
+      "id": "7342:2867",
+      "parent_id": "7342:2818",
+      "name": "Income",
+      "type": "STACK",
+      "bounds": {
+        "left": 324.0,
+        "top": 12673.0,
+        "width": 12.000000953674316,
+        "height": 12.000000953674316
+      },
+      "children_count": 1,
+      "componentRef": "7110:4425",
+      "componentName": "Income"
+    },
+    {
+      "id": "I7342:2867;7110:4418",
+      "parent_id": "7342:2867",
+      "name": "Income",
+      "type": "STACK",
+      "bounds": {
+        "left": 323.99999947546337,
+        "top": 12672.999999475463,
+        "width": 12.000000524536631,
+        "height": 12.000000524536517
+      },
+      "children_count": 1,
+      "componentRef": "7110:3929",
+      "componentName": "Income"
+    },
+    {
+      "id": "7342:2878",
+      "parent_id": "7342:2818",
+      "name": "check",
+      "type": "STACK",
+      "bounds": {
+        "left": 324.0,
+        "top": 12777.0,
+        "width": 11.0,
+        "height": 11.0
+      },
+      "children_count": 2,
+      "componentRef": "7110:4439",
+      "componentName": "check"
+    },
+    {
+      "id": "7342:2879",
+      "parent_id": "7342:2818",
+      "name": "Bottom Navigation - Light Mode",
+      "type": "BOTTOM_NAV",
+      "bounds": {
+        "left": 264.0,
+        "top": 13358.0,
+        "width": 430.0,
+        "height": 108.0
+      },
+      "children_count": 5,
+      "componentRef": "7041:1264",
+      "componentName": "Bottom Navigation - Light Mode"
+    },
+    {
+      "id": "I7342:2879;7045:344",
+      "parent_id": "7342:2879",
+      "name": "Home",
+      "type": "STACK",
+      "bounds": {
+        "left": 324.0,
+        "top": 13394.0,
+        "width": 25.0,
+        "height": 31.0
+      },
+      "children_count": 2,
+      "componentRef": "7045:326",
+      "componentName": "Home",
+      "variantProperties": {
+        "Property 1": "Home-Off"
+      }
+    },
+    {
+      "id": "I7342:2879;7045:346",
+      "parent_id": "7342:2879",
+      "name": "Analysis",
+      "type": "STACK",
+      "bounds": {
+        "left": 392.0,
+        "top": 13394.5,
+        "width": 31.0,
+        "height": 30.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:321",
+      "componentName": "Analysis",
+      "variantProperties": {
+        "Property 1": "Analysis-Off"
+      }
+    },
+    {
+      "id": "I7342:2879;7045:348",
+      "parent_id": "7342:2879",
+      "name": "Transactions",
+      "type": "STACK",
+      "bounds": {
+        "left": 466.0,
+        "top": 13397.0,
+        "width": 33.0,
+        "height": 25.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:322",
+      "componentName": "Transactions",
+      "variantProperties": {
+        "Property 1": "Transactions-Off"
+      }
+    },
+    {
+      "id": "I7342:2879;7045:350",
+      "parent_id": "7342:2879",
+      "name": "Category",
+      "type": "STACK",
+      "bounds": {
+        "left": 542.0,
+        "top": 13398.0,
+        "width": 27.0,
+        "height": 23.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:323",
+      "componentName": "Category",
+      "variantProperties": {
+        "Property 1": "category-Off"
+      }
+    },
+    {
+      "id": "I7342:2879;7045:352",
+      "parent_id": "7342:2879",
+      "name": "Profile",
+      "type": "STACK",
+      "bounds": {
+        "left": 612.0,
+        "top": 13396.0,
+        "width": 22.0,
+        "height": 27.0
+      },
+      "children_count": 1,
+      "componentRef": "7045:324",
+      "componentName": "Profile",
+      "variantProperties": {
+        "Property 1": "Profile-Off"
+      }
+    }
+  ],
+  "relationshipHints": [
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2819",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2819",
+      "to_node_id": "7342:2820",
+      "relation": "next_sibling",
+      "distance_px": 211.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2820",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2820",
+      "to_node_id": "7342:2819",
+      "relation": "previous_sibling",
+      "distance_px": 211.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2820",
+      "to_node_id": "7342:2821",
+      "relation": "next_sibling",
+      "distance_px": 325.78,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2821",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2821",
+      "to_node_id": "7342:2820",
+      "relation": "previous_sibling",
+      "distance_px": 325.78,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2821",
+      "to_node_id": "7342:2824",
+      "relation": "next_sibling",
+      "distance_px": 323.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2821",
+      "to_node_id": "7342:2822",
+      "relation": "parent_child",
+      "parent_id": "7342:2821"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2822",
+      "to_node_id": "7342:2823",
+      "relation": "next_sibling",
+      "distance_px": 57.24,
+      "parent_id": "7342:2821"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "7342:2822",
+      "to_node_id": "7342:2823",
+      "relation": "next_sibling_in_column",
+      "distance_px": 57.24,
+      "parent_id": "7342:2821"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2821",
+      "to_node_id": "7342:2823",
+      "relation": "parent_child",
+      "parent_id": "7342:2821"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2823",
+      "to_node_id": "7342:2822",
+      "relation": "previous_sibling",
+      "distance_px": 57.24,
+      "parent_id": "7342:2821"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "7342:2823",
+      "to_node_id": "7342:2822",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 57.24,
+      "parent_id": "7342:2821"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2824",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2824",
+      "to_node_id": "7342:2821",
+      "relation": "previous_sibling",
+      "distance_px": 323.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2824",
+      "to_node_id": "7342:2825",
+      "relation": "next_sibling",
+      "distance_px": 98.52,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2825",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2825",
+      "to_node_id": "7342:2824",
+      "relation": "previous_sibling",
+      "distance_px": 98.52,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2825",
+      "to_node_id": "7342:2826",
+      "relation": "next_sibling",
+      "distance_px": 31.47,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2826",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2826",
+      "to_node_id": "7342:2825",
+      "relation": "previous_sibling",
+      "distance_px": 31.47,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2826",
+      "to_node_id": "7342:2827",
+      "relation": "next_sibling",
+      "distance_px": 62.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2827",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2827",
+      "to_node_id": "7342:2826",
+      "relation": "previous_sibling",
+      "distance_px": 62.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2827",
+      "to_node_id": "7342:2828",
+      "relation": "next_sibling",
+      "distance_px": 23.58,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2828",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2828",
+      "to_node_id": "7342:2827",
+      "relation": "previous_sibling",
+      "distance_px": 23.58,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2828",
+      "to_node_id": "7342:2829",
+      "relation": "next_sibling",
+      "distance_px": 62.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2829",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2829",
+      "to_node_id": "7342:2828",
+      "relation": "previous_sibling",
+      "distance_px": 62.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2829",
+      "to_node_id": "7342:2830",
+      "relation": "next_sibling",
+      "distance_px": 221.44,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2830",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2830",
+      "to_node_id": "7342:2829",
+      "relation": "previous_sibling",
+      "distance_px": 221.44,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2830",
+      "to_node_id": "7342:2831",
+      "relation": "next_sibling",
+      "distance_px": 223.23,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2831",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2831",
+      "to_node_id": "7342:2830",
+      "relation": "previous_sibling",
+      "distance_px": 223.23,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2831",
+      "to_node_id": "7342:2832",
+      "relation": "next_sibling",
+      "distance_px": 94.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2832",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2832",
+      "to_node_id": "7342:2831",
+      "relation": "previous_sibling",
+      "distance_px": 94.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2832",
+      "to_node_id": "7342:2833",
+      "relation": "next_sibling",
+      "distance_px": 108.61,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2833",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2833",
+      "to_node_id": "7342:2832",
+      "relation": "previous_sibling",
+      "distance_px": 108.61,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2833",
+      "to_node_id": "7342:2834",
+      "relation": "next_sibling",
+      "distance_px": 61.05,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2834",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2834",
+      "to_node_id": "7342:2833",
+      "relation": "previous_sibling",
+      "distance_px": 61.05,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2834",
+      "to_node_id": "7342:2835",
+      "relation": "next_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2835",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2835",
+      "to_node_id": "7342:2834",
+      "relation": "previous_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2835",
+      "to_node_id": "7342:2836",
+      "relation": "next_sibling",
+      "distance_px": 172.4,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2836",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2836",
+      "to_node_id": "7342:2835",
+      "relation": "previous_sibling",
+      "distance_px": 172.4,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2836",
+      "to_node_id": "7342:2837",
+      "relation": "next_sibling",
+      "distance_px": 216.25,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2837",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2837",
+      "to_node_id": "7342:2836",
+      "relation": "previous_sibling",
+      "distance_px": 216.25,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2837",
+      "to_node_id": "7342:2838",
+      "relation": "next_sibling",
+      "distance_px": 99.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2838",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2838",
+      "to_node_id": "7342:2837",
+      "relation": "previous_sibling",
+      "distance_px": 99.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2838",
+      "to_node_id": "7342:2839",
+      "relation": "next_sibling",
+      "distance_px": 108.11,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2839",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2839",
+      "to_node_id": "7342:2838",
+      "relation": "previous_sibling",
+      "distance_px": 108.11,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2839",
+      "to_node_id": "7342:2840",
+      "relation": "next_sibling",
+      "distance_px": 60.56,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2840",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2840",
+      "to_node_id": "7342:2839",
+      "relation": "previous_sibling",
+      "distance_px": 60.56,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2840",
+      "to_node_id": "7342:2841",
+      "relation": "next_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2841",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2841",
+      "to_node_id": "7342:2840",
+      "relation": "previous_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2841",
+      "to_node_id": "7342:2842",
+      "relation": "next_sibling",
+      "distance_px": 192.77,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2842",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2842",
+      "to_node_id": "7342:2841",
+      "relation": "previous_sibling",
+      "distance_px": 192.77,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2842",
+      "to_node_id": "7342:2843",
+      "relation": "next_sibling",
+      "distance_px": 234.05,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2843",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2843",
+      "to_node_id": "7342:2842",
+      "relation": "previous_sibling",
+      "distance_px": 234.05,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2843",
+      "to_node_id": "7342:2844",
+      "relation": "next_sibling",
+      "distance_px": 98.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2844",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2844",
+      "to_node_id": "7342:2843",
+      "relation": "previous_sibling",
+      "distance_px": 98.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2844",
+      "to_node_id": "7342:2845",
+      "relation": "next_sibling",
+      "distance_px": 111.71,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2845",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2845",
+      "to_node_id": "7342:2844",
+      "relation": "previous_sibling",
+      "distance_px": 111.71,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2845",
+      "to_node_id": "7342:2846",
+      "relation": "next_sibling",
+      "distance_px": 64.02,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2846",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2846",
+      "to_node_id": "7342:2845",
+      "relation": "previous_sibling",
+      "distance_px": 64.02,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2846",
+      "to_node_id": "7342:2847",
+      "relation": "next_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2847",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2847",
+      "to_node_id": "7342:2846",
+      "relation": "previous_sibling",
+      "distance_px": 93.43,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2847",
+      "to_node_id": "7342:2848",
+      "relation": "next_sibling",
+      "distance_px": 700.47,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2848",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2848",
+      "to_node_id": "7342:2847",
+      "relation": "previous_sibling",
+      "distance_px": 700.47,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2848",
+      "to_node_id": "7342:2849",
+      "relation": "next_sibling",
+      "distance_px": 174.63,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2848",
+      "to_node_id": "I7342:2848;7043:3064",
+      "relation": "parent_child",
+      "parent_id": "7342:2848"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2848;7043:3064",
+      "to_node_id": "I7342:2848;7043:3065",
+      "relation": "parent_child",
+      "parent_id": "I7342:2848;7043:3064"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2849",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2849",
+      "to_node_id": "7342:2848",
+      "relation": "previous_sibling",
+      "distance_px": 174.63,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2849",
+      "to_node_id": "7342:2856",
+      "relation": "next_sibling",
+      "distance_px": 517.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2849",
+      "to_node_id": "7342:2850",
+      "relation": "parent_child",
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2850",
+      "to_node_id": "7342:2851",
+      "relation": "next_sibling",
+      "distance_px": 292.5,
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2849",
+      "to_node_id": "7342:2851",
+      "relation": "parent_child",
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2851",
+      "to_node_id": "7342:2850",
+      "relation": "previous_sibling",
+      "distance_px": 292.5,
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2851",
+      "to_node_id": "7342:2852",
+      "relation": "next_sibling",
+      "distance_px": 19.01,
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2849",
+      "to_node_id": "7342:2852",
+      "relation": "parent_child",
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2852",
+      "to_node_id": "7342:2851",
+      "relation": "previous_sibling",
+      "distance_px": 19.01,
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2852",
+      "to_node_id": "7342:2853",
+      "relation": "next_sibling",
+      "distance_px": 21.01,
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2849",
+      "to_node_id": "7342:2853",
+      "relation": "parent_child",
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2853",
+      "to_node_id": "7342:2852",
+      "relation": "previous_sibling",
+      "distance_px": 21.01,
+      "parent_id": "7342:2849"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2853",
+      "to_node_id": "7342:2854",
+      "relation": "parent_child",
+      "parent_id": "7342:2853"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2854",
+      "to_node_id": "7342:2855",
+      "relation": "next_sibling",
+      "distance_px": 1.5,
+      "parent_id": "7342:2853"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2853",
+      "to_node_id": "7342:2855",
+      "relation": "parent_child",
+      "parent_id": "7342:2853"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2855",
+      "to_node_id": "7342:2854",
+      "relation": "previous_sibling",
+      "distance_px": 1.5,
+      "parent_id": "7342:2853"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2856",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2856",
+      "to_node_id": "7342:2849",
+      "relation": "previous_sibling",
+      "distance_px": 517.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2856",
+      "to_node_id": "7342:2857",
+      "relation": "next_sibling",
+      "distance_px": 169.8,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2856",
+      "to_node_id": "I7342:2856;7065:2800",
+      "relation": "parent_child",
+      "parent_id": "7342:2856"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2856;7065:2800",
+      "to_node_id": "I7342:2856;7065:2801",
+      "relation": "next_sibling",
+      "distance_px": 119.0,
+      "parent_id": "7342:2856"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2856;7065:2800",
+      "to_node_id": "I7342:2856;7065:2800;7045:2573",
+      "relation": "parent_child",
+      "parent_id": "I7342:2856;7065:2800"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2856;7065:2800;7045:2573",
+      "to_node_id": "I7342:2856;7065:2800;7045:2574",
+      "relation": "parent_child",
+      "parent_id": "I7342:2856;7065:2800;7045:2573"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2856",
+      "to_node_id": "I7342:2856;7065:2801",
+      "relation": "parent_child",
+      "parent_id": "7342:2856"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2856;7065:2801",
+      "to_node_id": "I7342:2856;7065:2800",
+      "relation": "previous_sibling",
+      "distance_px": 119.0,
+      "parent_id": "7342:2856"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2856;7065:2801",
+      "to_node_id": "I7342:2856;7065:2802",
+      "relation": "next_sibling",
+      "distance_px": 119.0,
+      "parent_id": "7342:2856"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2856;7065:2801",
+      "to_node_id": "I7342:2856;7065:2801;7045:2573",
+      "relation": "parent_child",
+      "parent_id": "I7342:2856;7065:2801"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2856;7065:2801;7045:2573",
+      "to_node_id": "I7342:2856;7065:2801;7045:2574",
+      "relation": "parent_child",
+      "parent_id": "I7342:2856;7065:2801;7045:2573"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2856",
+      "to_node_id": "I7342:2856;7065:2802",
+      "relation": "parent_child",
+      "parent_id": "7342:2856"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2856;7065:2802",
+      "to_node_id": "I7342:2856;7065:2801",
+      "relation": "previous_sibling",
+      "distance_px": 119.0,
+      "parent_id": "7342:2856"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2856;7065:2802",
+      "to_node_id": "I7342:2856;7065:2802;7045:2573",
+      "relation": "parent_child",
+      "parent_id": "I7342:2856;7065:2802"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2856;7065:2802;7045:2573",
+      "to_node_id": "I7342:2856;7065:2802;7045:2574",
+      "relation": "parent_child",
+      "parent_id": "I7342:2856;7065:2802;7045:2573"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2857",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2857",
+      "to_node_id": "7342:2856",
+      "relation": "previous_sibling",
+      "distance_px": 169.8,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2857",
+      "to_node_id": "7342:2858",
+      "relation": "next_sibling",
+      "distance_px": 77.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2857",
+      "to_node_id": "I7342:2857;7102:2847",
+      "relation": "parent_child",
+      "parent_id": "7342:2857"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2857;7102:2847",
+      "to_node_id": "I7342:2857;7102:1277",
+      "relation": "next_sibling",
+      "distance_px": 0.56,
+      "parent_id": "7342:2857"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2857",
+      "to_node_id": "I7342:2857;7102:1277",
+      "relation": "parent_child",
+      "parent_id": "7342:2857"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2857;7102:1277",
+      "to_node_id": "I7342:2857;7102:2847",
+      "relation": "previous_sibling",
+      "distance_px": 0.56,
+      "parent_id": "7342:2857"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2858",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2858",
+      "to_node_id": "7342:2857",
+      "relation": "previous_sibling",
+      "distance_px": 77.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2858",
+      "to_node_id": "7342:2859",
+      "relation": "next_sibling",
+      "distance_px": 80.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2858",
+      "to_node_id": "I7342:2858;7102:1245",
+      "relation": "parent_child",
+      "parent_id": "7342:2858"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2858;7102:1245",
+      "to_node_id": "I7342:2858;7102:1254",
+      "relation": "next_sibling",
+      "distance_px": 0.25,
+      "parent_id": "7342:2858"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2858",
+      "to_node_id": "I7342:2858;7102:1254",
+      "relation": "parent_child",
+      "parent_id": "7342:2858"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2858;7102:1254",
+      "to_node_id": "I7342:2858;7102:1245",
+      "relation": "previous_sibling",
+      "distance_px": 0.25,
+      "parent_id": "7342:2858"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2859",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2859",
+      "to_node_id": "7342:2858",
+      "relation": "previous_sibling",
+      "distance_px": 80.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2859",
+      "to_node_id": "7342:2860",
+      "relation": "next_sibling",
+      "distance_px": 370.88,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2859",
+      "to_node_id": "I7342:2859;7102:1246",
+      "relation": "parent_child",
+      "parent_id": "7342:2859"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2859;7102:1246",
+      "to_node_id": "I7342:2859;7102:1256",
+      "relation": "next_sibling",
+      "distance_px": 0.69,
+      "parent_id": "7342:2859"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2859",
+      "to_node_id": "I7342:2859;7102:1256",
+      "relation": "parent_child",
+      "parent_id": "7342:2859"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2859;7102:1256",
+      "to_node_id": "I7342:2859;7102:1246",
+      "relation": "previous_sibling",
+      "distance_px": 0.69,
+      "parent_id": "7342:2859"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2859;7102:1256",
+      "to_node_id": "I7342:2859;7102:1257",
+      "relation": "parent_child",
+      "parent_id": "I7342:2859;7102:1256"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2859;7102:1257",
+      "to_node_id": "I7342:2859;7102:1258",
+      "relation": "parent_child",
+      "parent_id": "I7342:2859;7102:1257"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2859;7102:1258",
+      "to_node_id": "I7342:2859;7102:1259",
+      "relation": "next_sibling",
+      "distance_px": 10.99,
+      "parent_id": "I7342:2859;7102:1257"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2859;7102:1257",
+      "to_node_id": "I7342:2859;7102:1259",
+      "relation": "parent_child",
+      "parent_id": "I7342:2859;7102:1257"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2859;7102:1259",
+      "to_node_id": "I7342:2859;7102:1258",
+      "relation": "previous_sibling",
+      "distance_px": 10.99,
+      "parent_id": "I7342:2859;7102:1257"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2860",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2860",
+      "to_node_id": "7342:2859",
+      "relation": "previous_sibling",
+      "distance_px": 370.88,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2860",
+      "to_node_id": "7342:2861",
+      "relation": "next_sibling",
+      "distance_px": 61.03,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2860",
+      "to_node_id": "I7342:2860;7102:2971",
+      "relation": "parent_child",
+      "parent_id": "7342:2860"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2861",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2861",
+      "to_node_id": "7342:2860",
+      "relation": "previous_sibling",
+      "distance_px": 61.03,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2861",
+      "to_node_id": "7342:2862",
+      "relation": "next_sibling",
+      "distance_px": 104.75,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2861",
+      "to_node_id": "I7342:2861;7102:2995",
+      "relation": "parent_child",
+      "parent_id": "7342:2861"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2862",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2862",
+      "to_node_id": "7342:2861",
+      "relation": "previous_sibling",
+      "distance_px": 104.75,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2862",
+      "to_node_id": "7342:2863",
+      "relation": "next_sibling",
+      "distance_px": 0.33,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2862",
+      "to_node_id": "I7342:2862;7105:3001",
+      "relation": "parent_child",
+      "parent_id": "7342:2862"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2863",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2863",
+      "to_node_id": "7342:2862",
+      "relation": "previous_sibling",
+      "distance_px": 0.33,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2863",
+      "to_node_id": "7342:2864",
+      "relation": "next_sibling",
+      "distance_px": 16.74,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2864",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2864",
+      "to_node_id": "7342:2863",
+      "relation": "previous_sibling",
+      "distance_px": 16.74,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2864",
+      "to_node_id": "7342:2865",
+      "relation": "next_sibling",
+      "distance_px": 56.85,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2865",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2865",
+      "to_node_id": "7342:2864",
+      "relation": "previous_sibling",
+      "distance_px": 56.85,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2865",
+      "to_node_id": "7342:2866",
+      "relation": "next_sibling",
+      "distance_px": 328.03,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2866",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2866",
+      "to_node_id": "7342:2865",
+      "relation": "previous_sibling",
+      "distance_px": 328.03,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2866",
+      "to_node_id": "7342:2867",
+      "relation": "next_sibling",
+      "distance_px": 189.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2866",
+      "to_node_id": "I7342:2866;7110:3904",
+      "relation": "parent_child",
+      "parent_id": "7342:2866"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2866;7110:3904",
+      "to_node_id": "I7342:2866;7110:3905",
+      "relation": "parent_child",
+      "parent_id": "I7342:2866;7110:3904"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2866;7110:3905",
+      "to_node_id": "I7342:2866;7110:3906",
+      "relation": "next_sibling",
+      "distance_px": 0.0,
+      "parent_id": "I7342:2866;7110:3904"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2866;7110:3904",
+      "to_node_id": "I7342:2866;7110:3906",
+      "relation": "parent_child",
+      "parent_id": "I7342:2866;7110:3904"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2866;7110:3906",
+      "to_node_id": "I7342:2866;7110:3905",
+      "relation": "previous_sibling",
+      "distance_px": 0.0,
+      "parent_id": "I7342:2866;7110:3904"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2867",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2867",
+      "to_node_id": "7342:2866",
+      "relation": "previous_sibling",
+      "distance_px": 189.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2867",
+      "to_node_id": "7342:2868",
+      "relation": "next_sibling",
+      "distance_px": 175.72,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2867",
+      "to_node_id": "I7342:2867;7110:4418",
+      "relation": "parent_child",
+      "parent_id": "7342:2867"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2867;7110:4418",
+      "to_node_id": "I7342:2867;7110:4418;7110:3904",
+      "relation": "parent_child",
+      "parent_id": "I7342:2867;7110:4418"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2867;7110:4418;7110:3904",
+      "to_node_id": "I7342:2867;7110:4418;7110:3905",
+      "relation": "parent_child",
+      "parent_id": "I7342:2867;7110:4418;7110:3904"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2867;7110:4418;7110:3905",
+      "to_node_id": "I7342:2867;7110:4418;7110:3906",
+      "relation": "next_sibling",
+      "distance_px": 0.0,
+      "parent_id": "I7342:2867;7110:4418;7110:3904"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2867;7110:4418;7110:3904",
+      "to_node_id": "I7342:2867;7110:4418;7110:3906",
+      "relation": "parent_child",
+      "parent_id": "I7342:2867;7110:4418;7110:3904"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2867;7110:4418;7110:3906",
+      "to_node_id": "I7342:2867;7110:4418;7110:3905",
+      "relation": "previous_sibling",
+      "distance_px": 0.0,
+      "parent_id": "I7342:2867;7110:4418;7110:3904"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2868",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2868",
+      "to_node_id": "7342:2867",
+      "relation": "previous_sibling",
+      "distance_px": 175.72,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2868",
+      "to_node_id": "7342:2869",
+      "relation": "next_sibling",
+      "distance_px": 35.69,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2869",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2869",
+      "to_node_id": "7342:2868",
+      "relation": "previous_sibling",
+      "distance_px": 35.69,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2869",
+      "to_node_id": "7342:2870",
+      "relation": "next_sibling",
+      "distance_px": 132.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2870",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2870",
+      "to_node_id": "7342:2869",
+      "relation": "previous_sibling",
+      "distance_px": 132.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2870",
+      "to_node_id": "7342:2871",
+      "relation": "next_sibling",
+      "distance_px": 167.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2871",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2871",
+      "to_node_id": "7342:2870",
+      "relation": "previous_sibling",
+      "distance_px": 167.0,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2871",
+      "to_node_id": "7342:2872",
+      "relation": "next_sibling",
+      "distance_px": 80.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2872",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2872",
+      "to_node_id": "7342:2871",
+      "relation": "previous_sibling",
+      "distance_px": 80.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2872",
+      "to_node_id": "7342:2873",
+      "relation": "next_sibling",
+      "distance_px": 215.83,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2873",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2873",
+      "to_node_id": "7342:2872",
+      "relation": "previous_sibling",
+      "distance_px": 215.83,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2873",
+      "to_node_id": "7342:2874",
+      "relation": "next_sibling",
+      "distance_px": 190.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2874",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2874",
+      "to_node_id": "7342:2873",
+      "relation": "previous_sibling",
+      "distance_px": 190.5,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2874",
+      "to_node_id": "7342:2875",
+      "relation": "next_sibling",
+      "distance_px": 191.64,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2875",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2875",
+      "to_node_id": "7342:2874",
+      "relation": "previous_sibling",
+      "distance_px": 191.64,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2875",
+      "to_node_id": "7342:2876",
+      "relation": "next_sibling",
+      "distance_px": 97.74,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2876",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2876",
+      "to_node_id": "7342:2875",
+      "relation": "previous_sibling",
+      "distance_px": 97.74,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2876",
+      "to_node_id": "7342:2877",
+      "relation": "next_sibling",
+      "distance_px": 93.65,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2877",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2877",
+      "to_node_id": "7342:2876",
+      "relation": "previous_sibling",
+      "distance_px": 93.65,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2877",
+      "to_node_id": "7342:2878",
+      "relation": "next_sibling",
+      "distance_px": 264.19,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2878",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2878",
+      "to_node_id": "7342:2877",
+      "relation": "previous_sibling",
+      "distance_px": 264.19,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "7342:2878",
+      "to_node_id": "7342:2879",
+      "relation": "next_sibling",
+      "distance_px": 647.01,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2878",
+      "to_node_id": "I7342:2878;7110:4437",
+      "relation": "parent_child",
+      "parent_id": "7342:2878"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2878;7110:4437",
+      "to_node_id": "I7342:2878;7110:4438",
+      "relation": "next_sibling",
+      "distance_px": 0.5,
+      "parent_id": "7342:2878"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2878",
+      "to_node_id": "I7342:2878;7110:4438",
+      "relation": "parent_child",
+      "parent_id": "7342:2878"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2878;7110:4438",
+      "to_node_id": "I7342:2878;7110:4437",
+      "relation": "previous_sibling",
+      "distance_px": 0.5,
+      "parent_id": "7342:2878"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2818",
+      "to_node_id": "7342:2879",
+      "relation": "parent_child",
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "7342:2879",
+      "to_node_id": "7342:2878",
+      "relation": "previous_sibling",
+      "distance_px": 647.01,
+      "parent_id": "7342:2818"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2879",
+      "to_node_id": "I7342:2879;7045:344",
+      "relation": "parent_child",
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2879;7045:344",
+      "to_node_id": "I7342:2879;7045:346",
+      "relation": "next_sibling",
+      "distance_px": 71.0,
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2879;7045:344",
+      "to_node_id": "I7342:2879;7045:344;7045:308",
+      "relation": "parent_child",
+      "parent_id": "I7342:2879;7045:344"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2879;7045:344;7045:308",
+      "to_node_id": "I7342:2879;7045:344;7045:327",
+      "relation": "next_sibling",
+      "distance_px": 1.0,
+      "parent_id": "I7342:2879;7045:344"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2879;7045:344",
+      "to_node_id": "I7342:2879;7045:344;7045:327",
+      "relation": "parent_child",
+      "parent_id": "I7342:2879;7045:344"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2879;7045:344;7045:327",
+      "to_node_id": "I7342:2879;7045:344;7045:308",
+      "relation": "previous_sibling",
+      "distance_px": 1.0,
+      "parent_id": "I7342:2879;7045:344"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2879",
+      "to_node_id": "I7342:2879;7045:346",
+      "relation": "parent_child",
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2879;7045:346",
+      "to_node_id": "I7342:2879;7045:344",
+      "relation": "previous_sibling",
+      "distance_px": 71.0,
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2879;7045:346",
+      "to_node_id": "I7342:2879;7045:348",
+      "relation": "next_sibling",
+      "distance_px": 75.0,
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2879;7045:346",
+      "to_node_id": "I7342:2879;7045:346;7045:312",
+      "relation": "parent_child",
+      "parent_id": "I7342:2879;7045:346"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2879",
+      "to_node_id": "I7342:2879;7045:348",
+      "relation": "parent_child",
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2879;7045:348",
+      "to_node_id": "I7342:2879;7045:346",
+      "relation": "previous_sibling",
+      "distance_px": 75.0,
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2879;7045:348",
+      "to_node_id": "I7342:2879;7045:350",
+      "relation": "next_sibling",
+      "distance_px": 73.0,
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2879;7045:348",
+      "to_node_id": "I7342:2879;7045:348;7045:311",
+      "relation": "parent_child",
+      "parent_id": "I7342:2879;7045:348"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2879",
+      "to_node_id": "I7342:2879;7045:350",
+      "relation": "parent_child",
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2879;7045:350",
+      "to_node_id": "I7342:2879;7045:348",
+      "relation": "previous_sibling",
+      "distance_px": 73.0,
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I7342:2879;7045:350",
+      "to_node_id": "I7342:2879;7045:352",
+      "relation": "next_sibling",
+      "distance_px": 67.5,
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2879;7045:350",
+      "to_node_id": "I7342:2879;7045:350;7045:310",
+      "relation": "parent_child",
+      "parent_id": "I7342:2879;7045:350"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "7342:2879",
+      "to_node_id": "I7342:2879;7045:352",
+      "relation": "parent_child",
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I7342:2879;7045:352",
+      "to_node_id": "I7342:2879;7045:350",
+      "relation": "previous_sibling",
+      "distance_px": 67.5,
+      "parent_id": "7342:2879"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I7342:2879;7045:352",
+      "to_node_id": "I7342:2879;7045:352;7045:309",
+      "relation": "parent_child",
+      "parent_id": "I7342:2879;7045:352"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "I7342:2856;7065:2800",
+      "to_node_id": "I7342:2856;7065:2801",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "I7342:2856;7065:2800",
+      "to_node_id": "I7342:2856;7065:2802",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "I7342:2856;7065:2801",
+      "to_node_id": "I7342:2856;7065:2802",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "7342:2866",
+      "to_node_id": "I7342:2867;7110:4418",
+      "relation": "same_component_group"
+    }
+  ]
+}

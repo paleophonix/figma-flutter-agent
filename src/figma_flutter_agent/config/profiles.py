@@ -202,6 +202,9 @@ def apply_production_profile(settings: Settings) -> Settings:
                         update={
                             "regen_llm_on_token_change": True,
                             "strict_geometry_invariants": True,
+                            "widget_extraction": agent.generation.widget_extraction.model_copy(
+                                update={"fail_on_unextracted_annotations": True}
+                            ),
                         }
                     ),
                     "responsive": responsive,

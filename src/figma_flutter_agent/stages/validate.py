@@ -5,7 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from figma_flutter_agent.generator.checks.validate import validate_generated_dart
-from figma_flutter_agent.generator.widget_validation import validate_cluster_widget_extraction
+from figma_flutter_agent.generator.widget_validation import (
+    validate_annotated_widget_extraction,
+    validate_cluster_widget_extraction,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -24,6 +27,8 @@ class ValidateStageRequest:
     widget_suffix: str = "Widget"
     enforce_cluster_widgets: bool = True
     fail_duplicate_clusters: bool = False
+    annotation_prefixes: list[str] = field(default_factory=lambda: ["@widget"])
+    fail_on_unextracted_annotations: bool = False
     require_responsive_shell: bool | None = None
     require_reflow: bool = False
 
@@ -56,6 +61,13 @@ def validate_planned_generation(request: ValidateStageRequest) -> ValidateStageR
         widget_suffix=request.widget_suffix,
         enforce_cluster_widgets=request.enforce_cluster_widgets,
         fail_duplicate_clusters=request.fail_duplicate_clusters,
+    )
+    validate_annotated_widget_extraction(
+        request.planned_files,
+        request.clean_trees,
+        prefixes=request.annotation_prefixes,
+        widget_suffix=request.widget_suffix,
+        fail_on_unextracted=request.fail_on_unextracted_annotations,
     )
     warnings = validate_generated_dart(
         request.planned_files,

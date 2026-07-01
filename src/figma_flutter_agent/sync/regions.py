@@ -7,10 +7,9 @@ import json
 from collections import defaultdict
 from dataclasses import dataclass, field
 
+from figma_flutter_agent.config.models import WidgetExtractionConfig
 from figma_flutter_agent.generator.paths import Architecture, screen_file_path
-from figma_flutter_agent.generator.widget_extractor import (
-    collect_cluster_widget_specs,
-)
+from figma_flutter_agent.generator.widget_extraction import collect_widget_specs
 from figma_flutter_agent.parser.dedup.signatures import structural_signature
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
@@ -119,6 +118,7 @@ def build_incremental_bindings(
     cluster_min_count: int,
     widget_suffix: str,
     enforce_cluster_widgets: bool,
+    widget_extraction: WidgetExtractionConfig | None = None,
     architecture: Architecture = "feature_first",
 ) -> IncrementalFileBindings:
     """Derive which planned paths map to cluster widgets vs layout shell.
@@ -137,12 +137,15 @@ def build_incremental_bindings(
         File path bindings for region-aware incremental sync.
     """
     widget_files: dict[str, str] = {}
-    if enforce_cluster_widgets and cluster_summary:
-        specs = collect_cluster_widget_specs(
+    if enforce_cluster_widgets:
+        extraction = widget_extraction or WidgetExtractionConfig()
+        specs = collect_widget_specs(
             clean_tree,
             cluster_summary,
-            min_count=cluster_min_count,
+            config=extraction,
             widget_suffix=widget_suffix,
+            legacy_enforce=enforce_cluster_widgets,
+            legacy_min_count=cluster_min_count,
         )
         widget_files = {f"lib/widgets/{spec.file_name}.dart": spec.cluster_id for spec in specs}
 

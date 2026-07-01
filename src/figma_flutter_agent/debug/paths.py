@@ -97,6 +97,8 @@ _IR_STAGE_FILENAMES: dict[str, str] = {
     "pre_emit": "pre_emit.json",
     "semantic_context": "semantic_context.json",
     "semantic_context_llm": "semantic_context.llm.json",
+    "reusable_candidates": "reusable_candidates.json",
+    "widget_enrich": "widget_enrich.json",
     "semantic_verdicts": "semantic_verdicts.json",
     "element_contracts": "element_contracts.json",
     "contract_emit_diff": "contract_emit_diff.json",

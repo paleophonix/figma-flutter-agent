@@ -8,6 +8,58 @@ from figma_flutter_agent.generator.layout.widgets.positioned import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
+_VIEWPORT_PARTITION_MIN_SCROLLABLE_BODY = 64.0
+
+
+def stack_child_needs_viewport_pin_outside_scroll(
+    child: CleanDesignTreeNode,
+    parent_stack: CleanDesignTreeNode,
+) -> bool:
+    """Return True when bottom chrome must stay viewport-fixed outside scroll."""
+    if child.type == NodeType.BOTTOM_NAV:
+        return True
+    from figma_flutter_agent.parser.stack_paint import (
+        _is_bottom_nav_interactive,
+        _viewport_size,
+    )
+
+    if parent_stack.type != NodeType.STACK:
+        return False
+    viewport_width, viewport_height = _viewport_size(parent_stack.children)
+    return _is_bottom_nav_interactive(
+        child,
+        viewport_width=viewport_width,
+        viewport_height=viewport_height,
+    )
+
+
+def partition_viewport_pinned_stack_layers(
+    stack_node: CleanDesignTreeNode,
+    child_nodes: list[CleanDesignTreeNode],
+    child_widgets: list[str],
+) -> tuple[list[str], list[str]] | None:
+    """Split a root absolute stack into scrollable artboard vs viewport-pinned nav."""
+    if not _stack_has_bottom_anchored_child(stack_node):
+        return None
+    pinned_indices = [
+        index
+        for index, child in enumerate(child_nodes)
+        if stack_child_needs_viewport_pin_outside_scroll(child, stack_node)
+    ]
+    if not pinned_indices or len(pinned_indices) == len(child_nodes):
+        return None
+    clearance = bottom_chrome_clearance_height(stack_node)
+    stack_height = float(stack_node.sizing.height or 0.0)
+    if stack_height <= clearance + _VIEWPORT_PARTITION_MIN_SCROLLABLE_BODY:
+        return None
+    scroll_widgets = [
+        widget for index, widget in enumerate(child_widgets) if index not in pinned_indices
+    ]
+    pinned_widgets = [child_widgets[index] for index in pinned_indices]
+    if not scroll_widgets or not pinned_widgets:
+        return None
+    return scroll_widgets, pinned_widgets
+
 
 def is_bottom_docked_stack_child(child: CleanDesignTreeNode) -> bool:
     """Return True when a stack child is bottom navigation chrome."""

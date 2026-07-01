@@ -72,6 +72,7 @@ class PipelineContext:
     blocked_asset_paths: frozenset[str] = field(default_factory=frozenset)
     reference_image_hash: str | None = None
     reference_image_png: bytes | None = None
+    reusable_candidates: list[Any] = field(default_factory=list)
 
     resolved_feature: str = ""
     pipeline_run_id: str = ""

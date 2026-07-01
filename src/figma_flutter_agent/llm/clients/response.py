@@ -16,6 +16,10 @@ from figma_flutter_agent.schemas import (
     FlutterRepairPatchResponse,
     RepairCpiSupervisorResponse,
 )
+from figma_flutter_agent.schemas.reusable_candidates import (
+    ReusableWidgetCandidatesResponse,
+    WidgetEnrichResponse,
+)
 
 
 class ResponseMixin:
@@ -117,6 +121,22 @@ class ResponseMixin:
         except (json.JSONDecodeError, ValueError) as exc:
             logger.warning("CPI supervisor validation failed: {}", exc)
             raise LlmError(f"CPI supervisor validation failed: {exc}") from exc
+
+    def _parse_reusable_candidates_response(self, raw_text: str) -> ReusableWidgetCandidatesResponse:
+        try:
+            payload = json.loads(self._coerce_json_text(raw_text))
+            return ReusableWidgetCandidatesResponse.model_validate(payload)
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.warning("Reusable candidates validation failed: {}", exc)
+            raise LlmError(f"Reusable candidates validation failed: {exc}") from exc
+
+    def _parse_widget_enrich_response(self, raw_text: str) -> WidgetEnrichResponse:
+        try:
+            payload = json.loads(self._coerce_json_text(raw_text))
+            return WidgetEnrichResponse.model_validate(payload)
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.warning("Widget enrich validation failed: {}", exc)
+            raise LlmError(f"Widget enrich validation failed: {exc}") from exc
 
     @staticmethod
     def _coerce_json_text(raw_text: str) -> str:

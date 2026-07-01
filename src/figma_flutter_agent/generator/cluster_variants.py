@@ -4,12 +4,9 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode
-
-_SKIP_FORWARD_BACKWARD_PAIRS: dict[str, str] = {
-    "assets/icons/vector_1_4017.svg": "assets/icons/vector_1_4020.svg",
-}
 
 
 def _sizing_like_skip_control(node: CleanDesignTreeNode) -> bool:
@@ -27,9 +24,87 @@ def cluster_skip_backward_by_placement(node: CleanDesignTreeNode) -> bool:
     return skip_control_left_side_of_parent(node)
 
 
-def infer_backward_skip_asset(forward_asset: str) -> str | None:
-    """Infer the mirrored skip icon export when only the forward asset survived parsing."""
-    return _SKIP_FORWARD_BACKWARD_PAIRS.get(forward_asset)
+def _cluster_member_figma_ids(node: CleanDesignTreeNode) -> list[str]:
+    """Return figma node ids to probe for on-disk vector exports on a cluster member."""
+    ids: list[str] = []
+    seen: set[str] = set()
+
+    def add(node_id: str | None) -> None:
+        if node_id and node_id not in seen:
+            seen.add(node_id)
+            ids.append(node_id)
+
+    add(node.id)
+    for node_id in node.flatten_figma_node_ids or ():
+        add(node_id)
+
+    def walk(current: CleanDesignTreeNode) -> None:
+        add(current.id)
+        for child in current.children:
+            walk(child)
+
+    walk(node)
+    return ids
+
+
+def _discover_vector_assets_for_node(
+    node: CleanDesignTreeNode,
+    project_dir: Path | None,
+) -> set[str]:
+    """Collect vector asset keys from a cluster member and optional on-disk exports."""
+    assets: set[str] = set()
+    asset = primary_vector_asset(node) or node.vector_asset_key
+    if asset is not None:
+        assets.add(asset)
+    if project_dir is None:
+        return assets
+    from figma_flutter_agent.parser.boundaries.assets import discover_asset_path_for_node
+
+    for node_id in _cluster_member_figma_ids(node):
+        discovered = discover_asset_path_for_node(project_dir, node_id)
+        if discovered is not None:
+            assets.add(discovered.replace("\\", "/"))
+    return assets
+
+
+def precollect_cluster_vector_assets(
+    trees: list[CleanDesignTreeNode],
+    *,
+    project_dir: Path | None = None,
+) -> dict[str, tuple[str | None, str | None]]:
+    """Build forward/backward vector asset pairs per cluster before pruned stubs lose exports."""
+    pairs: dict[str, tuple[str | None, str | None]] = {}
+
+    def walk(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
+        cluster_id = node.cluster_id
+        if cluster_id:
+            from figma_flutter_agent.parser.dedup.prune import _cluster_instance_is_backward
+
+            parent_width = parent.sizing.width if parent is not None else None
+            is_backward = _cluster_instance_is_backward(node, parent_width=parent_width)
+            forward, backward = pairs.get(cluster_id, (None, None))
+            for asset in _discover_vector_assets_for_node(node, project_dir):
+                if is_backward:
+                    backward = asset
+                else:
+                    forward = asset
+            pairs[cluster_id] = (forward, backward)
+        for child in node.children:
+            walk(child, node)
+
+    for tree in trees:
+        walk(tree, None)
+    return pairs
+
+
+def _pair_from_precollected(
+    precollected: dict[str, tuple[str | None, str | None]],
+    cluster_id: str,
+) -> tuple[str | None, str | None] | None:
+    forward, backward = precollected.get(cluster_id, (None, None))
+    if forward is None or backward is None or forward == backward:
+        return None
+    return forward, backward
 
 
 @dataclass(frozen=True)
@@ -192,6 +267,8 @@ def detect_vector_flip_variant(
     cluster_id: str,
     *,
     representative: CleanDesignTreeNode | None = None,
+    project_dir: Path | None = None,
+    precollected_assets: dict[str, tuple[str | None, str | None]] | None = None,
 ) -> ClusterVectorVariant | None:
     """Detect forward/backward vector variants for a repeated cluster.
 
@@ -199,26 +276,46 @@ def detect_vector_flip_variant(
         trees: Parsed clean design trees for the screen batch.
         cluster_id: Structural cluster identifier.
         representative: Representative cluster node; its vector asset becomes ``forward``.
+        project_dir: Optional Flutter project root for on-disk SVG discovery.
+        precollected_assets: Optional per-cluster forward/backward asset pairs.
 
     Returns:
         Variant metadata when the cluster uses exactly two distinct vector assets.
     """
+    precollected = precollected_assets or precollect_cluster_vector_assets(
+        trees,
+        project_dir=project_dir,
+    )
     assets = sorted(_collect_cluster_assets(trees, cluster_id))
     if len(assets) == 1 and _cluster_has_mirror_skip_placements(trees, cluster_id):
-        inferred = infer_backward_skip_asset(assets[0])
-        if inferred is not None:
-            forward_asset = assets[0]
-            backward_asset = inferred
+        paired = _pair_from_precollected(precollected, cluster_id)
+        if paired is not None:
+            forward_asset, backward_asset = paired
             if representative is not None:
                 rep_asset = primary_vector_asset(representative) or representative.vector_asset_key
-                if rep_asset == inferred:
-                    forward_asset, backward_asset = inferred, assets[0]
+                if rep_asset == backward_asset:
+                    forward_asset, backward_asset = backward_asset, forward_asset
+                elif rep_asset == forward_asset:
+                    pass
+                elif rep_asset in {forward_asset, backward_asset}:
+                    forward_asset = rep_asset
+                    backward_asset = (
+                        backward_asset if forward_asset != backward_asset else forward_asset
+                    )
             return ClusterVectorVariant(
                 cluster_id=cluster_id,
                 forward_asset=forward_asset,
                 backward_asset=backward_asset,
             )
     if len(assets) != 2:
+        paired = _pair_from_precollected(precollected, cluster_id)
+        if paired is not None and _cluster_has_mirror_skip_placements(trees, cluster_id):
+            forward_asset, backward_asset = paired
+            return ClusterVectorVariant(
+                cluster_id=cluster_id,
+                forward_asset=forward_asset,
+                backward_asset=backward_asset,
+            )
         return None
     forward_asset = assets[0]
     backward_asset = assets[1]
@@ -258,14 +355,19 @@ def restore_pruned_cluster_vector_keys(
 def collect_cluster_vector_variants(
     trees: list[CleanDesignTreeNode],
     representatives: dict[str, CleanDesignTreeNode],
+    *,
+    project_dir: Path | None = None,
 ) -> dict[str, ClusterVectorVariant]:
     """Return vector flip variants for clusters that need parameterized widgets."""
+    precollected = precollect_cluster_vector_assets(trees, project_dir=project_dir)
     variants: dict[str, ClusterVectorVariant] = {}
     for cluster_id, representative in sorted(representatives.items()):
         variant = detect_vector_flip_variant(
             trees,
             cluster_id,
             representative=representative,
+            project_dir=project_dir,
+            precollected_assets=precollected,
         )
         if variant is not None:
             variants[cluster_id] = variant

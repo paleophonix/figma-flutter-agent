@@ -121,6 +121,7 @@ def collect_cluster_widget_specs(
     *,
     min_count: int = 2,
     widget_suffix: str = "Widget",
+    shape_cluster_summary: dict[str, int] | None = None,
 ) -> list[ClusterWidgetSpec]:
     """Collect one representative node per repeated structural cluster.
 
@@ -129,15 +130,23 @@ def collect_cluster_widget_specs(
         cluster_summary: Cluster id to occurrence count mapping.
         min_count: Minimum occurrences required to extract a widget.
         widget_suffix: Suffix appended to widget class names.
+        shape_cluster_summary: Optional shape-only cluster counts for parameterized widgets.
 
     Returns:
         Cluster widget specifications ordered by cluster id.
     """
+    effective_summary = dict(cluster_summary)
+    if shape_cluster_summary:
+        for cluster_id, count in shape_cluster_summary.items():
+            if cluster_id not in effective_summary:
+                effective_summary[cluster_id] = count
     candidates: dict[str, list[CleanDesignTreeNode]] = {}
 
     def walk(node: CleanDesignTreeNode) -> None:
         cluster_id = node.cluster_id
-        if cluster_id and cluster_summary.get(cluster_id, 0) >= min_count:
+        if shape_cluster_summary and node.shape_cluster_id:
+            cluster_id = node.shape_cluster_id
+        if cluster_id and effective_summary.get(cluster_id, 0) >= min_count:
             from figma_flutter_agent.parser.interaction import (
                 layout_fact_hosts_compact_checkbox_control,
                 layout_fact_hosts_payment_selection_indicator,
@@ -232,6 +241,8 @@ def _collect_component_family_widget_specs(
     widget_suffix: str,
     existing_cluster_ids: set[str],
     existing_class_names: set[str],
+    claimed_component_ids: set[str] | None = None,
+    allow_single_use: bool = False,
 ) -> list[ClusterWidgetSpec]:
     """Collect one widget per repeated published component family."""
     from collections import defaultdict
@@ -239,6 +250,7 @@ def _collect_component_family_widget_specs(
     from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
 
     families: dict[str, list[CleanDesignTreeNode]] = defaultdict(list)
+    claimed = claimed_component_ids or set()
 
     def walk(node: CleanDesignTreeNode) -> None:
         component_id = _component_id_for_node(node)
@@ -250,7 +262,10 @@ def _collect_component_family_widget_specs(
     walk(root)
     specs: list[ClusterWidgetSpec] = []
     for component_id, nodes in families.items():
-        if len(nodes) < min_count:
+        required = 1 if allow_single_use else min_count
+        if len(nodes) < required:
+            continue
+        if component_id in claimed:
             continue
         base_cluster_id = component_cluster_id(component_id)
         if _component_family_already_extracted(component_id, existing_cluster_ids):
@@ -268,7 +283,7 @@ def _collect_component_family_widget_specs(
             and not layout_fact_hosts_compact_checkbox_control(node)
             and not layout_fact_hosts_payment_selection_indicator(node)
         ]
-        if len(eligible) < min_count:
+        if len(eligible) < required:
             continue
         with_children = [node for node in eligible if node.children]
         candidates = with_children if with_children else eligible
@@ -379,6 +394,7 @@ def render_cluster_widgets(
         collect_cluster_vector_variants(
             clean_trees,
             {spec.cluster_id: spec.representative for spec in specs},
+            project_dir=project_dir,
         )
         if clean_trees
         else {}
@@ -449,6 +465,30 @@ def render_cluster_widgets(
         elif variant is not None:
             widget_fields = f"  final bool {variant.param_name};\n\n"
             constructor_params = f"{{super.key, this.{variant.param_name} = true}}"
+        elif spec.param_bundle is not None:
+            from figma_flutter_agent.generator.widget_extraction.props import (
+                WidgetParamBundle,
+                parameterize_widget_body,
+                render_constructor_params,
+                render_widget_fields,
+            )
+
+            bundle = spec.param_bundle
+            if isinstance(bundle, WidgetParamBundle):
+                body = parameterize_widget_body(body, bundle)
+                widget_fields = render_widget_fields(bundle)
+                constructor_params = render_constructor_params(bundle)
+        from figma_flutter_agent.generator.widget_extraction.variant_params import (
+            variant_constructor_params,
+            variant_widget_fields,
+        )
+
+        variant_params = variant_constructor_params(representative)
+        if variant_params is not None:
+            extra_fields = variant_widget_fields(representative)
+            if extra_fields:
+                widget_fields = (widget_fields or "") + extra_fields
+            constructor_params = variant_params
         path = f"lib/widgets/{spec.file_name}.dart"
         files[path] = render_widget_file(
             class_name=spec.class_name,

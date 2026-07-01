@@ -58,6 +58,23 @@ generation:
   allow_destination_stubs: false
   enforce_cluster_widgets: true
   cluster_min_count: 2
+  widget_extraction:
+    policy: balanced
+    min_count: 2
+    annotation_prefixes: ["@widget"]
+    extract_figma_components_single_use: true
+    fail_on_unextracted_annotations: true
+    parameterize_text: false
+    ai_reusable:
+      enabled: false
+      mode: suggest
+      min_confidence: 0.85
+      max_candidates: 12
+      require_static_gate: true
+      require_evidence: true
+    enrich:
+      enabled: false
+      cache_by_subtree_hash: true
   true_subtree_pruning: true
   use_package_imports: true
   regen_llm_on_token_change: true

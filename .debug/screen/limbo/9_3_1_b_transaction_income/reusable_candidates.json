@@ -1,0 +1,99 @@
+{
+  "cacheKey": "85bf844dc3a35f7a5db7498f101f51919a758c313918e58d96f51ae951a97e47",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "7110:1045",
+        "widgetName": "TransactionIncomeIcon",
+        "reason": "The 'Icon Salary' component (ref 7102:2848) is reused 5 times as the leading icon for transaction rows, making it a strong repeated widget candidate.",
+        "confidence": 0.98,
+        "suggestedParams": [],
+        "evidence": {
+          "similarNodes": [
+            "7110:1051",
+            "7110:1057",
+            "7110:1060",
+            "7110:1069"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "repeated leading transaction icon"
+        }
+      },
+      {
+        "nodeId": "7110:3217",
+        "widgetName": "SummaryStatCard",
+        "reason": "Income and Expense cards share the same card structure, text hierarchy, amount display, and trailing arrow badge, differing mainly by label, amount, and styling.",
+        "confidence": 0.88,
+        "suggestedParams": [
+          "title",
+          "amount",
+          "isIncome"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "7110:3218"
+          ],
+          "shapeSimilarity": 0.86,
+          "semanticRole": "summary metric card"
+        }
+      },
+      {
+        "nodeId": "7420:7339",
+        "widgetName": "BottomNavigationBarLight",
+        "reason": "The whole bottom navigation is an existing component and represents a reusable navigation family rather than a layout wrapper.",
+        "confidence": 0.85,
+        "suggestedParams": [
+          "selectedTab"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "bottom navigation"
+        }
+      },
+      {
+        "nodeId": "7035:1451",
+        "widgetName": "TotalBalanceCard",
+        "reason": "This is a self-contained balance card with background and two text layers, suitable as a reusable dashboard/account summary widget.",
+        "confidence": 0.73,
+        "suggestedParams": [
+          "title",
+          "amount"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 0.64,
+          "semanticRole": "balance summary card"
+        }
+      },
+      {
+        "nodeId": "7043:3387",
+        "widgetName": "CalendarActionButton",
+        "reason": "The calendar icon is a compact self-contained action control that can be reused in headers or filter bars.",
+        "confidence": 0.63,
+        "suggestedParams": [
+          "onTap"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 0.72,
+          "semanticRole": "header action button"
+        }
+      },
+      {
+        "nodeId": "7043:3117",
+        "widgetName": "BackButtonIcon",
+        "reason": "The back icon is a self-contained navigational control that is commonly reused across screens.",
+        "confidence": 0.61,
+        "suggestedParams": [
+          "onTap"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 0.7,
+          "semanticRole": "navigation back button"
+        }
+      }
+    ]
+  }
+}

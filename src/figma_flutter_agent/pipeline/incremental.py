@@ -140,6 +140,7 @@ def select_planned_writes(
             cluster_min_count=generation.cluster_min_count,
             widget_suffix=settings.agent.naming.widget_suffix,
             enforce_cluster_widgets=generation.enforce_cluster_widgets,
+            widget_extraction=generation.widget_extraction,
             architecture=settings.agent.flutter.architecture,
         )
 

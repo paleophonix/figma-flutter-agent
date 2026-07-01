@@ -225,6 +225,53 @@ class NamingConfig(BaseModel):
     feature_name: Literal["auto"] | str = "auto"
 
 
+class AiReusableConfig(BaseModel):
+    """LLM-assisted reusable widget candidate detection (gated inference amplifier)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    enabled: bool = False
+    mode: Literal["suggest", "enforce"] = "suggest"
+    min_confidence: float = Field(default=0.85, ge=0.0, le=1.0)
+    max_candidates: int = Field(default=12, ge=1, le=48)
+    require_static_gate: bool = True
+    require_evidence: bool = True
+
+
+class WidgetEnrichConfig(BaseModel):
+    """LLM naming and constructor param labels for extracted cluster widgets."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    enabled: bool = False
+    cache_by_subtree_hash: bool = True
+
+
+class WidgetExtractionConfig(BaseModel):
+    """Widget extraction policy (annotation, dedup, inference)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    policy: Literal[
+        "off",
+        "dedup",
+        "annotated",
+        "balanced",
+        "auto_reusable",
+        "aggressive",
+    ] = "balanced"
+    min_count: int = Field(default=2, ge=1)
+    annotation_prefixes: list[str] = Field(default_factory=lambda: ["@widget"])
+    extract_figma_components_single_use: bool = True
+    fail_on_unextracted_annotations: bool = True
+    auto_reusable_min_score: float = Field(default=0.85, ge=0.0, le=1.0)
+    parameterize_text: bool = False
+    parameterize_assets: bool = False
+    parameterize_variants: bool = False
+    ai_reusable: AiReusableConfig = Field(default_factory=AiReusableConfig)
+    enrich: WidgetEnrichConfig = Field(default_factory=WidgetEnrichConfig)
+
+
 class GenerationConfig(BaseModel):
     """Code generation mode settings (LLM usage policy — not model/provider env)."""
 
@@ -237,6 +284,7 @@ class GenerationConfig(BaseModel):
     )
     enforce_cluster_widgets: bool = True
     cluster_min_count: int = 2
+    widget_extraction: WidgetExtractionConfig = Field(default_factory=WidgetExtractionConfig)
     true_subtree_pruning: bool = True
     use_package_imports: bool = True
     allow_destination_stubs: bool = False

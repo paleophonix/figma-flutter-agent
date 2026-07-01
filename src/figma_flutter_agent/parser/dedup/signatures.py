@@ -65,3 +65,10 @@ def cluster_structure_signature(node: CleanDesignTreeNode) -> str:
         payload["textFingerprint"] = text_fingerprint
     serialized = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()[:16]
+
+
+def shape_structure_signature(node: CleanDesignTreeNode) -> str:
+    """Return a stable hash for shape-only clustering (ignores text copy)."""
+    payload = node_signature_payload(node, include_text=False)
+    serialized = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()[:16]

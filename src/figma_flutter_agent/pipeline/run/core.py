@@ -294,6 +294,17 @@ async def run_pipeline(
         routing_type=routing_type,
     )
 
+    from figma_flutter_agent.pipeline.run.stages import run_reusable_candidates_phase
+
+    widget_hints = await run_reusable_candidates_phase(
+        ctx,
+        settings=settings,
+        project_dir=project_dir,
+        widget_hints=widget_hints,
+        tokens=tokens,
+        pipeline_deps=pipeline_deps,
+    )
+
     attach_to_llm = settings.agent.generation.llm_figma_reference_image
     needs_reference_png = (
         attach_to_llm

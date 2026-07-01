@@ -1,8 +1,8 @@
 {
   "feature": "9_3_1_b_transaction_income",
-  "pipeline_run_id": "90b203f0ed86",
-  "candidate_build_run_id": "90b203f0ed86",
-  "committed_build_run_id": "90b203f0ed86",
+  "pipeline_run_id": "b3abf70fdc22",
+  "candidate_build_run_id": "b3abf70fdc22",
+  "committed_build_run_id": "b3abf70fdc22",
   "writeback": "committed",
   "written_files": [
     "lib/features/9_3_1_b_transaction_income/9_3_1_b_transaction_income_screen.dart",
@@ -16,12 +16,14 @@
     "lib/theme/app_spacing.dart",
     "lib/theme/app_theme.dart",
     "lib/theme/app_typography.dart",
+    "lib/widgets/calendar_filter_widget.dart",
     "lib/widgets/frame3_widget.dart",
     "lib/widgets/icon_notification_widget.dart",
     "lib/widgets/icon_salary_widget.dart",
+    "lib/widgets/transaction_category_icon_widget.dart",
     "test/golden/9_3_1_b_transaction_income_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-01T13:08:06.008343+00:00"
+  "captured_at": "2026-07-01T21:45:48.225594+00:00"
 }

@@ -270,14 +270,16 @@ def stack_should_emit_flattened_vector_group(node: CleanDesignTreeNode) -> bool:
 def _compact_icon_glyph_group_should_preserve_child_vectors(
     node: CleanDesignTreeNode,
 ) -> bool:
-    """Keep per-vector exports for compact multi-glyph product/icon stacks."""
+    """Keep per-vector exports for square compact multi-glyph product icon slots."""
     if len(node.children) < 2:
         return False
     width = node.sizing.width
     height = node.sizing.height
     if width is None or height is None:
         return False
-    if not (16.0 <= float(width) <= 48.0 and 16.0 <= float(height) <= 48.0):
+    if not (22.0 <= float(width) <= 36.0 and 22.0 <= float(height) <= 36.0):
+        return False
+    if abs(float(width) - float(height)) > 2.0:
         return False
     vectors = [child for child in node.children if child.type == NodeType.VECTOR]
     return len(vectors) >= 2 and len(vectors) == len(node.children)

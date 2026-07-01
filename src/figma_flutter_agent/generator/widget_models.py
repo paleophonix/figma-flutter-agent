@@ -15,6 +15,8 @@ class ClusterWidgetSpec:
     class_name: str
     file_name: str
     representative: CleanDesignTreeNode
+    param_bundle: object | None = None
+    shape_members: tuple[CleanDesignTreeNode, ...] = ()
 
 
 @dataclass(frozen=True)

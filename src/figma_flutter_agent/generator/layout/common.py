@@ -288,6 +288,40 @@ def bottom_chrome_pinned_live_viewport(
     )
 
 
+def bottom_chrome_viewport_partition_live(
+    *,
+    scrollable_stack: str,
+    pinned_layers: list[str],
+    width_token: str,
+    height_token: str,
+) -> str:
+    """Pin interactive bottom chrome to the viewport while the artboard scrolls."""
+    pinned = ", ".join(pinned_layers)
+    return (
+        "LayoutBuilder("
+        "builder: (context, constraints) {"
+        f"final viewportHeight = constraints.maxHeight.isFinite && "
+        f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
+        "return SizedBox("
+        f"width: {width_token}, "
+        "height: viewportHeight, "
+        "child: Stack(clipBehavior: Clip.none, children: ["
+        "Positioned.fill("
+        "child: SingleChildScrollView("
+        "clipBehavior: Clip.none, "
+        f"child: SizedBox(width: {width_token}, height: {height_token}, "
+        f"child: {scrollable_stack}"
+        ")"
+        ")"
+        "),"
+        f"{pinned}"
+        "])"
+        ");"
+        "},"
+        ")"
+    )
+
+
 def static_artboard_viewport(
     *,
     child: str,

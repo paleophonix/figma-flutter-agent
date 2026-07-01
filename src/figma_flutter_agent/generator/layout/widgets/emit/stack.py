@@ -605,6 +605,8 @@ def render_stack(
     stack_children = list(child_widgets)
     if playback_seek_widget is not None:
         stack_children.append(playback_seek_widget)
+    viewport_pinned_layers: list[str] | None = None
+    preview_stack_widget: str | None = None
     body = ", ".join(stack_children) or "const SizedBox.shrink()"
     from figma_flutter_agent.generator.layout.flex_policy import (
         column_center_hug_child_wrap,
@@ -914,6 +916,7 @@ def render_stack(
     else:
         from figma_flutter_agent.generator.layout.stack_chrome import (
             apply_pin_bottom_chrome_to_stack_layers,
+            partition_viewport_pinned_stack_layers,
         )
 
         stack_emit_children = [
@@ -931,11 +934,26 @@ def render_stack(
                 stack_children,
                 allow_outward_paint=stack_needs_soft_clip(node),
             )
-            body = ", ".join(stack_children) or "const SizedBox.shrink()"
+            if is_layout_root and not responsive_enabled:
+                partition = partition_viewport_pinned_stack_layers(
+                    node,
+                    stack_emit_children,
+                    stack_children,
+                )
+                if partition is not None:
+                    scroll_widgets, viewport_pinned_layers = partition
+                    body = ", ".join(scroll_widgets) or "const SizedBox.shrink()"
+                else:
+                    body = ", ".join(stack_children) or "const SizedBox.shrink()"
+            else:
+                body = ", ".join(stack_children) or "const SizedBox.shrink()"
         stack_clip = (
             "Clip.none" if not is_layout_root or stack_needs_soft_clip(node) else "Clip.hardEdge"
         )
         stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
+        if viewport_pinned_layers is not None:
+            full_body = ", ".join(stack_children) or "const SizedBox.shrink()"
+            preview_stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{full_body}])"
     if interaction == "button":
         from figma_flutter_agent.generator.layout.flex_policy.buttons import (
             bottom_nav_active_tab_icon_band_height,
@@ -1034,6 +1052,8 @@ def render_stack(
         is_layout_root=is_layout_root,
         responsive_enabled=responsive_enabled,
         theme_variant=theme_variant,
+        viewport_pinned_layers=viewport_pinned_layers,
+        preview_stack_widget=preview_stack_widget,
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         layout_fact_stack_overflowing_horizontal_content_strip,

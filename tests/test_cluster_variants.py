@@ -7,6 +7,7 @@ from figma_flutter_agent.generator.cluster_variants import (
     cluster_skip_backward_by_placement,
     collect_cluster_vector_variants,
     detect_vector_flip_variant,
+    precollect_cluster_vector_assets,
     primary_vector_asset,
     resolve_cluster_delegate_class,
 )
@@ -108,7 +109,11 @@ def test_cluster_skip_backward_by_placement_uses_right_anchor() -> None:
     assert cluster_skip_backward_by_placement(node) is True
 
 
-def test_detect_vector_flip_variant_infers_backward_asset_from_placement() -> None:
+def test_detect_vector_flip_variant_infers_backward_asset_from_placement(tmp_path: Path) -> None:
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    (icons / "vector_1_4017.svg").write_text("<svg></svg>", encoding="utf-8")
+    (icons / "vector_1_4020.svg").write_text("<svg></svg>", encoding="utf-8")
     forward = CleanDesignTreeNode(
         id="1:4016",
         name="Skip",
@@ -132,6 +137,7 @@ def test_detect_vector_flip_variant_infers_backward_asset_from_placement() -> No
         cluster_id="cluster_0",
         sizing=Sizing(width=38.8, height=39.0),
         stack_placement=StackPlacement(right=247.8, width=38.8, height=39.0),
+        flatten_figma_node_ids=["1:4020"],
         children=[],
     )
     screen = CleanDesignTreeNode(
@@ -140,10 +146,43 @@ def test_detect_vector_flip_variant_infers_backward_asset_from_placement() -> No
         type=NodeType.STACK,
         children=[forward, backward],
     )
-    variant = detect_vector_flip_variant([screen], "cluster_0", representative=forward)
+    variant = detect_vector_flip_variant(
+        [screen],
+        "cluster_0",
+        representative=forward,
+        project_dir=tmp_path,
+    )
     assert variant is not None
     assert variant.backward_asset == "assets/icons/vector_1_4020.svg"
     assert cluster_reference_args(backward, variant) == "isForward: false"
+
+
+def test_precollect_cluster_vector_assets_uses_flatten_ids(tmp_path: Path) -> None:
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    (icons / "skip_forward_1_4017.svg").write_text("<svg></svg>", encoding="utf-8")
+    (icons / "icon_b_4020.svg").write_text("<svg></svg>", encoding="utf-8")
+    forward = _skip_cluster(forward=True)
+    backward = CleanDesignTreeNode(
+        id="back-stub",
+        name="Skip",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=31.0, height=36.0),
+        stack_placement=StackPlacement(right=247.8, width=31.0, height=36.0),
+        flatten_figma_node_ids=["b:4020"],
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[forward, backward],
+    )
+    pairs = precollect_cluster_vector_assets([screen], project_dir=tmp_path)
+    forward_asset, backward_asset = pairs["cluster_0"]
+    assert forward_asset == "assets/icons/vector_forward.svg"
+    assert backward_asset == "assets/icons/icon_b_4020.svg"
 
 
 def test_collect_cluster_vector_variants_maps_representatives() -> None:

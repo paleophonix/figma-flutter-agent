@@ -143,7 +143,12 @@ def _input_content_padding(
         hint_node.style.glyph_top_offset or 0.0
     )
     centered_top = max(0.0, (field_height - text_height) / 2.0)
-    top = figma_top if figma_top >= centered_top - 1.0 else centered_top
+    if figma_top > centered_top + 2.0:
+        top = centered_top
+    elif figma_top >= centered_top - 1.0:
+        top = figma_top
+    else:
+        top = centered_top
     bottom = max(0.0, field_height - top - text_height)
     right = left
     return f"contentPadding: EdgeInsets.fromLTRB({left}, {top}, {right}, {bottom})"
@@ -238,16 +243,27 @@ def _stack_input_decoration(
         if vertical_center:
             value_node = input_value_style_node(host_node) if host_node is not None else None
             placement_ref = value_node or hint_node
-            padding = _optical_single_line_input_content_padding(
+            padding = _multiline_input_content_padding(
                 host_node,
                 placement_ref,
-                effective_field_height,
+                field_height=effective_field_height,
             )
-            if padding is None:
-                padding = _multiline_input_content_padding(
-                    host_node,
+            if (
+                padding is None
+                and placement_ref is not None
+                and placement_ref.stack_placement is not None
+            ):
+                padding = _input_content_padding(
+                    surface,
                     placement_ref,
-                    field_height=effective_field_height,
+                    effective_field_height,
+                )
+            if padding is None:
+                style_ref = value_node or hint_node
+                padding = _optical_single_line_input_content_padding(
+                    host_node,
+                    style_ref,
+                    effective_field_height,
                 )
             if padding is None:
                 left = _resolve_input_horizontal_inset(host_node, hint_node)

@@ -43,7 +43,6 @@ from figma_flutter_agent.generator.theme_typography import (
 )
 from figma_flutter_agent.generator.widget_extractor import (
     ClusterWidgetSpec,
-    collect_cluster_widget_specs,
     render_cluster_widgets,
 )
 from figma_flutter_agent.parser.navigation import build_feature_routes
@@ -75,13 +74,41 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     cluster_result = None
     cluster_specs: list[ClusterWidgetSpec] = []
-    if generation_cfg.enforce_cluster_widgets and context.cluster_summary:
-        cluster_specs = collect_cluster_widget_specs(
+    extraction_cfg = generation_cfg.widget_extraction
+    from figma_flutter_agent.generator.widget_extraction import collect_widget_specs
+    from figma_flutter_agent.generator.widget_extraction.policy import (
+        enforce_cluster_widgets_for_policy,
+    )
+
+    should_extract = generation_cfg.enforce_cluster_widgets and enforce_cluster_widgets_for_policy(
+        extraction_cfg
+    )
+    if should_extract:
+        cluster_specs = collect_widget_specs(
             context.clean_tree,
-            context.cluster_summary,
-            min_count=generation_cfg.cluster_min_count,
+            context.cluster_summary or {},
+            config=extraction_cfg,
             widget_suffix=settings.agent.naming.widget_suffix,
+            legacy_enforce=generation_cfg.enforce_cluster_widgets,
+            legacy_min_count=generation_cfg.cluster_min_count,
+            llm_candidates=context.reusable_candidates or None,
         )
+        if cluster_specs and context.llm_client_factory is not None:
+            from figma_flutter_agent.generator.widget_extraction.enrich import (
+                enrich_cluster_specs_sync,
+            )
+
+            cluster_specs = enrich_cluster_specs_sync(
+                cluster_specs,
+                clean_tree=context.clean_tree,
+                tokens=context.tokens,
+                config=extraction_cfg,
+                settings=settings,
+                project_dir=context.project_dir,
+                feature_name=context.resolved_feature,
+                widget_suffix=settings.agent.naming.widget_suffix,
+                llm_client_factory=context.llm_client_factory,
+            )
         if cluster_specs:
             clean_trees = [context.clean_tree, *context.destination_trees.values()]
             cluster_result = render_cluster_widgets(

@@ -15,6 +15,13 @@ from figma_flutter_agent.schemas.generation import (
     RepairCpiSupervisorResponse,
     merge_asset_manifests,
 )
+from figma_flutter_agent.schemas.reusable_candidates import (
+    ReusableWidgetCandidate,
+    ReusableWidgetCandidatesResponse,
+    ReusableWidgetEvidence,
+    WidgetEnrichEntry,
+    WidgetEnrichResponse,
+)
 from figma_flutter_agent.schemas.geometry import (
     Affine2,
     Alignment,
@@ -113,6 +120,9 @@ __all__ = [
     "NodeType",
     "Padding",
     "RepairCpiSupervisorResponse",
+    "ReusableWidgetCandidate",
+    "ReusableWidgetCandidatesResponse",
+    "ReusableWidgetEvidence",
     "ScreenIr",
     "ScrollAxis",
     "SemanticContractTraits",
@@ -129,6 +139,8 @@ __all__ = [
     "TypographyStyle",
     "TypographyToken",
     "VerticalConstraint",
+    "WidgetEnrichEntry",
+    "WidgetEnrichResponse",
     "WidgetIrArgValue",
     "WidgetIrKind",
     "WidgetIrLayoutHints",

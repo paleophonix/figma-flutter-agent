@@ -544,6 +544,8 @@ def _wrap_root_stack_viewport(
     is_layout_root: bool,
     responsive_enabled: bool = False,
     theme_variant: str = "material_3",
+    viewport_pinned_layers: list[str] | None = None,
+    preview_stack_widget: str | None = None,
 ) -> str:
     """Bound classic absolute frames to the Figma artboard (scroll or scale-down)."""
     if not is_layout_root:
@@ -603,18 +605,31 @@ def _wrap_root_stack_viewport(
                 ")"
             )
         else:
-            fallback = bottom_chrome_pinned_live_viewport(
-                stack_widget=stack_widget,
-                width_token=width_token,
-                height_token=height_token,
+            from figma_flutter_agent.generator.layout.common import (
+                bottom_chrome_pinned_live_viewport,
+                bottom_chrome_viewport_partition_live,
             )
+
+            if viewport_pinned_layers:
+                fallback = bottom_chrome_viewport_partition_live(
+                    scrollable_stack=stack_widget,
+                    pinned_layers=viewport_pinned_layers,
+                    width_token=width_token,
+                    height_token=height_token,
+                )
+            else:
+                fallback = bottom_chrome_pinned_live_viewport(
+                    stack_widget=stack_widget,
+                    width_token=width_token,
+                    height_token=height_token,
+                )
             fallback = wrap_scroll_viewport(
                 fallback,
                 theme_variant=theme_variant,
                 anchor_top=True,
             )
         preview_child = artboard_preview_sized_box(
-            child=stack_widget,
+            child=preview_stack_widget or stack_widget,
             alignment="Alignment.topLeft",
             bounded_child=True,
         )

@@ -61,3 +61,5 @@ class GenerationPlanContext:
     project_dir: Path | None = None
     truth_snapshot: CleanDesignTreeNode | None = None
     truth_emit_pair: object | None = None
+    reusable_candidates: list[Any] = field(default_factory=list)
+    llm_client_factory: Any | None = None

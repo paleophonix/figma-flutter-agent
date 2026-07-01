@@ -596,7 +596,13 @@ def prepare_navigation_and_subtree(
         ctx.warnings.extend(animation_hints)
 
     navigation_hints = build_navigation_hints(navigation_plan) if routing_on else []
-    widget_hints = build_widget_extraction_hints(ctx.dedup_result, ctx.cluster_summary)
+    widget_hints = build_widget_extraction_hints(
+        ctx.dedup_result,
+        ctx.cluster_summary,
+        clean_tree=ctx.clean_tree,
+        annotation_prefixes=settings.agent.generation.widget_extraction.annotation_prefixes,
+        widget_suffix=settings.agent.naming.widget_suffix,
+    )
     if ctx.clean_tree is not None:
         from figma_flutter_agent.generator.subtree import (
             build_subtree_widget_hints,
@@ -621,6 +627,54 @@ def prepare_navigation_and_subtree(
             )
 
     return navigation_plan, route_transitions, navigation_hints, widget_hints
+
+
+async def run_reusable_candidates_phase(
+    ctx: PipelineContext,
+    *,
+    settings: Settings,
+    project_dir: Path,
+    widget_hints: list[str],
+    tokens: Any,
+    pipeline_deps: Any,
+) -> list[str]:
+    """Resolve AI reusable widget candidates and extend hints in suggest mode."""
+    extraction = settings.agent.generation.widget_extraction
+    if not extraction.ai_reusable.enabled or ctx.clean_tree is None:
+        return widget_hints
+
+    from figma_flutter_agent.generator.widget_extraction.policy import inference_enabled
+    from figma_flutter_agent.llm.reusable_candidates import (
+        build_ai_reusable_hints,
+        resolve_reusable_candidates,
+    )
+
+    if not inference_enabled(extraction):
+        return widget_hints
+
+    candidates = await resolve_reusable_candidates(
+        ctx.clean_tree,
+        tokens,
+        config=extraction,
+        cluster_summary=ctx.cluster_summary,
+        widget_hints=widget_hints,
+        settings=settings,
+        project_dir=project_dir,
+        feature_name=ctx.resolved_feature,
+        llm_client_factory=pipeline_deps.create_llm_client,
+    )
+    ctx.reusable_candidates = candidates
+    if extraction.ai_reusable.mode == "suggest":
+        widget_hints = [
+            *widget_hints,
+            *build_ai_reusable_hints(
+                ctx.clean_tree,
+                candidates,
+                config=extraction,
+                widget_suffix=settings.agent.naming.widget_suffix,
+            ),
+        ]
+    return widget_hints
 
 
 async def run_llm_and_plan_phase(
@@ -740,6 +794,8 @@ async def run_llm_and_plan_phase(
                     blocked_asset_paths=ctx.blocked_asset_paths,
                     project_dir=project_dir,
                     truth_snapshot=ctx.truth_snapshot,
+                    reusable_candidates=ctx.reusable_candidates,
+                    llm_client_factory=pipeline_deps.create_llm_client,
                 ),
             ),
         ).planned_files
@@ -884,6 +940,10 @@ async def run_validate_repair_refine_phase(
                 widget_suffix=settings.agent.naming.widget_suffix,
                 enforce_cluster_widgets=settings.agent.generation.enforce_cluster_widgets,
                 fail_duplicate_clusters=settings.agent.quality.fail_duplicate_clusters,
+                annotation_prefixes=settings.agent.generation.widget_extraction.annotation_prefixes,
+                fail_on_unextracted_annotations=(
+                    settings.agent.generation.widget_extraction.fail_on_unextracted_annotations
+                ),
                 require_responsive_shell=responsive_shell_required,
                 require_reflow=settings.agent.responsive.require_reflow,
             ),
@@ -955,6 +1015,7 @@ __all__ = [
     "resolve_offline_reference_png",
     "apply_viewport_inset_and_resolve_feature",
     "prepare_navigation_and_subtree",
+    "run_reusable_candidates_phase",
     "run_llm_and_plan_phase",
     "run_validate_repair_refine_phase",
 ]

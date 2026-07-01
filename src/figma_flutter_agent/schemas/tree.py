@@ -42,6 +42,7 @@ class CleanDesignTreeNode(BaseModel):
     image_asset_key: str | None = Field(default=None, alias="imageAssetKey")
     component_ref: str | None = Field(default=None, alias="componentRef")
     cluster_id: str | None = Field(default=None, alias="clusterId")
+    shape_cluster_id: str | None = Field(default=None, alias="shapeClusterId")
     accessibility_label: str | None = Field(default=None, alias="accessibilityLabel")
     accessibility_hint: str | None = Field(default=None, alias="accessibilityHint")
     variant: ComponentVariant | None = None

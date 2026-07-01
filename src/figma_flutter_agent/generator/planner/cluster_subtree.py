@@ -97,6 +97,7 @@ def collect_and_restore_cluster_vector_variants(
     cluster_vector_variants = collect_cluster_vector_variants(
         variant_trees,
         {spec.cluster_id: spec.representative for spec in cluster_specs},
+        project_dir=context.project_dir,
     )
     restore_pruned_cluster_vector_keys(context.clean_tree, cluster_vector_variants)
     for destination_tree in context.destination_trees.values():

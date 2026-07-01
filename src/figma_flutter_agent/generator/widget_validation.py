@@ -12,6 +12,64 @@ from figma_flutter_agent.generator.widget_models import ClusterWidgetSpec
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
+def validate_annotated_widget_extraction(
+    planned_files: dict[str, str],
+    clean_trees: list[CleanDesignTreeNode],
+    *,
+    prefixes: list[str],
+    widget_suffix: str,
+    fail_on_unextracted: bool,
+) -> None:
+    """Fail when annotated layers did not produce widget files and layout refs."""
+    if not fail_on_unextracted:
+        return
+    from figma_flutter_agent.generator.layout.common import to_snake_case
+    from figma_flutter_agent.generator.widget_extraction.eligibility import (
+        is_eligible_extraction_candidate,
+    )
+    from figma_flutter_agent.parser.annotations.widget_marker import (
+        collect_annotated_widget_nodes,
+    )
+
+    layout_source = "\n".join(
+        content for path, content in planned_files.items() if path.endswith("_layout.dart")
+    )
+    for tree in clean_trees:
+        for node, class_name in collect_annotated_widget_nodes(
+            tree,
+            prefixes=prefixes,
+            widget_suffix=widget_suffix,
+        ):
+            if not is_eligible_extraction_candidate(node):
+                continue
+            widget_path = f"lib/widgets/{to_snake_case(class_name)}.dart"
+            if widget_path not in planned_files:
+                raise GenerationError(
+                    f"Annotated widget {class_name!r} for node {node.id} ({node.name!r}) "
+                    f"requires {widget_path}"
+                )
+            if f"{class_name}(" not in layout_source:
+                raise GenerationError(
+                    f"Annotated widget {class_name!r} for node {node.id} ({node.name!r}) "
+                    "is missing from layout references"
+                )
+
+
+def validate_inference_widget_extraction(
+    planned_files: dict[str, str],
+    specs: list[ClusterWidgetSpec],
+) -> None:
+    """Fail when semantic inference specs did not materialize widget files."""
+    for spec in specs:
+        if not spec.cluster_id.startswith("semantic_"):
+            continue
+        widget_path = f"lib/widgets/{spec.file_name}.dart"
+        if widget_path not in planned_files:
+            raise GenerationError(
+                f"Inference widget {spec.class_name!r} requires generated file {widget_path}"
+            )
+
+
 def validate_cluster_widget_extraction(
     planned_files: dict[str, str],
     clean_trees: list[CleanDesignTreeNode],

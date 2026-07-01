@@ -397,7 +397,7 @@ def test_checkbox_checked_from_inline_checkmark_vector() -> None:
     emitted = render_node_body(stack, uses_svg=True, parent_type=NodeType.COLUMN)
     compact = emitted.replace("\n", "")
     assert "initialValue: true" in compact
-    assert "0xFFFB6D3A" in compact
+    assert "checkboxTheme: CheckboxThemeData" in compact
     assert "spacing:" in compact
 
 

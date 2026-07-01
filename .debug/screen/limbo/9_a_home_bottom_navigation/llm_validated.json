@@ -1,0 +1,1364 @@
+{
+  "stage": "llm_validated",
+  "featureName": "9_a_home_bottom_navigation",
+  "screenIr": {
+    "root": {
+      "figmaId": "7342:2818",
+      "kind": "nav_bottom_bar",
+      "children": [
+        {
+          "figmaId": "7342:2819",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Rectangle 148",
+            "backgroundColor": "0xFFF1FFF3"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2820",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "backgroundColor": "0xFF00D09E"
+          },
+          "fidelityTier": "styled_primitive",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2821",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "7342:2822",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "Hi, Welcome Back",
+                "accessibilityLabel": "Hi, Welcome Back",
+                "textColor": "0xFF052224",
+                "fontSize": 20.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2823",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "Good Morning",
+                "accessibilityLabel": "Good Morning",
+                "textColor": "0xFF052224",
+                "fontSize": 14.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2824",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 5"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2825",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 6"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2826",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Food Last Week",
+            "accessibilityLabel": "Food Last Week",
+            "textColor": "0xFF052224",
+            "fontSize": 12.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2827",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Revenue Last Week",
+            "accessibilityLabel": "Revenue Last Week",
+            "textColor": "0xFF052224",
+            "fontSize": 12.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2828",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "$4.000.00",
+            "accessibilityLabel": "$4.000.00",
+            "textColor": "0xFF052224",
+            "fontSize": 15.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2829",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "-$100.00",
+            "accessibilityLabel": "-$100.00",
+            "fontSize": 15.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2830",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Salary",
+            "accessibilityLabel": "Salary",
+            "textColor": "0xFF052224",
+            "fontSize": 15.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2831",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "$4.000,00",
+            "accessibilityLabel": "$4.000,00",
+            "textColor": "0xFF052224",
+            "fontSize": 15.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2832",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Monthly",
+            "accessibilityLabel": "Monthly",
+            "textColor": "0xFF052224",
+            "fontSize": 13.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2833",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "18:27 - April 30",
+            "accessibilityLabel": "18:27 - April 30",
+            "fontSize": 12.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2834",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 11"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2835",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 12"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2836",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Groceries",
+            "accessibilityLabel": "Groceries",
+            "textColor": "0xFF052224",
+            "fontSize": 15.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2837",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "-$100,00",
+            "accessibilityLabel": "-$100,00",
+            "fontSize": 15.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2838",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Pantry",
+            "accessibilityLabel": "Pantry",
+            "textColor": "0xFF052224",
+            "fontSize": 13.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2839",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "17:00 - April 24",
+            "accessibilityLabel": "17:00 - April 24",
+            "fontSize": 12.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2840",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 13"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2841",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 14"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2842",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Rent",
+            "accessibilityLabel": "Rent",
+            "textColor": "0xFF052224",
+            "fontSize": 15.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2843",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "-$674,40",
+            "accessibilityLabel": "-$674,40",
+            "fontSize": 15.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2844",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Rent",
+            "accessibilityLabel": "Rent",
+            "textColor": "0xFF052224",
+            "fontSize": 13.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2845",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "8:30 - April 15",
+            "accessibilityLabel": "8:30 - April 15",
+            "fontSize": 12.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2846",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 15"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2847",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 16"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2848",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "IconNotificationWidget",
+            "namedArgs": {}
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2849",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "Frame3Widget",
+            "namedArgs": {}
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2856",
+          "kind": "control_segmented",
+          "children": [
+            {
+              "figmaId": "I7342:2856;7065:2800",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "I7342:2856;7065:2800;7045:2573",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I7342:2856;7065:2800;7045:2574",
+                      "kind": "text",
+                      "children": [],
+                      "overrides": {
+                        "text": "Daily",
+                        "accessibilityLabel": "Daily",
+                        "textColor": "0xFF052224",
+                        "fontSize": 15.0
+                      },
+                      "isSelected": false,
+                      "maxLines": 1,
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    }
+                  ],
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "I7342:2856;7065:2801",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "I7342:2856;7065:2801;7045:2573",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I7342:2856;7065:2801;7045:2574",
+                      "kind": "text",
+                      "children": [],
+                      "overrides": {
+                        "text": "Weekly",
+                        "accessibilityLabel": "Weekly",
+                        "textColor": "0xFF052224",
+                        "fontSize": 15.0
+                      },
+                      "isSelected": false,
+                      "maxLines": 1,
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    }
+                  ],
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "I7342:2856;7065:2802",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "I7342:2856;7065:2802;7045:2573",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I7342:2856;7065:2802;7045:2574",
+                      "kind": "text",
+                      "children": [],
+                      "overrides": {
+                        "text": "Monthly",
+                        "accessibilityLabel": "Monthly",
+                        "textColor": "0xFF052224",
+                        "fontSize": 15.0
+                      },
+                      "isSelected": true,
+                      "maxLines": 1,
+                      "fidelityTier": "native_verified",
+                      "tierSource": "policy_fallback"
+                    }
+                  ],
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "isSelected": true,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": true
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "overrides": {
+            "accessibilityLabel": "Switch-2",
+            "backgroundColor": "0xFFDFF7E2"
+          },
+          "payload": {
+            "payloadKind": "segmented"
+          },
+          "classificationHint": {
+            "suggestedKind": "control_segmented",
+            "confidence": 0.79,
+            "rationale": "Three mutually exclusive labeled options with one selected state."
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2857",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I7342:2857;7102:2847",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "0xFF6DB6FE"
+              },
+              "fidelityTier": "styled_primitive",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "I7342:2857;7102:1277",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2858",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I7342:2858;7102:1245",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "0xFF3299FF"
+              },
+              "fidelityTier": "styled_primitive",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "I7342:2858;7102:1254",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2859",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "IconRentWidget",
+            "namedArgs": {}
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2860",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I7342:2860;7102:2971",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2861",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I7342:2861;7102:2995",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2862",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I7342:2862;7105:3001",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2863",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Ellipse 182"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2864",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Ellipse 183"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2865",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Savings on goals",
+            "accessibilityLabel": "Savings on goals",
+            "textColor": "0xFF093030",
+            "fontSize": 12.0
+          },
+          "isMultiline": true,
+          "maxLines": 2,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2866",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "DirectionBadgeWidget",
+            "namedArgs": {}
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2867",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I7342:2867;7110:4418",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "DirectionBadgeWidget",
+                "namedArgs": {}
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2868",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "30% of your expenses, looks good.",
+            "accessibilityLabel": "30% of your expenses, looks good.",
+            "textColor": "0xFF052224",
+            "fontSize": 15.0
+          },
+          "isMultiline": false,
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2869",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "backgroundColor": "0xFF052224"
+          },
+          "fidelityTier": "styled_primitive",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2870",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "30%",
+            "accessibilityLabel": "30%",
+            "fontSize": 12.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2871",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "backgroundColor": "0xFFF1FFF3"
+          },
+          "fidelityTier": "styled_primitive",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2872",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "$20,000.00",
+            "accessibilityLabel": "$20,000.00",
+            "textColor": "0xFF052224",
+            "fontSize": 13.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2873",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "$7,783.00",
+            "accessibilityLabel": "$7,783.00",
+            "fontSize": 24.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2874",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "-$1.187.40",
+            "accessibilityLabel": "-$1.187.40",
+            "fontSize": 24.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2875",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Total Balance",
+            "accessibilityLabel": "Total Balance",
+            "textColor": "0xFF093030",
+            "fontSize": 12.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2876",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Line 2"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "7342:2877",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Total Expense",
+            "accessibilityLabel": "Total Expense",
+            "textColor": "0xFF093030",
+            "fontSize": 12.0
+          },
+          "maxLines": 1,
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2878",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I7342:2878;7110:4437",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "I7342:2878;7110:4438",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "isSelected": true,
+          "payload": {
+            "payloadKind": "check"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2879",
+          "kind": "nav_bottom_bar",
+          "children": [
+            {
+              "figmaId": "I7342:2879;7045:344",
+              "kind": "button_icon",
+              "children": [
+                {
+                  "figmaId": "I7342:2879;7045:344;7045:308",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "backgroundColor": "0xFF00D09E"
+                  },
+                  "isSelected": true,
+                  "fidelityTier": "styled_primitive",
+                  "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "I7342:2879;7045:344;7045:327",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "overrides": {
+                "accessibilityLabel": "Home"
+              },
+              "isSelected": true,
+              "payload": {
+                "payloadKind": "button_icon"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "I7342:2879;7045:346",
+              "kind": "button_icon",
+              "children": [
+                {
+                  "figmaId": "I7342:2879;7045:346;7045:312",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "overrides": {
+                "accessibilityLabel": "Analysis"
+              },
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "button_icon"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "I7342:2879;7045:348",
+              "kind": "button_icon",
+              "children": [
+                {
+                  "figmaId": "I7342:2879;7045:348;7045:311",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "overrides": {
+                "accessibilityLabel": "Transactions"
+              },
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "button_icon"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "I7342:2879;7045:350",
+              "kind": "button_icon",
+              "children": [
+                {
+                  "figmaId": "I7342:2879;7045:350;7045:310",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "overrides": {
+                "accessibilityLabel": "Category"
+              },
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "button_icon"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "I7342:2879;7045:352",
+              "kind": "button_icon",
+              "children": [
+                {
+                  "figmaId": "I7342:2879;7045:352;7045:309",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "overrides": {
+                "accessibilityLabel": "Profile"
+              },
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "button_icon"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "overrides": {
+            "accessibilityLabel": "Bottom Navigation - Light Mode",
+            "backgroundColor": "0xFFDFF7E2"
+          },
+          "payload": {
+            "payloadKind": "navigation_bar"
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "policy_fallback"
+        }
+      ],
+      "overrides": {
+        "accessibilityLabel": "9 - A - Home - Bottom Navigation",
+        "backgroundColor": "0xFF00D09E"
+      },
+      "payload": {
+        "payloadKind": "navigation_bar"
+      },
+      "fidelityTier": "native_verified",
+      "tierSource": "policy_fallback"
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "7342:2819",
+      "7342:2849",
+      "7342:2821",
+      "7342:2848",
+      "7342:2875",
+      "7342:2873",
+      "7342:2867",
+      "7342:2869",
+      "7342:2870",
+      "7342:2871",
+      "7342:2872",
+      "7342:2876",
+      "7342:2877",
+      "7342:2874",
+      "7342:2868",
+      "7342:2820",
+      "7342:2863",
+      "7342:2864",
+      "7342:2862",
+      "7342:2861",
+      "7342:2824",
+      "7342:2827",
+      "7342:2828",
+      "7342:2825",
+      "7342:2826",
+      "7342:2860",
+      "7342:2829",
+      "7342:2856",
+      "7342:2830",
+      "7342:2857",
+      "7342:2831",
+      "7342:2832",
+      "7342:2833",
+      "7342:2834",
+      "7342:2835",
+      "7342:2836",
+      "7342:2858",
+      "7342:2837",
+      "7342:2838",
+      "7342:2839",
+      "7342:2840",
+      "7342:2841",
+      "7342:2842",
+      "7342:2859",
+      "7342:2843",
+      "7342:2844",
+      "7342:2845",
+      "7342:2846",
+      "7342:2847",
+      "7342:2865",
+      "7342:2866",
+      "7342:2878",
+      "7342:2879"
+    ],
+    "stateByFigmaId": {
+      "7342:2848": "default",
+      "7342:2856": "default",
+      "I7342:2856;7065:2800": "default",
+      "I7342:2856;7065:2801": "default",
+      "I7342:2856;7065:2802": "default",
+      "7342:2857": "default",
+      "7342:2858": "default",
+      "7342:2859": "default",
+      "7342:2860": "default",
+      "7342:2861": "default",
+      "7342:2862": "default",
+      "7342:2866": "default",
+      "7342:2867": "default",
+      "I7342:2867;7110:4418": "default",
+      "7342:2878": "default",
+      "7342:2879": "default",
+      "I7342:2879;7045:344": "default",
+      "I7342:2879;7045:346": "default",
+      "I7342:2879;7045:348": "default",
+      "I7342:2879;7045:350": "default",
+      "I7342:2879;7045:352": "default"
+    },
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "dashboard_home",
+      "confidence": 0.9,
+      "explanation": "Personal finance home dashboard with summary cards, segmented period selector, transaction list, and bottom navigation.",
+      "warnings": []
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "7342:2856",
+        "role": "segmented_control",
+        "subtype": "period_filter",
+        "controlNodeId": "7342:2856",
+        "boundaryNodeId": "7342:2856",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I7342:2856;7065:2802;7045:2574"
+        ],
+        "decorationNodeIds": [
+          "I7342:2856;7065:2800",
+          "I7342:2856;7065:2801",
+          "I7342:2856;7065:2802"
+        ],
+        "optionNodeIds": [
+          "I7342:2856;7065:2800",
+          "I7342:2856;7065:2801",
+          "I7342:2856;7065:2802"
+        ],
+        "stateNodeIds": [
+          "I7342:2856;7065:2802"
+        ],
+        "contractKind": "choice_chip_group",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "currentValue": "Monthly",
+          "selectedOptions": [
+            "Monthly"
+          ],
+          "actionKind": "single_select",
+          "visualState": "selected_option_present"
+        },
+        "proposedLayoutLaws": [
+          "single_select_chip_group",
+          "selected_chip_state_preserved"
+        ],
+        "value": "Monthly",
+        "options": [
+          {
+            "nodeId": "I7342:2856;7065:2800",
+            "label": "Daily",
+            "selected": false,
+            "value": "Daily",
+            "confidence": 0.96
+          },
+          {
+            "nodeId": "I7342:2856;7065:2801",
+            "label": "Weekly",
+            "selected": false,
+            "value": "Weekly",
+            "confidence": 0.96
+          },
+          {
+            "nodeId": "I7342:2856;7065:2802",
+            "label": "Monthly",
+            "selected": true,
+            "value": "Monthly",
+            "confidence": 0.99
+          }
+        ],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "selected_chip_state_preserved",
+          "segmented_filter_changes_dashboard_period"
+        ],
+        "explanation": "Three sibling pill options with one visibly highlighted indicate a single-select segmented filter."
+      },
+      {
+        "nodeId": "7342:2879",
+        "role": "navigation_bar",
+        "subtype": "bottom_navigation",
+        "controlNodeId": "7342:2879",
+        "boundaryNodeId": "7342:2879",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I7342:2879;7045:344;7045:308"
+        ],
+        "optionNodeIds": [
+          "I7342:2879;7045:344",
+          "I7342:2879;7045:346",
+          "I7342:2879;7045:348",
+          "I7342:2879;7045:350",
+          "I7342:2879;7045:352"
+        ],
+        "stateNodeIds": [
+          "I7342:2879;7045:344"
+        ],
+        "contractKind": "navigation_bar",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "currentValue": "Home",
+          "selectedOptions": [
+            "Home"
+          ],
+          "actionKind": "navigation",
+          "visualState": "selected_tab_present"
+        },
+        "proposedLayoutLaws": [
+          "bottom_nav_equal_hit_targets",
+          "selected_destination_emphasis"
+        ],
+        "value": "Home",
+        "options": [
+          {
+            "nodeId": "I7342:2879;7045:344",
+            "label": "Home",
+            "selected": true,
+            "value": "Home",
+            "confidence": 0.95
+          },
+          {
+            "nodeId": "I7342:2879;7045:346",
+            "label": "Analysis",
+            "selected": false,
+            "value": "Analysis",
+            "confidence": 0.94
+          },
+          {
+            "nodeId": "I7342:2879;7045:348",
+            "label": "Transactions",
+            "selected": false,
+            "value": "Transactions",
+            "confidence": 0.94
+          },
+          {
+            "nodeId": "I7342:2879;7045:350",
+            "label": "Category",
+            "selected": false,
+            "value": "Category",
+            "confidence": 0.94
+          },
+          {
+            "nodeId": "I7342:2879;7045:352",
+            "label": "Profile",
+            "selected": false,
+            "value": "Profile",
+            "confidence": 0.94
+          }
+        ],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "bottom_nav_selected_index_preserved",
+          "destination_change_on_tap"
+        ],
+        "explanation": "Bottom anchored bar with five icon destinations and one highlighted home destination."
+      },
+      {
+        "nodeId": "7342:2848",
+        "role": "button",
+        "subtype": "icon_button",
+        "controlNodeId": "7342:2848",
+        "boundaryNodeId": "7342:2848",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I7342:2848;7043:3064",
+          "I7342:2848;7043:3065"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "actionKind": "icon_action",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.8,
+        "proposedEffects": [
+          "tap_opens_notifications"
+        ],
+        "explanation": "Standalone notification bell in a rounded background suggests an icon action button."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "SegmentOptionWidget",
+      "widgetIr": {
+        "figmaId": "I7342:2856;7065:2800",
+        "kind": "chip_choice",
+        "children": [
+          {
+            "figmaId": "I7342:2856;7065:2800;7045:2573",
+            "kind": "stack",
+            "children": [
+              {
+                "figmaId": "I7342:2856;7065:2800;7045:2574",
+                "kind": "text",
+                "children": [],
+                "overrides": {
+                  "text": "Daily",
+                  "accessibilityLabel": "Daily",
+                  "textColor": "0xFF052224",
+                  "fontSize": 15.0
+                },
+                "isSelected": false,
+                "maxLines": 1,
+                "fidelityTier": "native_verified",
+                "tierSource": "policy_fallback"
+              }
+            ],
+            "fidelityTier": "native_verified",
+            "tierSource": "policy_fallback"
+          }
+        ],
+        "isSelected": false,
+        "payload": {
+          "payloadKind": "chip_choice",
+          "isSelected": false
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "policy_fallback"
+      }
+    },
+    {
+      "widgetName": "DirectionBadgeWidget",
+      "widgetIr": {
+        "figmaId": "I7342:2866;7110:3904",
+        "kind": "stack",
+        "children": [
+          {
+            "figmaId": "I7342:2866;7110:3905",
+            "kind": "auto",
+            "children": [],
+            "fidelityTier": "styled_primitive",
+            "tierSource": "policy_fallback"
+          },
+          {
+            "figmaId": "I7342:2866;7110:3906",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Arrow 1"
+            },
+            "fidelityTier": "native_verified",
+            "tierSource": "manifest"
+          }
+        ],
+        "fidelityTier": "native_verified",
+        "tierSource": "policy_fallback"
+      }
+    },
+    {
+      "widgetName": "IconNotificationWidget",
+      "widgetIr": {
+        "figmaId": "7342:2848",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I7342:2848;7043:3064",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "Frame3Widget",
+      "widgetIr": {
+        "figmaId": "7342:2849",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "7342:2850",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "7342:2851",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "7342:2852",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "7342:2853",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "IconRentWidget",
+      "widgetIr": {
+        "figmaId": "7342:2859",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I7342:2859;7102:1246",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I7342:2859;7102:1256",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

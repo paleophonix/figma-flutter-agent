@@ -433,7 +433,7 @@ def test_collapse_numbered_widget_stem_aliases_rewrites_callsites() -> None:
 
 
 def test_bottom_chrome_not_inside_scroll_extent() -> None:
-    """Static-mode fallback must not wrap the full artboard in an outer scroll host."""
+    """Live fallback must not wrap the full artboard in a top-left outer scroll host."""
     import json
     from pathlib import Path
 
@@ -464,8 +464,61 @@ def test_bottom_chrome_not_inside_scroll_extent() -> None:
         "child: SingleChildScrollView(child: SizedBox(width: 430.0, height: 932.0"
     )
     assert bad_outer_scroll not in layout
-    assert "Alignment.bottomCenter" in layout
-    assert "ClipRect(" in layout
+    assert "Positioned.fill(" in layout
+    assert "SingleChildScrollView(" in layout
+    assert "figma-7420_7339" in layout
+
+
+def test_bottom_chrome_viewport_partition_live_balanced_delimiters() -> None:
+    """Viewport partition wrapper must pass emit delimiter gate."""
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+    from figma_flutter_agent.generator.layout.common import bottom_chrome_viewport_partition_live
+
+    wrapper = bottom_chrome_viewport_partition_live(
+        scrollable_stack="Stack(clipBehavior: Clip.none, children: [Text('scroll')])",
+        pinned_layers=["Positioned(bottom: 0.0, child: Text('nav'))"],
+        width_token="430.0",
+        height_token="932.0",
+    )
+    snippet = f"Widget build(BuildContext context) {{ return {wrapper}; }}"
+    assert validate_dart_delimiters(snippet) is None
+
+
+def test_bottom_chrome_viewport_partition_pins_nav_outside_scroll() -> None:
+    """Bottom nav stays viewport-fixed while the artboard scrolls underneath."""
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.layout import render_layout_file
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+
+    debug_root = Path(".debug/screen/limbo/9_3_1_b_transaction_income")
+    if not (debug_root / "processed.json").is_file():
+        pytest.skip("transaction income debug bundle unavailable")
+    proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    norm = normalize_clean_tree(root, screen_ir=screen_ir)
+    layout = render_layout_file(
+        norm,
+        feature_name="9_3_1_b_transaction_income",
+        uses_svg=True,
+        screen_ir=screen_ir,
+        de_archetype_pass=True,
+        responsive_enabled=False,
+    )["lib/generated/9_3_1_b_transaction_income_layout.dart"]
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+
+    assert validate_dart_delimiters(layout) is None
+    scroll_host = layout.index("Positioned.fill(")
+    nav_host = layout.index("figma-7420_7339")
+    assert scroll_host >= 0
+    assert nav_host > scroll_host
+    assert "figma-7035_1265" in layout
 
 
 def test_bottom_nav_is_terminal_paint_layer() -> None:

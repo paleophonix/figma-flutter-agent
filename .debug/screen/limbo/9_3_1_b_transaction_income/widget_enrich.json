@@ -1,0 +1,37 @@
+{
+  "cacheKey": "89921b34f7ea2b73d610d1db665dc01094a9d402869039237974d44a4e0f56eb",
+  "response": {
+    "entries": [
+      {
+        "clusterId": "component_7043_3020",
+        "widgetName": "CalendarFilterWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7043_3066",
+        "widgetName": "NotificationIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7045_320",
+        "widgetName": "HomeNavItemWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7045_324",
+        "widgetName": "ProfileNavItemWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7045_333",
+        "widgetName": "TransactionsNavItemWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7102_2848",
+        "widgetName": "TransactionCategoryIconWidget",
+        "paramRenames": {}
+      }
+    ]
+  }
+}
