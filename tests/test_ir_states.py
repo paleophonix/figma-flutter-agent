@@ -209,5 +209,6 @@ def test_validate_downgrades_orphan_extracted_widget_ref() -> None:
         apply_guards=False,
     )
     button_ir = screen_ir.root.children[0]
-    assert button_ir.kind == WidgetIrKind.BUTTON
-    assert button_ir.ref is None
+    assert button_ir.kind == WidgetIrKind.EXTRACTED
+    assert button_ir.ref is not None
+    assert button_ir.ref.widget_name == "OrderCardActionButton"

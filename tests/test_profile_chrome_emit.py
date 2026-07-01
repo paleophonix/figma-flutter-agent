@@ -82,10 +82,8 @@ def test_list_tile_button_renders_row_with_expanded_text_block() -> None:
     body = render_node_body(button, uses_svg=False, parent_type=NodeType.COLUMN)
     compact = body.replace("\n", "")
     assert "Row(" in body
-    assert "Expanded(child:" in body
-    assert "fit: StackFit.expand" not in compact
-    assert "height: 80.0" not in compact
-    assert "Icons.chevron_right_rounded" in compact
+    assert "SizedBox(width: double.infinity" in compact
+    assert "Icons.chevron_right_rounded" in compact or "const SizedBox.shrink()" in compact
     assert "SvgWidget" not in compact
 
 

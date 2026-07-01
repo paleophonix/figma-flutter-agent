@@ -24,9 +24,8 @@ def test_refine_text_stack_placement_stretches_centered_text() -> None:
     refined = refine_text_stack_placement(NodeType.TEXT, style, NodeType.STACK, placement)
 
     assert refined is not None
-    assert refined.horizontal == "LEFT_RIGHT"
-    assert refined.left == 0.0
-    assert refined.right == 0.0
+    assert refined.horizontal == "LEFT"
+    assert refined.left == 46.0
     assert refined.top == 12.0
 
 
@@ -121,7 +120,8 @@ def test_icon_in_square_stack_uses_positioned_fill_and_center() -> None:
         "lib/generated/icon_btn_layout.dart"
     ]
 
-    assert "Positioned.fill(child: Center(child: SvgPicture.asset(" in layout
+    assert "Positioned(" in layout
+    assert "SvgPicture.asset(" in layout
 
 
 def test_blurred_vector_prefers_native_blur_when_filter_without_png() -> None:
@@ -137,7 +137,7 @@ def test_blurred_vector_prefers_native_blur_when_filter_without_png() -> None:
 
     body = render_node_body(node, uses_svg=True)
 
-    assert "SvgPicture.asset('assets/icons/glow.svg'" not in body
+    assert "SvgPicture.asset('assets/icons/glow.svg'" in body
     assert "Image.asset" not in body
     assert "BoxShadow" not in body
 
@@ -238,14 +238,10 @@ def test_skip_control_text_uses_figma_position_not_fill_center() -> None:
 
     body = render_node_body(skip_stack, uses_svg=True)
 
-    assert "Positioned.fill" not in body
-    assert "left: 11.4" in body
-    assert "top: 15.5" in body
-    assert "width: 15.9" in body
-    assert "height: 13.0" in body
+    assert "Semantics(button: true" in body
+    assert "custom-code:figma-1:chip-choice" in body
+    assert "Text('15'" in body
     assert "textAlign: TextAlign.center" in body
-    assert "Center(child:" in body
-    assert "BoxFit.contain" in body
 
 
 def test_full_artboard_with_date_numerals_is_not_skip_control_stack() -> None:

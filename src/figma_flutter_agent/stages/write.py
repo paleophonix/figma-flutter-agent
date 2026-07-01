@@ -199,6 +199,11 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
         analyze_catalog.update(files_to_write)
         if request.analyze_scope == "all_planned" and request.analyze_relative_paths:
             analyze_paths = sorted(request.analyze_relative_paths)
+            analyze_seeds = expand_planned_package_import_closure(
+                dict(files_to_write),
+                analyze_catalog,
+                package_name=request.package_name,
+            )
         else:
             analyze_seeds = expand_planned_package_import_closure(
                 dict(files_to_write),

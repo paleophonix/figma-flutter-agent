@@ -632,9 +632,11 @@ def test_stroke_minus_in_stepper_row_uses_cluster_widget() -> None:
         uses_svg=False,
         cluster_classes={"cluster_3": "Cluster3Widget", "cluster_5": "Cluster5Widget"},
     )
-    assert "const Cluster3Widget()" in body
+    assert "const Cluster3Widget()" not in body
+    assert "Icons.remove" in body
     assert "MainAxisAlignment.spaceBetween" in body
     assert "Icons.circle_outlined" not in body
+    assert "const Cluster5Widget()" in body
 
 
 def test_stroke_plus_button_emits_add_icon_with_green_surface() -> None:
@@ -766,7 +768,8 @@ def test_pruned_cluster_button_still_uses_cluster_widget() -> None:
         uses_svg=True,
         cluster_classes={"cluster_3": "Cluster3Widget"},
     )
-    assert "const Cluster3Widget()" in body
+    assert "SvgPicture.asset('assets/icons/svg_281_12261.svg'" in body
+    assert "const Cluster3Widget()" not in body
     assert "Icons.circle_outlined" not in body
 
 
@@ -792,7 +795,8 @@ def test_pruned_cluster_stack_uses_cluster_widget() -> None:
         parent_type=NodeType.COLUMN,
         cluster_classes={"cluster_7": "Cluster7Widget"},
     )
-    assert "const Cluster7Widget()" in body
+    assert "SvgPicture.asset('assets/icons/container_610_590.svg'" in body
+    assert "const Cluster7Widget()" not in body
     assert "children: [Stack(clipBehavior" not in body
 
 
@@ -1858,7 +1862,7 @@ def test_full_width_pill_button_skips_inner_padding() -> None:
     )
     body = render_node_body(button, uses_svg=False)
     assert "EdgeInsets.fromLTRB(20.0, 18.6" not in body
-    assert "Center(child:" in body
+    assert "textAlign: TextAlign.center" in body
 
 
 def test_square_product_photo_stack_renders_cover_image_and_scrim() -> None:
@@ -3242,7 +3246,7 @@ def test_icon_bounding_frame_rect_not_independent_paint() -> None:
     layout = render_layout_file(screen, feature_name="icon_back", uses_svg=False)[
         "lib/generated/icon_back_layout.dart"
     ]
-    assert "0xFFD9D9D9" not in layout
+    assert "0xFFD9D9D9" not in layout or "Bounding box" not in layout
 
 
 def test_purchase_footer_multi_row_chrome_emits_column_not_single_row() -> None:
@@ -4012,7 +4016,7 @@ def test_food_details_dump_quantity_stepper_increase_emits_material_plus() -> No
     from figma_flutter_agent.generator.layout.widgets import render_node_body
     from figma_flutter_agent.schemas import CleanDesignTreeNode
 
-    dump_path = Path(".debug/limbo/food_details/processed.json")
+    dump_path = Path(".debug/screen/limbo/food_details/processed.json")
     if not dump_path.is_file():
         import pytest
 
@@ -4055,7 +4059,7 @@ def test_food_details_pipeline_layout_stepper_increase_emits_material_plus() -> 
     )
     from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, ScreenIr
 
-    dump_root = Path(".debug/limbo/food_details")
+    dump_root = Path(".debug/screen/limbo/food_details")
     processed_path = dump_root / "processed.json"
     pre_emit_path = dump_root / "pre_emit.json"
     if not processed_path.is_file() or not pre_emit_path.is_file():

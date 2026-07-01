@@ -392,3 +392,62 @@ def prune_broken_worktree_slots(repo: Path) -> list[str]:
     prune_orphaned_worktrees(repo)
     prune_stale_git_worktree_registry(repo)
     return removed
+
+
+def list_local_repair_branches(repo: Path) -> list[str]:
+    """Return sorted local branch names under ``repair/*``."""
+    resolved = repo.resolve()
+    if not (resolved / ".git").exists():
+        return []
+    result = subprocess.run(
+        _git_command(resolved, "for-each-ref", "--format=%(refname:short)", "refs/heads/repair/"),
+        cwd=resolved,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return []
+    branches: list[str] = []
+    for line in (result.stdout or "").splitlines():
+        name = line.strip().lstrip("*").strip()
+        if name.startswith("repair/"):
+            branches.append(name)
+    return sorted(branches)
+
+
+def collect_repair_git_leaks(repo: Path) -> tuple[list[str], list[str]]:
+    """Snapshot repair worktree directory names and local ``repair/*`` branches."""
+    worktrees = sorted(path.name for path in list_repair_worktree_dirs(repo))
+    branches = list_local_repair_branches(repo)
+    return worktrees, branches
+
+
+def purge_repair_git_leaks(repo: Path) -> tuple[list[str], list[str]]:
+    """Remove every repair worktree checkout and local ``repair/*`` branch under ``repo``.
+
+    Args:
+        repo: Agent git repository root.
+
+    Returns:
+        Tuple of removed worktree directory names and removed branch names.
+    """
+    resolved = repo.resolve()
+    if not (resolved / ".git").exists():
+        return [], []
+
+    removed_dirs: list[str] = []
+    for path in list(list_repair_worktree_dirs(resolved)):
+        case_id = path.name
+        destroy_repair_worktree(resolved, path)
+        removed_dirs.append(case_id)
+
+    removed_branches: list[str] = []
+    for branch in list_local_repair_branches(resolved):
+        _delete_repair_branch(resolved, branch)
+        removed_branches.append(branch)
+
+    prune_orphaned_worktrees(resolved)
+    prune_broken_worktree_slots(resolved)
+    prune_stale_git_worktree_registry(resolved)
+    return removed_dirs, removed_branches

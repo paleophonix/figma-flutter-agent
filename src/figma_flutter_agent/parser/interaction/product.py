@@ -44,7 +44,7 @@ def _subtree_has_currency_price(node: CleanDesignTreeNode, *, max_depth: int = 4
 
 def _subtree_has_product_price_copy(node: CleanDesignTreeNode, *, max_depth: int = 4) -> bool:
     """Return True when a subtree contains currency or numeric product price copy."""
-    from .text_actions import looks_like_price_or_value_label
+    from .text_actions import price_or_value_label_fact
 
     if max_depth < 0:
         return False
@@ -52,7 +52,7 @@ def _subtree_has_product_price_copy(node: CleanDesignTreeNode, *, max_depth: int
         text = (node.text or "").strip()
         if text and (
             any(symbol in text for symbol in ("₽", "$", "€", "£", "¥", "₴", "₸"))
-            or looks_like_price_or_value_label(text)
+            or price_or_value_label_fact(text)
         ):
             return True
     return any(

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.form import (
     render_checkbox,
@@ -42,7 +44,7 @@ from ..svg import (
 )
 
 
-def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str | None:
+def render_simple_controls(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]) -> str | None:
     """Render CHECKBOX/SWITCH/RADIO_GROUP/RADIO/DROPDOWN/DIALOG/SLIDER/BUTTON/INPUT/CONTAINER-checkbox.
 
     Returns None if the node type does not match any of these branches.
@@ -174,7 +176,7 @@ def card_should_emit_as_overlay_stack(node: CleanDesignTreeNode) -> bool:
     return len(origins) >= 2
 
 
-def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
+def render_card(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]) -> str:
     """Render a NodeType.CARD node."""
     from figma_flutter_agent.generator.cluster_variants import resolve_cluster_delegate_class
     from figma_flutter_agent.parser.interaction.icons import passive_decorative_icon_glyph
@@ -536,7 +538,7 @@ def render_tabs_carousel_bottomnav_wrap(
     return None
 
 
-def render_grid(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
+def render_grid(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]) -> str:
     """Render a NodeType.GRID node."""
     parent_type = flow["parent_type"]
     parent_node = flow["parent_node"]
@@ -610,7 +612,7 @@ class render_misc:
         )
 
     @staticmethod
-    def image_asset_leaf(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str | None:
+    def image_asset_leaf(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]) -> str | None:
         parent_type = flow["parent_type"]
         parent_node = flow["parent_node"]
         scroll_content_root = flow["scroll_content_root"]
@@ -633,7 +635,7 @@ class render_misc:
         )
 
     @staticmethod
-    def fallback(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
+    def fallback(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]) -> str:
         parent_type = flow["parent_type"]
         parent_node = flow["parent_node"]
         scroll_content_root = flow["scroll_content_root"]

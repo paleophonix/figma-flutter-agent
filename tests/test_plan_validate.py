@@ -193,7 +193,7 @@ def test_enrich_plan_row_overflow_targets_adds_flex_policy_row(tmp_path: Path) -
         "steps": [
             {
                 "order": 2,
-                "lawId": "row-overflow-law",
+                "lawId": "FlexRowOverflowLaw",
                 "actionKind": "CODE_CHANGE",
                 "targetFiles": [flex_rel],
                 "tests": [test_rel],
@@ -203,9 +203,9 @@ def test_enrich_plan_row_overflow_targets_adds_flex_policy_row(tmp_path: Path) -
     diagnose = {
         "laws": [
             {
-                "id": "row-overflow-law",
+                "id": "FlexRowOverflowLaw",
                 "lawText": "RenderFlex overflow on divider row gaps",
-                "layer": "emitter",
+                "layer": "emit",
             }
         ]
     }
@@ -245,7 +245,7 @@ def test_enrich_plan_writeback_targets_adds_pipeline_companions(tmp_path: Path) 
         "steps": [
             {
                 "order": 2,
-                "lawId": "LAW-PIPELINE-WRITEBACK-CAPTURE-VERIFIED",
+                "lawId": "WritebackCaptureLaw",
                 "actionKind": "CODE_CHANGE",
                 "targetFiles": [write_rel],
                 "tests": [
@@ -259,9 +259,9 @@ def test_enrich_plan_writeback_targets_adds_pipeline_companions(tmp_path: Path) 
     diagnose = {
         "laws": [
             {
-                "id": "LAW-PIPELINE-WRITEBACK-CAPTURE-VERIFIED",
+                "id": "WritebackCaptureLaw",
                 "lawText": "writeback committed before capture verification rollback",
-                "layer": "pipeline/writeback",
+                "layer": "capture",
             }
         ]
     }

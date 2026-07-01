@@ -1,3 +1,8 @@
 # path | normalized_snippet_hash | category | owner_epic
-src/figma_flutter_agent/generator/layout/style/decoration.py | dbb66d8e | hardcoded_color_literal | E5
+src/figma_flutter_agent/generator/layout/interactive_time.py | ab517aba | hardcoded_color_literal | E5
+src/figma_flutter_agent/generator/layout/interactive_time.py | b58d66eb | hardcoded_color_literal | E5
+src/figma_flutter_agent/generator/layout/style/decoration.py | 4e456fe7 | hardcoded_hex_string | E5
+src/figma_flutter_agent/generator/layout/style/decoration.py | c49802be | hardcoded_color_literal | E5
+src/figma_flutter_agent/generator/layout/widgets/selection.py | 79d1feed | hardcoded_color_literal | E5
+src/figma_flutter_agent/generator/layout/widgets/selection.py | ea36f605 | hardcoded_color_literal | E5
 src/figma_flutter_agent/generator/layout/widgets/thumbnail.py | e4ff5f89 | hardcoded_color_literal | E5

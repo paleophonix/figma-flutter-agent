@@ -108,7 +108,7 @@ async def test_full_pipeline_custom_code_preservation(tmp_path: Path) -> None:
         ),
         patch.object(pipeline_module, "fetch_figma_frame", side_effect=_fake_fetch_figma_frame),
         patch.object(pipeline_module, "parse_figma_frame", side_effect=_fake_parse_figma_frame),
-        patch("figma_flutter_agent.stages.write.validate_dart_project"),
+        patch("figma_flutter_agent.generator.dart.project_validation.validate_dart_project"),
     ):
         await pipeline_module.run_pipeline(
             settings,
@@ -140,7 +140,7 @@ async def test_full_pipeline_custom_code_preservation(tmp_path: Path) -> None:
         ),
         patch.object(pipeline_module, "fetch_figma_frame", side_effect=_fake_fetch_figma_frame),
         patch.object(pipeline_module, "parse_figma_frame", side_effect=_fake_parse_figma_frame),
-        patch("figma_flutter_agent.stages.write.validate_dart_project"),
+        patch("figma_flutter_agent.generator.dart.project_validation.validate_dart_project"),
     ):
         await pipeline_module.run_pipeline(
             settings,

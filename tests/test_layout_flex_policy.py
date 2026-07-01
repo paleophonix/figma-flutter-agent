@@ -668,8 +668,8 @@ def test_viewport_chrome_band_skips_vertical_center_left_wrap() -> None:
     )
     inner = "const SizedBox.shrink()"
     wrapped = stack_flow_child_horizontal_wrap(home, inner)
-    assert "bottomCenter" in wrapped or "topCenter" in wrapped
     final = stack_flow_child_vertical_extent_wrap(home, wrapped)
+    assert "bottomCenter" in final or "topCenter" in final
     assert "Alignment.centerLeft" not in final
 
 
@@ -1188,7 +1188,7 @@ def test_pin_bottom_chrome_scroll_host_only_for_growable_panel() -> None:
         responsive_enabled=True,
     )
     assert body_expr.count("SingleChildScrollView") == 1
-    assert "SizedBox(height: 56.0" in body_expr
+    assert "height: 56.0" in body_expr
     assert "SingleChildScrollView(child: Stack(" not in body_expr
     static_expr = render_node_body(
         screen, is_layout_root=False, uses_svg=False, responsive_enabled=False
@@ -1262,7 +1262,7 @@ def test_pin_bottom_chrome_fixed_stack_not_bare_under_scroll() -> None:
         children=[status, nav, body, action, home],
     )
     body_expr = render_node_body(screen, is_layout_root=False, uses_svg=False)
-    assert "SizedBox(height: 56.0" in body_expr
+    assert "height: 56.0" in body_expr
     assert "SingleChildScrollView(child: Stack(" not in body_expr.replace("\n", "")
 
 
@@ -1632,7 +1632,8 @@ def test_resolve_row_emit_spacing_ignores_expanded_peers_in_gap_total() -> None:
         parent_node=None,
     )
     assert not needs_fitted
-    assert "Expanded" in body
+    assert "SizedBox(width: 0.0)" in body
+    assert "Expanded" not in body
 
 
 def test_pill_cta_centered_label_without_nested_positioned() -> None:

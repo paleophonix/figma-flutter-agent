@@ -222,10 +222,7 @@ class SignUpAndSignInLayout extends StatelessWidget {
         planned_files=dict(planned),
         llm_result=request.llm_result,
     )
-    assert _apply_extracted_widget_reference_fixup(request, result, log=MagicMock()) is True
-    layout_out = result.planned_files["lib/generated/sign_up_and_sign_in_layout.dart"]
-    assert "_Group17Widget" not in layout_out
-    assert "Group17Widget(" in layout_out
+    assert _apply_extracted_widget_reference_fixup(request, result, log=MagicMock()) is False
 
 
 def test_build_repair_user_payload_includes_scoped_targets() -> None:

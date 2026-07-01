@@ -31,6 +31,8 @@ Prefer `deps=` over patching `FigmaConnector` or `create_llm_client` on modules.
 | `live_figma` | `FIGMA_ACCESS_TOKEN`, `FIGMA_SMOKE_FILE_KEY`, `FIGMA_SMOKE_NODE_ID` | `pytest -m live_figma` |
 | `repair_live` | `OPENCODE_SERVER_PASSWORD`, pinned `opencode serve`, `repair.enabled` | `pytest -m repair_live` |
 
+`tests/conftest.py` purges local `repair/*` git branches and `.worktrees/` checkouts before the suite, after every unit test, and at session end (skipped for `live_figma` / `repair_live`).
+
 ## LLM context
 
 - Pipeline DI tests: `tests/test_pipeline_dependencies.py`

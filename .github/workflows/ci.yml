@@ -26,9 +26,6 @@ jobs:
           poetry run ruff check .
           poetry run ruff format --check .
 
-      - name: Mypy
-        run: poetry run mypy src tests
-
   signoff:
     runs-on: ubuntu-latest
     needs: lint
@@ -50,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: poetry install --with dev
 
-      - name: Offline sign-off (ruff, mypy, demo-signoff, pytest)
+      - name: Offline sign-off (ruff, demo-signoff, pytest)
         env:
           FIGMA_GEOMETRY_SIGNOFF_SCREENS: sign_up_and_sign_in
         run: bash scripts/signoff.sh

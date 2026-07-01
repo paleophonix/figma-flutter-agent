@@ -10,7 +10,7 @@ from figma_flutter_agent.parser.semantics.detectors._base import (
     _variant_axis_value,
 )
 from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalTier
-from figma_flutter_agent.schemas import NodeType, WidgetIrKind
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
 
 
 def _is_input_text_field(ctx: DetectorContext) -> bool:
@@ -63,6 +63,35 @@ def _is_input_file_uploader(ctx: DetectorContext) -> bool:
         return True
     types = _child_types(node)
     return NodeType.BUTTON in types and (NodeType.VECTOR in types or NodeType.IMAGE in types)
+
+
+def _is_rating_star_unit(node: CleanDesignTreeNode) -> bool:
+    if node.type not in {NodeType.STACK, NodeType.CONTAINER, NodeType.VECTOR}:
+        return False
+    if node.type == NodeType.VECTOR:
+        return True
+    extent = node.sizing.width, node.sizing.height
+    if extent[0] is None or extent[1] is None:
+        return False
+    if max(float(extent[0]), float(extent[1])) > 48.0:
+        return False
+    return NodeType.VECTOR in _child_types(node) or any(
+        child.type == NodeType.VECTOR for child in node.children
+    )
+
+
+def _count_rating_star_units(node: CleanDesignTreeNode) -> int:
+    return sum(1 for child in node.children if _is_rating_star_unit(child))
+
+
+def _is_input_rating(ctx: DetectorContext) -> bool:
+    node = ctx.clean_node
+    axis = _variant_axis_value(node, "type", "role", "variant", "control")
+    if axis and ("rating" in axis or "star" in axis):
+        return True
+    if node.type not in {NodeType.ROW, NodeType.STACK, NodeType.WRAP}:
+        return False
+    return _count_rating_star_units(node) >= 3
 
 
 INPUT_DETECTORS: tuple[RuleDetector, ...] = (
@@ -121,5 +150,12 @@ INPUT_DETECTORS: tuple[RuleDetector, ...] = (
         tier=SignalTier.ANATOMY,
         base_confidence=0.83,
         evidence_key="input_file_uploader",
+    ),
+    RuleDetector(
+        WidgetIrKind.INPUT_RATING,
+        predicate=_is_input_rating,
+        tier=SignalTier.ANATOMY,
+        base_confidence=0.84,
+        evidence_key="input_rating",
     ),
 )

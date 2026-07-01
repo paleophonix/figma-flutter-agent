@@ -24,7 +24,7 @@ def _argb_rgb_channels(color: str | None) -> tuple[int, int, int] | None:
     return (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF
 
 
-def looks_like_price_or_value_label(text: str | None) -> bool:
+def price_or_value_label_fact(text: str | None) -> bool:
     """Return True when copy is numeric price/discount value, not an action label."""
     if not text:
         return False
@@ -79,7 +79,7 @@ def layout_fact_actionable_accent_text_node(node: CleanDesignTreeNode) -> bool:
     label = node.text.strip()
     if not label or len(label) > 40:
         return False
-    if looks_like_price_or_value_label(label):
+    if price_or_value_label_fact(label):
         return False
     if node.style.text_decoration == "underline":
         return True

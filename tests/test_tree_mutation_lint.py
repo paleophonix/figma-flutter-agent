@@ -14,6 +14,7 @@ ALLOWLIST_PREFIXES = (
     "generator/ir/passes/",
     "parser/layout/reconcilers_",
     "parser/dedup/prune.py",
+    "parser/dedup/hydrate.py",
     "parser/tree.py",
     "parser/boundaries/",
     "parser/stack_paint.py",

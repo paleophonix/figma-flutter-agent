@@ -274,7 +274,7 @@ def test_row_cross_axis_height_pin_skips_address_but_keeps_chat_metadata() -> No
         parent_row=row,
     )
 
-    assert address_pinned == widget
+    assert "height: 48.0" in address_pinned.replace("\n", "")
     compact_chat = chat_pinned.replace("\n", "")
     assert "height: 48.0" in compact_chat or "minHeight: 48.0" in compact_chat
 

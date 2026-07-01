@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any, Callable
+
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.cupertino import (
     wrap_back_nav_stack as cupertino_wrap_back_nav_stack,
@@ -91,7 +93,9 @@ def _logo_wordmark_stack_size(node: CleanDesignTreeNode) -> tuple[float, float]:
     return width, height
 
 
-def _render_logo_wordmark_stack(node: CleanDesignTreeNode, ctx: dict, *, recurse) -> str:
+def _render_logo_wordmark_stack(
+    node: CleanDesignTreeNode, ctx: dict[str, Any], *, recurse: Callable[..., str]
+) -> str:
     width, height = _logo_wordmark_stack_size(node)
     child_widgets = [
         recurse(
@@ -122,7 +126,9 @@ def _render_logo_wordmark_stack(node: CleanDesignTreeNode, ctx: dict, *, recurse
     )
 
 
-def _render_vector_logo_mark_stack(node: CleanDesignTreeNode, ctx: dict, *, recurse) -> str:
+def _render_vector_logo_mark_stack(
+    node: CleanDesignTreeNode, ctx: dict[str, Any], *, recurse: Callable[..., str]
+) -> str:
     """Emit positioned vector icon + wordmark inside a bounded logo stack."""
     width, height = _logo_wordmark_stack_size(node)
     child_widgets: list[str] = []
@@ -155,7 +161,9 @@ def _render_vector_logo_mark_stack(node: CleanDesignTreeNode, ctx: dict, *, recu
     )
 
 
-def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> str:
+def render_stack(
+    node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any], *, recurse: Callable[..., str]
+) -> str:
     """Render a NodeType.STACK node (the non-early-return path)."""
     parent_type = flow["parent_type"]
     parent_node = flow["parent_node"]
@@ -614,8 +622,8 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             ),
         )
         spacing_lit = format_geometry_literal(stack_pill_button_wrap_spacing(node.children))
-        flow_parts = [widget for _, widget in ordered_pairs]
-        body = ", ".join(flow_parts) or "const SizedBox.shrink()"
+        wrap_flow_parts = [widget for _, widget in ordered_pairs]
+        body = ", ".join(wrap_flow_parts) or "const SizedBox.shrink()"
         stack_widget = (
             "Wrap("
             "alignment: WrapAlignment.start, "
@@ -659,7 +667,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             zip(sorted_children, stack_children, strict=True),
             key=lambda pair: stack_flow_column_child_sort_key(pair[0]),
         )
-        flow_parts: list[str] = []
+        column_flow_parts: list[str] = []
         scroll_body_parts: list[str] = []
         trailing_parts: list[str] = []
         for index, (child, widget) in enumerate(ordered_pairs):
@@ -729,23 +737,23 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 trailing_parts.append(flow_widget)
             else:
                 if gap_expr is not None:
-                    flow_parts.append(gap_expr)
-                flow_parts.append(flow_widget)
+                    column_flow_parts.append(gap_expr)
+                column_flow_parts.append(flow_widget)
         if uses_shared_scroll and scroll_body_parts:
             inner_body = ", ".join(scroll_body_parts) or "const SizedBox.shrink()"
             inner_column = (
                 "Column(mainAxisSize: MainAxisSize.min, "
                 f"crossAxisAlignment: CrossAxisAlignment.stretch, children: [{inner_body}])"
             )
-            flow_parts.append(
+            column_flow_parts.append(
                 pin_bottom_flow_column_scroll_wrap(
                     inner_column,
                     allow_outward_paint=allow_outward_paint,
                     bottom_padding=bottom_padding,
                 )
             )
-        flow_parts.extend(trailing_parts)
-        body = ", ".join(flow_parts) or "const SizedBox.shrink()"
+        column_flow_parts.extend(trailing_parts)
+        body = ", ".join(column_flow_parts) or "const SizedBox.shrink()"
         main_axis = (
             "mainAxisSize: MainAxisSize.max, "
             if (pin_bottom_chrome or is_phone_shell) and responsive_enabled
@@ -918,7 +926,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             node
         ) or bottom_nav_active_tab_should_split_surface_label(node):
             icon_widgets: list[str] = []
-            label_widgets: list[str] = []
+            button_label_widgets: list[str] = []
             widget_iter = iter(child_widgets)
             for child in sorted_children:
                 if (
@@ -933,7 +941,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 except StopIteration:
                     break
                 if child.type == NodeType.TEXT:
-                    label_widgets.append(widget)
+                    button_label_widgets.append(widget)
                 else:
                     icon_widgets.append(widget)
             icon_body = ", ".join(icon_widgets) or "const SizedBox.shrink()"
@@ -950,7 +958,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             )
             width_lit = format_geometry_literal(float(node.sizing.width or 65.0))
             height_lit = format_geometry_literal(band_height)
-            label_body = ", ".join(label_widgets)
+            label_body = ", ".join(button_label_widgets)
             stack_widget = (
                 "Stack(clipBehavior: Clip.none, children: ["
                 f"Positioned(left: 0.0, top: 0.0, width: {width_lit}, height: {height_lit}, "

@@ -53,12 +53,7 @@ def is_tag_option_chip_group(node: CleanDesignTreeNode) -> bool:
     """Return True when a container hosts two or more ``Tag`` option chips."""
     if node.type not in _TAG_OPTION_GROUP_TYPES or len(node.children) < 2:
         return False
-    tag_count = count_tag_option_chips(node)
-    if tag_count >= 2:
-        return True
-    if node.name.strip().lower() == "chips" and tag_count >= 1 and len(node.children) >= 2:
-        return all(is_tag_option_chip_row(child) for child in node.children)
-    return False
+    return all(is_tag_option_chip_row(child) for child in node.children)
 
 
 def stack_should_preserve_absolute_tag_chips(stack: CleanDesignTreeNode) -> bool:

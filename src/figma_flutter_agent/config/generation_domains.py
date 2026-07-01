@@ -48,7 +48,7 @@ class FidelityGenerationPolicy:
 def llm_repair_refine_policy(cfg: GenerationConfig) -> LlmRepairRefinePolicy:
     """Build LLM repair/refine policy view from generation config."""
     return LlmRepairRefinePolicy(
-        llm_repair_attempts=cfg.llm_repair_attempts,
+        llm_repair_attempts=cfg.llm_repair_max_attempts,
         llm_visual_refine=cfg.llm_visual_refine,
         golden_capture_timeout_sec=cfg.golden_capture_timeout_sec,
     )
@@ -74,8 +74,7 @@ def geometry_emit_policy(cfg: GenerationConfig) -> GeometryEmitPolicy:
 
 def fidelity_generation_policy(cfg: GenerationConfig) -> FidelityGenerationPolicy:
     """Build fidelity generation policy view from generation config."""
-    profile = cfg.render_profile
-    profile_value = profile.value if hasattr(profile, "value") else str(profile)
+    profile_value = cfg.render_profile
     return FidelityGenerationPolicy(
         pixel_fidelity=cfg.pixel_fidelity,
         preserve_placement=cfg.preserve_placement,

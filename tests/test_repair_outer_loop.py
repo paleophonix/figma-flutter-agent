@@ -76,6 +76,8 @@ class _LoopOnceRunner:
 
 def _prepare_screen(tmp_path: Path, *, capture_ok: bool = True) -> tuple[Path, str]:
     project = tmp_path / "demo_app"
+    project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo_app\n", encoding="utf-8")
     feature = "login"
     root = screen_root(project, feature)
     root.mkdir(parents=True)
@@ -333,7 +335,8 @@ async def test_fix_exhausted_routes_diagnose_refine(
     project, feature = _prepare_screen(tmp_path)
     settings = load_settings()
     loops = settings.agent.debug_pipeline.loops.model_copy(update={"max_fix_attempts": 1})
-    monkeypatch.setattr(settings.agent.debug_pipeline, "loops", loops)
+    policy = settings.agent.debug_pipeline.model_copy(update={"fix_enabled": True, "loops": loops})
+    monkeypatch.setattr(settings.agent, "debug_pipeline", policy)
 
     class _Runner:
         diagnose_calls = 0

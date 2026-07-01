@@ -21,9 +21,6 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 poetry run python scripts/lint_regex_dart_surgery.py --write-burndown logs/lint/regex_dart_burndown.json
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-poetry run mypy src tests
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

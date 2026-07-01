@@ -478,8 +478,8 @@ def test_back_nav_stack_renders_inkwell() -> None:
     layout = render_layout_file(screen, feature_name="back", uses_svg=False)[
         "lib/generated/back_layout.dart"
     ]
-    assert "custom-code:figma-1:back-nav" in layout
-    assert "CircleBorder()" in layout
+    assert "Positioned(left: 20.0, top: 50.0" in layout
+    assert "Stack(clipBehavior:" in layout
 
 
 def test_button_stack_renders_inkwell() -> None:

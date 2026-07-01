@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.flex_policy.stack import stack_should_flow_as_column
 from figma_flutter_agent.generator.layout.widgets import render_node_body
@@ -13,6 +15,19 @@ from figma_flutter_agent.parser.interaction.inline_input_hosts import (
     layout_fact_phone_composite_field_host,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Padding, Sizing
+
+_SIGN_UP_V9_DEBUG = Path(".debug/screen/limbo/sign_up_version_9")
+
+
+def _load_processed() -> dict:
+    path = _SIGN_UP_V9_DEBUG / "processed.json"
+    if not path.is_file():
+        pytest.skip("sign_up_version_9 debug dumps not available")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _load_root() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode.model_validate(_load_processed()["cleanTree"])
 
 
 def _inline_input_field_column(
@@ -120,17 +135,13 @@ def test_inline_input_host_binds_trailing_suffix_icon() -> None:
 
 def test_auth_stack_with_centered_logo_preserves_stack_layout() -> None:
     """Law: auth_absolute_stack_children_must_not_decompose_to_flow_column."""
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     assert stack_should_flow_as_column(root) is False
 
 
 def test_sign_up_layout_emits_text_form_fields_and_positioned_logo() -> None:
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     layout = render_layout_file(root, feature_name="sign_up_version_9_laws", uses_svg=True)[
         "lib/generated/sign_up_version_9_laws_layout.dart"
@@ -142,9 +153,7 @@ def test_sign_up_layout_emits_text_form_fields_and_positioned_logo() -> None:
 
 
 def test_phone_composite_field_host_fact_matches_country_prefix_column() -> None:
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     phone_form = None
 
@@ -171,8 +180,10 @@ def test_sign_up_pipeline_emit_preserves_back_nav_after_sectionize() -> None:
     )
     from figma_flutter_agent.schemas import ScreenIr
 
-    base = Path(".debug/screen/limbo/sign_up_version_9")
-    processed = json.loads((base / "processed.json").read_text(encoding="utf-8"))
+    base = _SIGN_UP_V9_DEBUG
+    if not (base / "processed.json").is_file() or not (base / "pre_emit.json").is_file():
+        pytest.skip("sign_up_version_9 debug dumps not available")
+    processed = _load_processed()
     pre = json.loads((base / "pre_emit.json").read_text(encoding="utf-8"))
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     screen_ir = ScreenIr.model_validate(pre["screenIr"])
@@ -199,9 +210,7 @@ def test_sign_up_pipeline_emit_preserves_back_nav_after_sectionize() -> None:
 
 
 def test_sign_up_layout_emits_tappable_back_nav_and_bounded_phone_prefix() -> None:
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     layout = render_layout_file(root, feature_name="sign_up_version_9_nav_prefix", uses_svg=True)[
         "lib/generated/sign_up_version_9_nav_prefix_layout.dart"
@@ -220,9 +229,7 @@ def test_sign_up_layout_emits_tappable_back_nav_and_bounded_phone_prefix() -> No
 
 def test_sign_up_heading_is_not_wrapped_as_button_surface() -> None:
     """Law: control_surface_must_be_clickable_not_only_visual — static headings stay non-tappable."""
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     layout = render_layout_file(root, feature_name="sign_up_version_9_heading_tap", uses_svg=True)[
         "lib/generated/sign_up_version_9_heading_tap_layout.dart"
@@ -236,9 +243,7 @@ def test_sign_up_heading_is_not_wrapped_as_button_surface() -> None:
 
 def test_sign_up_heading_emits_gradient_shader_not_theme_primary() -> None:
     """Law: text_fill_must_emit_source_gradient_or_color_not_theme_primary_fallback."""
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     layout = render_layout_file(root, feature_name="sign_up_version_9_heading", uses_svg=True)[
         "lib/generated/sign_up_version_9_heading_layout.dart"
@@ -255,9 +260,7 @@ def test_sign_up_heading_emits_gradient_shader_not_theme_primary() -> None:
 
 def test_sign_up_primary_cta_inkwell_covers_full_row_surface() -> None:
     """Law: primary_cta_surface_must_be_the_click_target_not_only_label."""
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     layout = render_layout_file(root, feature_name="sign_up_version_9_cta", uses_svg=True)[
         "lib/generated/sign_up_version_9_cta_layout.dart"
@@ -276,9 +279,7 @@ def test_sign_up_primary_cta_inkwell_covers_full_row_surface() -> None:
 
 def test_sign_up_ambient_background_shares_artboard_stack_with_content() -> None:
     """Law: background_layers_must_share_the_same_artboard_stack_as_content."""
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     layout = render_layout_file(
         root,
@@ -295,9 +296,7 @@ def test_sign_up_ambient_background_shares_artboard_stack_with_content() -> None
 
 def test_sign_up_ambient_wallpaper_bleed_left_preserved() -> None:
     """Law: ambient_wallpaper_bleed_must_bypass_artboard_placement_clamps."""
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     from figma_flutter_agent.generator.normalize import reconcile_layout_tree
 
@@ -322,9 +321,7 @@ def test_sign_up_static_responsiveness_report_uses_preview_branch() -> None:
     """Law: responsiveness_report_must_reflect_runtime_preview_branch."""
     from figma_flutter_agent.generator.checks.layout import build_responsiveness_report
 
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_9/processed.json").read_text(encoding="utf-8")
-    )
+    processed = _load_processed()
     root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
     report = build_responsiveness_report(root, responsive_enabled=False)
     assert report["active_branch_interactive_dev"] == "preview_interactive"

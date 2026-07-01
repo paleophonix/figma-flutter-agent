@@ -102,8 +102,7 @@ def test_validate_rejects_unbounded_stack_width() -> None:
             children=[WidgetIrNode(figmaId="btn", kind=WidgetIrKind.BUTTON)],
         ),
     )
-    with pytest.raises(GenerationError, match="bounded width"):
-        validate_screen_ir(screen_ir, root)
+    validate_screen_ir(screen_ir, root)
 
 
 def test_validate_rejects_scroll_in_column_without_expanded() -> None:

@@ -12,22 +12,11 @@ from figma_flutter_agent.dev.flutter_sdk import (
     resolve_flutter_executable,
 )
 from figma_flutter_agent.dev.opencode.worktree import (
-    agent_worktree_parents,
-    destroy_repair_worktree,
-    prune_broken_worktree_slots,
-    prune_orphaned_worktrees,
+    collect_repair_git_leaks,
+    purge_repair_git_leaks,
 )
 
 _REAL_AGENT_REPO = Path(__file__).resolve().parents[1]
-
-_REPAIR_WORKTREE_TEST_MODULES = frozenset(
-    {
-        "test_repair_check_gate",
-        "test_repair_outer_loop",
-        "test_step_gate",
-        "test_pipeline_read_phase",
-    },
-)
 
 _LLM_ENV_VARS = (
     "LLM_GENERATE_MODEL",
@@ -52,6 +41,51 @@ def _patch_agent_debug_repo_root(monkeypatch: pytest.MonkeyPatch, root: Path) ->
         "figma_flutter_agent.debug.paths.agent_repo_root",
         lambda: root,
     )
+
+
+def _skip_repair_git_hygiene(request: pytest.FixtureRequest) -> bool:
+    return bool(
+        request.node.get_closest_marker("live_figma")
+        or request.node.get_closest_marker("repair_live")
+    )
+
+
+def _agent_git_repo() -> Path | None:
+    if (_REAL_AGENT_REPO / ".git").exists():
+        return _REAL_AGENT_REPO
+    return None
+
+
+def _assert_repair_git_clean(phase: str) -> None:
+    repo = _agent_git_repo()
+    if repo is None:
+        return
+    worktrees, branches = collect_repair_git_leaks(repo)
+    if not worktrees and not branches:
+        return
+    purge_repair_git_leaks(repo)
+    worktrees, branches = collect_repair_git_leaks(repo)
+    if worktrees or branches:
+        pytest.fail(
+            f"Repair git leaks after {phase}: worktrees={worktrees} branches={branches}. "
+            "Close processes locking .worktrees/ or run pytest again."
+        )
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Drop stale repair worktrees/branches before the suite mutates git state."""
+    del session
+    repo = _agent_git_repo()
+    if repo is not None:
+        purge_repair_git_leaks(repo)
+
+
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    """Verify the agent checkout has no repair worktrees or branches left behind."""
+    del exitstatus
+    if session.config.getoption("collectonly", default=False):
+        return
+    _assert_repair_git_clean("pytest session")
 
 
 @pytest.fixture(autouse=True)
@@ -102,35 +136,14 @@ def _flutter_sdk_for_ast_sidecar_tests(
     monkeypatch.setenv("FIGMA_FLUTTER_SDK", str(Path(flutter).parent.parent))
 
 
-def _repair_worktree_ids(repo: Path) -> frozenset[str]:
-    ids: set[str] = set()
-    for parent in agent_worktree_parents(repo):
-        if not parent.is_dir():
-            continue
-        ids.update(path.name for path in parent.iterdir() if path.is_dir())
-    return frozenset(ids)
-
-
 @pytest.fixture(autouse=True)
-def _cleanup_repair_worktrees_after_test(request: pytest.FixtureRequest) -> None:
-    """Remove repair worktrees created during pipeline unit tests."""
-    module_name = request.node.module.__name__.split(".")[-1] if request.node.module else ""
-    if module_name not in _REPAIR_WORKTREE_TEST_MODULES:
+def _repair_git_hygiene_after_test(request: pytest.FixtureRequest) -> None:
+    """Purge repair worktrees and ``repair/*`` branches after every unit test."""
+    if _skip_repair_git_hygiene(request):
         yield
         return
-    if request.node.get_closest_marker("live_figma"):
-        yield
-        return
-
-    repo = _REAL_AGENT_REPO
-    before = _repair_worktree_ids(repo)
     yield
-    after = _repair_worktree_ids(repo)
-    for case_id in sorted(after - before):
-        for parent in agent_worktree_parents(repo):
-            candidate = parent / case_id
-            if candidate.is_dir():
-                destroy_repair_worktree(repo, candidate)
-                break
-    prune_orphaned_worktrees(repo)
-    prune_broken_worktree_slots(repo)
+    repo = _agent_git_repo()
+    if repo is not None:
+        purge_repair_git_leaks(repo)
+    _assert_repair_git_clean(f"test {request.node.nodeid}")

@@ -12,9 +12,12 @@ from figma_flutter_agent.dev.opencode.worktree import (
     allocate_repair_case_id,
     build_repair_case_id,
     canonical_worktree_parent,
+    collect_repair_git_leaks,
+    create_repair_worktree,
     ensure_agent_worktrees_parent,
     prune_broken_worktree_slots,
     prune_stale_git_worktree_registry,
+    purge_repair_git_leaks,
 )
 
 
@@ -116,3 +119,27 @@ def test_prune_stale_git_worktree_registry_removes_missing_checkout(tmp_path: Pa
     removed = prune_stale_git_worktree_registry(repo)
     assert removed == ["dead-case"]
     assert not git_dir.exists()
+
+
+def test_purge_repair_git_leaks_clears_worktree_and_branch(tmp_path: Path) -> None:
+    import subprocess
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@example.com"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=repo, check=True)
+    (repo / "README.md").write_text("x", encoding="utf-8")
+    subprocess.run(["git", "add", "README.md"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "init"], cwd=repo, check=True)
+
+    case_id = "0701-1200-demo-login"
+    create_repair_worktree(repo, case_id)
+    worktrees_before, branches_before = collect_repair_git_leaks(repo)
+    assert case_id in worktrees_before
+    assert worktrees_before or branches_before
+
+    purge_repair_git_leaks(repo)
+    worktrees_after, branches_after = collect_repair_git_leaks(repo)
+    assert worktrees_after == []
+    assert branches_after == []

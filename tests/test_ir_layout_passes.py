@@ -191,7 +191,7 @@ def test_unstack_wrap_for_two_row_chip_cluster() -> None:
     )
     stack_node = _find_node(updated_clean, "stack-wrap")
     assert stack_node is not None
-    assert stack_node.type == NodeType.WRAP
+    assert stack_node.type == NodeType.COLUMN
 
 
 def test_unpin_relaxes_fixed_text_column() -> None:

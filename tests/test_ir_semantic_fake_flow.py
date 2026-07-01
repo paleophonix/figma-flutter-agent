@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from figma_flutter_agent.debug.ir_dumps import write_ir_debug_json
+from figma_flutter_agent.debug.paths import screen_ir_dump_path
 from figma_flutter_agent.generator.ir.context import IrEmitContext, IrEmitPolicy
 from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
@@ -104,7 +105,7 @@ def test_finalize_generation_preserves_semantic_verdicts(tmp_path: Path) -> None
     assert finalized.screen_ir is not None
     assert finalized.screen_ir.semantic_summary is not None
     assert finalized.screen_ir.semantic_verdicts[0].node_id == "281:7386"
-    dump_path = tmp_path / ".debug" / "ir" / "feedback_llm_parsed.json"
+    dump_path = screen_ir_dump_path(tmp_path, "feedback", "llm_parsed")
     assert dump_path.is_file()
     payload = json.loads(dump_path.read_text(encoding="utf-8"))
     assert payload["screenIr"]["semanticVerdicts"]
@@ -141,7 +142,7 @@ def test_write_ir_debug_json_semantic_context_stage(tmp_path: Path) -> None:
         payload={"rawContext": {"id": "281:7179"}},
         project_dir=tmp_path,
     )
-    assert path.name == "feedback_semantic_context.json"
+    assert path.name == "semantic_context.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
     assert payload["stage"] == "semantic_context"
     assert payload["rawContext"]["id"] == "281:7179"

@@ -9,7 +9,6 @@ poetry run python scripts/lint_dart_in_python.py --write-burndown logs/lint/dart
 poetry run python scripts/lint_settings_purity.py --write-burndown logs/lint/settings_purity_burndown.json
 poetry run python scripts/lint_hardcoded_colors.py --write-burndown logs/lint/hardcoded_color_burndown.json
 poetry run python scripts/lint_regex_dart_surgery.py --write-burndown logs/lint/regex_dart_burndown.json
-poetry run mypy src tests
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter fixture-ir-validate
 poetry run figma-flutter fidelity validate

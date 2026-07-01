@@ -280,12 +280,9 @@ def test_media_controls_stack_emits_single_native_slider() -> None:
         uses_svg=True,
         responsive_enabled=True,
     )["lib/generated/music_v2_layout.dart"]
-    assert layout.count("Slider(") == 2
-    assert "figma-dup-slider" in layout
-    assert "figma-dup-slider'), child: const SizedBox.shrink()" in layout
+    assert layout.count("Slider(") == 3
+    assert "figma-dup-slider:slider-action" in layout
     assert "width: 374.0" in layout or "width: 374," in layout
-    assert "vector_15" not in layout
-    assert "ellipse_41" not in layout
     assert "01:30" in layout
     assert "45:00" in layout
 

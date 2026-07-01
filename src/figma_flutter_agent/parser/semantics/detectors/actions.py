@@ -65,8 +65,6 @@ def _is_chip_row(ctx: DetectorContext) -> bool:
         return True
     if count_tag_option_chips(node) >= 2:
         return True
-    if node.type == NodeType.STACK and layout_fact_compact_chip_stack(node):
-        return True
     if node.type in {NodeType.ROW, NodeType.WRAP}:
         return count_compact_chip_stacks(node) >= 2
     return False

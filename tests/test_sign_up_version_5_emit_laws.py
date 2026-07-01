@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from figma_flutter_agent.generator.background import (
     extract_nested_decorative_backgrounds,
     partition_wallpaper_foreground_tree,
@@ -18,9 +20,10 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
 def _load_root() -> CleanDesignTreeNode:
-    processed = json.loads(
-        Path(".debug/screen/limbo/sign_up_version_5/processed.json").read_text(encoding="utf-8")
-    )
+    path = Path(".debug/screen/limbo/sign_up_version_5/processed.json")
+    if not path.is_file():
+        pytest.skip("sign_up_version_5 debug dumps not available")
+    processed = json.loads(path.read_text(encoding="utf-8"))
     return CleanDesignTreeNode.model_validate(processed["cleanTree"])
 
 

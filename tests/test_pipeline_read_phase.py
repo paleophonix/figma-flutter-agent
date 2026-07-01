@@ -58,6 +58,8 @@ class _MockRunner:
 @pytest.mark.asyncio
 async def test_pipeline_mock_runner_completes(tmp_path, monkeypatch) -> None:
     project = tmp_path / "demo_app"
+    project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo_app\n", encoding="utf-8")
     feature = "login"
     root = screen_root(project, feature)
     root.mkdir(parents=True)

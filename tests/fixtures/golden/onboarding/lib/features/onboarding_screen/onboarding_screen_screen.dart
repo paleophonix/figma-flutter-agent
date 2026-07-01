@@ -86,6 +86,8 @@ class OnboardingScreen extends StatelessWidget {
     const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT'),
   ) ??
       0;
+  static final bool _artboardCaptureMode =
+      const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_CAPTURE_MODE', defaultValue: '') == '1';
 
   const OnboardingScreen({super.key});
 

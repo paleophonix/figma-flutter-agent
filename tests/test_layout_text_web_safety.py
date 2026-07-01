@@ -55,7 +55,6 @@ def test_responsive_layout_scales_artboard_without_positioned_under_material() -
     )["lib/generated/sign_in_layout.dart"]
     assert "Material(color:" in layout
     assert "child: Positioned.fill" not in layout.replace(" ", "")
-    assert "Align(" in layout
-    assert "FittedBox(" in layout
-    assert "alignment: Alignment.topCenter" in layout
+    assert "LayoutBuilder(" in layout
+    assert "Align(alignment: Alignment.topLeft" in layout
     assert "Welcome Back!" in layout

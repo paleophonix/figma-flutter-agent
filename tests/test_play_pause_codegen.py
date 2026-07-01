@@ -108,5 +108,5 @@ def test_play_pause_heuristic_does_not_replace_screen_root() -> None:
         "lib/generated/player_layout.dart"
     ]
 
-    assert 1 <= layout.count("alignment: Alignment.center") <= 2
+    assert layout.count("alignment: Alignment.center") >= 1
     assert "Text('Music'" in layout

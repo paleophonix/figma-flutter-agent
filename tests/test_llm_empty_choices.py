@@ -18,7 +18,10 @@ def test_request_generation_raises_llm_error_when_choices_none() -> None:
     mock_response.id = None
     mock_response.model = None
     mock_response.error = None
-    mock_client.chat.completions.create.return_value = mock_response
+    mock_raw = MagicMock()
+    mock_raw.text = '{"choices": null}'
+    mock_raw.parse.return_value = mock_response
+    mock_client.chat.completions.with_raw_response.create.return_value = mock_raw
 
     client = OpenRouterLlmClient(
         api_key="test-key",

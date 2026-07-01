@@ -12,14 +12,39 @@ from figma_flutter_agent.parser.semantics.detectors._base import (
     _variant_axis_value,
 )
 from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalTier
-from figma_flutter_agent.schemas import NodeType, WidgetIrKind
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
+
+_ICON_TILE_MAX_SIDE = 40.0
+_ICON_DESCENDANT_DEPTH = 3
+
+
+def _descendant_nodes(node: CleanDesignTreeNode, max_depth: int) -> list[CleanDesignTreeNode]:
+    if max_depth < 0:
+        return []
+    nodes = [node]
+    for child in node.children:
+        nodes.extend(_descendant_nodes(child, max_depth - 1))
+    return nodes
+
+
+def _passive_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
+    if node.type not in {NodeType.STACK, NodeType.CARD}:
+        return False
+    if not _is_compact_square(node, max_side=_ICON_TILE_MAX_SIDE):
+        return False
+    local_nodes = _descendant_nodes(node, _ICON_DESCENDANT_DEPTH)
+    if not any(item.type == NodeType.VECTOR for item in local_nodes):
+        return False
+    if any(item.type == NodeType.TEXT and (item.text or "").strip() for item in local_nodes):
+        return False
+    if node.component_ref is not None:
+        return True
+    return node.type == NodeType.CARD
 
 
 def _is_container_card(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    from figma_flutter_agent.parser.interaction.icons import passive_decorative_icon_glyph
-
-    if passive_decorative_icon_glyph(node):
+    if _passive_decorative_icon_glyph(node):
         return False
     signal_type = _signal_type(node)
     return signal_type == NodeType.CARD or (

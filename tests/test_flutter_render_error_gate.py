@@ -33,7 +33,7 @@ def test_render_error_capture_accumulates_errors() -> None:
 
 
 def test_last_log_overflow_sample_is_render_error() -> None:
-    log_path = Path(".debug/limbo/food_details/last.log")
+    log_path = Path(".debug/screen/limbo/food_details/last.log")
     if not log_path.is_file():
         return
     overflow_lines = [

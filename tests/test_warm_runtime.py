@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.debug.paths import screen_perf_dir
 from figma_flutter_agent.validation.golden_capture import (
     FixtureCaptureBatch,
     GoldenCaptureResult,
@@ -137,12 +138,7 @@ def test_persist_golden_capture_timings_writes_project_only_when_project_bound(
     )
     assert not (agent_perf / "golden_capture_music_v2_ru_dirty.json").exists()
     assert (
-        project
-        / ".debug"
-        / "music_v2"
-        / "secondary"
-        / "perf"
-        / "golden_capture_music_v2_ru_dirty.json"
+        screen_perf_dir(project, "music_v2") / "golden_capture_music_v2_ru_dirty.json"
     ).is_file()
 
 
@@ -167,7 +163,7 @@ def test_persist_golden_capture_timings_distinct_project_paths_for_shared_featur
             agent_timings_dir=agent_perf,
             project_dir=project,
         )
-    perf_dir = project / ".debug" / "music_v2" / "secondary" / "perf"
+    perf_dir = screen_perf_dir(project, "music_v2")
     assert (perf_dir / "golden_capture_music_v2.json").is_file()
     assert (perf_dir / "golden_capture_music_v2_ru_dirty.json").is_file()
 
@@ -188,14 +184,7 @@ def test_fixture_batch_writes_timings_json(tmp_path: Path) -> None:
         write_timings=True,
     )
     batch._persist_timings(timings)
-    out_path = (
-        project
-        / ".debug"
-        / "music_v2"
-        / "secondary"
-        / "perf"
-        / "golden_capture_music_v2_ru_dirty.json"
-    )
+    out_path = screen_perf_dir(project, "music_v2") / "golden_capture_music_v2_ru_dirty.json"
     assert out_path.is_file()
     assert not (tmp_path / "perf" / "golden_capture_music_v2_ru_dirty.json").exists()
     payload = json.loads(out_path.read_text(encoding="utf-8"))

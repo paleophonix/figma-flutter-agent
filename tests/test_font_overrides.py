@@ -13,6 +13,7 @@ from figma_flutter_agent.fonts.googlefonts import clear_metadata_cache
 from figma_flutter_agent.fonts.overrides import PROJECT_OVERRIDES_FILENAME
 from figma_flutter_agent.fonts.registry import clear_registry_cache
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
+from tests.font_bytes import minimal_ttf_payload as _minimal_ttf_payload
 
 
 @pytest.fixture(autouse=True)
@@ -85,7 +86,7 @@ def test_bundle_uses_disk_cache_without_redownload(
 
     def fake_download(url: str, *, client: object) -> bytes:
         calls.append(url)
-        return b"cached-font"
+        return _minimal_ttf_payload()
 
     monkeypatch.setattr("figma_flutter_agent.fonts.bundle._download_bytes", fake_download)
     tree = CleanDesignTreeNode(

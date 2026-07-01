@@ -19,7 +19,7 @@ _MVP_FIXTURES = [
         WidgetIrKind.BUTTON_FILLED,
         ("ElevatedButton", "CupertinoButton"),
     ),
-    ("chip_choice", weekday_chip_row, "chip-row-m", WidgetIrKind.CHIP_CHOICE, ("ChoiceChip",)),
+    ("chip_choice", weekday_chip_row, "chip-row", WidgetIrKind.CHIP_CHOICE, ("ChoiceChip",)),
 ]
 
 

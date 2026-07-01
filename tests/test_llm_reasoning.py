@@ -21,6 +21,15 @@ from figma_flutter_agent.llm.reasoning import (
 )
 
 
+def _bind_openrouter_create_mock(client: OpenRouterLlmClient, mock_client: MagicMock) -> None:
+    """Route OpenRouter completions through a plain MagicMock (skip raw-response wrapper)."""
+
+    def _create(**kwargs: object) -> object:
+        return mock_client.chat.completions.create(**kwargs)
+
+    client._chat_completions_create = _create  # type: ignore[method-assign]
+
+
 def test_openai_output_token_param_for_gpt5_uses_completion_tokens() -> None:
     assert openai_output_token_param("gpt-5.5") == "max_completion_tokens"
     assert openai_output_token_param("openai/gpt-5.5") == "max_completion_tokens"
@@ -54,6 +63,7 @@ def test_openai_client_sends_max_completion_tokens_for_gpt55() -> None:
 
     client = OpenAiLlmClient(api_key="test-key", model="gpt-5.5", strict_json_schema=False)
     client._client = mock_client
+    _bind_openrouter_create_mock(client, mock_client)
 
     client._request_generation('{"featureName":"demo"}', system_prompt=build_system_prompt())
 
@@ -164,6 +174,7 @@ def test_openrouter_client_attaches_reasoning_extra_body() -> None:
         reasoning=LlmReasoningSettings(effort="medium", exclude=True),
     )
     client._client = mock_client
+    _bind_openrouter_create_mock(client, mock_client)
 
     client._request_generation('{"featureName":"demo"}', system_prompt=build_system_prompt())
 
@@ -201,6 +212,7 @@ def test_openrouter_client_falls_back_when_reasoning_is_rejected() -> None:
         reasoning=LlmReasoningSettings(effort="high"),
     )
     client._client = mock_client
+    _bind_openrouter_create_mock(client, mock_client)
 
     client._request_generation('{"featureName":"demo"}', system_prompt=build_system_prompt())
 
@@ -243,6 +255,7 @@ def test_openrouter_client_falls_back_on_timeout_without_reasoning() -> None:
         reasoning=LlmReasoningSettings(effort="medium", exclude=True),
     )
     client._client = mock_client
+    _bind_openrouter_create_mock(client, mock_client)
 
     client._request_generation('{"featureName":"demo"}', system_prompt=build_system_prompt())
 
@@ -277,6 +290,7 @@ def test_openrouter_client_bumps_max_tokens_after_truncation() -> None:
         max_retries=3,
     )
     client._client = mock_client
+    _bind_openrouter_create_mock(client, mock_client)
 
     client._run_with_retry(
         lambda: client._request_generation(
@@ -303,6 +317,7 @@ def test_openrouter_client_does_not_fallback_on_unrelated_400() -> None:
         reasoning=LlmReasoningSettings(effort="high"),
     )
     client._client = mock_client
+    _bind_openrouter_create_mock(client, mock_client)
 
     with pytest.raises(LlmError, match="Invalid json schema"):
         client._request_generation('{"featureName":"demo"}', system_prompt=build_system_prompt())

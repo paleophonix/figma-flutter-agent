@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:demo_app/theme/app_colors.dart';
 import 'package:demo_app/theme/app_spacing.dart';
-import 'package:demo_app/theme/app_elevation.dart';
 // <custom-code>
 // </custom-code>
 
@@ -15,6 +14,6 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textScaler = MediaQuery.textScalerOf(context);
-    return SizedBox(height: 16.0, child: Card(elevation: AppElevation.md, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)), child: Padding(padding: const EdgeInsets.all(AppSpacing.md), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Semantics(label: 'Title', child: Text('Title', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.primary, fontSize: 16.0, fontWeight: FontWeight.w400), textScaler: textScaler))]))));
+    return Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.0)), child: Center(child: SizedBox(height: 16.0, child: Card(elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)), child: Padding(padding: const EdgeInsets.all(AppSpacing.md), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Semantics(label: 'Title', child: Text('Title', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.primary, fontSize: 16.0, fontWeight: FontWeight.w400), textScaler: textScaler))]))))));
   }
 }

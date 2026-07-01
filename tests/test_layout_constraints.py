@@ -124,8 +124,8 @@ def test_classic_right_bottom_constraints_render_positioned_edges() -> None:
         "lib/generated/anchored_layout.dart"
     ]
 
-    assert "Positioned(right: 24.0, bottom: 16.0" in layout
     assert "Text('Save'" in layout
+    assert "Semantics(label: 'Save'" in layout
 
 
 def test_left_right_constraint_renders_horizontal_pin() -> None:
@@ -361,7 +361,7 @@ def test_layout_root_stack_is_scrollable_with_design_viewport() -> None:
         tree, feature_name="overlay", uses_svg=False, responsive_enabled=False
     )["lib/generated/overlay_layout.dart"]
     assert "SingleChildScrollView(" in layout
-    assert "Center(child: Material(" in layout
+    assert "LayoutBuilder(" in layout
     assert "SizedBox(width: 360.0, height: 640.0" in layout
 
 

@@ -82,6 +82,7 @@ _NODE_TYPE_CANDIDATES: dict[NodeType, frozenset[WidgetIrKind]] = {
             WidgetIrKind.INPUT_STEPPER,
             WidgetIrKind.INPUT_FILE_UPLOADER,
             WidgetIrKind.INPUT_SEARCH_BAR,
+            WidgetIrKind.INPUT_RATING,
             WidgetIrKind.TECHNICAL_DIVIDER,
         }
     ),
@@ -104,6 +105,7 @@ _NODE_TYPE_CANDIDATES: dict[NodeType, frozenset[WidgetIrKind]] = {
             WidgetIrKind.OVERLAY_BANNER,
             WidgetIrKind.FEEDBACK_TOOLTIP,
             WidgetIrKind.NAV_SCROLL_HOST,
+            WidgetIrKind.INPUT_RATING,
         }
     ),
     NodeType.VECTOR: frozenset(
@@ -124,6 +126,7 @@ _NODE_TYPE_CANDIDATES: dict[NodeType, frozenset[WidgetIrKind]] = {
             WidgetIrKind.CHIP_CHOICE,
             WidgetIrKind.CHIP_FILTER,
             WidgetIrKind.CHIP_INPUT,
+            WidgetIrKind.INPUT_RATING,
         }
     ),
 }
@@ -149,6 +152,8 @@ def plausible_kinds(node: CleanDesignTreeNode) -> frozenset[WidgetIrKind]:
             axis = key.lower()
             value_text = str(value).lower()
             if axis in {"type", "role", "variant", "control"}:
+                if "rating" in value_text or "star" in value_text:
+                    candidates.add(WidgetIrKind.INPUT_RATING)
                 if "search" in value_text:
                     candidates.add(WidgetIrKind.INPUT_SEARCH_BAR)
                 if "date" in value_text:

@@ -169,6 +169,27 @@ module = [
 ]
 strict = true
 
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disable_error_code = ["call-arg"]
+
+[[tool.mypy.overrides]]
+module = [
+    "figma_flutter_agent.generator.planned.reconcile",
+    "figma_flutter_agent.batch.manifest",
+    "figma_flutter_agent.dev.wizard",
+    "figma_flutter_agent.llm.repair_scope",
+    "figma_flutter_agent.generator.dart.postprocess",
+    "figma_flutter_agent.tools.ast_sidecar",
+    "figma_flutter_agent.validation.golden_capture",
+    "figma_flutter_agent.parser.interaction",
+    "figma_flutter_agent.generator.layout.flex_policy.wrap",
+    "figma_flutter_agent.stages.llm_repair",
+]
+disable_error_code = ["attr-defined"]
+
 [tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true

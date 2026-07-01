@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
 from figma_flutter_agent.pipeline.incremental import (
     DesignHashState,
     should_skip_snapshot_persist,
@@ -21,6 +22,7 @@ def test_should_skip_snapshot_persist_when_unchanged() -> None:
         typography_hash="typography",
         spacing_hash="spacing",
         file_hashes={"lib/main.dart": file_hash},
+        emitter_version=EMITTER_VERSION,
         version=1,
     )
     hashes = DesignHashState(

@@ -43,6 +43,15 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+def _trace_debug_root(project_dir: Path, feature: str) -> str:
+    """Return a stable trace debug-root path for both repo-local and temp test projects."""
+    debug_root = screen_root(project_dir, feature)
+    try:
+        return debug_root.relative_to(agent_repo_root()).as_posix()
+    except ValueError:
+        return debug_root.as_posix()
+
+
 @dataclass
 class RepairTraceRecorder:
     """Write one repair run to ``.debug/agent/<project>/<feature>/trace/`` (overwrite)."""
@@ -109,15 +118,6 @@ class RepairTraceRecorder:
             manifest.update(extra_manifest)
         _write_json(root / "manifest.json", manifest)
         return recorder
-
-
-def _trace_debug_root(project_dir: Path, feature: str) -> str:
-    """Return a stable trace debug-root path for both repo-local and temp test projects."""
-    debug_root = screen_root(project_dir, feature)
-    try:
-        return debug_root.relative_to(agent_repo_root()).as_posix()
-    except ValueError:
-        return debug_root.as_posix()
 
     def _next_prefix(self, step: str) -> str:
         prefix = f"{self._seq:02d}-{step}"

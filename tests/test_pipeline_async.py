@@ -148,7 +148,7 @@ class ScreenScreen extends StatelessWidget {
         patch.object(pipeline_module, "fetch_figma_frame", side_effect=_fake_fetch_figma_frame),
         patch.object(pipeline_module, "parse_figma_frame", side_effect=_fake_parse_figma_frame),
         patch(
-            "figma_flutter_agent.stages.write.validate_dart_project",
+            "figma_flutter_agent.generator.dart.project_validation.validate_dart_project",
             return_value=ProjectAnalyzeResult(passed=True, detail="stubbed analyze"),
         ),
         patch.object(pipeline_module, "run_analyze_repair_loop", side_effect=_skip_repair),
@@ -366,7 +366,7 @@ async def test_pipeline_raises_when_llm_fails(tmp_path: Path) -> None:
         patch.object(pipeline_module, "fetch_figma_frame", side_effect=_fake_fetch_figma_frame),
         patch.object(pipeline_module, "parse_figma_frame", side_effect=_fake_parse_figma_frame),
         patch.object(pipeline_module, "export_figma_assets", return_value=AssetManifest()),
-        patch("figma_flutter_agent.stages.write.validate_dart_project"),
+        patch("figma_flutter_agent.generator.dart.project_validation.validate_dart_project"),
     ):
         with pytest.raises(LlmError, match="LLM response validation failed"):
             await pipeline_module.run_pipeline(
@@ -421,7 +421,7 @@ async def test_pipeline_raises_when_llm_fails_and_fallback_disabled(tmp_path: Pa
         patch.object(pipeline_module, "fetch_figma_frame", side_effect=_fake_fetch_figma_frame),
         patch.object(pipeline_module, "parse_figma_frame", side_effect=_fake_parse_figma_frame),
         patch.object(pipeline_module, "export_figma_assets", return_value=AssetManifest()),
-        patch("figma_flutter_agent.stages.write.validate_dart_project"),
+        patch("figma_flutter_agent.generator.dart.project_validation.validate_dart_project"),
         pytest.raises(LlmError, match="LLM response validation failed"),
     ):
         await pipeline_module.run_pipeline(
