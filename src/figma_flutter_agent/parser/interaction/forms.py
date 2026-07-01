@@ -569,10 +569,21 @@ def _is_footer_link_text_node(text_node: CleanDesignTreeNode) -> bool:
 
 def _looks_like_form_field_stack(
     *,
+    host_node: CleanDesignTreeNode | None = None,
     text_nodes: list[CleanDesignTreeNode],
     surfaces: list[CleanDesignTreeNode],
 ) -> bool:
     """Gray rounded field + single inset label (e.g. name prefilled as ``afsar``)."""
+    if host_node is not None:
+        from .icons import (
+            layout_fact_stack_vertical_icon_label_chip_tile,
+            layout_fact_upload_placeholder_tile,
+        )
+
+        if layout_fact_stack_vertical_icon_label_chip_tile(host_node):
+            return False
+        if layout_fact_upload_placeholder_tile(host_node):
+            return False
     if len(text_nodes) != 1 or not surfaces:
         return False
     text_node = text_nodes[0]
@@ -584,11 +595,107 @@ def _looks_like_form_field_stack(
     placement = text_node.stack_placement
     if placement is None or placement.left is None or placement.left < 8:
         return False
+    if host_node is not None and _caption_label_below_icon_band(host_node, text_node):
+        return False
     surface = max(
         surfaces,
         key=lambda item: float(item.sizing.width or 0) * float(item.sizing.height or 0),
     )
     return surface.style.background_color is not None or surface.style.border_radius is not None
+
+
+def _caption_label_below_icon_band(
+    host_node: CleanDesignTreeNode,
+    text_node: CleanDesignTreeNode,
+) -> bool:
+    """Caption sibling below an upper icon/plate band is not an inset field value."""
+    height = host_node.sizing.height
+    if height is None or float(height) <= 0:
+        return False
+    placement = text_node.stack_placement
+    if placement is None:
+        return False
+    label_top = placement.top if placement.top is not None else 0.0
+    if label_top < float(height) * 0.55:
+        return False
+    for child in host_node.children:
+        if child.id == text_node.id:
+            continue
+        if child.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.VECTOR, NodeType.IMAGE}:
+            continue
+        child_placement = child.stack_placement
+        child_top = (
+            float(child_placement.top or 0.0) if child_placement is not None else 0.0
+        )
+        if child_top <= float(height) * 0.45:
+            return True
+    return False
+
+
+def checkbox_option_stack_is_checked(stack: CleanDesignTreeNode) -> bool:
+    """Return True when a checkbox option row carries an inline checkmark glyph."""
+    from figma_flutter_agent.generator.variant.state import variant_is_checked
+
+    if variant_is_checked(stack):
+        return True
+    for child in stack.children:
+        if child.type != NodeType.VECTOR or not child.style.has_stroke:
+            continue
+        width = child.sizing.width or 0.0
+        height = child.sizing.height or 0.0
+        if 0.0 < float(width) <= 14.0 and 0.0 < float(height) <= 12.0:
+            return True
+    return False
+
+
+def checkbox_option_border_container(
+    stack: CleanDesignTreeNode,
+) -> CleanDesignTreeNode | None:
+    """Return the stroked square that frames a compact checkbox option."""
+    for child in stack.children:
+        if child.type != NodeType.CONTAINER:
+            continue
+        if not child.style.border_color or not child.style.border_width:
+            continue
+        width = child.sizing.width
+        height = child.sizing.height
+        if width is None or height is None:
+            continue
+        if (
+            _MIN_CHECKBOX_SIZE <= float(width) <= _MAX_CHECKBOX_SIZE
+            and _MIN_CHECKBOX_SIZE <= float(height) <= _MAX_CHECKBOX_SIZE
+            and abs(float(width) - float(height)) <= 4.0
+        ):
+            return child
+    return None
+
+
+def checkbox_option_label_gap(stack: CleanDesignTreeNode) -> float | None:
+    """Derive checkbox-to-label spacing from absolute placements when present."""
+    box = checkbox_option_border_container(stack)
+    label_leaf: CleanDesignTreeNode | None = None
+    for child in stack.children:
+        host = checkbox_label_text_host(child)
+        if host is not None:
+            label_leaf = host
+            break
+    if box is None or label_leaf is None:
+        return None
+    label_placement = label_leaf.stack_placement
+    box_placement = box.stack_placement
+    if label_placement is None or box_placement is None:
+        return None
+    label_left = label_placement.left
+    if label_left is None:
+        return None
+    box_left = box_placement.left if box_placement.left is not None else 0.0
+    box_width = box.sizing.width or box_placement.width or 0.0
+    if float(box_width) <= 0:
+        return None
+    gap = float(label_left) - (float(box_left) + float(box_width))
+    if gap >= 4.0:
+        return gap
+    return None
 
 
 def _stack_spans_primary_button_and_footer_link(

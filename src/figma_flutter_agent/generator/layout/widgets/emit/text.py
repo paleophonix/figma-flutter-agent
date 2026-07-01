@@ -209,15 +209,20 @@ def render_text_node(
             step_title_label = parent_node is not None and layout_fact_step_indicator_title_column(
                 parent_node
             )
+            from figma_flutter_agent.parser.interaction.icons import (
+                layout_fact_stack_vertical_icon_label_chip_tile,
+            )
+
+            catalog_chip_label = (
+                parent_node is not None
+                and layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
+            )
             single_line_clipped_label = (
                 guard_label_row
                 or metadata_rail
                 or bounded_single_line_label_slot
                 or step_title_label
-                or (
-                    parent_node is not None
-                    and layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
-                )
+                or catalog_chip_label
             )
             if payment_subtitle and "\n" not in (node.text or ""):
                 trailing = text_widget_trailing_params(
@@ -241,6 +246,13 @@ def render_text_node(
                     node.style,
                     text_align_suffix=align_suffix,
                     clip_single_line=True,
+                )
+            elif catalog_chip_label:
+                trailing = text_widget_trailing_params(
+                    node.style,
+                    text_align_suffix=align_suffix,
+                    omit_strut=omit_glyph_strut,
+                    soft_wrap=False,
                 )
             elif single_line_clipped_label:
                 trailing = text_widget_trailing_params(
@@ -282,6 +294,8 @@ def render_text_node(
             if notification_counter_glyph:
                 widget = f"Center(child: {widget})"
             if painted_pill_label:
+                widget = wrap_painted_pill_scale_down_label(widget)
+            elif catalog_chip_label:
                 widget = wrap_painted_pill_scale_down_label(widget)
             elif pill_label and not painted_pill_label:
                 widget = wrap_tight_chip_label(widget)

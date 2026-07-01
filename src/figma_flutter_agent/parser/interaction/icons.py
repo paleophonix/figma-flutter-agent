@@ -594,7 +594,7 @@ def layout_fact_stack_vertical_icon_label_chip_tile(node: CleanDesignTreeNode) -
     height = node.sizing.height
     if width is None or height is None:
         return False
-    if not (48.0 <= float(width) <= 80.0 and 80.0 <= float(height) <= 120.0):
+    if not (48.0 <= float(width) <= 80.0 and 65.0 <= float(height) <= 120.0):
         return False
     has_icon_slot = any(_vertical_chip_icon_slot(child) for child in node.children)
     label_nodes = [
@@ -609,6 +609,54 @@ def layout_fact_stack_vertical_icon_label_chip_tile(node: CleanDesignTreeNode) -
         return False
     top = placement.top if placement.top is not None else 0.0
     return top >= float(height) * 0.55
+
+
+def _dashed_placeholder_surface(child: CleanDesignTreeNode) -> bool:
+    """Return True for dashed/outlined upload placeholder surfaces."""
+    if child.type != NodeType.CONTAINER:
+        return False
+    style = child.style
+    if not style.border_color or not style.border_width:
+        return False
+    dash = style.stroke_dash_pattern
+    return dash is not None and len(dash) >= 2
+
+
+def layout_fact_upload_placeholder_tile(node: CleanDesignTreeNode) -> bool:
+    """Tappable upload slot: dashed surface, upper glyph band, lower short label."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (90.0 <= float(width) <= 140.0 and 85.0 <= float(height) <= 130.0):
+        return False
+    if not any(_dashed_placeholder_surface(child) for child in node.children):
+        return False
+    label_nodes = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if len(label_nodes) != 1:
+        return False
+    placement = label_nodes[0].stack_placement
+    if placement is None:
+        return False
+    label_top = placement.top if placement.top is not None else 0.0
+    if label_top < float(height) * 0.55:
+        return False
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            continue
+        child_placement = child.stack_placement
+        child_top = (
+            float(child_placement.top or 0.0) if child_placement is not None else 0.0
+        )
+        if child_top <= float(height) * 0.45:
+            return True
+    return False
 
 
 def _node_names_calendar_affordance(node: CleanDesignTreeNode) -> bool:

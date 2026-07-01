@@ -255,6 +255,8 @@ def stack_should_emit_flattened_vector_group(node: CleanDesignTreeNode) -> bool:
     """Emit a parent SVG export instead of empty color-only vector children."""
     if not node.children:
         return False
+    if _compact_icon_glyph_group_should_preserve_child_vectors(node):
+        return False
     if node.vector_svg_path_count is not None and node.vector_svg_path_count < 2:
         return False
     for child in node.children:
@@ -263,6 +265,22 @@ def stack_should_emit_flattened_vector_group(node: CleanDesignTreeNode) -> bool:
         if child.vector_asset_key:
             return False
     return True
+
+
+def _compact_icon_glyph_group_should_preserve_child_vectors(
+    node: CleanDesignTreeNode,
+) -> bool:
+    """Keep per-vector exports for compact multi-glyph product/icon stacks."""
+    if len(node.children) < 2:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (16.0 <= float(width) <= 48.0 and 16.0 <= float(height) <= 48.0):
+        return False
+    vectors = [child for child in node.children if child.type == NodeType.VECTOR]
+    return len(vectors) >= 2 and len(vectors) == len(node.children)
 
 
 SVG_PATH_RASTER_THRESHOLD = 120

@@ -33,13 +33,18 @@ def wrap_material_input_child(widget: str, *, theme_variant: str) -> str:
     return f"Material(color: Colors.transparent, child: {widget})"
 
 
-def render_checkbox(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
+def render_checkbox(
+    node: CleanDesignTreeNode,
+    *,
+    theme_variant: str,
+    selection_stack: CleanDesignTreeNode | None = None,
+) -> str:
     if layout_fact_checkbox_control(node):
         from figma_flutter_agent.generator.layout.interactive_toggle import (
             render_stateful_toggle_checkbox,
         )
 
-        return render_stateful_toggle_checkbox(node)
+        return render_stateful_toggle_checkbox(node, selection_stack=selection_stack)
     label = escape_dart_string(node.accessibility_label or node.name)
     semantics_label = label
     control = render_checkbox_widget(label=label, node=node, theme_variant=theme_variant)

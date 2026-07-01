@@ -7,8 +7,13 @@ from figma_flutter_agent.generator.custom_code_zones import (
     inline_custom_code_comment,
 )
 from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.layout.style import dart_color_expr
 from figma_flutter_agent.generator.variant.state import variant_is_checked
-from figma_flutter_agent.parser.interaction.forms import _stack_hosts_stroked_outline_checkbox_glyph
+from figma_flutter_agent.parser.interaction.forms import (
+    _stack_hosts_stroked_outline_checkbox_glyph,
+    checkbox_option_border_container,
+    checkbox_option_stack_is_checked,
+)
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -33,6 +38,24 @@ def _stroked_checkbox_visual_scale(node: CleanDesignTreeNode) -> float | None:
     if scale >= 0.98:
         return None
     return scale
+
+
+def _checkbox_theme_wrapper(widget: str, border: CleanDesignTreeNode) -> str:
+    """Apply Figma stroke color and corner radius to Material checkbox chrome."""
+    radius = border.style.border_radius if border.style.border_radius is not None else 3.0
+    width = border.style.border_width if border.style.border_width is not None else 1.0
+    radius_lit = format_geometry_literal(float(radius))
+    width_lit = format_geometry_literal(float(width))
+    color_expr = dart_color_expr(border.style)
+    return (
+        "Theme("
+        "data: Theme.of(context).copyWith("
+        "checkboxTheme: CheckboxThemeData("
+        f"side: BorderSide(color: {color_expr}, width: {width_lit}), "
+        f"shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular({radius_lit}))"
+        ")), "
+        f"child: {widget})"
+    )
 
 
 def toggle_checkbox_stateful_helpers() -> str:
@@ -87,20 +110,38 @@ class _GeneratedToggleCheckboxState extends State<_GeneratedToggleCheckbox> {
 """
 
 
-def render_stateful_toggle_checkbox(node: CleanDesignTreeNode) -> str:
+def render_stateful_toggle_checkbox(
+    node: CleanDesignTreeNode,
+    *,
+    selection_stack: CleanDesignTreeNode | None = None,
+) -> str:
     """Render a compact checkbox with local selection state."""
-    initial = "true" if variant_is_checked(node) else "false"
-    label = escape_dart_string(node.accessibility_label or "Checkbox")
+    stack_ref = selection_stack or node
+    checked = variant_is_checked(node) or checkbox_option_stack_is_checked(stack_ref)
+    initial = "true" if checked else "false"
+    label = escape_dart_string(node.accessibility_label or node.name or "Checkbox")
+    if selection_stack is not None:
+        from figma_flutter_agent.parser.interaction.forms import checkbox_label_text_host
+
+        for child in selection_stack.children:
+            host = checkbox_label_text_host(child)
+            if host is not None and (host.text or host.name):
+                label = escape_dart_string(host.text or host.name)
+                break
     zone = custom_code_zone_id(node.id, "toggle-action")
     comment = inline_custom_code_comment(zone)
     scale = _stroked_checkbox_visual_scale(node)
     scale_field = ""
     if scale is not None:
         scale_field = f", visualScale: {format_geometry_literal(scale)}"
-    return (
+    widget = (
         f"_GeneratedToggleCheckbox("
         f"initialValue: {initial}, "
         f"semanticsLabel: '{label}'"
         f"{scale_field}, "
         f"onChangedBody: () {{ {comment} }})"
     )
+    border = checkbox_option_border_container(stack_ref)
+    if border is not None and border.style.border_color:
+        widget = _checkbox_theme_wrapper(widget, border)
+    return widget

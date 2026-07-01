@@ -188,7 +188,11 @@ def _try_render_checkbox_label_row(
     )
     if is_link_text(label_child.text):
         text_widget = _wrap_link_text(text_widget)
-    checkbox_widget = render_checkbox(checkbox_node, theme_variant=theme_variant)
+    checkbox_widget = render_checkbox(
+        checkbox_node,
+        theme_variant=theme_variant,
+        selection_stack=node,
+    )
     width = checkbox_node.sizing.width
     height = checkbox_node.sizing.height
     if width is not None and height is not None and width > 0 and height > 0:
@@ -197,7 +201,14 @@ def _try_render_checkbox_label_row(
             width=float(width),
             height=float(height),
         )
-    spacing_field = _flex_spacing_field(node)
+    from figma_flutter_agent.parser.interaction.forms import checkbox_option_label_gap
+
+    gap = checkbox_option_label_gap(node)
+    spacing_field = (
+        f"spacing: {format_geometry_literal(gap)}, "
+        if gap is not None
+        else _flex_spacing_field(node)
+    )
     return (
         "Row("
         "crossAxisAlignment: CrossAxisAlignment.center, "

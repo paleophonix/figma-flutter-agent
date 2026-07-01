@@ -274,6 +274,11 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     if layout_fact_stack_vertical_icon_label_chip_tile(node):
         return "button"
 
+    from .icons import layout_fact_upload_placeholder_tile
+
+    if layout_fact_upload_placeholder_tile(node):
+        return "button"
+
     height = node.sizing.height
     if height is not None and height > _MAX_CONTROL_HEIGHT:
         return None
@@ -322,7 +327,11 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
                 return None
             return "button"
 
-    if _looks_like_form_field_stack(text_nodes=text_nodes, surfaces=surfaces):
+    if _looks_like_form_field_stack(
+        host_node=node,
+        text_nodes=text_nodes,
+        surfaces=surfaces,
+    ):
         return "input"
 
     return None

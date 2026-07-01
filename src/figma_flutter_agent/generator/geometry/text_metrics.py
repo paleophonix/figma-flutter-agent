@@ -12,7 +12,8 @@ from figma_flutter_agent.schemas import (
 
 _BASELINE_EPSILON = 0.5
 _SPACING_SLACK_FRACTION = 0.25
-_POSITIONED_TEXT_WIDTH_METRIC_SLACK = 1.06
+_POSITIONED_TEXT_WIDTH_METRIC_SLACK = 1.12
+_POSITIONED_TEXT_MIN_EXTRA_WIDTH = 4.0
 
 
 def should_skip_centered_glyph_delta(node: CleanDesignTreeNode) -> bool:
@@ -84,7 +85,8 @@ def positioned_text_allows_metric_slack(
 
 def positioned_text_width_with_metric_slack(figma_width: float) -> float:
     """Widen absolute text slots so Flutter font metrics do not clip trailing glyphs."""
-    slack_width = float(figma_width) * _POSITIONED_TEXT_WIDTH_METRIC_SLACK
+    scaled = float(figma_width) * _POSITIONED_TEXT_WIDTH_METRIC_SLACK
+    slack_width = max(scaled, float(figma_width) + _POSITIONED_TEXT_MIN_EXTRA_WIDTH)
     if slack_width == int(slack_width):
         return float(int(slack_width))
     return round(slack_width, 1)

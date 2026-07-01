@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+import pytest
+
 from figma_flutter_agent.generator.layout.flex_policy import stack_should_flow_as_column
 from figma_flutter_agent.generator.layout.flex_policy.row import (
     layout_fact_stack_tab_switcher_host,
@@ -11,7 +16,21 @@ from figma_flutter_agent.generator.layout.navigation.items import (
 )
 from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_node_body
 from figma_flutter_agent.generator.layout.widgets.position import _render_leaf_surface
-from figma_flutter_agent.parser.interaction import stack_hosts_checkbox_label_pair
+from figma_flutter_agent.generator.layout.widgets.svg import (
+    stack_should_emit_flattened_vector_group,
+)
+from figma_flutter_agent.parser.interaction import (
+    stack_hosts_checkbox_label_pair,
+    stack_interaction_kind,
+)
+from figma_flutter_agent.parser.interaction.forms import (
+    checkbox_option_stack_is_checked,
+    layout_fact_checkbox_control,
+)
+from figma_flutter_agent.parser.interaction.icons import (
+    layout_fact_stack_vertical_icon_label_chip_tile,
+    layout_fact_upload_placeholder_tile,
+)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
@@ -19,6 +38,26 @@ from figma_flutter_agent.schemas import (
     Sizing,
     StackPlacement,
 )
+
+_FOOD_DEBUG = Path(".debug/screen/limbo/food_add_new_items")
+
+
+def _find_node(root: CleanDesignTreeNode, node_id: str) -> CleanDesignTreeNode | None:
+    if root.id == node_id:
+        return root
+    for child in root.children:
+        found = _find_node(child, node_id)
+        if found is not None:
+            return found
+    return None
+
+
+def _load_food_root() -> CleanDesignTreeNode:
+    path = _FOOD_DEBUG / "processed.json"
+    if not path.is_file():
+        pytest.skip("food_add_new_items debug bundle unavailable")
+    processed = json.loads(path.read_text(encoding="utf-8"))
+    return CleanDesignTreeNode.model_validate(processed["cleanTree"])
 
 
 def _ingredient_chip_stack() -> CleanDesignTreeNode:
@@ -250,3 +289,131 @@ def test_single_line_input_vertical_center_uses_center_align() -> None:
     )
     assert "TextAlignVertical.center" in field
     assert "TextAlignVertical.top" not in field
+
+
+def test_ingredient_chip_stack_not_classified_as_input() -> None:
+    """Law: vertical_icon_label_chip_not_form_field."""
+    chip = _ingredient_chip_stack()
+    assert layout_fact_stack_vertical_icon_label_chip_tile(chip)
+    assert stack_interaction_kind(chip) == "button"
+    emitted = render_node_body(chip, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "TextField(" not in compact
+    assert "keyboard_arrow_down" not in compact
+
+
+def test_food_replay_ingredient_chips_not_text_fields() -> None:
+    """Replay corpus chips must not compile as dropdown text fields."""
+    root = _load_food_root()
+    for node_id in ("602:1142", "602:1169", "602:1153", "602:1098"):
+        chip = _find_node(root, node_id)
+        assert chip is not None, node_id
+        assert stack_interaction_kind(chip) == "button", node_id
+        emitted = render_node_body(chip, uses_svg=True, parent_type=NodeType.STACK)
+        compact = emitted.replace("\n", "")
+        assert "TextField(" not in compact, node_id
+        assert "keyboard_arrow_down" not in compact, node_id
+
+
+def test_food_replay_upload_tile_not_text_field() -> None:
+    """Law: upload_placeholder_not_text_field."""
+    root = _load_food_root()
+    tile = _find_node(root, "602:1184")
+    assert tile is not None
+    assert layout_fact_upload_placeholder_tile(tile)
+    assert stack_interaction_kind(tile) == "button"
+    emitted = render_node_body(tile, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "TextField(" not in compact
+
+
+def test_compact_icon_glyph_group_not_flattened() -> None:
+    """Law: icon_chip_glyph_children_not_parent_flatten."""
+    group = CleanDesignTreeNode(
+        id="1:glyph",
+        name="Icon group",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        vector_svg_path_count=3,
+        children=[
+            CleanDesignTreeNode(
+                id="1:v1",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=10.0, height=10.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:v2",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=12.0, height=8.0),
+            ),
+        ],
+    )
+    assert not stack_should_emit_flattened_vector_group(group)
+
+
+def test_checkbox_checked_from_inline_checkmark_vector() -> None:
+    """Law: checkbox_reflects_figma_state_and_style."""
+    stack = CleanDesignTreeNode(
+        id="1:option",
+        name="Pick up",
+        type=NodeType.STACK,
+        sizing=Sizing(width=75.0, height=19.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:box",
+                name="Rectangle",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=18.0, height=18.0),
+                style=NodeStyle(
+                    border_color="0xFFFB6D3A",
+                    border_width=1.0,
+                    border_radius=3.0,
+                    has_stroke=True,
+                ),
+                stack_placement=StackPlacement(top=1.0, right=57.0, width=18.0, height=18.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Pick up",
+                type=NodeType.TEXT,
+                text="Pick up",
+                sizing=Sizing(width=47.0, height=16.0),
+                stack_placement=StackPlacement(left=28.0, bottom=3.0, width=47.0, height=16.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:mark",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=8.0, height=6.0),
+                style=NodeStyle(border_color="0xFFFB6D3A", border_width=1.5, has_stroke=True),
+                stack_placement=StackPlacement(left=5.0, top=7.0, width=8.0, height=6.0),
+            ),
+        ],
+    )
+    assert stack_hosts_checkbox_label_pair(stack)
+    assert checkbox_option_stack_is_checked(stack)
+    emitted = render_node_body(stack, uses_svg=True, parent_type=NodeType.COLUMN)
+    compact = emitted.replace("\n", "")
+    assert "initialValue: true" in compact
+    assert "0xFFFB6D3A" in compact
+    assert "spacing:" in compact
+
+
+def test_food_replay_pick_up_checkbox_checked_and_spaced() -> None:
+    root = _load_food_root()
+    stack = _find_node(root, "602:1210")
+    assert stack is not None
+    assert checkbox_option_stack_is_checked(stack)
+    emitted = render_node_body(stack, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "initialValue: true" in compact
+    assert "TextField(" not in compact
+
+
+def test_catalog_chip_label_uses_scale_down_not_ellipsis() -> None:
+    chip = _ingredient_chip_stack()
+    emitted = render_node_body(chip, uses_svg=True, parent_type=NodeType.STACK)
+    assert "FittedBox(fit: BoxFit.scaleDown" in emitted.replace("\n", "")
+    assert "TextOverflow.ellipsis" not in emitted
