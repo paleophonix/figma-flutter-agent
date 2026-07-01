@@ -329,3 +329,100 @@ async def test_run_pipeline_offline_does_not_fetch_reference_png(tmp_path: Path)
             )
 
     assert connector_calls == 0
+
+
+def test_is_figma_node_missing_error() -> None:
+    from figma_flutter_agent.errors import FlutterProjectError
+    from figma_flutter_agent.pipeline.helpers import is_figma_node_missing_error
+
+    missing = FlutterProjectError(
+        "Node 602:1027 was not found in Figma file (deleted frame, wrong node-id, or no access)."
+    )
+    assert is_figma_node_missing_error(missing)
+    assert not is_figma_node_missing_error(FlutterProjectError("FIGMA_ACCESS_TOKEN is required"))
+
+
+@pytest.mark.asyncio
+async def test_live_fetch_missing_node_falls_back_to_manifest_dump(tmp_path: Path) -> None:
+    import figma_flutter_agent.pipeline.run.core as pipeline_module
+    from figma_flutter_agent.errors import FlutterProjectError
+
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    (project_dir / "pubspec.yaml").write_text(
+        "\n".join(
+            [
+                "name: demo_app",
+                "dependencies:",
+                "  flutter:",
+                "    sdk: flutter",
+                "flutter:",
+                "  uses-material-design: true",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    dump_rel = Path(".debug/screen/limbo/food_add_new_items/raw.json")
+    dump_path = project_dir / dump_rel
+    dump_path.parent.mkdir(parents=True)
+    dump_path.write_text(
+        json.dumps(
+            {
+                "id": "602:1027",
+                "name": "Add new Items",
+                "type": "FRAME",
+                "visible": True,
+                "children": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (project_dir / "screens.yaml").write_text(
+        "\n".join(
+            [
+                "file_key: abc",
+                "project_dir: .",
+                "screens:",
+                "- feature: food_add_new_items",
+                "  node_id: 602:1027",
+                f"  dump: {dump_rel.as_posix()}",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    settings = Settings(
+        FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
+        ANTHROPIC_API_KEY=SecretStr("sk-ant-test"),
+    )
+
+    async def _missing_fetch(*_args: object, **_kwargs: object) -> object:
+        raise FlutterProjectError(
+            "Node 602:1027 was not found in Figma file (deleted frame, wrong node-id, or no access)."
+        )
+
+    async def _stop_before_llm(*_args: object, **_kwargs: object) -> LlmPipelineOutcome:
+        raise StopAsyncIteration
+
+    deps = pipeline_test_dependencies()
+
+    with (
+        patch.object(
+            pipeline_module,
+            "parse_figma_url",
+            return_value=MagicMock(file_key="abc", node_id="602:1027"),
+        ),
+        patch.object(pipeline_module, "fetch_figma_frame", side_effect=_missing_fetch),
+        patch.object(pipeline_module, "execute_llm_stage", side_effect=_stop_before_llm),
+    ):
+        with pytest.raises(StopAsyncIteration):
+            await pipeline_module.run_pipeline(
+                settings,
+                figma_url="https://www.figma.com/design/abc/x?node-id=602-1027",
+                project_dir=project_dir,
+                feature_name="food_add_new_items",
+                dry_run=True,
+                sync_enabled=False,
+                force_live_fetch=True,
+                deps=deps,
+            )

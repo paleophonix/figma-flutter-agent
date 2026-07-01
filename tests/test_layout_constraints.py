@@ -13,6 +13,9 @@ from figma_flutter_agent.generator.layout.widgets import (
     render_node_body,
 )
 from figma_flutter_agent.parser.layout import extract_stack_placement
+from figma_flutter_agent.parser.layout.placement import (
+    reconcile_center_constraint_placement_from_edges,
+)
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -102,6 +105,72 @@ def test_absolute_auto_layout_child_preserves_bbox_offset_over_center_constraint
     assert placement is not None
     assert placement.top == -38.0
     assert placement.left == -5.0
+
+
+def test_classic_center_constraint_child_keeps_bbox_top() -> None:
+    """Law: bbox_offset_preserved_over_center_constraint for classic stack children."""
+    parent = {
+        "id": "7035:1262",
+        "name": "Screen",
+        "type": "FRAME",
+        "absoluteBoundingBox": {"x": 780.0, "y": 16067.0, "width": 430.0, "height": 932.0},
+        "children": [],
+    }
+    child = {
+        "id": "7253:3639",
+        "name": "Icon-Notification",
+        "type": "INSTANCE",
+        "constraints": {"vertical": "CENTER", "horizontal": "RIGHT"},
+        "absoluteBoundingBox": {"x": 1144.0, "y": 16128.0, "width": 30.0, "height": 30.0},
+    }
+    placement = extract_stack_placement(child, parent)
+    assert placement is not None
+    assert placement.top == 61.0
+    assert placement.right == 36.0
+    assert placement.horizontal == "RIGHT"
+    assert placement.vertical == "CENTER"
+
+
+def test_reconcile_center_constraint_restores_bbox_top_from_bottom_edge() -> None:
+    placement = StackPlacement(
+        horizontal="RIGHT",
+        vertical="CENTER",
+        left=364.0,
+        top=451.0,
+        right=36.0,
+        bottom=841.0,
+        width=30.0,
+        height=30.0,
+    )
+    fixed = reconcile_center_constraint_placement_from_edges(placement, parent_height=932.0)
+    assert fixed.top == 61.0
+    assert fixed.vertical == "TOP"
+
+
+def test_classic_center_constraint_bell_renders_bbox_top_in_layout() -> None:
+    """Integration: parsed classic CENTER+RIGHT child keeps bbox top in layout emit."""
+    root = {
+        "id": "7035:1262",
+        "name": "Screen",
+        "type": "FRAME",
+        "absoluteBoundingBox": {"x": 0.0, "y": 0.0, "width": 430.0, "height": 932.0},
+        "children": [
+            {
+                "id": "7253:3639",
+                "name": "Icon-Notification",
+                "type": "FRAME",
+                "constraints": {"vertical": "CENTER", "horizontal": "RIGHT"},
+                "absoluteBoundingBox": {"x": 364.0, "y": 61.0, "width": 30.0, "height": 30.0},
+                "children": [],
+            }
+        ],
+    }
+    tree, _, _, _ = build_clean_tree(root)
+    layout = render_layout_file(tree, feature_name="bell", uses_svg=False)[
+        "lib/generated/bell_layout.dart"
+    ]
+    assert "top: 61.0" in layout or "top: 61," in layout
+    assert "top: 451.0" not in layout
 
 
 def test_classic_right_bottom_constraints_render_positioned_edges() -> None:

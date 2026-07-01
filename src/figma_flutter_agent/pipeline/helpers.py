@@ -20,6 +20,14 @@ def validate_project_dir(project_dir: Path) -> None:
         raise FlutterProjectError(f"Flutter project not found at {project_dir}")
 
 
+_FIGMA_NODE_MISSING_MARKER = "was not found in Figma file"
+
+
+def is_figma_node_missing_error(exc: BaseException) -> bool:
+    """Return True when a live Figma fetch failed because the node id is absent."""
+    return isinstance(exc, FlutterProjectError) and _FIGMA_NODE_MISSING_MARKER in str(exc)
+
+
 def resolve_manifest_cached_dump(
     project_dir: Path,
     *,

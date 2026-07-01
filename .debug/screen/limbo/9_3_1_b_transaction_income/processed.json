@@ -184,7 +184,7 @@
           "horizontal": "CENTER",
           "left": 152.5,
           "top": 64.0,
-          "right": 152.0,
+          "right": 152.5,
           "bottom": 846.0,
           "width": 125.0,
           "height": 22.0
@@ -329,7 +329,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 191.0,
+          "left": 109.0,
           "top": 407.0,
           "right": 273.0,
           "bottom": 502.0,
@@ -352,11 +352,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 191.0,
+            "x": 109.0,
             "y": 407.0
           },
           "placementAabb": {
-            "x": 191.0,
+            "x": 109.0,
             "y": 407.0,
             "width": 48.0,
             "height": 23.0
@@ -418,7 +418,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 177.5,
+          "left": 320.0,
           "top": 424.0,
           "right": 35.0,
           "bottom": 485.0,
@@ -441,11 +441,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 177.5,
+            "x": 320.0,
             "y": 424.0
           },
           "placementAabb": {
-            "x": 177.5,
+            "x": 320.0,
             "y": 424.0,
             "width": 75.0,
             "height": 23.0
@@ -507,7 +507,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 197.5,
+          "left": 37.0,
           "top": 360.0,
           "right": 358.0,
           "bottom": 549.0,
@@ -530,11 +530,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 197.5,
+            "x": 37.0,
             "y": 360.0
           },
           "placementAabb": {
-            "x": 197.5,
+            "x": 37.0,
             "y": 360.0,
             "width": 35.0,
             "height": 23.0
@@ -596,7 +596,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 191.0,
+          "left": 37.0,
           "top": 559.0,
           "right": 345.0,
           "bottom": 350.0,
@@ -619,11 +619,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 191.0,
+            "x": 37.0,
             "y": 559.0
           },
           "placementAabb": {
-            "x": 191.0,
+            "x": 37.0,
             "y": 559.0,
             "width": 48.0,
             "height": 23.0
@@ -686,7 +686,7 @@
         "stackPlacement": {
           "horizontal": "CENTER",
           "vertical": "BOTTOM",
-          "left": 191.0,
+          "left": 239.0,
           "top": 426.0,
           "right": 143.0,
           "bottom": 488.0,
@@ -709,11 +709,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 191.0,
+            "x": 239.0,
             "y": 426.0
           },
           "placementAabb": {
-            "x": 191.0,
+            "x": 239.0,
             "y": 426.0,
             "width": 48.0,
             "height": 18.0
@@ -775,7 +775,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 171.0,
+          "left": 109.0,
           "top": 432.4,
           "right": 233.0,
           "bottom": 481.6,
@@ -798,11 +798,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 171.0,
+            "x": 109.0,
             "y": 432.4
           },
           "placementAabb": {
-            "x": 171.0,
+            "x": 109.0,
             "y": 432.4,
             "width": 88.0,
             "height": 18.0
@@ -1020,7 +1020,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 189.5,
+          "left": 109.0,
           "top": 482.0,
           "right": 270.0,
           "bottom": 427.0,
@@ -1043,11 +1043,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 189.5,
+            "x": 109.0,
             "y": 482.0
           },
           "placementAabb": {
-            "x": 189.5,
+            "x": 109.0,
             "y": 482.0,
             "width": 51.0,
             "height": 23.0
@@ -1109,7 +1109,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 184.5,
+          "left": 334.0,
           "top": 803.0,
           "right": 35.0,
           "bottom": 106.0,
@@ -1132,11 +1132,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 184.5,
+            "x": 334.0,
             "y": 803.0
           },
           "placementAabb": {
-            "x": 184.5,
+            "x": 334.0,
             "y": 803.0,
             "width": 61.0,
             "height": 23.0
@@ -1198,7 +1198,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 187.0,
+          "left": 339.0,
           "top": 501.0,
           "right": 35.0,
           "bottom": 408.0,
@@ -1221,11 +1221,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 187.0,
+            "x": 339.0,
             "y": 501.0
           },
           "placementAabb": {
-            "x": 187.0,
+            "x": 339.0,
             "y": 501.0,
             "width": 56.0,
             "height": 23.0
@@ -1287,7 +1287,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 192.5,
+          "left": 241.0,
           "top": 805.0,
           "right": 144.0,
           "bottom": 109.0,
@@ -1310,11 +1310,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 192.5,
+            "x": 241.0,
             "y": 805.0
           },
           "placementAabb": {
-            "x": 192.5,
+            "x": 241.0,
             "y": 805.0,
             "width": 45.0,
             "height": 18.0
@@ -1376,7 +1376,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 185.0,
+          "left": 233.0,
           "top": 503.0,
           "right": 137.0,
           "bottom": 411.0,
@@ -1399,11 +1399,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 185.0,
+            "x": 233.0,
             "y": 503.0
           },
           "placementAabb": {
-            "x": 185.0,
+            "x": 233.0,
             "y": 503.0,
             "width": 60.0,
             "height": 18.0
@@ -1465,7 +1465,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 167.0,
+          "left": 110.0,
           "top": 813.4,
           "right": 224.0,
           "bottom": 100.6,
@@ -1488,11 +1488,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 167.0,
+            "x": 110.0,
             "y": 813.4
           },
           "placementAabb": {
-            "x": 167.0,
+            "x": 110.0,
             "y": 813.4,
             "width": 96.0,
             "height": 18.0
@@ -1554,7 +1554,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 170.5,
+          "left": 109.0,
           "top": 507.4,
           "right": 232.0,
           "bottom": 406.6,
@@ -1577,11 +1577,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 170.5,
+            "x": 109.0,
             "y": 507.4
           },
           "placementAabb": {
-            "x": 170.5,
+            "x": 109.0,
             "y": 507.4,
             "width": 89.0,
             "height": 18.0
@@ -1955,7 +1955,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 191.0,
+          "left": 110.0,
           "top": 859.0,
           "right": 272.0,
           "bottom": 50.0,
@@ -1978,11 +1978,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 191.0,
+            "x": 110.0,
             "y": 859.0
           },
           "placementAabb": {
-            "x": 191.0,
+            "x": 110.0,
             "y": 859.0,
             "width": 48.0,
             "height": 23.0
@@ -2044,7 +2044,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 191.0,
+          "left": 109.0,
           "top": 607.0,
           "right": 273.0,
           "bottom": 302.0,
@@ -2067,11 +2067,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 191.0,
+            "x": 109.0,
             "y": 607.0
           },
           "placementAabb": {
-            "x": 191.0,
+            "x": 109.0,
             "y": 607.0,
             "width": 48.0,
             "height": 23.0
@@ -2133,7 +2133,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 179.0,
+          "left": 323.0,
           "top": 879.0,
           "right": 35.0,
           "bottom": 32.0,
@@ -2156,11 +2156,11 @@
             "height": 21.0
           },
           "placementOrigin": {
-            "x": 179.0,
+            "x": 323.0,
             "y": 879.0
           },
           "placementAabb": {
-            "x": 179.0,
+            "x": 323.0,
             "y": 879.0,
             "width": 72.0,
             "height": 21.0
@@ -2222,7 +2222,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 177.5,
+          "left": 320.0,
           "top": 624.0,
           "right": 35.0,
           "bottom": 285.0,
@@ -2245,11 +2245,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 177.5,
+            "x": 320.0,
             "y": 624.0
           },
           "placementAabb": {
-            "x": 177.5,
+            "x": 320.0,
             "y": 624.0,
             "width": 75.0,
             "height": 23.0
@@ -2311,7 +2311,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 191.0,
+          "left": 239.0,
           "top": 878.3,
           "right": 143.0,
           "bottom": 35.7,
@@ -2334,11 +2334,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 191.0,
+            "x": 239.0,
             "y": 878.3
           },
           "placementAabb": {
-            "x": 191.0,
+            "x": 239.0,
             "y": 878.3,
             "width": 48.0,
             "height": 18.0
@@ -2400,7 +2400,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 191.0,
+          "left": 239.0,
           "top": 626.0,
           "right": 143.0,
           "bottom": 288.0,
@@ -2423,11 +2423,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 191.0,
+            "x": 239.0,
             "y": 626.0
           },
           "placementAabb": {
-            "x": 191.0,
+            "x": 239.0,
             "y": 626.0,
             "width": 48.0,
             "height": 18.0
@@ -2489,7 +2489,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 167.0,
+          "left": 110.0,
           "top": 884.4,
           "right": 224.0,
           "bottom": 29.6,
@@ -2512,11 +2512,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 167.0,
+            "x": 110.0,
             "y": 884.4
           },
           "placementAabb": {
-            "x": 167.0,
+            "x": 110.0,
             "y": 884.4,
             "width": 96.0,
             "height": 18.0
@@ -2578,7 +2578,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 167.0,
+          "left": 109.0,
           "top": 632.4,
           "right": 225.0,
           "bottom": 281.6,
@@ -2601,11 +2601,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 167.0,
+            "x": 109.0,
             "y": 632.4
           },
           "placementAabb": {
-            "x": 167.0,
+            "x": 109.0,
             "y": 632.4,
             "width": 96.0,
             "height": 18.0
@@ -3065,7 +3065,7 @@
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
               "horizontal": "CENTER",
-              "left": 120.0,
+              "left": 118.0,
               "top": 34.0,
               "right": 122.0,
               "bottom": 5.0,
@@ -3088,11 +3088,11 @@
                 "height": 36.0
               },
               "placementOrigin": {
-                "x": 120.0,
+                "x": 118.0,
                 "y": 34.0
               },
               "placementAabb": {
-                "x": 120.0,
+                "x": 118.0,
                 "y": 34.0,
                 "width": 117.0,
                 "height": 36.0
@@ -3156,7 +3156,7 @@
               "horizontal": "CENTER",
               "left": 126.5,
               "top": 11.0,
-              "right": 126.0,
+              "right": 126.5,
               "bottom": 41.0,
               "width": 104.0,
               "height": 23.0
@@ -3953,7 +3953,7 @@
                 "stackPlacement": {
                   "horizontal": "CENTER",
                   "vertical": "CENTER",
-                  "left": 2.5,
+                  "left": 1.0,
                   "top": 1.0,
                   "right": 4.0,
                   "bottom": 1.0,
@@ -3976,11 +3976,11 @@
                     "height": 7.0
                   },
                   "placementOrigin": {
-                    "x": 2.5,
+                    "x": 1.0,
                     "y": 1.0
                   },
                   "placementAabb": {
-                    "x": 2.5,
+                    "x": 1.0,
                     "y": 1.0,
                     "width": 12.0,
                     "height": 7.0
@@ -5625,7 +5625,7 @@
           "horizontal": "RIGHT",
           "vertical": "CENTER",
           "left": 364.0,
-          "top": 451.0,
+          "top": 61.0,
           "right": 36.0,
           "bottom": 841.0,
           "width": 30.0,
@@ -5794,11 +5794,11 @@
           },
           "placementOrigin": {
             "x": 364.0,
-            "y": 451.0
+            "y": 61.0
           },
           "placementAabb": {
             "x": 364.0,
-            "y": 451.0,
+            "y": 61.0,
             "width": 30.0,
             "height": 30.0
           },
@@ -5851,7 +5851,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 189.5,
+          "left": 110.0,
           "top": 676.0,
           "right": 269.0,
           "bottom": 233.0,
@@ -5874,11 +5874,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 189.5,
+            "x": 110.0,
             "y": 676.0
           },
           "placementAabb": {
-            "x": 189.5,
+            "x": 110.0,
             "y": 676.0,
             "width": 51.0,
             "height": 23.0
@@ -5940,7 +5940,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 184.5,
+          "left": 334.0,
           "top": 691.0,
           "right": 35.0,
           "bottom": 218.0,
@@ -5963,11 +5963,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 184.5,
+            "x": 334.0,
             "y": 691.0
           },
           "placementAabb": {
-            "x": 184.5,
+            "x": 334.0,
             "y": 691.0,
             "width": 61.0,
             "height": 23.0
@@ -6029,7 +6029,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 181.0,
+          "left": 37.0,
           "top": 745.0,
           "right": 325.0,
           "bottom": 164.0,
@@ -6052,11 +6052,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 181.0,
+            "x": 37.0,
             "y": 745.0
           },
           "placementAabb": {
-            "x": 181.0,
+            "x": 37.0,
             "y": 745.0,
             "width": 68.0,
             "height": 23.0
@@ -6118,7 +6118,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 192.5,
+          "left": 241.0,
           "top": 693.0,
           "right": 144.0,
           "bottom": 221.0,
@@ -6141,11 +6141,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 192.5,
+            "x": 241.0,
             "y": 693.0
           },
           "placementAabb": {
-            "x": 192.5,
+            "x": 241.0,
             "y": 693.0,
             "width": 45.0,
             "height": 18.0
@@ -6207,7 +6207,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 174.5,
+          "left": 110.0,
           "top": 701.4,
           "right": 239.0,
           "bottom": 212.6,
@@ -6230,11 +6230,11 @@
             "height": 18.0
           },
           "placementOrigin": {
-            "x": 174.5,
+            "x": 110.0,
             "y": 701.4
           },
           "placementAabb": {
-            "x": 174.5,
+            "x": 110.0,
             "y": 701.4,
             "width": 81.0,
             "height": 18.0
@@ -6452,7 +6452,7 @@
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "horizontal": "CENTER",
-          "left": 189.5,
+          "left": 110.0,
           "top": 787.0,
           "right": 269.0,
           "bottom": 122.0,
@@ -6475,11 +6475,11 @@
             "height": 23.0
           },
           "placementOrigin": {
-            "x": 189.5,
+            "x": 110.0,
             "y": 787.0
           },
           "placementAabb": {
-            "x": 189.5,
+            "x": 110.0,
             "y": 787.0,
             "width": 51.0,
             "height": 23.0
@@ -7035,7 +7035,7 @@
                   "left": -12.0,
                   "top": -14.0,
                   "right": -12.0,
-                  "bottom": -15.0,
+                  "bottom": -14.0,
                   "width": 57.0,
                   "height": 53.0
                 },

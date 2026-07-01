@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import typer
@@ -13,10 +14,27 @@ if TYPE_CHECKING:
 console = Console()
 
 
-def report_plan_failure_stale_preview() -> None:
+def report_plan_failure_stale_preview(
+    *,
+    exc: BaseException | None = None,
+    dump_path: Path | None = None,
+) -> None:
     """Warn that Chrome preview still reflects the previous successful writeback."""
+    from figma_flutter_agent.pipeline.helpers import is_figma_node_missing_error
+
     console.print("[bold red]Codegen failed before writeback — Chrome preview is stale.[/bold red]")
     console.print("[dim]plan: failed | writeback: skipped | served_preview: previous build[/dim]")
+    if exc is not None and is_figma_node_missing_error(exc):
+        console.print(
+            "[yellow]Figma node missing from live file.[/yellow] "
+            "Update screens.yaml node_id from a fresh Figma link, "
+            "or run wizard → offline / launch when a cached dump exists."
+        )
+        if dump_path is not None and Path(dump_path).is_file():
+            console.print(
+                f"[dim]Cached dump available:[/dim] {Path(dump_path).as_posix()} "
+                "(wizard → run → offline)"
+            )
 
 
 def report_launch_preflight_failure() -> None:
@@ -229,7 +247,7 @@ def _wizard_sync_preview(
         if "pre_launch_stale_import_scan" in str(exc):
             report_launch_preflight_failure()
         else:
-            report_plan_failure_stale_preview()
+            report_plan_failure_stale_preview(exc=exc, dump_path=plan.dump_path)
         raise
     from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
 
@@ -247,9 +265,7 @@ def _wizard_sync_preview(
     print_pipeline_warnings(pipeline_result.warnings)
     if launched is None:
         report_preview_launch_failure()
-        console.print(
-            f"[yellow]Codegen complete — preview launch failed.[/yellow] — {screen}"
-        )
+        console.print(f"[yellow]Codegen complete — preview launch failed.[/yellow] — {screen}")
     elif launched is False:
         console.print(f"[yellow]Sync complete — Flutter run stopped.[/yellow] — {screen}")
     else:

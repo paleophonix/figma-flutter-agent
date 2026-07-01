@@ -59,9 +59,15 @@ def extract_stack_placement(
     )
     if not is_auto_absolute:
         if horizontal == "CENTER" and parent_width > 0:
-            left = (parent_width - node_width) / 2
+            centered_left = (parent_width - node_width) / 2
+            if abs(left - centered_left) <= 1.0:
+                left = centered_left
         if vertical == "CENTER" and parent_height > 0:
-            top = (parent_height - node_height) / 2
+            centered_top = (parent_height - node_height) / 2
+            if abs(top - centered_top) <= 1.0:
+                top = centered_top
+        right = parent_width - left - node_width
+        bottom = parent_height - top - node_height
 
     return round_stack_placement(
         StackPlacement(
@@ -118,6 +124,39 @@ def reconcile_stack_placement_top_from_edges(
             update={"top": rounded if rounded is not None else inferred_top}
         )
     return placement
+
+
+_CENTER_CONSTRAINT_EDGE_DRIFT_PX = 8.0
+
+
+def reconcile_center_constraint_placement_from_edges(
+    placement: StackPlacement,
+    *,
+    parent_height: float | None,
+) -> StackPlacement:
+    """Restore bbox top when CENTER metadata disagrees with conserved bottom edge."""
+    if parent_height is None or parent_height <= 0:
+        return placement
+    if (placement.vertical or "").upper() != "CENTER":
+        return placement
+    height = placement.height
+    bottom = placement.bottom
+    top = placement.top
+    if height is None or height <= 0 or bottom is None or top is None:
+        return placement
+    inferred_top = parent_height - float(bottom) - float(height)
+    centered_top = (parent_height - float(height)) / 2
+    if abs(float(top) - centered_top) > 1.0:
+        return placement
+    if abs(inferred_top - float(top)) <= _CENTER_CONSTRAINT_EDGE_DRIFT_PX:
+        return placement
+    rounded = round_geometry(inferred_top)
+    return placement.model_copy(
+        update={
+            "top": rounded if rounded is not None else inferred_top,
+            "vertical": "TOP",
+        }
+    )
 
 
 def clamp_stack_child_placement_to_parent(
@@ -264,6 +303,10 @@ def reconcile_stack_placements_in_tree(
                 placement = child.stack_placement
                 if parent_height is not None:
                     placement = reconcile_stack_placement_top_from_edges(
+                        placement,
+                        parent_height=parent_height,
+                    )
+                    placement = reconcile_center_constraint_placement_from_edges(
                         placement,
                         parent_height=parent_height,
                     )

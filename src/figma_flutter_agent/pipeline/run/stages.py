@@ -19,7 +19,11 @@ from figma_flutter_agent.observability import log_stage
 from figma_flutter_agent.pipeline.deps import PipelineDependencies
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
 from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
-from figma_flutter_agent.pipeline.helpers import resolve_feature_name
+from figma_flutter_agent.pipeline.helpers import (
+    is_figma_node_missing_error,
+    resolve_feature_name,
+    resolve_manifest_cached_dump,
+)
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 from figma_flutter_agent.pipeline_context import PipelineContext
 from figma_flutter_agent.render_log import update_render_log_session
@@ -280,13 +284,42 @@ async def run_live_fetch_parse_phase(
         settings.figma_api_base_url,
     ) as connector:
         with log_stage(log, "fetch"):
-            fetch_result = await fetch_fn(
-                connector,
-                file_key=parsed.file_key,
-                node_id=parsed.node_id,
-                project_dir=project_dir,
-                verbose=verbose,
-            )
+            try:
+                fetch_result = await fetch_fn(
+                    connector,
+                    file_key=parsed.file_key,
+                    node_id=parsed.node_id,
+                    project_dir=project_dir,
+                    verbose=verbose,
+                )
+            except Exception as exc:
+                from figma_flutter_agent.errors import FlutterProjectError
+
+                if not isinstance(exc, FlutterProjectError) or not is_figma_node_missing_error(exc):
+                    raise
+                fallback_dump = resolve_manifest_cached_dump(
+                    project_dir,
+                    feature_name=ctx.feature_name,
+                    node_id=parsed.node_id,
+                    file_key=parsed.file_key,
+                )
+                if fallback_dump is None:
+                    raise
+                log.warning(
+                    "Live Figma node {} missing; continuing from cached dump {}",
+                    parsed.node_id,
+                    fallback_dump.as_posix(),
+                )
+                ctx.warnings.append(
+                    f"Live Figma node {parsed.node_id} was not found; "
+                    f"using cached dump {fallback_dump.name}. "
+                    "Update screens.yaml with the current node-id for fresh Figma sync."
+                )
+                fetch_result = load_fetch_result_from_dump(
+                    fallback_dump,
+                    file_key=parsed.file_key,
+                    node_id=parsed.node_id,
+                )
             ctx.apply_fetch(fetch_result)
         with log_stage(log, "parse"):
             ctx.apply_parse(
