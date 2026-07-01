@@ -264,6 +264,57 @@ def test_extracted_salary_widget_with_cluster_classes_preserves_substrate() -> N
     assert "IconSalaryWidget(" not in build.replace("const IconSalaryWidget({super.key})", "")
     assert "0xFF6DB6FE" in code
     assert "SvgPicture" in code
+    assert "width: 26.0" in code
+    assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in code
+
+
+def test_materialize_refreshes_icon_badge_with_plate_sized_glyph_cache() -> None:
+    from figma_flutter_agent.generator.ir.extracted import materialize_extracted_widgets
+    from figma_flutter_agent.schemas import ExtractedWidget
+
+    salary = _salary_icon_stack()
+    screen = CleanDesignTreeNode(
+        id="7035:1262",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=430.0, height=932.0),
+        children=[salary],
+    )
+    widget_ir = WidgetIrNode(
+        figma_id="7110:1045",
+        kind=WidgetIrKind.AUTO,
+        children=[
+            WidgetIrNode(figma_id="I7110:1045;7102:2847", kind=WidgetIrKind.AUTO),
+            WidgetIrNode(figma_id="I7110:1045;7102:1277", kind=WidgetIrKind.AUTO),
+        ],
+    )
+    stale = (
+        "class IconSalaryWidget extends StatelessWidget {"
+        "const IconSalaryWidget({super.key});"
+        "@override Widget build(BuildContext context) {"
+        "return Container(width: 57.0, height: 53.0, decoration: BoxDecoration("
+        "color: Color(0xFF6DB6FE), borderRadius: BorderRadius.circular(22.0)), "
+        "child: Center(child: SvgPicture.asset('assets/icons/x.svg', "
+        "width: 57.0, height: 53.0, fit: BoxFit.fill)));"
+        "}}"
+    )
+    widgets = [
+        ExtractedWidget(
+            widget_name="IconSalaryWidget",
+            widget_ir=widget_ir,
+            code=stale,
+        )
+    ]
+    ctx = IrEmitContext(uses_svg=True, responsive_enabled=False, is_layout_root=False)
+    refreshed = materialize_extracted_widgets(
+        widgets,
+        clean_tree=screen,
+        ctx=ctx,
+        prefer_existing_code=True,
+    )[0].resolved_code()
+    assert refreshed is not None
+    assert "width: 26.0" in refreshed
+    assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in refreshed
 
 
 def test_subtree_salary_widget_body_inlines_cluster_content_not_self() -> None:
@@ -381,6 +432,28 @@ def test_collapse_numbered_widget_stem_aliases_rewrites_callsites() -> None:
     assert "IconSalaryWidget(" in updated["lib/generated/screen_layout.dart"]
 
 
+def test_wizard_preview_viewport_pins_bottom_chrome_without_outer_scroll() -> None:
+    from figma_flutter_agent.generator.layout.common import (
+        artboard_static_wizard_preview,
+        wrap_artboard_preview_layout_builder,
+    )
+
+    preview = artboard_static_wizard_preview(
+        scroll_child="child",
+        viewport_pin_bottom_chrome=True,
+    )
+    assert "SingleChildScrollView(" not in preview
+    assert "Alignment.bottomCenter" in preview
+    wrapped = wrap_artboard_preview_layout_builder(
+        preview_child="SizedBox(width: _artboardPreviewWidth, height: _artboardPreviewHeight, child: child)",
+        fallback="child",
+        viewport_pin_bottom_chrome=True,
+    )
+    assert "viewport_pin_bottom_chrome" not in wrapped
+    assert "Alignment.bottomCenter" in wrapped
+    assert "SingleChildScrollView(" not in wrapped.split("if (_artboardCaptureMode)")[1]
+
+
 def test_positioned_text_dual_pin_prefers_explicit_width_for_table_cells() -> None:
     monthly = _monthly_category_text()
     placement = monthly.stack_placement
@@ -419,3 +492,47 @@ def test_positioned_text_dual_pin_prefers_explicit_width_for_table_cells() -> No
     assert "right: 35.0" in joined_amount
     assert "width: 56.0" in joined_amount
     assert "left: 187.0" not in joined_amount
+
+
+def test_transaction_income_layout_emits_calendar_plate_and_salary_glyph() -> None:
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_code_from_ir
+    from figma_flutter_agent.generator.ir.tree import index_clean_tree
+    from figma_flutter_agent.generator.layout import render_layout_file
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr, WidgetIrNode
+
+    debug_root = Path(".debug/screen/limbo/9_3_1_b_transaction_income")
+    if not (debug_root / "processed.json").is_file():
+        pytest.skip("transaction income debug bundle unavailable")
+    proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    norm = normalize_clean_tree(root, screen_ir=screen_ir)
+    layout = render_layout_file(
+        norm,
+        feature_name="9_3_1_b_transaction_income",
+        uses_svg=True,
+        screen_ir=screen_ir,
+        de_archetype_pass=True,
+    )["lib/generated/9_3_1_b_transaction_income_layout.dart"]
+    assert "figma-I7043_3387_7043_3015" in layout
+    assert "Color(0xFF00D09E)" in layout
+    salary_entry = next(
+        widget for widget in pre["extractedWidgets"] if widget["widgetName"] == "IconSalaryWidget"
+    )
+    salary_node = index_clean_tree(norm)["7110:1045"]
+    salary_code = emit_extracted_widget_code_from_ir(
+        WidgetIrNode.model_validate(salary_entry["widgetIr"]),
+        clean_tree=root,
+        widget_name="IconSalaryWidget",
+        ctx=IrEmitContext(uses_svg=True, responsive_enabled=False, is_layout_root=False),
+    )
+    assert "width: 26.0" in salary_code
+    assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in salary_code
+    assert salary_node.sizing.width == 57.0

@@ -1,0 +1,25 @@
+{
+  "feature": "food_add_new_items",
+  "pipeline_run_id": "7099a6db9b60",
+  "candidate_build_run_id": "7099a6db9b60",
+  "committed_build_run_id": "7099a6db9b60",
+  "writeback": "committed",
+  "written_files": [
+    "lib/features/food_add_new_items/food_add_new_items_screen.dart",
+    "lib/generated/food_add_new_items_chunk_2e8d5787.dart",
+    "lib/generated/food_add_new_items_layout.dart",
+    "lib/main.dart",
+    "lib/theme/app_colors.dart",
+    "lib/theme/app_elevation.dart",
+    "lib/theme/app_layout.dart",
+    "lib/theme/app_radius.dart",
+    "lib/theme/app_spacing.dart",
+    "lib/theme/app_theme.dart",
+    "lib/theme/app_typography.dart",
+    "lib/widgets/ingridents_widget.dart",
+    "test/golden/food_add_new_items_screen_test.dart",
+    "test/harness/element_coordinate_mapper.dart"
+  ],
+  "analyze_passed": null,
+  "captured_at": "2026-07-01T11:04:09.764476+00:00"
+}

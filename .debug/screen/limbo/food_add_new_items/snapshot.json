@@ -1,0 +1,34 @@
+{
+  "file_key": "nJBqmuLJ1KXSA23yNouMOR",
+  "node_id": "602:1027",
+  "feature_name": "food_add_new_items",
+  "tree_hash": "27ce40abd1e82d7e06139305c927281b057e662ab075f216559371285e20ecfc",
+  "colors_hash": "e595c5659d230391e9ffa762a76dfbb0b8b0d91faa7305cdef0d7f6d7cb7150d",
+  "typography_hash": "d97c05e72371a71cb0f5aa778aa1c22c5d8c310c6850c843377c1616a41a6105",
+  "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
+  "file_hashes": {
+    "lib/widgets/ingridents_widget.dart": "0f51b1411603a6951f5ae319f26528d8d27df6e8468a9384475ce201e50852d9",
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "f233a46b5a2102c41acde0d1dbec95c9fbf65328d8f8dae7f9365d86c443c33b",
+    "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
+    "lib/theme/app_typography.dart": "00b9ab1149675d4468cec1074448e0fe964e030c014fba72911e64c65275800c",
+    "lib/theme/app_radius.dart": "474d7e026c62009f7d895430bdbdc27422eb4ce236bb1b61ae87a203f6012cdb",
+    "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
+    "lib/theme/app_theme.dart": "36062c5562921a35851b6958f87f9f73ebd03ae52112dc8993ae54a12727460f",
+    "lib/generated/food_add_new_items_layout.dart": "34be88b33ba30eaa7eef7903b446113016deb21d1fb07bd6d0b604600f0819ea",
+    "lib/generated/food_add_new_items_chunk_2e8d5787.dart": "5851b0a44f5291ed96ce7fbef866b08652bc1aaae019604ff9ee152d537ba69a",
+    "lib/features/food_add_new_items/food_add_new_items_screen.dart": "c7b2934ebc14e97e073f6a35cbb3c1f5c693d7168cb57860f996eddcaed55e84",
+    "test/golden/food_add_new_items_screen_test.dart": "3976e51c9f9ae808c521d655e09932b8e03c66a609a9b83d99246b18839783b5",
+    "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
+    "lib/main.dart": "7e4e3351b8cd77e30baa895735e3bbde198816456a5e32c1c934afcb303c59a8"
+  },
+  "layout_region_hash": "82cd0fc0bf6b364cbb1833cb00613ed719f0fb14ca3c6b4256c94710e5b3893c",
+  "cluster_hashes": {
+    "cluster_0": "8eccad5b507cfbb3609f63dfbf0cb114e04a3d33245bedbd4bbff19bbb7d5db5",
+    "cluster_1": "f8ece058b7c2e5f9ffcc262122b9e12d63860f4dc948b54cd0bd4cd7d22fb525"
+  },
+  "reference_image_hash": null,
+  "emitter_version": "2026.06.2",
+  "version": 1,
+  "updated_at": "2026-07-01T11:04:09.731091+00:00"
+}

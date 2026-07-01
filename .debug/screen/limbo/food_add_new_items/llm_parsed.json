@@ -1,0 +1,966 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "food_add_new_items",
+  "screenIr": {
+    "root": {
+      "figmaId": "602:1027",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "602:1183",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "602:1184",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "UploadAddTileWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "602:1194",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "UploadAddTileWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "602:1204",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "color8"
+              }
+            },
+            {
+              "figmaId": "602:1205",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Upload photo/video",
+                "accessibilityLabel": "Upload photo/video",
+                "textColor": "primary",
+                "fontSize": 13.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "602:1206",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "602:1207",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "602:1208",
+                  "kind": "auto",
+                  "children": [],
+                  "classificationHint": {
+                    "suggestedKind": "control_checkbox",
+                    "confidence": 0.74,
+                    "rationale": "Small square with delivery label suggests unchecked option control."
+                  }
+                },
+                {
+                  "figmaId": "602:1209",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Delivery",
+                    "accessibilityLabel": "Delivery",
+                    "fontSize": 13.0
+                  }
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "classificationHint": {
+                "suggestedKind": "chip_choice",
+                "confidence": 0.73,
+                "rationale": "Compact labeled option row with checkbox-like affordance behaves like a selectable delivery mode chip."
+              }
+            },
+            {
+              "figmaId": "602:1210",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "602:1211",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {},
+                  "isSelected": true,
+                  "classificationHint": {
+                    "suggestedKind": "control_radio",
+                    "confidence": 0.71,
+                    "rationale": "Selected bordered box with checkmark-like vector and label indicates active pickup option."
+                  }
+                },
+                {
+                  "figmaId": "602:1212",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Pick up",
+                    "accessibilityLabel": "Pick up",
+                    "fontSize": 13.0
+                  }
+                },
+                {
+                  "figmaId": "602:1213",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "accessibilityLabel": "Vector"
+                  }
+                }
+              ],
+              "isSelected": true,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": true
+              },
+              "classificationHint": {
+                "suggestedKind": "chip_choice",
+                "confidence": 0.78,
+                "rationale": "Selected delivery mode with checkmark and label appears as a choice chip / segmented option."
+              }
+            },
+            {
+              "figmaId": "602:1214",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "602:1215",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "602:1216",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "$50",
+                    "accessibilityLabel": "$50",
+                    "fontSize": 14.0
+                  }
+                }
+              ],
+              "classificationHint": {
+                "suggestedKind": "input_text_field",
+                "confidence": 0.74,
+                "rationale": "Bounded field container with visible monetary value inside a price section suggests editable price input."
+              }
+            },
+            {
+              "figmaId": "602:1217",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "PRice",
+                "accessibilityLabel": "PRice",
+                "textColor": "primary",
+                "fontSize": 13.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "602:1218",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "602:1219",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "602:1220",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "item name",
+                "accessibilityLabel": "item name",
+                "textColor": "primary",
+                "fontSize": 13.0
+              }
+            },
+            {
+              "figmaId": "602:1221",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Mazalichiken Halim",
+                "accessibilityLabel": "Mazalichiken Halim",
+                "fontSize": 12.0
+              },
+              "hintText": "item name",
+              "isMultiline": false,
+              "maxLines": 1,
+              "payload": {
+                "payloadKind": "input_text_field",
+                "hintText": "item name",
+                "isMultiline": false,
+                "maxLines": 1
+              },
+              "classificationHint": {
+                "suggestedKind": "input_text_field",
+                "confidence": 0.79,
+                "rationale": "Label above outlined field with current text value strongly indicates single-line text input."
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "602:1222",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "602:1223",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Reset",
+                "accessibilityLabel": "Reset",
+                "fontSize": 14.0
+              },
+              "classificationHint": {
+                "suggestedKind": "button_text",
+                "confidence": 0.76,
+                "rationale": "Standalone top-right text acts like a tappable reset action."
+              }
+            },
+            {
+              "figmaId": "602:1224",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "602:1225",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "602:1226",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "602:1227",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "accessibilityLabel": "Back"
+                      }
+                    }
+                  ],
+                  "classificationHint": {
+                    "suggestedKind": "button_icon",
+                    "confidence": 0.78,
+                    "rationale": "Circular icon control with arrow glyph indicates navigation back action."
+                  }
+                }
+              ],
+              "classificationHint": {
+                "suggestedKind": "button_icon",
+                "confidence": 0.78,
+                "rationale": "Back affordance container represents a tappable icon button."
+              }
+            },
+            {
+              "figmaId": "602:1228",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Add New Items",
+                "accessibilityLabel": "Add New Items",
+                "textColor": "primary",
+                "fontSize": 17.0
+              }
+            }
+          ],
+          "classificationHint": {
+            "suggestedKind": "nav_app_bar",
+            "confidence": 0.75,
+            "rationale": "Top header cluster with back affordance, title, and reset action behaves like app bar."
+          }
+        },
+        {
+          "figmaId": "602:1229",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "602:1230",
+              "kind": "button_filled",
+              "children": [
+                {
+                  "figmaId": "602:1231",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "accessibilityLabel": "Rectangle 1344",
+                    "backgroundColor": "color10"
+                  }
+                },
+                {
+                  "figmaId": "602:1232",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Save Changes",
+                    "accessibilityLabel": "Save Changes",
+                    "fontSize": 18.0
+                  }
+                }
+              ],
+              "overrides": {
+                "accessibilityLabel": "Save Changes",
+                "backgroundColor": "color10"
+              },
+              "payload": {
+                "payloadKind": "button"
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "602:1028",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "602:1029",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "602:1030",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Details",
+                "accessibilityLabel": "Details",
+                "textColor": "primary",
+                "fontSize": 13.0
+              }
+            },
+            {
+              "figmaId": "602:1031",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Lorem ipsum dolor sit amet, consectetur adips cing elit. Bibendum in vel, mattis et amet dui mauris turpis.",
+                "accessibilityLabel": "Lorem ipsum dolor sit amet, consectetur adips cing elit. Bibendum in vel, mattis et amet dui mauris turpis.",
+                "textColor": "color7",
+                "fontSize": 12.0
+              },
+              "hintText": "Details",
+              "isMultiline": true,
+              "payload": {
+                "payloadKind": "input_text_field",
+                "hintText": "Details",
+                "isMultiline": true
+              },
+              "classificationHint": {
+                "suggestedKind": "input_text_field",
+                "confidence": 0.77,
+                "rationale": "Section label above large outlined area with paragraph text suggests multiline details input."
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "602:1032",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "IngridentsWidget",
+            "namedArgs": {}
+          }
+        }
+      ],
+      "overrides": {
+        "backgroundColor": "color5"
+      }
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "602:1229",
+      "602:1028",
+      "602:1032",
+      "602:1206",
+      "602:1183",
+      "602:1218",
+      "602:1222"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "item_creation_form",
+      "confidence": 0.9,
+      "explanation": "Screen is a product/item creation form with media upload, name, price, ingredient selection, details, and save action.",
+      "warnings": [
+        "Ingredient section is extracted as a prebuilt widget, so fine-grained option contracts are summarized at the section level.",
+        "Some upload tiles are visually repeated add placeholders with unclear exact interaction semantics beyond media attachment."
+      ]
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "602:1218",
+        "role": "input",
+        "subtype": "single_line_text",
+        "controlNodeId": "602:1221",
+        "boundaryNodeId": "602:1219",
+        "labelNodeIds": [
+          "602:1220"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "602:1221"
+        ],
+        "decorationNodeIds": [
+          "602:1219"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Mazalichiken Halim",
+          "keyboardIntent": "text",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center",
+          "label_above_field",
+          "value_inside_boundary_padding"
+        ],
+        "value": "Mazalichiken Halim",
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "controller_required",
+          "editable_text_on_changed"
+        ],
+        "explanation": "Outlined field with uppercase label and current item-name value indicates a single-line item name input."
+      },
+      {
+        "nodeId": "602:1206",
+        "role": "input",
+        "subtype": "price_and_fulfillment",
+        "controlNodeId": "602:1214",
+        "boundaryNodeId": "602:1215",
+        "labelNodeIds": [
+          "602:1217"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "602:1216"
+        ],
+        "decorationNodeIds": [
+          "602:1215"
+        ],
+        "optionNodeIds": [
+          "602:1210",
+          "602:1207"
+        ],
+        "stateNodeIds": [
+          "602:1211",
+          "602:1208",
+          "602:1213"
+        ],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "$50",
+          "selectedOptions": [
+            "Pick up"
+          ],
+          "keyboardIntent": "number",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center",
+          "selection_group_trailing_to_input",
+          "selected_chip_state_preserved"
+        ],
+        "value": "$50",
+        "options": [
+          {
+            "nodeId": "602:1210",
+            "label": "Pick up",
+            "selected": true,
+            "value": "pick_up",
+            "confidence": 0.87
+          },
+          {
+            "nodeId": "602:1207",
+            "label": "Delivery",
+            "selected": false,
+            "value": "delivery",
+            "confidence": 0.82
+          }
+        ],
+        "confidence": 0.84,
+        "proposedEffects": [
+          "numeric_keyboard",
+          "option_toggle_on_tap",
+          "currency_value_parsing"
+        ],
+        "explanation": "Price section combines a numeric field and a two-option fulfillment selector with visible selected state on Pick up."
+      },
+      {
+        "nodeId": "602:1028",
+        "role": "input",
+        "subtype": "multiline_text",
+        "controlNodeId": "602:1031",
+        "boundaryNodeId": "602:1029",
+        "labelNodeIds": [
+          "602:1030"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "602:1031"
+        ],
+        "decorationNodeIds": [
+          "602:1029"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "textarea",
+        "contractTraits": {
+          "isMultiline": true,
+          "obscureText": false,
+          "currentValue": "Lorem ipsum dolor sit amet, consectetur adips cing elit. Bibendum in vel, mattis et amet dui mauris turpis.",
+          "keyboardIntent": "multiline_text",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "multiline_input_top_align",
+          "label_above_field",
+          "textarea_preserve_padding"
+        ],
+        "value": "Lorem ipsum dolor sit amet, consectetur adips cing elit. Bibendum in vel, mattis et amet dui mauris turpis.",
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "multiline_editing",
+          "controller_required"
+        ],
+        "explanation": "Labeled large outlined box with paragraph content indicates a multiline details/description input."
+      },
+      {
+        "nodeId": "602:1183",
+        "role": "input",
+        "subtype": "media_uploader",
+        "controlNodeId": "602:1183",
+        "boundaryNodeId": "602:1183",
+        "labelNodeIds": [
+          "602:1205"
+        ],
+        "placeholderNodeIds": [
+          "602:1193",
+          "602:1203"
+        ],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "602:1204",
+          "602:1185",
+          "602:1195",
+          "602:1186",
+          "602:1196"
+        ],
+        "optionNodeIds": [
+          "602:1184",
+          "602:1194",
+          "602:1204"
+        ],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "actionKind": "upload_media",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "media_slots_in_row",
+          "upload_tile_tappable",
+          "placeholder_add_icon_centered"
+        ],
+        "options": [
+          {
+            "nodeId": "602:1204",
+            "selected": true,
+            "value": "existing_media_slot",
+            "confidence": 0.63
+          },
+          {
+            "nodeId": "602:1194",
+            "label": "Add",
+            "selected": false,
+            "value": "empty_upload_slot",
+            "confidence": 0.84
+          },
+          {
+            "nodeId": "602:1184",
+            "label": "Add",
+            "selected": false,
+            "value": "empty_upload_slot",
+            "confidence": 0.84
+          }
+        ],
+        "confidence": 0.74,
+        "proposedEffects": [
+          "open_media_picker_on_tap",
+          "allow_multiple_upload_slots"
+        ],
+        "explanation": "Upload section contains a heading and three slot tiles, two clearly marked Add placeholders and one filled preview tile."
+      },
+      {
+        "nodeId": "602:1032",
+        "role": "input",
+        "subtype": "ingredient_selector",
+        "controlNodeId": "602:1032",
+        "boundaryNodeId": "602:1032",
+        "labelNodeIds": [
+          "602:1182"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [
+          "602:1126",
+          "602:1134",
+          "602:1142",
+          "602:1153",
+          "602:1160",
+          "602:1169",
+          "602:1038",
+          "602:1051",
+          "602:1065",
+          "602:1084",
+          "602:1098",
+          "602:1109"
+        ],
+        "stateNodeIds": [],
+        "contractKind": "choice_chip_group",
+        "contractTraits": {
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "chip_row_wrapping_or_horizontal_scroll",
+          "icon_above_label_option_layout",
+          "selected_chip_state_preserved"
+        ],
+        "options": [
+          {
+            "nodeId": "602:1169",
+            "label": "Salt",
+            "value": "salt",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1160",
+            "label": "Chicken",
+            "value": "chicken",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1153",
+            "label": "onion",
+            "value": "onion",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1142",
+            "label": "Garlic",
+            "value": "garlic",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1134",
+            "label": "Pappers",
+            "selected": true,
+            "value": "pappers",
+            "confidence": 0.66
+          },
+          {
+            "nodeId": "602:1126",
+            "label": "Ginger",
+            "value": "ginger",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1109",
+            "label": "Avocado",
+            "value": "avocado",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1098",
+            "label": "Apple",
+            "value": "apple",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1084",
+            "label": "Blueberry",
+            "value": "blueberry",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1065",
+            "label": "Broccoli",
+            "value": "broccoli",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1051",
+            "label": "Orange",
+            "value": "orange",
+            "confidence": 0.75
+          },
+          {
+            "nodeId": "602:1038",
+            "label": "Walnut",
+            "value": "walnut",
+            "confidence": 0.75
+          }
+        ],
+        "confidence": 0.78,
+        "proposedEffects": [
+          "toggle_ingredient_selection",
+          "preserve_selection_state",
+          "optional_see_all_navigation"
+        ],
+        "explanation": "Extracted ingredients section presents multiple icon chips grouped under Basic and Fruit headings with a highlighted pepper tile suggesting selectable ingredient options."
+      },
+      {
+        "nodeId": "602:1230",
+        "role": "action",
+        "subtype": "primary_submit",
+        "controlNodeId": "602:1230",
+        "boundaryNodeId": "602:1231",
+        "labelNodeIds": [
+          "602:1232"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "602:1231"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "actionKind": "submit",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "button_label_centered",
+          "min_touch_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "submit_form"
+        ],
+        "explanation": "Large bottom filled button labeled Save Changes is the primary submit action."
+      },
+      {
+        "nodeId": "602:1224",
+        "role": "action",
+        "subtype": "back_navigation",
+        "controlNodeId": "602:1224",
+        "boundaryNodeId": "602:1225",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "602:1226",
+          "602:1227"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate_back",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "icon_button_centered",
+          "min_touch_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.93,
+        "proposedEffects": [
+          "navigate_back"
+        ],
+        "explanation": "Circular leading back affordance in the header is a navigation button."
+      },
+      {
+        "nodeId": "602:1223",
+        "role": "action",
+        "subtype": "reset_form",
+        "controlNodeId": "602:1223",
+        "boundaryNodeId": "602:1222",
+        "labelNodeIds": [
+          "602:1223"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "actionKind": "reset",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "text_action_top_right",
+          "min_touch_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.82,
+        "proposedEffects": [
+          "reset_form_fields"
+        ],
+        "explanation": "Header Reset text likely clears the form or reverts edits."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "UploadAddTileWidget",
+      "widgetIr": {
+        "figmaId": "602:1184",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "602:1185",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "602:1186",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "602:1187",
+                "kind": "auto",
+                "children": [],
+                "overrides": {
+                  "accessibilityLabel": "Ellipse 51",
+                  "backgroundColor": "color6"
+                }
+              },
+              {
+                "figmaId": "602:1188",
+                "kind": "extracted",
+                "children": [],
+                "ref": {
+                  "widgetName": "UploadAddGlyphWidget",
+                  "namedArgs": {}
+                }
+              }
+            ]
+          },
+          {
+            "figmaId": "602:1193",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "text": "Add",
+              "accessibilityLabel": "Add",
+              "fontSize": 13.0
+            }
+          }
+        ],
+        "classificationHint": {
+          "suggestedKind": "button_outlined",
+          "confidence": 0.74,
+          "rationale": "Dashed bordered placeholder tile with centered add affordance suggests tappable media-add tile."
+        }
+      }
+    },
+    {
+      "widgetName": "UploadAddGlyphWidget",
+      "widgetIr": {
+        "figmaId": "602:1188",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "602:1189",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Vector"
+            }
+          },
+          {
+            "figmaId": "602:1190",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Vector"
+            }
+          },
+          {
+            "figmaId": "602:1191",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Vector"
+            }
+          },
+          {
+            "figmaId": "602:1192",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Vector"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "IngridentsWidget",
+      "widgetIr": {
+        "figmaId": "602:1032",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "602:1033",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "602:1125",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "602:1182",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

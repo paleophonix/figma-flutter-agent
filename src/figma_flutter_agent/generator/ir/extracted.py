@@ -12,7 +12,8 @@ from figma_flutter_agent.generator.dart.llm_codegen import _canonical_widget_cla
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_screen_body_from_ir
 from figma_flutter_agent.generator.ir.extracted_paint import (
-    should_render_extracted_widget_from_clean_tree,
+    extracted_icon_badge_glyph_emit_needs_rematerialization,
+    prefers_clean_tree_extracted_widget_emit,
     subtree_has_visible_paint,
 )
 from figma_flutter_agent.generator.ir.tree import index_clean_tree, merge_screen_ir
@@ -291,7 +292,7 @@ def emit_extracted_widget_code_from_ir(
         skip_cluster_id=skip_cluster_id,
         policy=ctx.policy,
     )
-    if should_render_extracted_widget_from_clean_tree(widget_ir, subtree):
+    if prefers_clean_tree_extracted_widget_emit(widget_ir, subtree):
         body = _render_extracted_widget_body(merged, widget_name=widget_name, ctx=widget_ctx)
     else:
         body = emit_screen_body_from_ir(
@@ -435,7 +436,10 @@ def materialize_extracted_widgets(
             and not _is_shrink_only_widget_source(existing)
             and not (
                 subtree is not None
-                and _extracted_widget_needs_decoration_rematerialization(subtree, existing)
+                and (
+                    _extracted_widget_needs_decoration_rematerialization(subtree, existing)
+                    or extracted_icon_badge_glyph_emit_needs_rematerialization(subtree, existing)
+                )
             )
         ):
             materialized.append(widget)

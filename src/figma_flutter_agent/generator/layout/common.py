@@ -495,13 +495,33 @@ def artboard_interactive_scroll_preview(*, scroll_child: str) -> str:
     )
 
 
-def artboard_static_wizard_preview(*, scroll_child: str) -> str:
+def artboard_static_wizard_preview(
+    *,
+    scroll_child: str,
+    viewport_pin_bottom_chrome: bool = False,
+) -> str:
     """Emit a centered, clipped Figma artboard for static wizard Chrome preview.
 
     Wizard passes artboard dart-defines for ``responsive.mode: static``. The shell
     letterboxes the design inside the browser viewport without an opaque overlay
     that would hide hoisted ambient background layers behind the artboard.
     """
+    if viewport_pin_bottom_chrome:
+        return (
+            "Align("
+            "alignment: Alignment.bottomCenter, "
+            "child: ClipRect("
+            "child: SizedBox("
+            "width: _artboardPreviewWidth, "
+            "height: constraints.maxHeight.isFinite && constraints.maxHeight > 0 "
+            "&& constraints.maxHeight < _artboardPreviewHeight "
+            "? constraints.maxHeight "
+            ": _artboardPreviewHeight, "
+            f"child: {scroll_child}"
+            ")"
+            ")"
+            ")"
+        )
     return (
         "Center("
         "child: ClipRect("
@@ -522,6 +542,7 @@ def wrap_artboard_preview_layout_builder(
     preview_child: str,
     fallback: str,
     scroll_child: str | None = None,
+    viewport_pin_bottom_chrome: bool = False,
 ) -> str:
     """Emit a ``LayoutBuilder`` that skips ``FittedBox`` margins in artboard preview."""
     preview_body = preview_child.replace("previewW", "_artboardPreviewWidth").replace(
@@ -529,7 +550,10 @@ def wrap_artboard_preview_layout_builder(
     )
     clipped_preview = f"ClipRect(child: {preview_body})"
     interactive_child = scroll_child if scroll_child is not None else preview_body
-    static_wizard_preview = artboard_static_wizard_preview(scroll_child=interactive_child)
+    static_wizard_preview = artboard_static_wizard_preview(
+        scroll_child=interactive_child,
+        viewport_pin_bottom_chrome=viewport_pin_bottom_chrome,
+    )
     return (
         "LayoutBuilder("
         "builder: (context, constraints) {"

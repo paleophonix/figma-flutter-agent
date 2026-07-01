@@ -619,6 +619,7 @@ def _wrap_root_stack_viewport(
         return wrap_artboard_preview_layout_builder(
             preview_child=preview_child,
             fallback=fallback,
+            viewport_pin_bottom_chrome=True,
         )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         _stack_is_phone_shell_layout,
