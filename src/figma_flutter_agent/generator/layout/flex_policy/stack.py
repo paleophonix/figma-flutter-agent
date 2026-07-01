@@ -1022,6 +1022,9 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     if layout_fact_stack_bottom_nav_tab_glyph_column(stack):
         return True
 
+    if stack_uses_shared_body_scroll_host(stack):
+        return True
+
     if stack_has_non_sequential_raster_overlay(stack):
         return False
 
@@ -1035,8 +1038,9 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
 
     if stack.type != NodeType.STACK or len(stack.children) < 2:
         return False
+    body_children = _stack_flow_body_children(stack)
     growable_panels = sum(
-        1 for child in stack.children if stack_child_is_growable_panel(child)
+        1 for child in body_children if stack_child_is_growable_panel(child)
     )
     if _stack_is_phone_shell_layout(stack, growable_panels=growable_panels):
         return True

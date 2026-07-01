@@ -183,6 +183,23 @@ def wrap_repaint_boundary(widget: str) -> str:
     return f"RepaintBoundary(child: {widget})"
 
 
+def wrap_centered_decoration_container(
+    body: str,
+    *,
+    decoration: str,
+    width: str | None = None,
+    height: str | None = None,
+) -> str:
+    """Wrap a widget in a decoration container with centered child content."""
+    size_fields: list[str] = []
+    if width is not None:
+        size_fields.append(f"width: {width}")
+    if height is not None:
+        size_fields.append(f"height: {height}")
+    prefix = ", ".join([*size_fields, f"decoration: {decoration}"])
+    return f"Container({prefix}, child: Center(child: {body}))"
+
+
 def layout_fact_centered_glyph_badge(node: object) -> bool:
     """Return True for square flex hosts carrying one centered glyph (avatar initial)."""
     from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType

@@ -197,12 +197,15 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
         if request.frozen_planned_graph is not None:
             analyze_catalog = dict(request.frozen_planned_graph.files)
         analyze_catalog.update(files_to_write)
-        analyze_seeds = expand_planned_package_import_closure(
-            dict(files_to_write),
-            analyze_catalog,
-            package_name=request.package_name,
-        )
-        analyze_paths = sorted(analyze_seeds.keys())
+        if request.analyze_scope == "all_planned" and request.analyze_relative_paths:
+            analyze_paths = sorted(request.analyze_relative_paths)
+        else:
+            analyze_seeds = expand_planned_package_import_closure(
+                dict(files_to_write),
+                analyze_catalog,
+                package_name=request.package_name,
+            )
+            analyze_paths = sorted(analyze_seeds.keys())
 
         from figma_flutter_agent.generator.planned.reconcile.imports import (
             find_stale_widget_package_imports,

@@ -11,6 +11,7 @@ from figma_flutter_agent.debug.mirror import (
     project_mirror_label,
     sync_figma_debug_tree,
 )
+from figma_flutter_agent.debug.paths import render_session_dir
 
 
 def test_mirror_figma_debug_artifact_is_noop(tmp_path: Path) -> None:
@@ -67,7 +68,7 @@ def test_migrate_agent_logs_moves_mirror_dart_errors_and_renders(
     assert moved == 4
     assert (project / ".debug" / "ir" / "login.json").is_file()
     assert (project / ".debug" / "logs" / "last.log").is_file()
-    assert (project / ".debug" / "renders" / render_session.name / "flutter_render.png").is_file()
+    assert (render_session_dir(project, render_session.name) / "flutter_render.png").is_file()
     assert not mirror_ir.is_file()
     assert not dart_log.is_file()
     assert not render_session.exists()

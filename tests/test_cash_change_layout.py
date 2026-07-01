@@ -52,8 +52,8 @@ def test_cash_change_payment_section_uses_info_icon() -> None:
 def test_cash_change_payment_cards_emit_inline_selection_not_margin_widget() -> None:
     layout = _cash_change_layout(with_clusters=False)
     assert "MarginWidget" not in layout
-    assert "Icons.check" in layout
-    assert layout.count("Icons.check") <= 2
+    assert "Color(0xFF28A745)" in layout
+    assert "shape: BoxShape.circle" in layout
 
 
 def test_cash_change_unselected_payment_radio_has_light_fill() -> None:

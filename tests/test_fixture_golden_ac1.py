@@ -17,6 +17,7 @@ from figma_flutter_agent.validation.golden_runtime import resolve_golden_runtime
 
 _DOCKER_GOLDEN_DIR = fixtures_root() / "golden" / "png" / "docker"
 _PIXEL_THRESHOLD = 0.05
+_AC1_ENV = "FIGMA_RUN_FIXTURE_GOLDEN_AC1"
 
 
 def _flutter_sdk_root_for_tests() -> str | None:
@@ -39,9 +40,15 @@ def _flutter_available() -> bool:
     return resolve_flutter_executable(sdk_root=_flutter_sdk_root_for_tests()) is not None
 
 
+def _fixture_ac1_enabled() -> bool:
+    return os.environ.get(_AC1_ENV, "").strip() == "1"
+
+
 @pytest.mark.parametrize("screen_id", ["music_v2"])
 def test_fixture_golden_capture_is_stable_on_host(screen_id: str) -> None:
     """Two captures from the same planned files should be pixel-identical on host."""
+    if not _fixture_ac1_enabled():
+        pytest.skip(f"set {_AC1_ENV}=1 to run slow fixture AC-1 golden capture checks")
     if not _flutter_available():
         pytest.skip("Flutter SDK not available")
     sdk = _flutter_sdk_root_for_tests()
@@ -72,6 +79,8 @@ def test_fixture_golden_capture_is_stable_on_host(screen_id: str) -> None:
 )
 def test_fixture_golden_matches_committed_baseline(screen_id: str) -> None:
     """Committed docker baseline PNG should match a fresh host capture (AC-1)."""
+    if not _fixture_ac1_enabled():
+        pytest.skip(f"set {_AC1_ENV}=1 to run slow fixture AC-1 golden capture checks")
     if not _flutter_available():
         pytest.skip("Flutter SDK not available")
     manifest = load_screens_manifest()

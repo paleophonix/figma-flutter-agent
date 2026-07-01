@@ -192,12 +192,14 @@ def collect_cluster_widget_specs(
                 )
             )
     existing_ids = {spec.cluster_id for spec in specs}
+    existing_class_names = {spec.class_name for spec in specs}
     specs.extend(
         _collect_component_family_widget_specs(
             root,
             min_count=min_count,
             widget_suffix=widget_suffix,
             existing_cluster_ids=existing_ids,
+            existing_class_names=existing_class_names,
         )
     )
     return sorted(specs, key=lambda item: item.cluster_id)
@@ -229,6 +231,7 @@ def _collect_component_family_widget_specs(
     min_count: int,
     widget_suffix: str,
     existing_cluster_ids: set[str],
+    existing_class_names: set[str],
 ) -> list[ClusterWidgetSpec]:
     """Collect one widget per repeated published component family."""
     from collections import defaultdict
@@ -271,6 +274,8 @@ def _collect_component_family_widget_specs(
         candidates = with_children if with_children else eligible
         representative = max(candidates, key=_representative_score)
         class_name = _widget_class_name(representative, base_cluster_id, widget_suffix)
+        if class_name in existing_class_names:
+            continue
         specs.append(
             ClusterWidgetSpec(
                 cluster_id=base_cluster_id,
@@ -280,6 +285,7 @@ def _collect_component_family_widget_specs(
             )
         )
         existing_cluster_ids.add(base_cluster_id)
+        existing_class_names.add(class_name)
     return specs
 
 

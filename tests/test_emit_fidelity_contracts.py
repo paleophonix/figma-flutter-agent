@@ -329,12 +329,11 @@ def test_root_viewport_expands_when_bottom_chrome_present() -> None:
     )
     body = render_node_body(root, uses_svg=False, is_layout_root=True)
     assert "LayoutBuilder" in body
-    assert "viewportHeight" in body
+    assert "SingleChildScrollView" in body
     assert ": 844.0" in body
     assert ": 844;" not in body
-    assert "FittedBox" in body
-    assert "BoxFit.scaleDown" in body
-    assert "SingleChildScrollView" not in body
+    assert "FittedBox" not in body
+    assert "BoxFit.scaleDown" not in body
 
 
 def test_bottom_chrome_layout_emits_parseable_dart() -> None:
@@ -383,7 +382,8 @@ def test_bottom_chrome_layout_emits_parseable_dart() -> None:
     )
     assert outcome.passed, outcome.errors
     layout = planned["lib/generated/background_layout.dart"]
-    assert "return Align" in layout
+    assert "return Material" in layout
+    assert "SingleChildScrollView" in layout
     assert "),),})," not in layout.replace(" ", "")
 
 

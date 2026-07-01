@@ -2,6 +2,7 @@
 
 import pytest
 
+from figma_flutter_agent.errors import PlannedDartGraphError
 from figma_flutter_agent.generator.checks.validate import validate_generated_dart
 from figma_flutter_agent.generator.dart.postprocess import (
     discover_widgets_requiring_on_pressed,
@@ -994,11 +995,11 @@ class SocialButton extends StatelessWidget {
 }
 """,
     }
-    reconciled = reconcile_planned_dart_files(planned)
-    widget_src = reconciled["lib/widgets/social_button.dart"]
-    assert "onPressed: () {}" in reconciled["lib/features/auth/auth_screen.dart"]
-    assert "onPressed: () {}, {" not in widget_src
-    assert widget_src.count("const SocialButton({") == 1
+    with pytest.raises(
+        PlannedDartGraphError,
+        match="widget_callsite_matches_constructor: lib/features/auth/auth_screen.dart calls SocialButton with unknown named args \\['child'\\]",
+    ):
+        reconcile_planned_dart_files(planned)
 
 
 def test_strip_design_canvas_gesture_matryoshka() -> None:

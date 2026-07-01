@@ -103,12 +103,21 @@ class RepairTraceRecorder:
             "started_at": recorder._started_at,
             "folder_stamp": stamp,
             "posthog_trace_id": resolved_trace_id,
-            "debug_root": screen_root(project_dir, feature).relative_to(agent_repo_root()).as_posix(),
+            "debug_root": _trace_debug_root(project_dir, feature),
         }
         if extra_manifest:
             manifest.update(extra_manifest)
         _write_json(root / "manifest.json", manifest)
         return recorder
+
+
+def _trace_debug_root(project_dir: Path, feature: str) -> str:
+    """Return a stable trace debug-root path for both repo-local and temp test projects."""
+    debug_root = screen_root(project_dir, feature)
+    try:
+        return debug_root.relative_to(agent_repo_root()).as_posix()
+    except ValueError:
+        return debug_root.as_posix()
 
     def _next_prefix(self, step: str) -> str:
         prefix = f"{self._seq:02d}-{step}"

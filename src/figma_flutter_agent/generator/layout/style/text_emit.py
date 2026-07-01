@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout.style.colors import is_dark_fill_color
 from figma_flutter_agent.generator.layout.style.text_helpers import (
     _theme_text_style_expr,
 )
@@ -55,7 +54,7 @@ def filled_button_label_text_color(
     if node.type != NodeType.TEXT:
         return None
     surface = _filled_surface_color(parent)
-    if surface is None or not is_dark_fill_color(surface):
+    if surface is None:
         return None
     first_text = next(
         (child for child in parent.children if child.type == NodeType.TEXT),

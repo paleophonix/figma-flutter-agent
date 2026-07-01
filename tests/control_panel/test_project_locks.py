@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import pytest
 from redis.asyncio import Redis
 
@@ -12,9 +14,20 @@ from control_panel.workers.locks import (
 )
 
 
+async def _local_test_redis() -> Redis:
+    """Return the local Redis test client or skip quickly when Redis is unavailable."""
+    redis = Redis.from_url("redis://127.0.0.1:6379/15", decode_responses=False)
+    try:
+        await asyncio.wait_for(redis.ping(), timeout=1.0)
+    except Exception:
+        await redis.aclose()
+        pytest.skip("local Redis is not available on 127.0.0.1:6379")
+    return redis
+
+
 @pytest.mark.asyncio
 async def test_force_release_project_lock() -> None:
-    redis = Redis.from_url("redis://127.0.0.1:6379/15", decode_responses=False)
+    redis = await _local_test_redis()
     project_key = "E:/tmp/test-sandbox"
     key = project_lock_key(project_key)
     try:
@@ -29,7 +42,7 @@ async def test_force_release_project_lock() -> None:
 
 @pytest.mark.asyncio
 async def test_purge_orphan_project_locks() -> None:
-    redis = Redis.from_url("redis://127.0.0.1:6379/15", decode_responses=False)
+    redis = await _local_test_redis()
     key = project_lock_key("E:/tmp/purge-me")
     try:
         await redis.set(key, b"stale")

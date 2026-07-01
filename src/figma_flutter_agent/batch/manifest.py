@@ -7,7 +7,7 @@ from pathlib import Path
 from ruamel.yaml import YAML
 
 from figma_flutter_agent.batch.models import BatchManifest, ScreenEntry
-from figma_flutter_agent.debug.paths import debug_path_display, raw_dump_path
+from figma_flutter_agent.debug.paths import agent_debug_root, debug_path_display, raw_dump_path
 from figma_flutter_agent.generator.layout.common import to_snake_case
 
 
@@ -39,7 +39,12 @@ def load_batch_manifest(path: Path) -> BatchManifest:
         dump_path: Path | None = None
         if item.get("dump"):
             dump_raw = Path(str(item["dump"]))
-            dump_path = dump_raw if dump_raw.is_absolute() else project_dir / dump_raw
+            if dump_raw.is_absolute():
+                dump_path = dump_raw
+            elif len(dump_raw.parts) >= 2 and dump_raw.parts[0] == ".debug" and dump_raw.parts[1] == "screen":
+                dump_path = agent_debug_root().parent / dump_raw
+            else:
+                dump_path = project_dir / dump_raw
         screens.append(
             ScreenEntry(
                 feature=str(item["feature"]),

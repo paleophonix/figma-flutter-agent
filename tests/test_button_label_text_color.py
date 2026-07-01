@@ -34,7 +34,10 @@ def test_filled_button_label_uses_white_on_button_frame_fill() -> None:
         ],
     )
     label = button.children[0]
-    assert filled_button_label_text_color(label, button) == "Color(0xFFFFFFFF)"
+    assert (
+        filled_button_label_text_color(label, button)
+        == "Theme.of(context).colorScheme.onPrimary"
+    )
 
 
 def test_filled_button_label_uses_white_on_purple_fill() -> None:
@@ -68,7 +71,10 @@ def test_filled_button_label_uses_white_on_purple_fill() -> None:
     )
     label = button_row.children[1]
     footer = button_row.children[2]
-    assert filled_button_label_text_color(label, button_row) == "Color(0xFFFFFFFF)"
+    assert (
+        filled_button_label_text_color(label, button_row)
+        == "Theme.of(context).colorScheme.onPrimary"
+    )
     assert filled_button_label_text_color(footer, button_row) is None
     expr = text_style_expr(label, parent_node=button_row)
-    assert "Color(0xFFFFFFFF)" in expr
+    assert "Theme.of(context).colorScheme.onPrimary" in expr

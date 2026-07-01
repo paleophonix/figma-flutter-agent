@@ -253,7 +253,7 @@ async def test_import_figma_frame_writes_dump_and_manifest(tmp_path: Path, monke
     )
 
     assert feature == "music_v2"
-    assert dump_path.name == "music_v2_layout.json"
+    assert dump_path.name == "raw.json"
     dump_mock.assert_awaited_once()
     manifest = load_batch_manifest(manifest_path)
     assert manifest.screens[0].feature == "music_v2"
@@ -326,7 +326,7 @@ async def test_import_figma_frame_json_mode_skips_asset_export(tmp_path: Path, m
     )
 
     assert feature == "music_v2"
-    assert dump_path.name == "music_v2_layout.json"
+    assert dump_path.name == "raw.json"
     assert assets is None
     export_mock.assert_not_called()
 

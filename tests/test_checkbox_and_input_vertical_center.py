@@ -212,4 +212,5 @@ def test_checkbox_label_row_uses_intrinsic_width_not_fixed_slot() -> None:
     intrinsic_before = body.rfind("IntrinsicWidth(", 0, remember_idx)
     assert intrinsic_before >= 0
     remember_band = body[intrinsic_before : remember_idx + 80]
-    assert "Expanded(child: Text('Remember me'" in remember_band
+    assert "Text('Remember me'" in remember_band
+    assert "Expanded(child: Text('Remember me'" not in remember_band

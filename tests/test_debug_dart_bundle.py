@@ -119,8 +119,8 @@ class HomeScreen extends StatelessWidget {
         package_name="demo_app",
     )
     assert path is not None
-    assert path.name == "home_screen.dart"
-    assert path.parent.name == "dart"
+    assert path.name == "screen.dart"
+    assert path.parent.name == "home"
     assert "class HomeScreen" in path.read_text(encoding="utf-8")
 
 

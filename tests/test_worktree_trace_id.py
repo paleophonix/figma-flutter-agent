@@ -40,6 +40,7 @@ def _gate(tmp_path: Path) -> RunGateResult:
         committed_build_run_id="run-1",
         served_build_run_id="run-1",
         writeback="committed",
+        served_probe_present=False,
         candidate_available=False,
         manifest_path=manifest,
         allowed_questions=(),
@@ -195,11 +196,15 @@ async def test_resume_reuses_worktree_trace_id_in_observability(
                         {
                             "order": 1,
                             "actionKind": "CODE_CHANGE",
+                            "lawId": "law_a",
                             "targetFiles": ["src/figma_flutter_agent/stages/write.py"],
                             "tests": ["tests/test_debug_pipeline_models.py"],
                         }
                     ],
+                    "blocked": False,
                 }
+            if step == "diagnose":
+                return {"step": "diagnose", "laws": [{"id": "law_a"}], "blocked": False}
             raise AssertionError(step)
 
     async def _noop_repair(**_kwargs):

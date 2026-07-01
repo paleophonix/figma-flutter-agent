@@ -42,7 +42,7 @@ def test_record_render_png_writes_under_session_dir(tmp_path: Path) -> None:
     session_dir = render_artifacts_dir()
     assert session_dir is not None
     assert session_dir == session
-    assert session_dir == render_session_dir(project, session_dir.name)
+    assert session_dir == render_session_dir(project, session_dir.name, feature_name="sign_in")
     manifest = session_dir / "manifest.jsonl"
     assert manifest.is_file()
     assert "figma_reference" in manifest.read_text(encoding="utf-8")

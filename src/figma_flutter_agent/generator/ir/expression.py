@@ -15,6 +15,9 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     apply_flex_wrap_to_widget,
     emit_flexible_loose,
 )
+from figma_flutter_agent.generator.layout.flex_policy.stack import (
+    layout_fact_stack_circular_option_glyph_host,
+)
 from figma_flutter_agent.generator.layout.widgets.emit.shell import (
     build_flow_context,
     build_render_ctx,
@@ -32,6 +35,7 @@ from figma_flutter_agent.schemas import (
     WidgetIrKind,
     WidgetIrNode,
 )
+from figma_flutter_agent.parser.interaction.chip_variant import is_tag_component_chip_row
 
 _STRUCTURAL_NODE_TYPES = frozenset(
     {
@@ -99,12 +103,17 @@ def emit_widget_expression(
             figma_id_to_widget_name=figma_map,
         )
     if ir.kind == WidgetIrKind.CHIP_CHOICE:
-        from figma_flutter_agent.generator.layout.widgets.option_chip import (
-            emit_chip_choice_layout,
-        )
+        if (
+            not _should_ir_walk_children(clean)
+            or layout_fact_stack_circular_option_glyph_host(clean)
+            or is_tag_component_chip_row(clean)
+        ):
+            from figma_flutter_agent.generator.layout.widgets.option_chip import (
+                emit_chip_choice_layout,
+            )
 
-        widget = emit_chip_choice_layout(ir, clean=clean, ctx=ctx)
-        return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+            widget = emit_chip_choice_layout(ir, clean=clean, ctx=ctx)
+            return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
     if ir.kind in SEMANTIC_MVP_IR_KINDS and _semantic_mvp_emit_enabled(ctx):
         from figma_flutter_agent.generator.ir.fidelity import (
             EmitPath,

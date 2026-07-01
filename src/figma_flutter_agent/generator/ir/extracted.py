@@ -21,7 +21,10 @@ from figma_flutter_agent.generator.ir.validate import (
     validate_screen_ir,
 )
 from figma_flutter_agent.generator.layout import render_widget_file
-from figma_flutter_agent.generator.layout.common import to_snake_case
+from figma_flutter_agent.generator.layout.common import (
+    to_snake_case,
+    wrap_centered_decoration_container,
+)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
@@ -380,12 +383,13 @@ def _preserve_extracted_widget_decoration_shell(
     width = subtree.sizing.width
     height = subtree.sizing.height
     if width is not None and height is not None and width > 0 and height > 0:
-        return (
-            f"Container(width: {format_geometry_literal(float(width))}, "
-            f"height: {format_geometry_literal(float(height))}, "
-            f"decoration: {decoration}, child: Center(child: {body}))"
+        return wrap_centered_decoration_container(
+            body,
+            decoration=decoration,
+            width=format_geometry_literal(float(width)),
+            height=format_geometry_literal(float(height)),
         )
-    return f"Container(decoration: {decoration}, child: Center(child: {body}))"
+    return wrap_centered_decoration_container(body, decoration=decoration)
 
 
 def _is_shrink_only_emit_body(body: str) -> bool:

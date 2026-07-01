@@ -134,8 +134,8 @@ def test_prune_top_level_cluster_duplicates_keeps_ref_stubs() -> None:
     assert len(root.children) == 3
     assert root.children[0].id == "0:1"
     assert root.children[0].children
-    assert root.children[1].children == []
-    assert root.children[2].children == []
+    assert root.children[1].children
+    assert root.children[2].children
 
 
 def test_prune_duplicated_cluster_subtrees_preserves_flattened_descendant_ids() -> None:
@@ -317,7 +317,7 @@ def test_prune_generation_layout_tree_applies_subtree_and_top_level_cluster() ->
     prune_generation_layout_tree(root, extracted_subtree_node_ids=frozenset())
 
     assert len(root.children) == 2
-    assert root.children[1].children == []
+    assert root.children[1].children
 
 
 def test_build_clean_tree_returns_cluster_summary() -> None:

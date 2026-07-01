@@ -26,11 +26,11 @@ def test_spec23_evaluator_passes_for_fixture(fixture_name: str) -> None:
     assert report.passed, _format_report(report)
 
 
-def test_spec23_report_lists_all_nine_criteria() -> None:
+def test_spec23_report_lists_all_criteria() -> None:
     root = json.loads(Path("tests/fixtures/figma_node_sample.json").read_text(encoding="utf-8"))
     report = evaluate_spec23(root, Settings(), node_id=root["id"], strict=True)
 
-    assert len(report.criteria) == 10
+    assert len(report.criteria) == 11
     assert {item.name for item in report.criteria} == {
         "figma_connectivity",
         "rest_css_synthesis",
@@ -42,6 +42,7 @@ def test_spec23_report_lists_all_nine_criteria() -> None:
         "flutter_optimization",
         "production_ready_code",
         "developer_changes_preserved",
+        "emit_fidelity_contracts",
     }
 
 

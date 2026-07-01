@@ -17,9 +17,9 @@ def _expected_overflow_gap_literal(
     row_width: float,
     child_total: float,
     n_gaps: int,
-    safety_total: float = 0.5,
+    safety_total: float = 1.0,
 ) -> str:
-    """Mirror emitter overflow gap sizing including geometry literal rounding."""
+    """Mirror emitter overflow gap sizing including current safety compression."""
     available_gap = max(0.0, row_width - child_total)
     safety_per_gap = safety_total / n_gaps if n_gaps > 0 else 0.0
     scaled_gap = max(0.0, available_gap / n_gaps - safety_per_gap) if n_gaps > 0 else 0.0

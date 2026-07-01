@@ -48,7 +48,7 @@ def test_wizard_menu_uses_short_labels() -> None:
         "select",
         "generate",
         "run",
-        "analyze",
+        "debug",
         "view",
     ]
     assert options[0].startswith("launch —")

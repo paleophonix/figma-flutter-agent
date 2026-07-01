@@ -107,7 +107,7 @@ def test_migrate_capture_sandbox_to_workspace(debug_agent_root: Path, tmp_path: 
     project.mkdir(parents=True)
     (project / "pubspec.yaml").write_text("name: limbo\n", encoding="utf-8")
     (workspace / "workspace-state.yml").write_text("active_project: limbo\n", encoding="utf-8")
-    agent_legacy = debug_agent_root / ".debug" / "limbo" / "capture" / "sandbox"
+    agent_legacy = debug_agent_root / ".debug" / "screen" / "limbo" / "capture" / "sandbox"
     agent_legacy.mkdir(parents=True)
     (agent_legacy / "pubspec.yaml").write_text("name: warm\n", encoding="utf-8")
 

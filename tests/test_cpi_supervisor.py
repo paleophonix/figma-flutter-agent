@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.dart.project_validation import PlannedAnalyzeOutcome
 from figma_flutter_agent.llm.prompts import (
     CpiSupervisorContext,
@@ -53,7 +54,7 @@ def test_repair_system_prompt_injects_cpi_directive() -> None:
 
 
 @pytest.mark.asyncio
-async def test_run_analyze_repair_loop_invokes_cpi_on_stagnation(
+async def test_run_analyze_repair_loop_blocks_deterministic_non_type_failures_before_cpi(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     drift_error = (
@@ -131,29 +132,27 @@ async def test_run_analyze_repair_loop_invokes_cpi_on_stagnation(
             )
         }
     )
-    result = await run_analyze_repair_loop(
-        _repair_request(
-            llm_client_factory=lambda _s: mock_client,
-            settings=settings,
-            llm_result=LlmStageResult(
-                generation=FlutterGenerationResponse(
-                    screen_code="class Bad { Widget build(_) => _AmbientBackground(); }",
-                    extracted_widgets=[
-                        ExtractedWidget(
-                            widget_name="AmbientBackground",
-                            code="class _AmbientBackground extends StatelessWidget {}",
-                        ),
-                    ],
+    with pytest.raises(
+        GenerationError,
+        match="Deterministic analyzer failure is not LLM-repairable",
+    ):
+        await run_analyze_repair_loop(
+            _repair_request(
+                llm_client_factory=lambda _s: mock_client,
+                settings=settings,
+                llm_result=LlmStageResult(
+                    generation=FlutterGenerationResponse(
+                        screen_code="class Bad { Widget build(_) => _AmbientBackground(); }",
+                        extracted_widgets=[
+                            ExtractedWidget(
+                                widget_name="AmbientBackground",
+                                code="class _AmbientBackground extends StatelessWidget {}",
+                            ),
+                        ],
+                    ),
                 ),
-            ),
-            clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
+                clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
+            )
         )
-    )
-
-    mock_client.cpi_supervisor_async.assert_awaited_once()
-    assert mock_client.repair_async.await_count == 1
-    last_repair_kwargs = mock_client.repair_async.await_args_list[-1].kwargs
-    assert last_repair_kwargs["cpi_supervisor_directive"] == (
-        "RENAME ALL _AmbientBackground TO AmbientBackground"
-    )
-    assert result.repair_attempts == 2
+    mock_client.cpi_supervisor_async.assert_not_awaited()
+    mock_client.repair_async.assert_not_awaited()

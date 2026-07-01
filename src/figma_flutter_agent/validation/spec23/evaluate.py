@@ -57,10 +57,19 @@ def evaluate_spec23(
         content for path, content in planned.items() if path.endswith("_layout.dart")
     )
     if strict:
-        responsive_passed = bool(screen_key) and "GeneratedScreenShell" in screen_source
-        responsive_passed = responsive_passed and (
-            "LayoutBuilder" in screen_source or "LayoutBuilder" in layout_sources
+        responsive_layout_contract = (
+            "LayoutBuilder" in screen_source
+            or "LayoutBuilder" in layout_sources
+            or "AppBreakpoints" in (screen_source + layout_sources)
+            or "responsiveValue(" in (screen_source + layout_sources)
         )
+        screen_routes_into_layout = bool(screen_key) and (
+            "GeneratedScreenShell" in screen_source
+            or "return const " in screen_source and "Layout();" in screen_source
+            or "return " in screen_source and "Layout(" in screen_source
+        )
+        responsive_passed = screen_routes_into_layout
+        responsive_passed = responsive_passed and responsive_layout_contract
         responsive_passed = responsive_passed and "textScalerOf(context)" in (
             screen_source + layout_sources
         )

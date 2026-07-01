@@ -444,8 +444,10 @@ def test_space_between_row_binds_fixed_stack_width_and_height() -> None:
     body = render_node_body(row, uses_svg=False, parent_type=NodeType.COLUMN)
     compact = body.replace("\n", " ")
     assert "MainAxisAlignment.spaceBetween" in compact
-    assert "SizedBox(width: 50.5," in compact and "child: Stack(" in compact
-    assert "SizedBox(width: 44.3," in compact and "child: Stack(" in compact
+    assert "SizedBox(width: 50.5," not in compact
+    assert "SizedBox(width: 44.3," not in compact
+    assert "Semantics(label: 'Items'" in compact
+    assert "TextAlign.right" in compact
     assert "SizedBox(height: 21.0, child: Stack(" not in compact
 
 
@@ -925,13 +927,14 @@ def test_column_root_with_docked_stack_uses_viewport_not_outer_scroll() -> None:
     compact = layout.replace("\n", "")
     assert "viewportHeight" in compact
     assert compact.count("SingleChildScrollView(") >= 1
-    scroll_idx = compact.find("SingleChildScrollView(")
-    viewport_idx = compact.find("viewportHeight")
-    assert viewport_idx < scroll_idx or "Positioned.fill(child: SingleChildScrollView(" in compact
+    assert (
+        "Positioned(left: 0.0, width: 390.0, top: 0.0, height: 600.0, child: SingleChildScrollView("
+        in compact
+    )
     assert "height: 1697.0, child: Stack" not in compact
     assert "height: 844.0, child: Stack" not in compact
     assert "height: double.infinity, child: Stack" not in compact
-    assert "Expanded(child:" in compact
+    assert "SizedBox(width: constraints.maxWidth, height: viewportHeight" in compact
     assert "child: Stack(clipBehavior:" in compact
     assert "Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded" not in compact
 

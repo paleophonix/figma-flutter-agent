@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.layout.style import (
 )
 from figma_flutter_agent.generator.layout.style.colors import is_greenish_fill
 from figma_flutter_agent.generator.layout.style.decoration import _border_color_expr
+from figma_flutter_agent.generator.layout.style.facts import selected_from_variant_or_luminance
 from figma_flutter_agent.generator.variant.state import variant_is_checked
 from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
@@ -251,7 +252,7 @@ def try_render_payment_option_card_body(
     )
     indicator = render_payment_selection_indicator(
         indicator_leaf,
-        selected=variant_is_checked(indicator_leaf),
+        selected=selected_from_variant_or_luminance(indicator_leaf),
     )
     return (
         "Row("

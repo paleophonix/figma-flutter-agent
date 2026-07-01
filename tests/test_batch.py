@@ -57,7 +57,7 @@ def test_default_dump_path(monkeypatch: pytest.MonkeyPatch) -> None:
     project = Path("/proj")
     path = default_dump_path(project, "sign_in")
     project_label = screen_debug_safe_project(project)
-    assert path == Path("/agent") / ".debug" / project_label / "sign_in" / "raw.json"
+    assert path == Path("/agent") / ".debug" / "screen" / project_label / "sign_in" / "raw.json"
 
 
 @pytest.mark.asyncio

@@ -179,15 +179,22 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
     from figma_flutter_agent.generator.cluster_variants import resolve_cluster_delegate_class
     from figma_flutter_agent.parser.interaction.icons import passive_decorative_icon_glyph
 
+    def _ctx_get(key: str, default: object = None) -> object:
+        if hasattr(ctx, key):
+            return getattr(ctx, key)
+        if isinstance(ctx, dict):
+            return ctx.get(key, default)
+        return default
+
     if passive_decorative_icon_glyph(node):
-        uses_svg = ctx["uses_svg"]
-        cluster_classes = ctx.get("cluster_classes")
+        uses_svg = bool(_ctx_get("uses_svg"))
+        cluster_classes = _ctx_get("cluster_classes")
         from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
 
         delegate_class = resolve_cluster_delegate_class(
             node,
             cluster_classes,
-            skip_cluster_id=ctx.get("skip_cluster_id"),
+            skip_cluster_id=_ctx_get("skip_cluster_id"),
         )
         parent_type = flow["parent_type"]
         parent_node = flow["parent_node"]

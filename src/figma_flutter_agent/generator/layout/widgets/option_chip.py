@@ -349,12 +349,6 @@ def try_emit_chip_choice_layout_for_node(
 
     from figma_flutter_agent.parser.interaction import layout_fact_compact_chip_row
 
-    if layout_fact_compact_chip_row(node):
-        return None
-
-    if layout_fact_stack_bottom_nav_tab_glyph_column(node):
-        return None
-
     resolved_ir_by_id = ir_by_id
     if resolved_ir_by_id is None and isinstance(ctx, LayoutRenderContext):
         resolved_ir_by_id = ctx.ir_by_id
@@ -368,6 +362,12 @@ def try_emit_chip_choice_layout_for_node(
     structural = layout_fact_stack_circular_option_glyph_host(
         node
     ) or is_tag_component_chip_row(node)
+
+    if layout_fact_compact_chip_row(node):
+        return None
+    if layout_fact_stack_bottom_nav_tab_glyph_column(node) and not structural:
+        return None
+
     if ir is None and not structural:
         return None
     if ir is None:
