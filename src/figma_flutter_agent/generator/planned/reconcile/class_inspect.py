@@ -181,7 +181,6 @@ def _strip_would_collapse_substantive_widget(build_body: str, patched_build: str
         or "BoxDecoration(" in build_body
         or "Material(" in build_body
         or "Ink(" in build_body
-        or "RepaintBoundary(" in build_body
     )
 
 
@@ -209,6 +208,35 @@ def _strip_nested_self_widget_ctors(content: str, class_name: str) -> str:
     return content[:start] + patched_build + content[end:]
 
 
+_THIN_SELF_DELEGATE_WRAPPERS = frozenset(
+    {
+        "RepaintBoundary",
+        "ClipRRect",
+        "Center",
+        "Align",
+        "IgnorePointer",
+        "SizedBox",
+    }
+)
+
+
+def _build_is_thin_self_delegate(build: str, class_name: str) -> bool:
+    """True when ``build`` only wraps a sole ``class_name()`` delegate."""
+    if not re.search(rf"\b(?:const\s+)?{re.escape(class_name)}\s*\(", build):
+        return False
+    outer = _bare_widget_ctor_return_class(build)
+    if outer == class_name:
+        return True
+    if outer not in _THIN_SELF_DELEGATE_WRAPPERS:
+        return False
+    stripped = re.sub(rf"\bconst\s+{re.escape(class_name)}\s*\([^)]*\)", "", build)
+    stripped = re.sub(rf"\b{re.escape(class_name)}\s*\([^)]*\)", "", stripped)
+    return not re.search(
+        r"\b(SvgPicture|Image|Stack|Container|BoxDecoration|Material|Ink|Text)\b",
+        stripped,
+    )
+
+
 def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
     if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
         return False
@@ -216,7 +244,9 @@ def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
     called = _bare_widget_ctor_return_class(build)
     if called == "__context_widget__":
         return True
-    return called == class_name
+    if called == class_name:
+        return True
+    return _build_is_thin_self_delegate(build, class_name)
 
 
 def _single_foreign_widget_delegate_target(build: str, class_name: str) -> str | None:
@@ -401,10 +431,7 @@ def _collect_widget_use_class_names(
 
 
 def _is_ctor_self_referential_widget_build(content: str, class_name: str) -> bool:
-    if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
-        return False
-    build = _widget_build_snippet(content, class_name=class_name)
-    return _bare_widget_ctor_return_class(build) == class_name
+    return _is_self_referential_widget_build(content, class_name)
 
 
 def _planned_has_widget_consumers(planned) -> bool:

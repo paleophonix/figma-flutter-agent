@@ -6,7 +6,7 @@
 
 # --- Theme & project shape ---
 theme:
-  variant: material_3  # material_3 | cupertino — see docs/cupertino-coverage.md
+  variant: material_3  # material_3 | cupertino
   generate: true
 
 flutter:

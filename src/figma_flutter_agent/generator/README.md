@@ -41,7 +41,7 @@ Deterministic layout lives under [`layout/`](layout/) (`widget.py`, `renderer.py
 
 Deterministic layout is split across modules in `layout/`: `widget.py` (per-node dispatch), `renderer.py` (layout/screen file assembly), `cupertino.py` (Cupertino shells and tap targets), `responsive.py` (breakpoints), `scroll.py` (ListView/GridView), `navigation.py` (tabs, carousel, bottom nav), and `common.py` (shared helpers). Cluster widgets are rendered with the full `cluster_classes` map so nested clusters (e.g. `TitleWidget` inside `ProductCardWidget`) emit `const` references.
 
-Set `theme.variant: cupertino` in project YAML for iOS-style controls. Coverage per node type is documented in [docs/cupertino-coverage.md](../../../docs/cupertino-coverage.md) at the repo root.
+Set `theme.variant: cupertino` in project YAML for iOS-style controls. Widget mapping lives in `generator/layout/cupertino.py` and cupertino fixture tests.
 
 ## Screen IR validation
 

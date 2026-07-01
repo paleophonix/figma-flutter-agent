@@ -9,7 +9,10 @@ from figma_flutter_agent.batch.run import _figma_url_for_screen, _resolve_dump
 from figma_flutter_agent.config import load_settings
 from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
 from figma_flutter_agent.dev.run import RunScreenPlan, detect_wired_screen_feature
-from figma_flutter_agent.dev.wizard.asset_gap import resolve_asset_icon_gap_from_fetch
+from figma_flutter_agent.dev.wizard.asset_gap import (
+    ScreenAssetGapPartition,
+    resolve_screen_asset_gap_detail,
+)
 from figma_flutter_agent.dev.wizard.models import ScreenPreflight
 from figma_flutter_agent.parser.boundaries.assets import build_asset_node_index
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
@@ -43,6 +46,8 @@ def collect_screen_preflight(plan: RunScreenPlan) -> ScreenPreflight:
     local_icons = 0
     dump_prefetch: ScreenDumpPrefetch | None = None
 
+    gap_partition: ScreenAssetGapPartition | None = None
+
     if dump_exists:
         settings = load_settings(plan.config_path)
         fetch_result = load_fetch_result_from_dump(
@@ -63,7 +68,7 @@ def collect_screen_preflight(plan: RunScreenPlan) -> ScreenPreflight:
                 fetch_result=fetch_result,
                 parse_result=parse_result,
             )
-            expected_ids, covered_ids = resolve_asset_icon_gap_from_fetch(
+            _entries, covered_ids, gap_partition = resolve_screen_asset_gap_detail(
                 fetch_result,
                 project_dir=plan.project_dir,
                 primary_node_id=plan.screen.node_id,
@@ -72,7 +77,7 @@ def collect_screen_preflight(plan: RunScreenPlan) -> ScreenPreflight:
                 asset_index=asset_index,
             )
         except Exception:
-            expected_ids, covered_ids = resolve_asset_icon_gap_from_fetch(
+            _entries, covered_ids, gap_partition = resolve_screen_asset_gap_detail(
                 fetch_result,
                 project_dir=plan.project_dir,
                 primary_node_id=plan.screen.node_id,
@@ -81,9 +86,9 @@ def collect_screen_preflight(plan: RunScreenPlan) -> ScreenPreflight:
                 dev_mode_css_override=dev_mode_css_override,
                 asset_index=asset_index,
             )
-        exportable_icons = len(expected_ids)
+        exportable_icons = len(_entries)
         local_icons = len(covered_ids)
-        missing_asset_exports = len(expected_ids - covered_ids)
+        missing_asset_exports = gap_partition.total_missing
 
     return ScreenPreflight(
         feature=plan.screen.feature,
@@ -95,6 +100,7 @@ def collect_screen_preflight(plan: RunScreenPlan) -> ScreenPreflight:
         local_icons=local_icons,
         missing_asset_exports=missing_asset_exports,
         dump_prefetch=dump_prefetch,
+        gap_partition=gap_partition,
     )
 
 

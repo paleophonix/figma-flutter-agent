@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from figma_flutter_agent.dev.wizard.asset_gap import ScreenAssetGapPartition
     from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 
 
@@ -44,6 +45,7 @@ class ScreenPreflight:
     local_icons: int
     missing_asset_exports: int
     dump_prefetch: ScreenDumpPrefetch | None = None
+    gap_partition: ScreenAssetGapPartition | None = None
 
     @property
     def needs_live_sync(self) -> bool:

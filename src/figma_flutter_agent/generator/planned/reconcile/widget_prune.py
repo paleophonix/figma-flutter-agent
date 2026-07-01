@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
+from pathlib import Path
 
 from loguru import logger
 
@@ -15,6 +16,61 @@ from .class_inspect import (
     transitively_referenced_widget_paths,
 )
 from .hydrate import _sanitize_ingested_widget_source
+from .paths import _normalized_widget_stem
+
+
+def _widget_class_root_name(class_name: str) -> str | None:
+    """Return the base widget class when ``class_name`` is a numbered stem alias."""
+    match = re.match(r"^(.+Widget)\d+$", class_name)
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def collapse_numbered_widget_stem_aliases(planned: dict[str, str]) -> dict[str, str]:
+    """Rewrite numbered widget ctor aliases to the canonical class and drop alias files."""
+    class_paths = _widget_class_paths(planned)
+    canonical_by_stem: dict[str, str] = {}
+    for class_name, path in class_paths.items():
+        if re.search(r"\d+$", class_name):
+            continue
+        canonical_by_stem[_normalized_widget_stem(Path(path).stem)] = class_name
+
+    alias_to_canonical: dict[str, str] = {}
+    drop_paths: set[str] = set()
+    for class_name, path in class_paths.items():
+        root = _widget_class_root_name(class_name)
+        if root is None:
+            continue
+        stem = _normalized_widget_stem(Path(path).stem)
+        canonical = canonical_by_stem.get(stem) or (
+            root if root in class_paths and not re.search(r"\d+$", root) else None
+        )
+        if canonical is None or canonical == class_name:
+            continue
+        alias_to_canonical[class_name] = canonical
+        drop_paths.add(path)
+
+    if not alias_to_canonical:
+        return planned
+
+    updated = dict(planned)
+    for path, content in list(updated.items()):
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith(".dart"):
+            continue
+        patched = content
+        for alias, canonical in sorted(
+            alias_to_canonical.items(), key=lambda item: len(item[0]), reverse=True
+        ):
+            patched = patched.replace(f"const {alias}(", f"const {canonical}(")
+            patched = patched.replace(f"{alias}(", f"{canonical}(")
+        if patched != content:
+            updated[path] = patched
+    for path in drop_paths:
+        updated.pop(path, None)
+        logger.info("Collapsed numbered widget alias file: {}", path.replace("\\", "/"))
+    return updated
 
 
 def strip_inline_widget_duplicates_from_screen(

@@ -60,8 +60,8 @@ def test_asset_export_gap_hint_rate_limited() -> None:
         rate_limited=True,
     )
     with patch(
-        "figma_flutter_agent.batch.asset_export.count_exportable_assets",
-        return_value=(2, 0),
+        "figma_flutter_agent.batch.asset_export.collect_exportable_nodes",
+        return_value=[("2:2", "Star", "icon"), ("3:3", "Other", "icon")],
     ):
         hint = asset_export_gap_hint(document, assets, result)
     assert hint is not None

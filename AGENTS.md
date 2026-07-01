@@ -2,6 +2,8 @@
 
 Use this file when working in **Cursor**, **Codex**, or other coding agents on this repository.
 
+Product feature map: [README.md — Features](README.md#features). Stakeholder overview (RU): [docs/product-overview.ru.md](docs/product-overview.ru.md). Engineering reference: [docs/README.md](docs/README.md).
+
 ## Purpose
 
 Python CLI (`figma-flutter`) that fetches a Figma frame and generates Material 3 Flutter UI into an **existing** Flutter project (`--project-dir`).
@@ -37,7 +39,7 @@ See [README — VS Code / Cursor](README.md#vs-code--cursor).
 - Behavior: `.ai-figma-flutter.yml` in the **agent repo** (copy from `.ai-figma-flutter.yml.example`)
 - Runtime: `runtime.golden_capture: auto | docker | host` and `runtime.use_ast_sidecar: true` (AST layout rules; see `tools/dart_ast_sidecar/`)
 - Env: `FIGMA_GOLDEN_RUNTIME` (`host` for local warm sandbox; fixture scripts prefer host when unset + `golden_capture: auto`), `FIGMA_GOLDEN_CAPTURE_TIMINGS=1`, `FIGMA_AST_COMPILER_PATH`, optional `FIGMA_SIGNOFF_DOCKER=1` for compose smoke in signoff, optional `FIGMA_CORPUS_ORACLE_SIGNOFF=0` to skip corpus oracle step, `FIGMA_CORPUS_ORACLE_ALLOW_SKIP=1` only for local dev when blocking capture is unavailable (signoff fails by default)
-- Local fixture warm capture: `FIGMA_FLUTTER_PROJECT_DIR` → `<project>/.figma-flutter/capture-sandbox` via `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`); screen-run perf lives under `<agent_repo>/.debug/<project>/<feature>/perf/`; fixture-only perf may still use `logs/perf/`
+- Local fixture warm capture: `FIGMA_FLUTTER_PROJECT_DIR` → `<workspace>/.sandbox/` via `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`); screen-run perf lives under `<agent_repo>/.debug/screen/<project>/<feature>/perf/`; fixture-only perf may still use `logs/perf/`
 - Pipeline runtime geometry uses `capture_planned_for_fixture` (warm sandbox when `project_dir` set)
 - Fixture golden refresh: `scripts/generate_fixture_goldens.py` defaults to `--check`; writes require `--update-goldens`, and `golden/png/docker` writes require `--golden-runtime docker`; `scripts/update-golden-docker.ps1` passes both flags
 - **Build (agent-owned):** `generate` / golden capture auto-build `tools/bin/ast_compiler*` and `figma-flutter-golden-capture:local` when missing (`build_if_missing` + `FIGMA_GOLDEN_CAPTURE_AUTO_BUILD=1`). One-shot dev: `.\scripts\bootstrap.ps1`; verify: `poetry run figma-flutter doctor`
@@ -64,7 +66,7 @@ Do not commit `**/.dart_tool/` (local `pub get` artifacts).
 2. Config: `use_screen_ir: true` in `.ai-figma-flutter.yml`; `FIGMA_ACCESS_TOKEN` and provider API key in `.env`.
 3. `poetry run figma-flutter generate --figma-url … --project-dir … --feature sign_up_and_sign_in` (or fixture offline path).
 4. `flutter analyze` on target project; fix only via IR/repair, not hand-edits to generated layout.
-5. Golden: `scripts/update-golden-docker.ps1` or pipeline refine; compare `<agent_repo>/.debug/<project>/<feature>/figma.png` vs `flutter_render.png` / diff under the same folder.
+5. Golden: `scripts/update-golden-docker.ps1` or pipeline refine; compare `<agent_repo>/.debug/screen/<project>/<feature>/figma.png` vs `flutter_render.png` / diff under the same folder.
 6. `./scripts/signoff.ps1` before merge to `main`.
 
 ## Architecture (short)
@@ -185,13 +187,16 @@ Screen artifacts live under **`<agent_repo>/.debug/screen/<project>/<feature>/`*
 <project_dir>/
   wizard-state.yml            # active screen slug
   pubspec_resolve.sha256
-  .figma-flutter/
-    layout-version
-    shared/full_file_*.json
-    capture-sandbox/
+  screens.yaml                # batch manifest (when used)
+
+<workspace>/                    # FIGMA_FLUTTER_PROJECT_DIR
+  .figma-flutter/workspace-state.yml
+  .sandbox/                   # warm golden capture sandbox
 ```
 
 Naming rule: project label and feature slug in the directory path; files use short stable names (no `<feature>_` prefix). Example: `demo_app/bank_home/screen.dart`.
+
+Full-file batch dumps: `<agent_repo>/.debug/screen/<project>/shared/full_file_*.json`.
 
 Primary triage read order:
 
@@ -201,9 +206,9 @@ last.log → dart-errors.json → raw.json → processed.json → pre_emit.json 
 
 Project-level artifacts (outside agent `.debug`):
 
-- `wizard-state.yml`: active screen slug → which `.debug/<project>/<feature>/` to open.
+- `wizard-state.yml`: active screen slug → which `.debug/screen/<project>/<feature>/` to open.
 - `pubspec_resolve.sha256`: last successful `pub get` stamp.
-- `.figma-flutter/capture-sandbox/`: shared warm golden capture sandbox.
+- `<workspace>/.sandbox/`: shared warm golden capture sandbox.
 - `logs/figma_flutter_agent.log`: global telemetry only (not screen triage).
 
 Deprecated layouts are not canonical: project-root `.debug/`, `primary/`/`secondary/` shards, `raw/<feature>_layout.json`, `ir/<feature>_*.json`, `dart/<feature>_*.dart`, agent `logs/dart-errors/`, and `.artifact-layout-v2`/v3 markers under project `.debug/`.
@@ -218,7 +223,7 @@ Debugging — **two independent flows** (do not cross-route):
 /diagnose → BATCH PRE-FIX TRIAGE REPORT → /repair → BATCH REPAIR REPORT
 ```
 
-Skills: `.cursor/skills/diagnose/`, `.cursor/skills/repair/`. Artifacts: `.debug/<project>/<feature>/`.
+Skills: `.cursor/skills/diagnose/`, `.cursor/skills/repair/`. Artifacts: `.debug/screen/<project>/<feature>/`.
 
 **Control panel / infra / runtime**
 

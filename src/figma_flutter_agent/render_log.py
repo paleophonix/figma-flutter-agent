@@ -1,4 +1,4 @@
-"""Persist combat-mode Flutter/Figma render PNGs under ``<project>/.debug/renders/``."""
+"""Persist combat-mode Flutter/Figma render PNGs under ``.debug/screen/<project>/<feature>/renders/``."""
 
 from __future__ import annotations
 
@@ -135,7 +135,7 @@ def bind_render_log_session(
         project_dir: Flutter project root (preferred; combat-mode capture).
 
     Returns:
-        Session directory path under ``<project>/.debug/renders/``.
+        Session directory path under ``.debug/screen/<project>/<feature>/renders/``.
     """
     project = Path(project_dir).resolve().as_posix() if project_dir is not None else None
     started_at = datetime.now(tz=UTC)

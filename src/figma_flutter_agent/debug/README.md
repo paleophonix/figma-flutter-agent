@@ -1,14 +1,13 @@
 # Purpose
 
-Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<agent_repo>/.debug/<project>/<feature>/`` as a **flat** directory per screen.
+Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<agent_repo>/.debug/screen/<project>/<feature>/`` as a **flat** directory per screen.
 
 ## Layout
 
 ```text
 <agent-repo>/
-└── .debug/
+└── .debug/screen/
     └── <project>/
-        ├── layout-version
         ├── shared/full_file_<key>.json
         └── <feature>/
             ├── raw.json
@@ -16,13 +15,15 @@ Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandbo
             ├── diff_heatmap.png
             ├── capture.json   # sourceMode, bundleHash, visualRepairEligible, …
             ├── figma.png
+            ├── renders/<session>/   # combat-mode PNG sessions
             └── …
 
-<flutter-workspace>/          # e.g. apps/
-├── workspace-state.yml
+<flutter-workspace>/          # FIGMA_FLUTTER_PROJECT_DIR
+├── .figma-flutter/workspace-state.yml
 ├── .sandbox/                 # warm flutter test workspace (shared per workspace)
 └── <project>/                # e.g. limbo/
     ├── wizard-state.yml
+    ├── screens.yaml
     └── pubspec_resolve.sha256
 ```
 
@@ -40,4 +41,4 @@ write_provenance_dump()
 
 ## LLM Context
 
-Feed `provenance.json` and `pre_emit.json` from the same `.debug/<project>/<feature>/` folder when explaining pre_emit vs clean-tree diffs.
+Feed `provenance.json` and `pre_emit.json` from the same `.debug/screen/<project>/<feature>/` folder when explaining pre_emit vs clean-tree diffs.

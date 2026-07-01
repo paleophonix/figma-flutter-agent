@@ -18,8 +18,8 @@ Use them only to detect **unintended layout/codegen drift** in CI (AC-1 pixel co
 | Goal | Where |
 |------|--------|
 | Real screen from Figma | `poetry run figma-flutter generate --project-dir ../demo_app` |
-| Combat Flutter vs Figma PNG | `logs/renders/{timestamp}-{run_id}/` after generate with visual refine |
-| Figma reference in project | `demo_app/.figma-flutter/reference/{feature}_figma.png` |
+| Combat Flutter vs Figma PNG | `.debug/screen/<project>/<feature>/renders/<session>/` (wizard **view → renders**) |
+| Figma reference PNG | `.debug/screen/<project>/<feature>/figma.png` |
 
 ## Update baselines
 

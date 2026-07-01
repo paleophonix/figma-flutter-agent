@@ -19,7 +19,7 @@ flutter create ../demo_app   # outside this repo
 poetry run figma-flutter -i    # or F5 → "figma-flutter — interactive menu"
 ```
 
-Looping wizard: select active screen, run, generate, batch dump/generate, list screens, live-check, change project. See [README — VS Code / Cursor](README.md#vs-code--cursor).
+Looping wizard: **launch** (default), switch, check, fetch, list, select, generate, run, debug, view. See [README — Interactive CLI](README.md#interactive-cli-dialog-mode).
 
 ## Standard workflow
 
@@ -46,7 +46,7 @@ poetry run figma-flutter generate \
   --project-dir ../demo_app
 ```
 
-**Default codegen path is deterministic** (rule-based layout, no LLM). Set `generation.use_deterministic_screen: false` in the agent repo `.ai-figma-flutter.yml` for LLM screen bodies.
+**Default codegen path is LLM screen IR + emitter** (`generation.use_screen_ir: true` in `.ai-figma-flutter.yml` plus a provider API key in `.env`). Cached dumps and fixtures stay offline-friendly; live `generate` requires the key.
 
 Dev-only soft gates: add `--allow-dev-profile`.
 
@@ -63,10 +63,10 @@ flutter run -d chrome
 
 ```bash
 cd ../figma-flutter-agent
-./scripts/signoff.sh          # or .\scripts\signoff.ps1 on Windows
+./scripts/signoff.sh          # or .\scripts\signoff.ps1 on Windows — full gate (see scripts/README.md)
 ```
 
-Equivalent manual steps:
+Subset for quick checks:
 
 ```bash
 poetry run figma-flutter demo-signoff --strict --signoff-gates
@@ -105,7 +105,7 @@ Regeneration merges custom zones and may overwrite edits outside them. With `str
 | `FIGMA_ACCESS_TOKEN` | Figma REST API |
 | `FIGMA_FLUTTER_PROJECT_DIR` | Default Flutter project when `--project-dir` is omitted (env only) |
 | `FIGMA_SMOKE_FILE_KEY` / `FIGMA_SMOKE_NODE_ID` | Optional live-check / `pytest -m live_figma` |
-| `LLM_PROVIDER` | `anthropic` \| `openai` \| `openrouter` \| `google` |
+| `LLM_PROVIDER` | `anthropic` \| `openai` \| `openrouter` \| `google` \| `google_aistudio` |
 | `LLM_GENERATE_MODEL` | Primary codegen model override (env only; not in YAML) |
 | `LLM_REPAIR_MODEL` | Analyze repair model override; falls back to `LLM_GENERATE_MODEL` |
 | `LLM_REFINE_MODEL` | Visual refine model override; falls back to `LLM_GENERATE_MODEL` |

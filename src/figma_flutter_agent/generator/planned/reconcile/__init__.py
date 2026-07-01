@@ -163,6 +163,7 @@ from .syntax_repair import (
     sanitize_screen_emit_syntax,
 )
 from .widget_prune import (
+    collapse_numbered_widget_stem_aliases,
     drop_unparseable_planned_widget_files,
     prune_duplicate_widget_classes,
     prune_unreferenced_planned_widgets,
@@ -310,6 +311,7 @@ def reconcile_planned_dart_files(
     _log_reconcile_phase("consolidate_widgets")
     updated = consolidate_planned_widget_paths(updated)
     updated = prune_duplicate_widget_classes(updated)
+    updated = collapse_numbered_widget_stem_aliases(updated)
     updated = repair_self_referential_widget_builds(updated)
     updated = repair_foreign_delegate_widget_builds(updated)
     updated = repair_stale_widget_ctor_names_in_planned(updated)
@@ -320,6 +322,7 @@ def reconcile_planned_dart_files(
         updated = absorb_disk_widget_alias_bodies(updated, project_dir)
         _log_reconcile_phase("hydrate_absorb", end=True)
         updated = prune_duplicate_widget_classes(updated)
+        updated = collapse_numbered_widget_stem_aliases(updated)
         updated = repair_self_referential_widget_builds(updated)
         updated = repair_foreign_delegate_widget_builds(updated)
         updated = repair_stale_widget_ctor_names_in_planned(updated)

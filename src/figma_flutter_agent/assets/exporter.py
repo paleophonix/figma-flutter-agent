@@ -14,13 +14,12 @@ from figma_flutter_agent.assets.effects import index_figma_nodes, node_has_layer
 from figma_flutter_agent.assets.files import AssetFileDownloadMixin, rewrite_entries_to_webp
 from figma_flutter_agent.assets.models import AssetExportOutcome
 from figma_flutter_agent.assets.names import asset_filename
-from figma_flutter_agent.assets.reporting import log_failed_asset_exports
 from figma_flutter_agent.assets.optimize import (
-    optimize_svg,
     svg_has_unsupported_filter,
     svg_is_well_formed,
     svg_path_element_count,
 )
+from figma_flutter_agent.assets.reporting import log_failed_asset_exports
 from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry
 
@@ -48,6 +47,8 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
         exclude_node_ids: set[str] | None = None,
         flatten_exclude_node_ids: set[str] | None = None,
         render_boundary_node_ids: set[str] | None = None,
+        restrict_node_ids: frozenset[str] | None = None,
+        raster_fallback_node_ids: frozenset[str] | None = None,
     ) -> AssetExportOutcome:
         scales = png_scales or [1, 2, 3]
         exportables = collect_exportable_nodes(
@@ -57,6 +58,8 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
             flatten_exclude_node_ids=flatten_exclude_node_ids,
             render_boundary_node_ids=render_boundary_node_ids,
         )
+        if restrict_node_ids is not None:
+            exportables = [item for item in exportables if item[0] in restrict_node_ids]
         manifest = AssetManifest()
         failed_node_ids: set[str] = set()
         rate_limited = False
@@ -96,11 +99,18 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
 
         filter_by_id: dict[str, bool] = {}
         baked_blur_icon_ids: set[str] = set()
+        forced_raster_ids = {
+            node_id
+            for node_id in icon_ids
+            if raster_fallback_node_ids is not None and node_id in raster_fallback_node_ids
+        }
 
         if svg_enabled and icon_ids:
             pending_icon_ids: list[str] = []
             for node_id, name, kind in exportables:
                 if kind not in {"icon", "boundary_svg"}:
+                    continue
+                if node_id in forced_raster_ids:
                     continue
                 asset_dir = illustrations_dir if kind == "boundary_svg" else icons_dir
                 target = asset_dir / asset_filename(name, node_id, "svg")
@@ -225,16 +235,21 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                 if entry.svg_path_count is not None
                 and entry.svg_path_count > SVG_PATH_RASTER_THRESHOLD
             }
-            baked_blur_icon_ids = {
-                node_id
-                for node_id in icon_ids
-                if filter_by_id.get(node_id, False)
-                or node_has_layer_blur(figma_nodes.get(node_id, {}))
-            } | high_path_raster_ids | svg_url_failed_ids
+            baked_blur_icon_ids = (
+                {
+                    node_id
+                    for node_id in icon_ids
+                    if filter_by_id.get(node_id, False)
+                    or node_has_layer_blur(figma_nodes.get(node_id, {}))
+                }
+                | high_path_raster_ids
+                | svg_url_failed_ids
+                | forced_raster_ids
+            )
         elif blur_png_fallback and icon_ids:
             baked_blur_icon_ids = {
                 node_id for node_id in icon_ids if node_has_layer_blur(figma_nodes.get(node_id, {}))
-            }
+            } | forced_raster_ids
 
         if blur_png_fallback and baked_blur_icon_ids:
             pending_blur_ids: list[str] = []
@@ -272,7 +287,7 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                 image_url = png_urls.get(node_id)
                 if image_url is None:
                     logger.warning(
-                        "PNG fallback export unavailable for blurred vector node {}",
+                        "PNG raster fallback export unavailable for node {}",
                         node_id,
                     )
                     continue

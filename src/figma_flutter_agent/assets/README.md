@@ -17,7 +17,7 @@ async with FigmaConnector(token) as connector:
 
 Map manifest entries to `vectorAssetKey` / `imageAssetKey` on tree nodes. Filenames include node id suffix to avoid collisions.
 
-Wizard **check** uses `assets/diagnostics.py`: `all-assets` lists on-disk files; `screen-assets` compares the active dump to exportable icons and render-boundary SVGs via `dev/wizard/asset_gap.py` (shows kind, expected path, and live-sync hints when files are missing).
+Wizard **check → screen-assets** reuses wizard preflight parse (`dump_prefetch`) and a single `assets/` index scan. When icons are missing and `FIGMA_ACCESS_TOKEN` is set, the wizard offers to download them via `dev/wizard/asset_sync.py` (`skip_existing_assets=True`).
 
 Failed exports log per-node warnings via `assets/reporting.py` and surface in the wizard console (never demoted by `quiet_expected_warnings`). Figma Images API batches retry on 429 before marking nodes failed.
 

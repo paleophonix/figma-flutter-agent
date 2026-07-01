@@ -6,7 +6,7 @@ Shell helpers and maintainer utilities for **figma-flutter-agent**. Run from rep
 
 | Script | Platform | Purpose |
 |--------|----------|---------|
-| [`signoff.sh`](signoff.sh) | Linux/macOS | ruff → codex lint gates → mypy → `demo-signoff --strict --signoff-gates` → pytest |
+| [`signoff.sh`](signoff.sh) | Linux/macOS | Full release gate: ruff → codex lint gates → mypy → demo-signoff → fixture-ir → fidelity → corpus-oracle → semantics → geometry → pytest |
 | [`signoff.ps1`](signoff.ps1) | Windows | Same as `signoff.sh` |
 | [`visual-qa-signoff.sh`](visual-qa-signoff.sh) | Linux/macOS | Visual QA pytest subset + `demo-signoff --strict --signoff-gates --visual-qa` |
 | [`visual-qa-signoff.ps1`](visual-qa-signoff.ps1) | Windows | Same as `visual-qa-signoff.sh` |
@@ -56,12 +56,12 @@ Sign-off also writes semantics CI JSON under `logs/ci/semantics/` (same tree as 
 
 | Script | Purpose |
 |--------|---------|
-| [`regen-layout-from-dump.py`](regen-layout-from-dump.py) | Regenerate `lib/generated/<feature>_layout.dart` from a cached `.debug/raw/<feature>_layout.json` (no Figma API) |
+| [`regen-layout-from-dump.py`](regen-layout-from-dump.py) | Regenerate `lib/generated/<feature>_layout.dart` from a cached `.debug/screen/<project>/<feature>/raw.json` (no Figma API) |
 | [`generate-font-registry.py`](generate-font-registry.py) | Regenerate `data/font-registry.v1.yaml` after font mapping changes |
 
 ```bash
 poetry run python scripts/regen-layout-from-dump.py \
-  --dump ../demo_app/.debug/raw/sign_in_layout.json \
+  --dump .debug/screen/demo_app/sign_in/raw.json \
   --project-dir ../demo_app \
   --feature sign_in
 
@@ -79,6 +79,14 @@ docker compose -f docker-compose.control-panel.yml --profile repair up opencode
 ```
 
 Set `OPENCODE_SERVER_PASSWORD`, `OPENROUTER_API_KEY`, `REPAIR_OPENCODE_URL` in `.env`. Local dev: `npm install -g opencode-ai` then `figma-flutter doctor` (see `opencode_cli` check). Docker: `docker compose -f docker-compose.control-panel.yml --profile repair up opencode`.
+
+## VPS production deploy
+
+```bash
+./scripts/deploy-vps.sh
+```
+
+See [deploy/README.md](../deploy/README.md) for TLS (Caddy), secrets, and optional `--repair` / `--observability` profiles.
 
 ## Prometheus (ops metrics)
 

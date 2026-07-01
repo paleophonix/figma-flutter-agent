@@ -9,6 +9,9 @@ from typing import Literal
 from loguru import logger
 
 from figma_flutter_agent.assets.collect import collect_exportable_nodes
+from figma_flutter_agent.assets.composite_icons import collect_figma_composite_icon_groups
+from figma_flutter_agent.assets.effects import index_figma_nodes
+from figma_flutter_agent.assets.eligibility import figma_images_api_skip_export
 from figma_flutter_agent.assets.names import expected_svg_export_rel_path
 from figma_flutter_agent.assets.screen_frame import build_screen_frame_exclude_ids
 from figma_flutter_agent.config import AssetsConfig
@@ -23,6 +26,29 @@ from figma_flutter_agent.stages.fetch import FigmaFetchResult
 from figma_flutter_agent.stages.parse import FigmaParseResult, parse_figma_frame
 
 SvgExportKind = Literal["icon", "boundary_svg"]
+
+
+@dataclass(frozen=True)
+class ScreenAssetGapPartition:
+    """Missing screen asset exports split by recoverability."""
+
+    downloadable_missing_ids: frozenset[str]
+    api_unexportable_ids: frozenset[str]
+    boundary_missing_ids: frozenset[str]
+
+    @property
+    def total_missing(self) -> int:
+        """Count all missing export slots (downloadable, blur, and boundary)."""
+        return (
+            len(self.downloadable_missing_ids)
+            + len(self.api_unexportable_ids)
+            + len(self.boundary_missing_ids)
+        )
+
+    @property
+    def check_blocking_missing(self) -> int:
+        """Missing exports that should fail wizard asset check."""
+        return len(self.downloadable_missing_ids)
 
 
 @dataclass(frozen=True)
@@ -217,3 +243,63 @@ def resolve_asset_icon_gap_from_fetch(
     expected = frozenset(entry.node_id for entry in entries)
     covered = icon_ids_covered_on_disk(project_dir, expected, asset_index=asset_index)
     return expected, covered
+
+
+def partition_missing_asset_entries(
+    entries: tuple[ScreenSvgExportExpectation, ...],
+    covered: frozenset[str],
+    figma_root: dict,
+) -> ScreenAssetGapPartition:
+    """Split missing exports into downloadable icons, blur API skips, and boundaries."""
+    figma_nodes = index_figma_nodes(figma_root)
+    composite_parents, _composite_skip = collect_figma_composite_icon_groups(figma_root)
+    downloadable: set[str] = set()
+    unexportable: set[str] = set()
+    boundary_missing: set[str] = set()
+    for entry in entries:
+        if entry.node_id in covered:
+            continue
+        if entry.kind == "boundary_svg":
+            boundary_missing.add(entry.node_id)
+            continue
+        raw_node = figma_nodes.get(entry.node_id, {})
+        if figma_images_api_skip_export(
+            raw_node,
+            node_id=entry.node_id,
+            composite_parent_ids=composite_parents,
+        ):
+            unexportable.add(entry.node_id)
+        else:
+            downloadable.add(entry.node_id)
+    return ScreenAssetGapPartition(
+        downloadable_missing_ids=frozenset(downloadable),
+        api_unexportable_ids=frozenset(unexportable),
+        boundary_missing_ids=frozenset(boundary_missing),
+    )
+
+
+def resolve_screen_asset_gap_detail(
+    fetch_result: FigmaFetchResult,
+    *,
+    project_dir: Path,
+    primary_node_id: str,
+    assets: AssetsConfig,
+    parse_result: FigmaParseResult | None = None,
+    dev_mode_dump: object | None = None,
+    dev_mode_css_override: bool = False,
+    asset_index: dict[str, str] | None = None,
+) -> tuple[tuple[ScreenSvgExportExpectation, ...], frozenset[str], ScreenAssetGapPartition]:
+    """Return export entries, covered ids, and a partitioned missing gap report."""
+    entries = resolve_asset_export_entries_from_fetch(
+        fetch_result,
+        primary_node_id=primary_node_id,
+        assets=assets,
+        parse_result=parse_result,
+        dev_mode_dump=dev_mode_dump,
+        dev_mode_css_override=dev_mode_css_override,
+    )
+    expected = frozenset(entry.node_id for entry in entries)
+    index = asset_index if asset_index is not None else build_asset_node_index(project_dir)
+    covered = icon_ids_covered_on_disk(project_dir, expected, asset_index=index)
+    partition = partition_missing_asset_entries(entries, covered, fetch_result.root)
+    return entries, covered, partition

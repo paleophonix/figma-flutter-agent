@@ -181,6 +181,17 @@ def _append_subtree_spec_from_ref(
     )
 
 
+def _component_family_cluster_id(node: CleanDesignTreeNode) -> str | None:
+    """Return dedup cluster id for a repeated published component instance."""
+    from figma_flutter_agent.generator.cluster_variants import component_id_for_node
+    from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
+
+    component_id = component_id_for_node(node)
+    if not component_id:
+        return None
+    return component_cluster_id(component_id)
+
+
 def _append_subtree_spec(
     specs: list[SubtreeWidgetSpec],
     *,
@@ -189,10 +200,14 @@ def _append_subtree_spec(
     used_file_names: set[str],
     used_class_names: set[str],
     used_node_ids: set[str],
+    component_family_classes: dict[str, str],
     screen_left: float | None = None,
     screen_top: float | None = None,
 ) -> None:
     if node.id in used_node_ids:
+        return
+    family_cluster = _component_family_cluster_id(node)
+    if family_cluster and family_cluster in component_family_classes:
         return
     representative = node
     if screen_left is not None and screen_top is not None:
@@ -212,6 +227,8 @@ def _append_subtree_spec(
     used_file_names.add(file_name)
     used_class_names.add(class_name)
     used_node_ids.add(node.id)
+    if family_cluster:
+        component_family_classes[family_cluster] = class_name
     specs.append(
         SubtreeWidgetSpec(
             node_id=node.id,
@@ -259,6 +276,7 @@ def _walk_compact_icon_subtrees(
     used_file_names: set[str],
     used_class_names: set[str],
     used_node_ids: set[str],
+    component_family_classes: dict[str, str],
     excluded_node_ids: frozenset[str],
 ) -> None:
     from figma_flutter_agent.assets.composite_icons import (
@@ -308,6 +326,7 @@ def _walk_compact_icon_subtrees(
             used_file_names=used_file_names,
             used_class_names=used_class_names,
             used_node_ids=used_node_ids,
+            component_family_classes=component_family_classes,
             screen_left=screen_left,
             screen_top=screen_top,
         )
@@ -320,6 +339,7 @@ def _walk_compact_icon_subtrees(
             used_file_names=used_file_names,
             used_class_names=used_class_names,
             used_node_ids=used_node_ids,
+            component_family_classes=component_family_classes,
             screen_left=screen_left,
             screen_top=screen_top,
         )
@@ -333,6 +353,7 @@ def _walk_compact_icon_subtrees(
             used_file_names=used_file_names,
             used_class_names=used_class_names,
             used_node_ids=used_node_ids,
+            component_family_classes=component_family_classes,
             excluded_node_ids=excluded_node_ids,
         )
 
@@ -349,6 +370,7 @@ def collect_subtree_widget_specs(
     used_file_names = set(reserved)
     used_class_names: set[str] = set()
     used_node_ids: set[str] = set()
+    component_family_classes: dict[str, str] = {}
 
     social_ids = _social_button_subtree_ids(root)
     for child in root.children:
@@ -382,6 +404,7 @@ def collect_subtree_widget_specs(
             used_file_names=used_file_names,
             used_class_names=used_class_names,
             used_node_ids=used_node_ids,
+            component_family_classes=component_family_classes,
         )
 
     excluded = social_ids | frozenset(used_node_ids)
@@ -397,6 +420,7 @@ def collect_subtree_widget_specs(
             used_file_names=used_file_names,
             used_class_names=used_class_names,
             used_node_ids=used_node_ids,
+            component_family_classes=component_family_classes,
             excluded_node_ids=excluded,
         )
     return [spec for spec in specs if spec.node_id not in social_ids]

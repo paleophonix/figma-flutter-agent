@@ -303,9 +303,14 @@ def _try_render_compact_icon_cluster_body(
         layout_fact_compact_vector_icon_export_node,
     )
     from figma_flutter_agent.generator.layout.common import escape_dart_string
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
     from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
-    if not uses_svg or not layout_fact_compact_vector_icon_export_node(node):
+    if not uses_svg or layout_fact_icon_badge_stack(node):
+        return None
+    if not layout_fact_compact_vector_icon_export_node(node):
         return None
     asset = node.vector_asset_key
     if asset is None:
@@ -420,6 +425,11 @@ def render_cluster_widgets(
             body = _bound_cluster_widget_root_hug_width(spec.representative, body)
         else:
             body = _bound_cluster_widget_root(spec.representative, body)
+        from figma_flutter_agent.generator.ir.extracted import (
+            _preserve_extracted_widget_decoration_shell,
+        )
+
+        body = _preserve_extracted_widget_decoration_shell(representative, body)
         widget_fields = ""
         constructor_params = "{super.key}"
         if chip_cluster:

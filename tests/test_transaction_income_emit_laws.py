@@ -266,6 +266,121 @@ def test_extracted_salary_widget_with_cluster_classes_preserves_substrate() -> N
     assert "SvgPicture" in code
 
 
+def test_subtree_salary_widget_body_inlines_cluster_content_not_self() -> None:
+    from figma_flutter_agent.generator.subtree.render import _render_subtree_widget_body
+
+    root = _salary_icon_stack()
+    body = _render_subtree_widget_body(
+        root,
+        class_name="IconSalaryWidget",
+        uses_svg=True,
+        cluster_classes={"component_7102_2848": "IconSalaryWidget"},
+    )
+    assert "IconSalaryWidget(" not in body
+    assert "0xFF6DB6FE" in body
+    assert "SvgPicture" in body
+
+
+def test_recursion_gate_catches_wrapped_self_reference() -> None:
+    from figma_flutter_agent.generator.dart.static_contract_gates import (
+        find_extracted_widget_empty_or_recursive_shells,
+    )
+
+    planned = {
+        "lib/widgets/icon_salary_widget.dart": """
+import 'package:flutter/material.dart';
+class IconSalaryWidget extends StatelessWidget {
+  const IconSalaryWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(child: const IconSalaryWidget());
+  }
+}
+""",
+    }
+    violations = find_extracted_widget_empty_or_recursive_shells(planned)
+    assert violations
+    assert "icon_salary_widget.dart" in violations[0]
+
+
+def test_identical_component_family_compact_icons_emit_one_subtree_spec() -> None:
+    from figma_flutter_agent.generator.subtree.spec import collect_subtree_widget_specs
+
+    def salary_instance(node_id: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=node_id,
+            name="Icon Salary",
+            type=NodeType.STACK,
+            component_ref="7102:2848",
+            sizing=Sizing(width=57.0, height=53.0),
+            stack_placement=StackPlacement(left=37.0, top=100.0, width=57.0, height=53.0),
+            children=[
+                CleanDesignTreeNode(
+                    id=f"I{node_id.replace(':', '_')};7102:2847",
+                    name="Rectangle 150",
+                    type=NodeType.CONTAINER,
+                    sizing=Sizing(width=57.0, height=53.0),
+                    style=NodeStyle(background_color="0xFF6DB6FE", border_radius=22.0),
+                ),
+                CleanDesignTreeNode(
+                    id=f"I{node_id.replace(':', '_')};7102:1277",
+                    name="Vector",
+                    type=NodeType.VECTOR,
+                    vector_asset_key="assets/icons/vector.svg",
+                    sizing=Sizing(width=26.0, height=23.5),
+                ),
+                CleanDesignTreeNode(
+                    id=f"I{node_id.replace(':', '_')};7102:1278",
+                    name="Vector 2",
+                    type=NodeType.VECTOR,
+                    vector_asset_key="assets/icons/vector2.svg",
+                    sizing=Sizing(width=4.0, height=4.0),
+                ),
+            ],
+        )
+
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=430.0, height=932.0),
+        children=[
+            salary_instance("7110:1045"),
+            salary_instance("7110:1051"),
+            salary_instance("7110:1057"),
+        ],
+    )
+    specs = collect_subtree_widget_specs(screen, widget_suffix="Widget")
+    salary_specs = [spec for spec in specs if spec.class_name.startswith("IconSalary")]
+    assert len(salary_specs) == 1
+
+
+def test_collapse_numbered_widget_stem_aliases_rewrites_callsites() -> None:
+    from figma_flutter_agent.generator.planned.reconcile.widget_prune import (
+        collapse_numbered_widget_stem_aliases,
+    )
+
+    planned = {
+        "lib/widgets/icon_salary_widget.dart": (
+            "class IconSalaryWidget extends StatelessWidget {"
+            "const IconSalaryWidget({super.key});"
+            "Widget build(BuildContext c) => const SizedBox();"
+            "}"
+        ),
+        "lib/widgets/icon_salary_widget2.dart": (
+            "class IconSalaryWidget2 extends StatelessWidget {"
+            "const IconSalaryWidget2({super.key});"
+            "Widget build(BuildContext c) => const SizedBox();"
+            "}"
+        ),
+        "lib/generated/screen_layout.dart": "child: const IconSalaryWidget2(),",
+    }
+    updated = collapse_numbered_widget_stem_aliases(planned)
+    assert "lib/widgets/icon_salary_widget2.dart" not in updated
+    assert "IconSalaryWidget2(" not in updated["lib/generated/screen_layout.dart"]
+    assert "IconSalaryWidget(" in updated["lib/generated/screen_layout.dart"]
+
+
 def test_positioned_text_dual_pin_prefers_explicit_width_for_table_cells() -> None:
     monthly = _monthly_category_text()
     placement = monthly.stack_placement

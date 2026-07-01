@@ -5,12 +5,20 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
+from figma_flutter_agent.assets.names import asset_filename
 from figma_flutter_agent.config import AssetsConfig
 from figma_flutter_agent.dev.wizard.asset_gap import (
+    ScreenAssetGapPartition,
     ScreenSvgExportExpectation,
+    partition_missing_asset_entries,
+    resolve_asset_export_entries_from_fetch,
     resolve_screen_asset_export_entries,
 )
-from figma_flutter_agent.parser.boundaries.assets import discover_asset_path_for_node
+from figma_flutter_agent.parser.boundaries.assets import (
+    build_asset_node_index,
+    lookup_asset_path_for_node,
+)
+from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 
 _ASSET_SUBDIRS = ("icons", "images", "illustrations")
 _ASSET_FILE_SUFFIXES = {".svg", ".png", ".webp", ".jpg", ".jpeg"}
@@ -44,6 +52,9 @@ def format_wizard_asset_report(
     file_key: str | None = None,
     primary_node_id: str | None = None,
     assets: AssetsConfig | None = None,
+    dump_prefetch: ScreenDumpPrefetch | None = None,
+    has_figma_token: bool = False,
+    gap_partition: ScreenAssetGapPartition | None = None,
 ) -> tuple[bool, list[str]]:
     """Build human-readable asset audit lines for the interactive wizard.
 
@@ -56,14 +67,17 @@ def format_wizard_asset_report(
         file_key: Figma file key for screen-scope gap detection.
         primary_node_id: Screen frame node id for screen-scope gap detection.
         assets: Agent asset settings (illustrations toggle).
+        dump_prefetch: Optional preflight parse snapshot to avoid re-parsing the dump.
+        has_figma_token: When true, backfill hints reference the download prompt.
+        gap_partition: Optional precomputed missing-export partition from preflight.
 
     Returns:
         Tuple of pass flag and Rich-marked lines.
     """
     lines: list[str] = []
-    valid_files, invalid_files = list_on_disk_asset_files(project_dir)
 
     if scope == "assets":
+        valid_files, invalid_files = list_on_disk_asset_files(project_dir)
         lines.extend(_format_disk_inventory(project_dir, valid_files, invalid_files))
         return len(invalid_files) == 0, lines
 
@@ -81,9 +95,13 @@ def format_wizard_asset_report(
             file_key=file_key,
             primary_node_id=primary_node_id,
             assets=assets,
-            invalid_files=invalid_files,
+            invalid_files=[],
+            dump_prefetch=dump_prefetch,
+            has_figma_token=has_figma_token,
+            gap_partition=gap_partition,
         )
 
+    valid_files, invalid_files = list_on_disk_asset_files(project_dir)
     lines.extend(_format_disk_inventory(project_dir, valid_files, invalid_files))
     if dump_path is not None and dump_path.is_file() and file_key and primary_node_id and assets:
         lines.append("")
@@ -95,6 +113,9 @@ def format_wizard_asset_report(
             primary_node_id=primary_node_id,
             assets=assets,
             invalid_files=invalid_files,
+            dump_prefetch=dump_prefetch,
+            has_figma_token=has_figma_token,
+            gap_partition=gap_partition,
         )
         lines.extend(screen_lines)
         return passed and len(invalid_files) == 0, lines
@@ -135,23 +156,54 @@ def _export_kind_label(kind: str) -> str:
     return kind
 
 
-def _missing_export_hint(missing: tuple[ScreenSvgExportExpectation, ...]) -> str | None:
-    if not missing:
-        return None
-    missing_boundaries = [entry for entry in missing if entry.kind == "boundary_svg"]
-    missing_icons = [entry for entry in missing if entry.kind == "icon"]
+def _missing_export_hint(
+    partition: ScreenAssetGapPartition, *, has_figma_token: bool
+) -> str | None:
+    if partition.check_blocking_missing == 0 and not partition.boundary_missing_ids:
+        if not partition.api_unexportable_ids:
+            return None
     hints: list[str] = []
-    if missing_boundaries:
+    if partition.downloadable_missing_ids:
+        if has_figma_token:
+            hints.append("confirm the download prompt below, or use [bold]list → assets[/bold]")
+        else:
+            hints.append(
+                "set FIGMA_ACCESS_TOKEN, then [bold]list → assets[/bold] or [bold]run → full[/bold]"
+            )
+    if partition.api_unexportable_ids:
         hints.append(
-            "render-boundary SVG(s) need live generate or wizard run → full "
-            "(launch/offline and dump-only asset export skip the boundary plan)"
+            f"{len(partition.api_unexportable_ids)} icon(s) need raster fallback PNG "
+            "(confirm download below or use [bold]run → full[/bold])"
         )
-    if missing_icons:
+    if partition.boundary_missing_ids:
         hints.append(
-            "missing icon(s) need live sync with FIGMA_ACCESS_TOKEN "
-            "(launch/offline does not call Figma Images API)"
+            f"{len(partition.boundary_missing_ids)} render-boundary SVG(s) need "
+            "[bold]run → full[/bold] or live generate"
         )
-    return "[dim]" + "; ".join(hints) + "[/dim]"
+    return "[yellow]To backfill:[/yellow] " + "; ".join(hints)
+
+
+def _resolve_screen_export_entries(
+    *,
+    dump_path: Path,
+    file_key: str,
+    primary_node_id: str,
+    assets: AssetsConfig,
+    dump_prefetch: ScreenDumpPrefetch | None,
+) -> tuple[ScreenSvgExportExpectation, ...]:
+    if dump_prefetch is not None and dump_prefetch.matches_dump(dump_path):
+        return resolve_asset_export_entries_from_fetch(
+            dump_prefetch.fetch_result,
+            primary_node_id=primary_node_id,
+            assets=assets,
+            parse_result=dump_prefetch.parse_result,
+        )
+    return resolve_screen_asset_export_entries(
+        dump_path=dump_path,
+        file_key=file_key,
+        primary_node_id=primary_node_id,
+        assets=assets,
+    )
 
 
 def _format_screen_asset_gap(
@@ -163,20 +215,38 @@ def _format_screen_asset_gap(
     primary_node_id: str,
     assets: AssetsConfig,
     invalid_files: list[str],
+    dump_prefetch: ScreenDumpPrefetch | None = None,
+    has_figma_token: bool = False,
+    gap_partition: ScreenAssetGapPartition | None = None,
 ) -> tuple[bool, list[str]]:
-    entries = resolve_screen_asset_export_entries(
+    asset_index = build_asset_node_index(project_dir)
+    entries = _resolve_screen_export_entries(
         dump_path=dump_path,
         file_key=file_key,
         primary_node_id=primary_node_id,
         assets=assets,
+        dump_prefetch=dump_prefetch,
     )
     expected = frozenset(entry.node_id for entry in entries)
     covered = frozenset(
         entry.node_id
         for entry in entries
-        if discover_asset_path_for_node(project_dir, entry.node_id) is not None
+        if lookup_asset_path_for_node(asset_index, entry.node_id) is not None
     )
-    missing_entries = tuple(entry for entry in entries if entry.node_id not in covered)
+    if gap_partition is None:
+        figma_root: dict = {}
+        if dump_prefetch is not None and dump_prefetch.matches_dump(dump_path):
+            figma_root = dump_prefetch.fetch_result.root
+        else:
+            from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
+
+            fetch = load_fetch_result_from_dump(
+                dump_path,
+                file_key=file_key,
+                node_id=primary_node_id,
+            )
+            figma_root = fetch.root
+        gap_partition = partition_missing_asset_entries(entries, covered, figma_root)
     lines: list[str] = []
     header = f"Required exports ({len(expected)} icon/boundary asset(s))"
     if screen:
@@ -187,25 +257,42 @@ def _format_screen_asset_gap(
         return len(invalid_files) == 0, lines
 
     for entry in sorted(entries, key=lambda item: item.node_id):
-        rel = discover_asset_path_for_node(project_dir, entry.node_id)
+        rel = lookup_asset_path_for_node(asset_index, entry.node_id)
         kind_label = _export_kind_label(entry.kind)
         if rel is not None:
             lines.append(f"  [green]OK[/green] {entry.node_id} [{kind_label}]  {rel}")
+        elif entry.node_id in gap_partition.api_unexportable_ids:
+            png_name = asset_filename(entry.layer_name, entry.node_id, "png")
+            lines.append(
+                f"  [yellow]RASTER[/yellow] {entry.node_id} [{kind_label}]  "
+                f"→ assets/images/{png_name} [dim](SVG API skip — PNG fallback)[/dim]"
+            )
+        elif entry.kind == "boundary_svg":
+            lines.append(
+                f"  [yellow]BOUNDARY[/yellow] {entry.node_id} [{kind_label}]  "
+                f"→ {entry.expected_rel_path}"
+            )
         else:
             lines.append(
                 f"  [red]MISSING[/red] {entry.node_id} [{kind_label}]  → {entry.expected_rel_path}"
             )
 
-    lines.append(
-        f"[bold]{len(covered)}/{len(expected)}[/bold] on disk"
-        + (
-            f", [red]{len(missing_entries)} missing[/red]"
-            if missing_entries
-            else " [green](complete)[/green]"
+    summary_parts = [f"[bold]{len(covered)}/{len(expected)}[/bold] on disk"]
+    if gap_partition.downloadable_missing_ids:
+        summary_parts.append(
+            f"[red]{len(gap_partition.downloadable_missing_ids)} downloadable missing[/red]"
         )
-    )
-    hint = _missing_export_hint(missing_entries)
+    if gap_partition.api_unexportable_ids:
+        summary_parts.append(
+            f"[yellow]{len(gap_partition.api_unexportable_ids)} raster fallback[/yellow]"
+        )
+    if gap_partition.boundary_missing_ids:
+        summary_parts.append(f"[yellow]{len(gap_partition.boundary_missing_ids)} boundary[/yellow]")
+    if gap_partition.total_missing == 0:
+        summary_parts.append("[green](complete)[/green]")
+    lines.append(", ".join(summary_parts))
+    hint = _missing_export_hint(gap_partition, has_figma_token=has_figma_token)
     if hint is not None:
         lines.append(hint)
-    passed = not missing_entries and not invalid_files
+    passed = gap_partition.check_blocking_missing == 0 and not invalid_files
     return passed, lines

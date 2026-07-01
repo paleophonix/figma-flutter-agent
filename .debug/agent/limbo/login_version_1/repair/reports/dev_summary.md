@@ -1,3 +1,0 @@
-# Dev summary
-
-decision=LOOP

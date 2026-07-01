@@ -98,6 +98,9 @@ async def export_assets_for_document(
         export_raster=True,
         export_blur_png=True,
     )
+    from figma_flutter_agent.assets.eligibility import collect_raster_fallback_node_ids
+
+    raster_fallback_node_ids = collect_raster_fallback_node_ids(document)
     outcome = await exporter.export_assets(
         file_key,
         document,
@@ -112,6 +115,7 @@ async def export_assets_for_document(
         continue_on_rate_limit=True,
         inter_batch_delay_sec=assets.images_batch_delay_sec,
         skip_existing_assets=skip_existing_assets,
+        raster_fallback_node_ids=raster_fallback_node_ids,
     )
     manifest = outcome.manifest
     icon_count = sum(1 for entry in manifest.entries if entry.kind == "icon")
@@ -213,23 +217,30 @@ def asset_export_gap_hint(
     """
     if not assets.svg:
         return None
-    expected_icons, _expected_raster = count_exportable_assets(document, assets)
-    if expected_icons == 0:
+    exportables = collect_exportable_nodes(
+        document,
+        illustrations_enabled=assets.illustrations,
+    )
+    expected_icon_ids = frozenset(
+        node_id for node_id, _name, kind in exportables if kind == "icon"
+    )
+    if not expected_icon_ids:
         return None
-    if result.icon_count >= expected_icons:
+    covered = expected_icon_ids & result.exported_node_ids
+    if len(covered) >= len(expected_icon_ids):
         return None
     if result.rate_limited:
         return (
-            f"Figma rate limit: exported {result.icon_count}/{expected_icons} SVG icon(s). "
+            f"Figma rate limit: exported {len(covered)}/{len(expected_icon_ids)} icon(s). "
             "Retry list → assets export later."
         )
     if result.failed_node_ids:
         return (
-            f"Exported {result.icon_count}/{expected_icons} SVG icon(s); "
+            f"Exported {len(covered)}/{len(expected_icon_ids)} icon(s); "
             f"{len(result.failed_node_ids)} node(s) failed."
         )
     return (
-        f"Expected {expected_icons} SVG icon(s) from dump but wrote {result.icon_count}. "
+        f"Expected {len(expected_icon_ids)} icon(s) from dump but wrote {len(covered)}. "
         "Try list → assets export."
     )
 

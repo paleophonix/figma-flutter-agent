@@ -1,6 +1,6 @@
 Fix the law, not the screen. A screen is evidence; a visual mismatch is a symptom.
 
-Treat debug artifacts under .debug/<project>/<feature>/ as observation and triage evidence, not as fixtures or permission to patch one screen.
+Treat debug artifacts under `.debug/screen/<project>/<feature>/` as observation and triage evidence, not as fixtures or permission to patch one screen.
 
 Do not hand-edit generated Dart under the Flutter project lib to make one feature pass.
 

@@ -1262,7 +1262,7 @@ def test_subtree_skip_cluster_when_file_class_differs_from_cluster_widget() -> N
             class_name="Group6835Widget",
             cluster_classes={"cluster_0": "Group6835Widget"},
         )
-        is None
+        == "cluster_0"
     )
 
 
@@ -1726,8 +1726,9 @@ return Container(child: Padding(child: Column(children: [Text('x')))])) forceStr
     assert "lib/widgets/cluster0_widget.dart" not in updated
 
 
-def test_strip_nested_self_ctor_skips_repaint_boundary_delegate() -> None:
+def test_strip_nested_self_ctor_replaces_repaint_boundary_self_delegate() -> None:
     from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
+        _is_self_referential_widget_build,
         _strip_nested_self_widget_ctors,
     )
 
@@ -1741,9 +1742,10 @@ class IconSalaryWidget extends StatelessWidget {
   }
 }
 """
+    assert _is_self_referential_widget_build(code, "IconSalaryWidget")
     patched = _strip_nested_self_widget_ctors(code, "IconSalaryWidget")
-    assert "const IconSalaryWidget()" in patched
-    assert "SizedBox.shrink" not in patched
+    assert "const IconSalaryWidget()" not in patched
+    assert "SizedBox.shrink" in patched
 
 
 def test_repair_self_referential_replaces_single_path_ctor_stub() -> None:

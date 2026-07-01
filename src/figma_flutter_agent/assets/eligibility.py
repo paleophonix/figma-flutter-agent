@@ -6,6 +6,7 @@ from typing import Any
 
 from figma_flutter_agent.assets.collect import collect_exportable_nodes
 from figma_flutter_agent.assets.composite_icons import collect_figma_composite_icon_groups
+from figma_flutter_agent.assets.effects import index_figma_nodes, node_has_layer_blur
 
 _FIGMA_VECTOR_TYPES = frozenset(
     {
@@ -18,6 +19,64 @@ _FIGMA_VECTOR_TYPES = frozenset(
     }
 )
 _MAX_COMPACT_VECTOR_PX = 48.0
+_FIGMA_CONTAINER_CHILD_TYPES = frozenset({"GROUP", "FRAME", "COMPONENT", "INSTANCE"})
+
+
+def node_has_direct_container_child(node: dict[str, Any]) -> bool:
+    """Return True when a node has a visible GROUP/FRAME/COMPONENT/INSTANCE child."""
+    for child in node.get("children") or []:
+        if child.get("visible") is False:
+            continue
+        if child.get("type") in _FIGMA_CONTAINER_CHILD_TYPES:
+            return True
+    return False
+
+
+def figma_images_api_skip_export(
+    node: dict[str, Any],
+    *,
+    node_id: str,
+    composite_parent_ids: frozenset[str],
+) -> bool:
+    """Return True when Figma Images API is unlikely to export this icon node.
+
+    Covers layer-blur vectors and composite icon groups whose glyph sits inside a
+    nested container (ellipse + inner group). The exporter recovers these at codegen
+    via raster fallback or render-boundary flattening.
+    """
+    if node_has_layer_blur(node):
+        return True
+    return node_id in composite_parent_ids and node_has_direct_container_child(node)
+
+
+def collect_raster_fallback_node_ids(
+    figma_root: dict[str, Any],
+    *,
+    illustrations_enabled: bool = True,
+    exclude_node_ids: set[str] | None = None,
+    flatten_exclude_node_ids: set[str] | None = None,
+    render_boundary_node_ids: set[str] | None = None,
+) -> frozenset[str]:
+    """Return icon node ids that should use PNG raster fallback instead of SVG export."""
+    composite_parents, _composite_skip = collect_figma_composite_icon_groups(figma_root)
+    figma_nodes = index_figma_nodes(figma_root)
+    exportables = collect_exportable_nodes(
+        figma_root,
+        illustrations_enabled=illustrations_enabled,
+        exclude_node_ids=exclude_node_ids,
+        flatten_exclude_node_ids=flatten_exclude_node_ids,
+        render_boundary_node_ids=render_boundary_node_ids,
+    )
+    return frozenset(
+        node_id
+        for node_id, _name, kind in exportables
+        if kind == "icon"
+        and figma_images_api_skip_export(
+            figma_nodes.get(node_id, {}),
+            node_id=node_id,
+            composite_parent_ids=composite_parents,
+        )
+    )
 
 
 def _figma_bbox_size(node: dict[str, Any]) -> tuple[float | None, float | None]:

@@ -113,6 +113,13 @@ def resolve_cluster_delegate_class(
     """Resolve a cluster widget class for structural or component-family clusters."""
     if not cluster_classes:
         return None
+    if (
+        node.cluster_id is not None
+        and not node.children
+        and bool(node.flatten_figma_node_ids)
+        and bool(node.vector_asset_key)
+    ):
+        return None
     blocked_cluster_ids = _expand_skip_cluster_ids(skip_cluster_id, cluster_classes)
     blocked_class_names = {
         cluster_classes[cluster_id]

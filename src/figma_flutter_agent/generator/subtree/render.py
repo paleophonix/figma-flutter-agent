@@ -233,8 +233,10 @@ def _subtree_skip_cluster_id_for_root(
     if not cluster_id or not cluster_classes:
         return None
     mapped = cluster_classes.get(cluster_id)
-    if not mapped or mapped == class_name:
+    if not mapped:
         return None
+    if mapped == class_name:
+        return cluster_id
     if not root.children and _sizing_like_skip_control(root):
         variant = cluster_vector_variants.get(cluster_id) if cluster_vector_variants else None
         if root.vector_asset_key or variant is not None:
@@ -312,13 +314,18 @@ def _render_subtree_widget_body(
     )
     if force_inline_cluster and root.cluster_id:
         skip_cluster_id = root.cluster_id
-    return render_node_body(
+    body = render_node_body(
         root,
         uses_svg=uses_svg,
         cluster_classes=cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
         skip_cluster_id=skip_cluster_id,
     )
+    from figma_flutter_agent.generator.ir.extracted import (
+        _preserve_extracted_widget_decoration_shell,
+    )
+
+    return _preserve_extracted_widget_decoration_shell(representative, body)
 
 
 def render_subtree_widgets(

@@ -1,6 +1,0 @@
-{
-  "decision": "LOOP",
-  "reason_code": "SCOPE_DRIFT",
-  "route": "diagnose.refine",
-  "step": "review"
-}

@@ -57,6 +57,8 @@ services:
       FIGMA_CP_DATABASE_URL: ${FIGMA_CP_DATABASE_URL:-}
       FIGMA_CP_REDIS_URL: redis://redis:6379/0
       FIGMA_CP_INTERNAL_URL: http://control-panel:8787
+      FIGMA_CP_RUN_MIGRATIONS: "1"
+      FIGMA_CP_PG_HOST: postgres
       REPAIR_OPENCODE_URL: ${REPAIR_OPENCODE_URL:-http://opencode:4096}
     volumes:
       - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
@@ -66,6 +68,9 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
+        required: false
     command:
       [
         "uvicorn",
@@ -89,11 +94,14 @@ services:
       FIGMA_CP_DATABASE_URL: ${FIGMA_CP_DATABASE_URL:-}
       FIGMA_CP_REDIS_URL: redis://redis:6379/0
       FIGMA_CP_INTERNAL_URL: http://control-panel:8787
+      FIGMA_CP_RUN_MIGRATIONS: "0"
       REPAIR_OPENCODE_URL: ${REPAIR_OPENCODE_URL:-http://opencode:4096}
       FIGMA_CP_METRICS_PORT: "9090"
+      FIGMA_GOLDEN_RUNTIME: ${FIGMA_GOLDEN_RUNTIME:-docker}
     volumes:
       - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
       - ./.control-panel.yml:/app/.control-panel.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "${FIGMA_CP_WORKER_METRICS_PORT:-9090}:9090"
     depends_on:

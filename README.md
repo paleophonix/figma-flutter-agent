@@ -9,83 +9,481 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pytest](https://img.shields.io/badge/tests-pytest-0A9EDC?logo=pytest&logoColor=white)](tests/)
 
-**LLM-first CLI that converts Figma frames into Material 3 Flutter UI inside an existing Flutter project** — structured screen IR, deterministic emit, analyze repair, and optional visual refine.
+**Turn Figma frames into production Flutter UI inside your existing app** — offline batch for multi-screen products, an interactive wizard for day-to-day dev, and an optional control plane for design–dev handoff (preview links, MRs).
 
-Maintained by **[Celestial Agents](LICENSE)** · MIT licensed · offline-first batch pipeline · interactive dialog mode (Flutter-style CLI)
+Maintained by **[Celestial Agents](LICENSE)** · MIT · offline-first · Flutter-style CLI wizard
 
 ---
 
 ### Highlights
 
-- **Figma → Flutter codegen** — theme tokens, assets, widgets, routing, and feature screens from Auto Layout frames
-- **Offline-first batch workflow** — one API call to dump an entire file; regenerate all screens without touching Figma quota
-- **Interactive CLI** — TTY wizard for project path, screen picker, and manifest selection (`figma-flutter` with no args)
-- **LLM screen IR + emitter** — `screenIr` + `extractedWidgets[].widgetIr` via strict JSON schema, repair/refine loops, cluster and subtree widget guardrails
-- **Fail-fast generation** — live generation requires an LLM key; cached IR and fixtures stay offline-friendly
-- **Production gates** — `dart analyze`, spec §9/§23 validation, incremental sync, and structured LLM output
-- **455+ automated tests** — offline fixtures, golden generation, batch pipeline, and optional live Figma smoke
-- **Material 3 or Cupertino** — `theme.variant` in `.ai-figma-flutter.yml`; see [docs/cupertino-coverage.md](docs/cupertino-coverage.md) for the deterministic widget matrix
+- **Figma frame → production Flutter** — screens, reusable widgets, theme, assets, routing into your existing app
+- **Offline-first for real products** — download a whole file once; codegen 15+ screens without burning Figma quota
+- **Flutter-style interactive wizard** — `figma-flutter` with no args: launch, fetch, generate, run, check, debug, view
+- **LLM layout intent + deterministic compiler** — structured screen IR, validated emit, analyzer repair, optional pixel refine
+- **Incremental sync** — regenerate only what changed; `// <custom-code>` zones survive updates
+- **Team-ready control plane** — GitLab Issue workflow, Discord bot, REST + SSE jobs, web preview links, auto PR/MR
+- **3700+ automated tests** — offline fixtures, corpus oracle, semantics gates, golden capture, optional live Figma smoke
+- **Material 3 or Cupertino** — one config switch for iOS-style chrome and controls
 
 ---
 
 ## Table of contents
 
 - [Overview](#overview)
-- [Requirements](#requirements)
-- [Setup](#setup)
-- [Interactive CLI](#interactive-cli-dialog-mode)
-- [VS Code / Cursor](#vs-code--cursor)
-- [Quick start: multi-screen app](#quick-start-multi-screen-app-recommended-workflow)
-- [Single-frame generation](#single-frame-generation)
-- [Batch commands](#batch-commands-reference)
-- [CLI reference](#cli-command-overview)
-- [Tests & quality](#tests--quality)
-- [Generation modes](#generation-modes)
-- [Widget matrix](#deterministic-widget-support-74)
-- [Live Figma CI](#live-figma-ci-optional)
-- [Project layout](#project-layout-agent-repo)
-- [Notes & limitations](#notes--limitations)
-- [Spec interpretation](#spec-interpretation)
+- [Features](#features)
+- [FAQ](#faq)
+- [Requirements & setup](#requirements--setup)
+- [Quick start](#quick-start)
+- [Control panel](#control-panel-optional)
+- [Documentation](#documentation)
 - [License](#license)
 
 ---
 
 ## Overview
 
-The agent ingests Figma REST API data (or cached JSON dumps), normalizes design trees and tokens, asks an LLM for screen IR, validates that IR, and emits idiomatic Flutter into your app’s `lib/` tree. Theme, assets, routing, and reusable widgets are planned around that IR path. Built for real multi-screen products: download once, iterate offline, launch any screen with a single command.
+**Figma → Flutter Adaptive Layout Agent** turns Figma frames into Material 3 (or Cupertino) Flutter UI inside your existing app: screens, widgets, theme, assets, and optional routing — with an offline-first batch path for multi-screen products.
 
 ```text
 Figma file  →  fetch / dump  →  parse & plan  →  codegen  →  flutter run
-                  ↑ offline path (.debug/) skips live API
+                  ↑ cached dumps under <agent_repo>/.debug/screen/ skip live API
 ```
 
-Typical commands:
+**Typical journeys:**
 
-| Goal | Command |
-|------|---------|
-| First-time setup for many screens | `batch dump-file` → `batch generate` |
-| Preview one screen on device | `run sign_in --project-dir ./demo_app` |
-| Single frame from live Figma | `generate --figma-url … --project-dir ./demo_app` |
-| Verify credentials | `live-check` |
-| CI / offline sign-off | `./scripts/signoff.sh` or `demo-signoff --strict --signoff-gates` |
+| I want to… | Start here |
+|------------|------------|
+| See one screen in 30 seconds | Wizard **launch** (cached dump, no LLM) |
+| Onboard a 15-screen Figma file | [Quick start](#quick-start) |
+| Ship one frame from a fresh URL | `generate --figma-url …` |
+| Let design open a GitLab Issue | [Control panel](#control-panel-optional) |
+| Know what the wizard menus do | [Features §2](#2-interactive-wizard-figma-flutter--i) |
+| Match a scenario to a workflow | [Features §15](#15-user-journeys-jtbd) |
+| Understand LLM vs Figma costs | [FAQ](#faq) |
 
 Agent context for coding assistants: [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md).
 
+### How this differs from Figma export plugins
+
+| | **Browser / IDE plugins** | **This agent** |
+|---|---------------------------|----------------|
+| **Output** | Snippets or a throwaway project | Idiomatic Flutter in **your** repo (`lib/`, `assets/`, theme) |
+| **Multi-screen** | Usually one frame at a time | **One file dump** → batch codegen for all frames |
+| **Iteration** | Re-export overwrites blindly | **Incremental sync** + `// <custom-code>` preservation |
+| **Quality** | Best-effort Dart | `dart analyze`, repair loops, 3700+ tests, CI signoff |
+| **Team workflow** | Manual copy-paste | GitLab Issue → **preview URL** → MR |
+| **Offline** | Needs live Figma | Cached dumps; regen without API calls |
+
+Plugins are great for spikes. This agent targets **ongoing products** where design changes every week.
+
+### Flow: solo dev (local wizard)
+
+```mermaid
+flowchart LR
+  A[Figma file] --> B[fetch / dump-file]
+  B --> C[batch generate]
+  C --> D[select screen]
+  D --> E[launch / run]
+  E --> F[Flutter on device]
+  B -.->|cached JSON| C
+  C -.->|optional| G[view renders]
+```
+
+### Flow: team (GitLab Issue)
+
+```mermaid
+flowchart LR
+  A[Designer opens Issue + Figma URL] --> B[Webhook]
+  B --> C[Control panel job]
+  C --> D[Generate Flutter]
+  D --> E[Preview link in comment]
+  E --> F[Review]
+  F --> G[MR to main]
+  F -.->|/bug| H[Repair job]
+  H --> D
+```
+
 ---
 
-## Requirements
+## Features
+
+End-to-end product map. The agent combines **LLM layout intent** (what goes where) with a **deterministic Flutter compiler** (how it is written) — you get adaptive UI in your repo, not one-off snippets. Engineering detail: [docs/](docs/).
+
+### Deliverables (what lands in your Flutter project)
+
+| Output | Description |
+|--------|-------------|
+| **Feature screens** | `lib/features/<slug>/<slug>_screen.dart` — one folder per Figma top-level frame |
+| **Reusable widgets** | `lib/widgets/*.dart` — repeated clusters, extracted subtrees, shared components |
+| **Theme system** | `app_colors.dart`, `app_spacing.dart`, `app_theme.dart`, optional dark theme |
+| **Typography & layout tokens** | Radii, spacing, breakpoints (`app_layout.dart`) |
+| **Assets** | SVG icons, PNG rasters (incl. blur fallbacks), optional WebP |
+| **Fonts** | Google/custom font wiring + `pubspec` entries when enabled |
+| **Routing** | Optional GoRouter / AutoRoute / Navigator 2.0 + prototype transitions |
+| **State management stubs** | Optional Riverpod / BLoC / Provider scaffolding |
+| **Navigation chrome** | Tabs, bottom nav, side rail on wide breakpoints |
+| **Prototype flows** | Modal sheets, dialogs, scroll-to targets from Figma prototype links |
+| **Golden tests** | Optional `test/golden/*_screen_test.dart` scaffolds |
+| **Design tokens import** | `import-tokens` from Figma Variables (when API allows) |
+
+Everything is written into an **existing** Flutter repo — the agent does not scaffold a greenfield app for you.
+
+---
+
+### Who it is for
+
+| Persona | Typical workflow |
+|---------|------------------|
+| **Solo mobile dev** | Wizard **fetch → generate → launch**; iterate on one screen with cached dumps |
+| **Team with 10–50 screens** | **batch dump-file** once → **batch generate** offline → **run** any screen |
+| **Design–dev handoff** | Preflight (**check → screen-assets**), combat renders (**view → renders**), Issue-based regen |
+| **Platform / release engineer** | `./scripts/signoff.sh`, corpus oracle, semantics gates, CI live Figma smoke |
+| **Ops / internal tools** | Control panel: webhook → job → preview URL → MR to `main` |
+
+---
+
+### 1. Figma ingestion
+
+Pull design truth from Figma REST API or from cached JSON on disk.
+
+| Capability | User value |
+|------------|------------|
+| **Single frame URL** | Paste any `figma.com/design/...?node-id=` link — wizard or `generate` |
+| **Full file dump** | One file API call + batched images for **all** screens and assets |
+| **Offline dumps** | Work without network after first fetch; ideal for CI and air-gapped regen |
+| **Scoped refresh** | Re-download JSON only, vectors only, rasters only, or skip existing files |
+| **Frame import** | Add one screen to `screens.yaml` with merge or overwrite manifest |
+| **screens.yaml manifest** | Stable slug ↔ node id map; drives batch generate, run, and wizard pickers |
+| **Variables & styles** | Best-effort token fetch; paints + published styles fallback on 403 |
+| **Prototype metadata** | Overlay destinations, transitions (DISSOLVE, SLIDE_IN, …) for routing emit |
+
+**Quota-friendly pattern:** `batch dump-file` → `batch generate` → `run` — not repeated live `generate` per screen. See [FAQ — Figma API usage](#how-do-i-minimize-figma-api-usage).
+
+---
+
+### 2. Interactive wizard (`figma-flutter` / `-i`)
+
+TTY menu when you run the CLI with no subcommand — same spirit as `flutter create` / `flutter run`.
+
+**Default: launch** — fastest path to see something on device: cached dump + saved screen IR, **no new LLM call**, then `flutter run`.
+
+| Menu | What you do here |
+|------|------------------|
+| **launch** | Quick preview: offline IR + device run (Chrome/mobile from config) |
+| **switch** | Pick active app in a multi-app workspace (`FIGMA_FLUTTER_PROJECT_DIR`) |
+| **check** | Health: fonts, assets on disk, doctor, live Figma, `flutter analyze` |
+| **fetch** | Import one frame or whole file (`quick` = full rewrite; `advanced` = scope + skip-existing) |
+| **list** | Manifest + preflight; rename slug; export missing assets; delete/copy screens |
+| **select** | Set active screen → wires `main.dart` for run/launch |
+| **generate** | **batch** all manifest screens, **one** frame, or **compare** 3 LLM models side by side |
+| **run** | **ir-offline** (cache only), **full** (live sync + assets + run), **offline** (cache generate + run) |
+| **debug** | OpenCode repair: new worktree, continue session, or run Flutter from repair bundle |
+| **view** | **chrome** / **preview** PNG / **renders** (Figma vs Flutter heatmap) / combined review flows |
+
+**check** submenu in detail:
+
+| Item | Finds / fixes |
+|------|----------------|
+| **all** | Full preflight chain before a big generate |
+| **all-fonts** / **screen-fonts** | Missing or mismatched fonts under `assets/fonts/` |
+| **all-assets** / **screen-assets** | Icons/images on disk vs what the active screen dump expects; can export gaps |
+| **doctor** | Token, Flutter SDK, AST sidecar binary, Docker golden image, OpenCode CLI |
+| **live-check** | Smoke fetch against real Figma API |
+| **analyze** | `flutter analyze` on the target project |
+
+**list** submenu: **rename** slugs, **assets** export from cached dump, **delete** screen + purge lib/assets/debug, **copy** screens to another Flutter project.
+
+Exit wizard with **Ctrl+C** (menu loops until interrupted).
+
+---
+
+### 3. Code generation pipeline
+
+**Product mental model:** the LLM proposes a structured screen plan (IR); the compiler validates it and writes Material/Cupertino Dart. Analyzer repair fixes compile errors; optional visual refine closes pixel gaps.
+
+| Stage | What happens |
+|-------|----------------|
+| **Parse** | Figma tree → clean geometry, classification (button, input, stack, scroll, …) |
+| **LLM screen IR** | Model returns structured `screenIr` + `extractedWidgets[].widgetIr` (strict JSON schema) |
+| **IR validation** | Stack bounds, nested scroll, ghost occlusion, tokens, on-disk assets — auto-fix or fail |
+| **Deterministic emit** | Material/Cupertino widgets, flex/stack layout, theme tokens — no hand-written Dart from LLM |
+| **Cluster widgets** | Repeated Figma patterns → single `lib/widgets/<name>.dart` |
+| **Subtree widgets** | Vector-heavy icons/illustrations the LLM must not redraw inline |
+| **Background layer** | Decorative root art → `Positioned.fill` behind centered canvas |
+| **AST sidecar** | Post-emit Dart fixes (unscale, unwrap `LayoutBuilder`) without regex surgery |
+| **Analyzer repair** | LLM patches materialized files when `dart analyze` fails (configurable attempts) |
+| **Visual refine** | Optional pixel-diff loop: capture Flutter PNG → compare to Figma → surgical IR patches |
+
+**Compare mode** (`generate → compare`): same dump, three models (`LLM_GENERATE_MODEL` ×3), IR snapshots only — pick a winner before full emit.
+
+**Profiles:** production gates on by default for `generate`; `run` uses dev profile unless `--strict`; `--allow-dev-profile` for local iteration.
+
+---
+
+### 4. Layout & widgets
+
+Compiler maps Figma Auto Layout, stacks, and semantic names to Flutter layout.
+
+| Category | Supported emit |
+|----------|----------------|
+| **Flex** | `Row`, `Column`, `Wrap`, `Expanded` / `Flexible` |
+| **Scroll** | `ListView` / `ListView.builder`, `GridView` / `GridView.builder`, nested scroll for BOTH overflow |
+| **Stack** | `Stack` + `Positioned`, paint-order preservation |
+| **Inputs** | `TextField`, `Checkbox`, `Switch`, `RadioListTile`, `DropdownButton`, `Slider` (+ Cupertino twins) |
+| **Actions** | `ElevatedButton`, `OutlinedButton`, `TextButton`, `CupertinoButton` |
+| **Surfaces** | `Card`, `AlertDialog` |
+| **Carousel** | `PageView` (names: carousel / pager / swiper) |
+| **Navigation** | `DefaultTabController`, `BottomNavigationBar`, `NavigationRail` on wide |
+| **Variants** | Figma component properties → `enabled`, `obscureText`, button style, selection state |
+
+Large lists (≥ 8 children) prefer builders where structure is provable. Heavy subtrees get `RepaintBoundary`.
+
+---
+
+### 5. Responsive & preview
+
+| Feature | Behavior |
+|---------|----------|
+| **Breakpoints** | Mobile-small ≤480, mobile-large ≤768, tablet ≤1024; column→row reflow |
+| **Max web width** | `max_web_width: 1200` — centered column on desktop |
+| **Preview modes** | `static` (fixed artboard), `responsive` (adaptive), `both` (dual Chrome ports) |
+| **Launch sizing** | Frame size from dump wins; YAML preview dimensions are fallback only |
+| **Wide chrome** | Sidebar / rail navigation when layout tier demands it |
+
+Wizard **view** and **launch** respect `runtime.flutter_device_id` (default: auto → Chrome when available).
+
+---
+
+### 6. Assets & fonts
+
+| Feature | Behavior |
+|---------|----------|
+| **SVG icons** | Exported via Figma Images API; referenced in generated `flutter_svg` code |
+| **PNG rasters** | Fills, photos, blur-layer fallbacks when vectors are insufficient |
+| **Multi-scale PNG** | `@2x` / `@3x` when configured |
+| **On-demand export** | Wizard **list → assets** or **check → screen-assets** fills gaps without full re-dump |
+| **Font audit** | Wizard flags design fonts missing from `assets/fonts/` |
+| **Font download** | Optional fetch + `pubspec` wiring (`fonts.download_fonts`) |
+| **WebP** | Opt-in (`assets.webp`); requires Pillow |
+
+**Fidelity tiers (conceptual):** declarative flex/stack (default) → SVG paths for simple vectors → PNG/raster for complex art → unsupported layers surface in design-coverage report.
+
+---
+
+### 7. Incremental sync & developer preservation
+
+| Feature | Behavior |
+|---------|----------|
+| **Region-aware hashes** | Repeated cluster edits rewrite only `lib/widgets/<widget>.dart` |
+| **Layout changes** | Non-cluster diffs rewrite the screen layout file |
+| **Skip unchanged tree** | Same design hash → skip LLM regen (theme-only pass still runs) |
+| **Token-only Figma change** | `regen_llm_on_token_change` triggers IR refresh without full tree churn |
+| **Custom zones** | Edits inside `// <custom-code>` … `// </custom-code>` survive regeneration |
+| **Strict preservation** | Production profile can **refuse** to write if you edited outside zones |
+| **Per-screen snapshot** | `.debug/screen/<project>/<feature>/snapshot.json` tracks what changed |
+| **Force regen** | `--force-llm-regen` after prompt/model swaps |
+
+---
+
+### 8. Visual review & golden capture
+
+| Feature | Behavior |
+|---------|----------|
+| **Figma reference PNG** | `figma.png` + metadata beside debug bundle |
+| **Flutter capture** | Warm sandbox `flutter test` capture (Docker or host) |
+| **Combat renders** | Side-by-side Figma ref, Flutter PNG, diff heatmap under `renders/<session>/` |
+| **Wizard view** | chrome-only, PNG-only, renders-only, or full-review combos |
+| **Golden tests** | Optional scaffold comparing Flutter render to committed baseline |
+| **Visual refine loop** | Optional LLM patches driven by pixel diff (off by default) |
+| **Typography specimen** | Optional font/glyph golden for text-heavy screens |
+
+Golden capture runtime: `auto` \| `docker` \| `host` — see [docs/reference/development.md](docs/reference/development.md).
+
+---
+
+### 9. AI repair & debug agent
+
+When codegen or analyze fails, wizard **debug** spins an OpenCode repair session:
+
+| Mode | Use when |
+|------|----------|
+| **new** | Fresh repair worktree from `.debug` triage bundle |
+| **continue** | Resume stalled repair on existing worktree |
+| **run** | Launch Flutter from repaired debug bundle |
+
+Requires `opencode` CLI (`bootstrap.ps1` can install). Headless repair also available via control panel ARQ jobs when `repair.enabled`.
+
+Diagnose/repair skills for coding agents: `.cursor/skills/diagnose/`, `.cursor/skills/repair/` — read `.debug` artifacts, fix compiler laws, not one-off screen patches.
+
+---
+
+### 10. Quality, semantics & CI gates
+
+Offline release gate (`./scripts/signoff.sh`) bundles:
+
+| Gate | Protects against |
+|------|------------------|
+| **demo-signoff** | Five fixture screens failing §23 acceptance + `dart analyze` |
+| **fixture-ir-validate** | Drift in cached screen IR snapshots |
+| **fidelity validate** | Broken fidelity manifest entries |
+| **corpus-oracle gate** | Regressions across fixture corpus pixel/geometry profiles |
+| **semantics corpus-gate** | Wrong BUTTON/INPUT/… classification precision/recall |
+| **fixture-geometry-check** | Parse-tree geometry invariant violations |
+| **3700+ pytest** | Parser, emitter, batch, sync, layout law regressions |
+
+**Semantics (report-only by default):** classifies nodes as buttons, inputs, chips, etc.; writes `semantics.json` for triage without silently changing emit until gates allow.
+
+**AI UX report:** heuristic a11y/spacing/nesting suggestions in `ai_ux.json` + pipeline warnings.
+
+**Accessibility:** optional `accessibility.auto_fix` bumps small fonts and low contrast before emit; production can fail instead of auto-fixing.
+
+---
+
+### 11. Control panel & team workflows (optional)
+
+Install: `poetry install --with dev,control_panel`. See [Control panel](#control-panel-optional).
+
+| Channel | Workflow |
+|---------|----------|
+| **GitLab Issues** | Issue description = Figma URL → agent generates → preview link in comment → MR on close |
+| **Issue commands** | `/bug …` repair, `/regen` cold regen (in issue notes) |
+| **Discord** | `/generate` with same codegen config as local wizard |
+| **REST API** | `POST /v1/jobs`, poll or SSE `GET /v1/jobs/{id}/events` |
+| **Web preview** | `GET /preview/{job_id}?token=&mode=` — live `flutter run` or static release build |
+| **CLI publish** | `generate --pr --repo-key … --publish-mode new\|existing` → GitHub/GitLab PR/MR |
+| **Feedback jobs** | User comment → LLM ticket text + artifact bundle zip |
+
+Multi-repo mapping via `.control-panel.yml` (`projects.repos`, GitLab `app_project_id`, artifact remote).
+
+---
+
+### 12. Multi-app workspace
+
+| Feature | Behavior |
+|---------|------------|
+| **FIGMA_FLUTTER_PROJECT_DIR** | Parent folder with `demo_app/`, `limbo/`, … |
+| **wizard switch** | Pick active app; persisted in `workspace-state.yml` |
+| **wizard-state.yml** | Active screen slug per Flutter project |
+| **screens.yaml per app** | Independent batch manifests |
+| **Agent-owned debug** | All screen artifacts under agent repo `.debug/screen/<project>/` |
+
+One agent install can serve many Flutter apps in a monorepo-style workspace.
+
+---
+
+### 13. Configuration surfaces (no code changes)
+
+| File | Controls |
+|------|----------|
+| **`.env`** | Figma token, LLM provider/models/keys, golden runtime overrides |
+| **`.ai-figma-flutter.yml`** | Theme variant, responsive mode, repair/refine loops, gates, assets, routing, sync |
+| **`.control-panel.yml`** | Discord/GitLab, preview ports, publish strategy, repair jobs |
+| **`wizard-state.yml`** | Active screen (per Flutter app) |
+| **`screens.yaml`** | Batch screen list (per Flutter app) |
+
+LLM provider and model names live in **`.env` only** — not in YAML — so secrets and model swaps stay out of git.
+
+---
+
+### 14. Product boundaries (honest MVP)
+
+Not promised in the default `generate` path:
+
+| Area | Status |
+|------|--------|
+| **Pixel-perfect without iteration** | Compile-time fidelity is the goal; mandatory pixel-refine loops are optional dev tools |
+| **Editable text 1:1 with Figma** | True typographic identity needs rasterization (accessibility trade-off) |
+| **Figma Dev Mode API** | Styles synthesized from REST; optional plugin CSS dump for gaps |
+| **Lottie / micro-animations** | Prototype navigation transitions only |
+| **Logic / variables / conditions** | Planned epics — not production codegen today |
+| **Auto-commit from Figma webhooks** | Control panel publishes MRs; local wizard does not |
+| **Greenfield `flutter create`** | You bring the Flutter project; agent fills `lib/` |
+
+See [docs/reference/technical-notes.md](docs/reference/technical-notes.md) for engineering detail and MVP deltas.
+
+---
+
+### 15. User journeys (JTBD)
+
+| When I want to… | I use… | Success looks like |
+|-----------------|--------|-------------------|
+| **See the last generated screen on my phone in under a minute** | Wizard **launch** | `flutter run` with cached IR — no LLM wait, no Figma call |
+| **Import a new 20-screen Figma file without killing API quota** | **fetch → quick** then **generate → batch** | `screens.yaml` + assets + offline codegen for all frames |
+| **Check that icons from the design actually landed in the repo** | **check → screen-assets** or **list → assets** | Preflight lists gaps; export fills missing SVG/PNG |
+| **Hand a screen to QA with a visual diff** | **view → renders** | Figma PNG, Flutter PNG, heatmap in `renders/<session>/` |
+| **Regenerate after a Figma tweak without losing my `onPressed` hack** | `generate` with sync + `// <custom-code>` zones | Only touched widgets/layout files change; custom block intact |
+| **Pick which of three LLM models layouts better** | **generate → compare** | Three IR snapshots (`ir_1.json` … `ir_3.json`) before Dart write |
+| **Fix analyze failures without hand-editing generated layout** | **debug → new/continue** | OpenCode repair worktree from `.debug` bundle |
+| **Let design request a screen via ticket, not Slack** | GitLab Issue + control panel | Preview URL in issue comment; MR on close |
+| **Ship a hotfix layout from CI, not a laptop** | `generate --pr` or Issue workflow | PR/MR with production gates from signoff profile |
+| **Run the same gates as CI before merge** | `./scripts/signoff.ps1` | ruff, mypy, fixtures, oracle, semantics, pytest green |
+
+Menu reference: [Features §2](#2-interactive-wizard-figma-flutter--i).
+
+---
+
+## FAQ
+
+### Why is an LLM required?
+
+Live `generate` asks a model for **layout intent** (structured screen IR), not raw Dart. A deterministic compiler then emits Flutter widgets, enforces analyze gates, and can repair failures. Cached dumps and wizard **launch** can skip a **new** LLM call when IR is already on disk; batch regen after the first pass still needs keys unless you reuse cached IR.
+
+### How do I minimize Figma API usage?
+
+| Pattern | Figma calls |
+|---------|-------------|
+| `batch dump-file` once per file | 1× file + batched images |
+| `batch generate` on cached dumps | **0** |
+| Wizard **launch** / **run → ir-offline** | **0** |
+| `batch dump` per screen | 1× per screen (avoid for large files) |
+| Repeated live `generate` per frame | 1×+ per run — expensive |
+
+Use **fetch → advanced → skip existing** when refreshing assets without rewriting JSON.
+
+### What drives LLM cost?
+
+- **Per screen:** one generate call (plus optional repair attempts after `dart analyze`, and optional visual refine loops).
+- **Compare mode:** three IR calls, one Dart emit — useful for model selection, not daily iteration.
+- **Mitigation:** batch offline regen, skip unchanged trees (sync), wizard **launch** for preview without regen.
+
+Tune models via `.env` (`LLM_GENERATE_MODEL`, `LLM_REPAIR_MODEL`). Provider: `anthropic`, `openai`, `openrouter`, `google`, `google_aistudio`.
+
+### Can I preview without regenerating?
+
+Yes. Wizard **launch** uses cached dump + saved screen IR and runs `flutter run` — no Figma fetch, no new LLM call. Use after **select** to wire `main.dart` to the screen you care about.
+
+### Where does generated code live?
+
+In your Flutter project: `lib/features/`, `lib/widgets/`, `lib/theme/`, `assets/`. Debug/triage artifacts live in the **agent repo** under `.debug/screen/<project>/<feature>/` (not in the app repo).
+
+### What should I design in Figma for best results?
+
+- **Auto Layout** on frames and lists  
+- **Named components** and variants (`Type`, `State`, `Size`)  
+- **Consistent slugs** — frame names become feature folders  
+- **SVG-friendly icons** where possible  
+- **Prototype links** for overlays and navigation hints  
+
+### Is pixel-perfect guaranteed?
+
+Compile-time fidelity is the goal; optional visual refine can close gaps. Editable text rarely matches Figma typography 1:1 without rasterization. See [Features §14](#14-product-boundaries-honest-mvp).
+
+---
+
+## Requirements & setup
 
 - Python 3.11+
 - [Poetry](https://python-poetry.org/) (recommended) or [uv](https://github.com/astral-sh/uv)
 - Flutter SDK 3.44+ (for running and validating generated apps)
 - Figma Personal Access Token
-- Anthropic / OpenAI / OpenRouter / Google API key (required for normal `generate` / batch workflows)
-
-## Setup
+- Anthropic / OpenAI / OpenRouter / Google (AI Studio) API key (required for normal `generate` / batch workflows)
 
 ```bash
 poetry install --with dev
 copy .env.example .env
+# optional one-shot dev bootstrap (deps, opencode-ai, AST sidecar, golden image):
+.\scripts\bootstrap.ps1
 ```
 
 Copy agent config once in this repo:
@@ -110,9 +508,13 @@ Set in `.env`:
 FIGMA_ACCESS_TOKEN=figd_...
 FIGMA_FLUTTER_PROJECT_DIR=E:/@dev
 ANTHROPIC_API_KEY=sk-ant-...
+LLM_PROVIDER=anthropic
+LLM_GENERATE_MODEL=
 ```
 
-`FIGMA_FLUTTER_PROJECT_DIR` is optional: workspace root (parent of Flutter apps) when `--project-dir` is omitted. Use wizard **switch** to pick the active app; choice is stored in `<workspace>/.figma-flutter/workspace-state.yml`. Falls back to sibling `../demo_app`, then cwd. Not stored in YAML — agent `.env` only.
+`LLM_PROVIDER` supports `anthropic`, `openai`, `openrouter`, `google`, and `google_aistudio` (AI Studio → `GOOGLE_API_KEY`). See `.env.example` for repair/refine models, reasoning knobs, and golden-capture overrides.
+
+`FIGMA_FLUTTER_PROJECT_DIR` is optional: workspace root (parent of Flutter apps) when `--project-dir` is omitted. Use wizard **switch** to pick the active app; choice is stored in `<workspace>/.figma-flutter/workspace-state.yml`. Active screen slug lives in `<project_dir>/wizard-state.yml`. Falls back to sibling `../demo_app`, then cwd. Not stored in YAML — agent `.env` only.
 
 Create a Flutter project separately:
 
@@ -124,494 +526,85 @@ Design frames in Figma with Auto Layout, named components, and SVG export settin
 
 > **Note:** Throughout this document, `poetry run figma-flutter` is used. With uv, replace it with `uv run figma-flutter`.
 
----
-
-## Interactive CLI (dialog mode)
-
-When stdin and stdout are a TTY (normal terminal), the CLI **automatically prompts** for missing options — similar to `flutter create` or `flutter run` without a device selected.
-
-### Launch the main menu
-
-```bash
-poetry run figma-flutter
-```
-
-You get a looping menu ordered by pipeline stage (setup → fetch → select → generate → run → validate). Default action: **sync & preview**.
-
-| Stage | Option | What it does |
-|-------|--------|----------------|
-| Setup | **switch** | Pick active Flutter app under `FIGMA_FLUTTER_PROJECT_DIR` workspace |
-| Setup | **doctor** | Check Figma token, Flutter/Dart SDK, project files |
-| Setup | **live-check** | Verify `FIGMA_ACCESS_TOKEN` and optionally smoke-test fetch |
-| Fetch | **import from Figma URL** | Paste any Figma link — auto-detects full file vs single frame (`node-id`) |
-| Fetch | **batch dump-file** | Download the entire Figma file to `.debug` (one API call) |
-| Screens | **list screens** | View manifest + preflight for active screen |
-| Screens | **select active screen** | Numbered list from `screens.yaml` → wire `main.dart` |
-| Codegen | **batch generate** | Codegen all screens listed in `screens.yaml` |
-| Codegen | **generate** | Codegen one frame (offline dump or live Figma URL) |
-| Preview | **sync & preview** | Live/offline generate, SVG assets, device picker, `flutter run` |
-| Preview | **run** | `flutter run` only (with device picker) |
-| Debug | **debug** | Agent debug for active screen (OpenCode local; same modes as run) |
-| Validate | **flutter analyze** | Under **check** submenu — run `flutter analyze` on the Flutter project |
-| Validate | **agent sign-off** | `demo-signoff --signoff-gates` + pytest (agent repo) |
-| — | **quit** | Exit |
-
-Header shows project and active screen between iterations.
-
-### Flags
-
-| Flag | Effect |
-|------|--------|
-| `-i` / `--interactive` | Force prompts even when auto-detection is unclear |
-| `--no-interactive` | Never prompt (CI, scripts, pipes). Missing args → error or help |
-
-### Examples (interactive)
-
-```bash
-# Main wizard (TTY only)
-poetry run figma-flutter
-
-# Run one screen — prompts for project and screen name if omitted
-poetry run figma-flutter run --project-dir E:/@dev/demo_app
-
-# Generate — prompts for Figma URL or offers offline dump from screens.yaml
-poetry run figma-flutter generate --project-dir E:/@dev/demo_app
-```
-
-### Examples (non-interactive / CI)
-
-```bash
-poetry run figma-flutter --no-interactive run sign_in --project-dir E:/@dev/demo_app
-poetry run figma-flutter --no-interactive generate \
-  --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" \
-  --project-dir E:/@dev/demo_app
-```
-
-**PowerShell tip:** type only the command, not the prompt prefix. If you paste `PS E:\path> poetry run ...`, PowerShell may treat `PS` as `Get-Process` and fail.
 
 ---
 
-## VS Code / Cursor
+## Quick start
 
-CLI-first IDE integration (spec §19). One entrypoint: the **interactive menu** (`-i`). A single VS Code task delegates to it; optional status-bar button via **Task Buttons**.
+Interactive wizard: `poetry run figma-flutter` (or `Ctrl+Shift+B` / `F5` in VS Code). Menu map: [Features §2](#2-interactive-wizard-figma-flutter--i).
 
-| File | Purpose |
-|------|---------|
-| [`.vscode/tasks.json`](.vscode/tasks.json) | Default build task → `poetry run figma-flutter -i` |
-| [`.vscode/settings.json`](.vscode/settings.json) | Status bar **`▶ figma-flutter`** (Task Buttons extension) |
-| [`.vscode/launch.json`](.vscode/launch.json) | Debug interactive CLI + Flutter `demo_app` |
-| [`.vscode/extensions.json`](.vscode/extensions.json) | Recommended extensions incl. Task Buttons |
-
-| How | Action |
-|-----|--------|
-| **Status bar** | Click **`▶ figma-flutter`** (needs [Task Buttons](https://marketplace.visualstudio.com/items?itemName=spencerwmiles.vscode-task-buttons)) |
-| **`Ctrl+Shift+B`** | Same menu (default build task) |
-| **Terminal** | `poetry run figma-flutter -i` |
-| **`F5`** | Run and Debug → **figma-flutter — interactive menu** |
-
-Recommended workflow:
-
-```text
-poetry run figma-flutter -i
-  → batch dump-file → batch generate → select active screen → run
-```
-
-| Symptom | Fix |
-|---------|-----|
-| No menu / instant exit | Use integrated terminal only; not Output panel |
-| Wrong project | Menu → **switch** |
-| `flutter` not found | Install Flutter SDK; restart IDE |
-
-Release sign-off is available from the wizard (**agent sign-off**) or run `./scripts/signoff.ps1` from the agent repo root for the full gate (ruff, mypy, demo-signoff, pytest).
-
-### AST sidecar and golden runtime
-
-| Piece | Purpose |
-|-------|---------|
-| `tools/dart_ast_sidecar/` | Compiled Dart transforms (unscale, unwrap `LayoutBuilder`) |
-| `runtime.use_ast_sidecar` | Reconcile path uses AST + `apply_codegen_dart_fixes` (not legacy layout regex in reconcile) |
-| `runtime.golden_capture` | `auto` (Docker if available) \| `docker` \| `host` for visual refine / golden PNG |
-| `poetry run figma-flutter doctor` | Poetry, Flutter, AST binary (`ast_sidecar`), Docker + `golden_image` |
-| `poetry run figma-flutter doctor --build-ast` | Compile `tools/bin/ast_compiler*` when missing |
-| `poetry run figma-flutter doctor --build-golden` | Manual golden image build (normally `generate` / capture auto-build) |
-| `FIGMA_SIGNOFF_DOCKER=1` | Optional signoff step: build `tools/render-capture` image |
+### Multi-screen (offline-first)
 
 ```bash
-poetry run figma-flutter doctor
-poetry run figma-flutter generate --figma-url "..." --project-dir ../demo_app --golden-runtime host
-# force host golden capture (no Docker):
-poetry run figma-flutter generate ... --no-docker
-```
-
-Offline screen fixtures: `tests/fixtures/screens.yaml` and `docs/projects/ast-modernization/ast-modernization.md`.
-
----
-
-## Quick start: multi-screen app (recommended workflow)
-
-For a Figma file with many screens (e.g. 15–16 frames), use the **offline-first** pipeline to minimize API quota usage.
-
-### 1. Download the whole file once (JSON + SVG + PNG)
-
-```bash
+# 1. Download whole Figma file once
 poetry run figma-flutter batch dump-file \
-  --project-dir E:/@dev/demo_app \
+  --project-dir ../demo_app \
   --figma-url "https://www.figma.com/design/FILE_KEY/Name"
+
+# 2. Codegen all screens offline (no Figma API)
+poetry run figma-flutter batch generate --manifest ../demo_app/screens.yaml
+
+# 3. Preview one screen
+poetry run figma-flutter run sign_in --project-dir ../demo_app
 ```
 
-One command:
-
-- **1×** `GET /v1/files/:key` — full design tree JSON
-- **batched** `GET /v1/images/:key` — every SVG icon + PNG raster (incl. blur fallbacks) for the **entire file**, not per screen
-
-This writes:
-
-- `demo_app/.debug/raw/full_file_<FILE_KEY>.json` — full file snapshot
-- `demo_app/.debug/raw/<feature>_layout.json` — one raw dump per top-level frame
-- `demo_app/screens.yaml` — batch manifest (feature slug → node id)
-- `demo_app/assets/icons/*.svg` and `demo_app/assets/images/*.png` — all media
-
-Tree JSON only (no media): add `--json-only`.
-
-### 2. Generate all screens offline
+### Single frame (live)
 
 ```bash
-poetry run figma-flutter batch generate --manifest E:/@dev/demo_app/screens.yaml
-```
-
-Uses cached dumps only — **no live Figma calls** when dumps exist.
-
-### 3. Run one screen on a device
-
-```bash
-poetry run figma-flutter run sign_in --project-dir E:/@dev/demo_app
-```
-
-What `run` does automatically:
-
-1. Loads agent config from this repo (`.ai-figma-flutter.yml`)
-2. Generates Dart from the matching `.debug/raw/<feature>_layout.json` dump (`--from-dump` path internally)
-3. Wires `lib/main.dart` to the selected screen
-4. Runs `flutter pub get` and `flutter run`
-
-List available screens:
-
-```bash
-poetry run figma-flutter run --list --project-dir E:/@dev/demo_app
-```
-
-Skip regeneration if code is already up to date:
-
-```bash
-poetry run figma-flutter run sign_in --project-dir E:/@dev/demo_app --skip-generate
-```
-
----
-
-## Single-frame generation
-
-### Dry run
-
-```bash
-poetry run figma-flutter generate ^
-  --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" ^
-  --project-dir ../demo_app ^
-  --dry-run
-```
-
-### Full generation (live Figma)
-
-```bash
-poetry run figma-flutter generate ^
-  --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" ^
+poetry run figma-flutter generate \
+  --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" \
   --project-dir ../demo_app
 ```
 
-### Offline from a cached dump
+Add `--dry-run` to plan without writes. Add `--allow-dev-profile` for soft gates locally.
+
+### IDE shortcuts
+
+| Action | How |
+|--------|-----|
+| Wizard menu | `poetry run figma-flutter -i` or status bar **▶ figma-flutter** |
+| Default build | `Ctrl+Shift+B` → same menu |
+| Doctor | `poetry run figma-flutter doctor` |
+
+---
+
+## Control panel (optional)
+
+Headless jobs for teams: design opens a ticket, agent generates code, stakeholder gets a preview link, MR lands on `main`. Full capability table: [Features §11](#11-control-panel--team-workflows-optional).
+
+| Capability | Detail |
+|------------|--------|
+| **GitLab Issue-first** | Webhook → job → preview URL → MR on close |
+| **Issue commands** | `/bug …`, `/regen` in issue notes |
+| **Discord** | `/generate` with same config as local wizard |
+| **REST + SSE** | `POST /v1/jobs`, `GET /v1/jobs/{id}/events` |
+| **Web preview** | Tokenized URL; live or static release build |
+| **CLI publish** | `generate --pr --repo-key …` |
 
 ```bash
-poetry run figma-flutter generate ^
-  --from-dump ../demo_app/.debug/raw/home_layout.json ^
-  --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" ^
-  --project-dir ../demo_app ^
-  --feature-name sign_in
+poetry install --with dev,control_panel
+copy .control-panel.yml.example .control-panel.yml
+docker compose -f docker-compose.control-panel.yml --profile bundled-db up
+poetry run alembic upgrade head
+poetry run figma-flutter-control-panel
+poetry run figma-flutter-worker
 ```
 
-The `--figma-url` is still required for metadata (file key, node id) even when loading from dump; in interactive mode the agent can pick a screen from `screens.yaml` instead.
-
-Production-style runs use **LLM screen IR + emitter** (`generation.use_screen_ir: true` in `.ai-figma-flutter.yml` plus an API key in `.env`). Cached dumps avoid repeated Figma fetches, but live generation still requires the provider key.
-
-### Generated output inside the Flutter project
-
-- `lib/theme/app_colors.dart`
-- `lib/theme/app_spacing.dart`
-- `lib/theme/app_theme.dart`
-- `lib/main.dart` (wired to theme and routing)
-- `lib/features/<feature>/<feature>_screen.dart`
-- `lib/widgets/*.dart`
-- `assets/icons/`, `assets/images/`
-
-Optional visual QA (off by default in `.ai-figma-flutter.yml`):
-
-```yaml
-validation:
-  export_figma_reference: true   # saves .figma-flutter/reference/{feature}_figma.png
-  generate_golden_test: true     # emits test/golden/{feature}_screen_test.dart
-```
-
-Then run:
-
-```bash
-cd ../demo_app
-dart format .
-flutter analyze
-flutter run -d chrome
-```
+Details: [src/control_panel/README.md](src/control_panel/README.md).
 
 ---
 
-## Batch commands reference
-
-| Command | API calls | Purpose |
-|---------|-----------|---------|
-| `batch dump-file` | **1 file + batched images** | Full JSON tree, all SVG/PNG assets, `screens.yaml`, per-screen dumps |
-| `batch dump-file --json-only` | **1** per run | JSON tree + manifest only (no media) |
-| `batch dump` | **1 per screen** | Refresh individual screen JSON (avoid if quota is tight) |
-| `batch generate` | **0** (offline) | Codegen every entry in `screens.yaml` from dumps |
-
-### `screens.yaml` manifest
-
-Example structure (auto-generated by `batch dump-file`):
-
-```yaml
-file_key: F7D3hhz7vdcIYSCFzTurz6
-project_dir: E:/@dev/demo_app
-screens:
-  - feature: sign_in
-    node_id: "1:234"
-  - feature: home
-    node_id: "1:567"
-```
-
-- `feature` — folder name under `lib/features/` and CLI screen slug for `run`
-- `node_id` — Figma node id (`:` separator, e.g. `1:234`)
-
-### Per-screen dump (alternative to dump-file)
-
-If you already have `screens.yaml` and only need to refresh individual dumps:
-
-```bash
-poetry run figma-flutter batch dump --manifest E:/@dev/demo_app/screens.yaml
-```
-
----
-
-## CLI command overview
-
-| Command | Description |
-|---------|-------------|
-| `figma-flutter` | Interactive menu (TTY) or help |
-| `run [screen]` | Generate one screen from dump + `flutter run` |
-| `generate` | Single-frame codegen |
-| `batch dump-file` | One-call full file download + manifest |
-| `batch dump` | Per-screen Figma fetch into `.debug/` |
-| `batch generate` | Offline batch codegen |
-| `live-check` | Token + optional smoke fetch |
-| `demo-signoff` | Offline spec §23 fixture validation |
-| `validate-spec23` | Run §23 checks on a fixture |
-| `visual-qa` | Pixel diff and typography specimens |
-| `version` | Print package version |
-
-Global options: `-i` / `--interactive`, `--no-interactive`.
-
----
-
-## Tests & quality
-
-```bash
-poetry run pytest -v -ra
-./scripts/signoff.sh          # ruff, mypy, demo-signoff --signoff-gates, pytest
-# or: poetry run figma-flutter demo-signoff --strict --signoff-gates
-```
-
-`demo-signoff` validates five local Figma fixtures against spec §23 without network access. Use `--signoff-gates` for the same CI quality/validation profile as `./scripts/signoff.sh`. CI: jobs `lint` + `signoff` (see [scripts/README.md](scripts/README.md)).
-
-Manual end-to-end QA on a real Figma frame: [tests/README.md — Manual E2E acceptance](tests/README.md#manual-e2e-acceptance). Helper script: `.\scripts\e2e-manual.ps1 -FigmaUrl "..." -ProjectDir ..\demo_app`.
-
-Optional visual QA: `./scripts/visual-qa-signoff.sh` or `demo-signoff --strict --signoff-gates --visual-qa` (enables dark theme, reference PNG, golden scaffolds in code). Refresh planner goldens: `UPDATE_GOLDEN=1 poetry run pytest tests/test_golden_generation.py -q`.
-
----
-
-## Generation
-
-The production path is **LLM screen IR + emitter**:
-
-| Step | Role |
-|------|------|
-| LLM screen IR | Provider returns `screenIr` plus `extractedWidgets[].widgetIr` through structured output |
-| IR validation | Guardrails enforce stack bounds, nested scroll rules, ghost occlusion, tokens, and asset references |
-| Emitter / planner | Materializes Dart screens, widgets, theme, assets, and routing from validated IR |
-| Repair / refine | Analyzer repair and optional visual refine patch the materialized IR-owned files |
-
-Live `generate` and batch workflows require a configured provider API key. Cached IR, fixture planning, and golden fixture utilities remain offline-friendly, but there is no keyless full-screen layout fallback product mode.
-
-**Cluster widgets** (`enforce_cluster_widgets`) and **subtree widgets** (vector-heavy subtrees the LLM must not reimplement) are part of the IR pipeline.
-
-See `.ai-figma-flutter.yml.example` for all options.
-
-**Production gates** (spec §9 / §23 — analyze, preservation, spec9, fail-fast LLM) apply **by default** on `generate` (non-dry-run):
-
-```bash
-poetry run figma-flutter generate --figma-url "..." --project-dir ../demo_app
-```
-
-**Local dev only** (soft gates): add `--allow-dev-profile`. The `run` command uses dev profile by default; pass `--strict` for production gates.
-
-Release sign-off: `./scripts/signoff.sh` or `.\scripts\signoff.ps1`.
-
-Large scrollable lists (≥ 8 children) use `ListView.builder` / `GridView.builder` where the emitter can prove the structure. Scrollable and heavy widgets are wrapped in `RepaintBoundary`. Enable `accessibility.auto_fix` to bump small fonts and low-contrast text before codegen.
-
----
-
-## Deterministic widget support (§7.4)
-
-Rule-based layout helpers map Figma structure and names to Flutter widget expressions used by the IR emitter, cluster widgets, subtree widgets, and fixture/golden infrastructure.
-
-| Category | Widgets |
-|----------|---------|
-| Layout | `Row`, `Column`, `Stack`, `Wrap`, `GridView` / `GridView.builder`, `ListView` / `ListView.builder`, nested scroll for `BOTH` overflow |
-| Inputs | `TextField` / `CupertinoTextField`, `Checkbox`, `Switch`, `RadioListTile`, `DropdownButton`, `Slider` |
-| Actions | `ElevatedButton`, `OutlinedButton`, `TextButton`, `CupertinoButton` |
-| Surfaces | `Card`, `AlertDialog` |
-| Carousel | `PageView` (semantic name: carousel / pager / swiper) |
-| Navigation | `DefaultTabController`, `BottomNavigationBar` |
-| Prototype | `showModalBottomSheet` or `showDialog` for `OVERLAY` links (dialog-like destinations) |
-
-Component **variants** (`Type`, `State`, `Size`, `Checked`) drive `enabled`, `obscureText`, button style, and selection state.
-
----
-
-## Live Figma CI (optional)
-
-GitHub Actions job `live-figma` runs when repository secrets are set:
-
-- `FIGMA_ACCESS_TOKEN`
-- `FIGMA_SMOKE_FILE_KEY`
-- `FIGMA_SMOKE_NODE_ID`
-
-Local credential + fetch smoke:
-
-```bash
-set FIGMA_ACCESS_TOKEN=figd_...
-set FIGMA_SMOKE_FILE_KEY=...
-set FIGMA_SMOKE_NODE_ID=1:2
-poetry run figma-flutter live-check --dump --project-dir ../demo_app
-poetry run pytest -v -ra -m live_figma
-```
-
----
-
-## Project layout (agent repo)
-
-```
-figma-flutter-agent/
-├── src/figma_flutter_agent/   # CLI, pipeline, codegen, Figma connector
-├── tests/                     # pytest suite (offline-first)
-├── scripts/                   # signoff, E2E helper, maintainer tools — see scripts/README.md
-├── .ai-figma-flutter.yml.example
-├── .ai-figma-flutter.yml      # local agent config (gitignored; copy from .example)
-├── .env.example
-```
-
-Cache and batch artifacts live **inside the Flutter project**, not the agent repo:
-
-```
-demo_app/
-├── screens.yaml               # batch manifest
-├── .debug/
-│   ├── raw/
-│   │   ├── full_file_*.json
-│   │   └── *_layout.json
-│   ├── processed/
-│   │   └── *_layout.json
-│   └── dart/
-│       └── *_screen.dart          # screen + widgets + layout inlined for debugging
-└── lib/features/              # generated screens
-```
-
----
-
-## Notes & limitations
-
-### Style metadata (“Dev Mode”)
-
-The agent does **not** call the separate Figma Dev Mode API. Style metadata is **synthesized from REST** nodes + Styles API (`rest_css_synthesis` in spec23). Expect gaps: no plugin handoff URLs, some enterprise-only fields absent, `SCALE` constraints approximated in codegen.
-
-**Optional Dev Mode enrichment (Phase 1–2 — config only, plugin stub)**
-
-A two-layer opt-in is available for values the REST API cannot surface (e.g. `clip-path`, `mix-blend-mode`, composite gradients):
-
-```yaml
-figma:
-  style_metadata:
-    source: hybrid          # rest_synthesis (default) | hybrid | dev_mode_inspect
-  dev_mode:
-    enabled: true
-    inspect_css:
-      mode: plugin_dump
-      dump_path: dumps/my_screen.json   # v1 JSON from tools/figma_css_inspect/
-```
-
-| `source` | REST synthesis | Plugin dump |
-|---|---|---|
-| `rest_synthesis` | ✅ (default) | ❌ ignored |
-| `hybrid` | ✅ base | fills gaps only |
-| `dev_mode_inspect` | ✅ typed fields | overrides `css_properties` |
-
-The plugin that produces the dump is a Phase 3 stub — see `tools/figma_css_inspect/README.md`. The `rest_css_synthesis` spec§23 criterion is never removed.
-
-### Incremental sync
-
-File-hash sync with `layout_region_hash` + `cluster_hashes`. Edits inside repeated clusters rewrite `lib/widgets/<widget>.dart`; non-cluster layout changes rewrite the full `*_layout.dart`. Corrupt `.figma-flutter/snapshot.json` is quarantined to `snapshot.json.corrupt` (production: `sync.fail_on_corrupt_snapshot: true` fails fast).
-
-When the design tree hash is unchanged, LLM screen generation is skipped (theme-only updates). Use `--force-llm-regen` after prompt/model changes. Production sets `regen_llm_on_token_change: true` for token-only Figma changes.
-
-### LLM codegen
-
-Use API keys in `.env` (`LLM_PROVIDER`, `LLM_GENERATE_MODEL`, provider key). Production `generate` requires `anthropic` or `openai` when `require_strict_json_schema: true`. Dev providers (`openrouter`, `google`) may log `structured_output_fallback`. Optional loops: `llm_repair_after_analyze`, `llm_visual_refine` (see `.ai-figma-flutter.yml.example`).
-
-### Other
-
-- **Figma quota:** prefer `batch dump-file` + `batch generate` + `run` over repeated live `generate` during iteration.
-- **Sync:** `--no-sync` forces full rewrite. `--allow-stubs` only for placeholder destination screens on LLM failure.
-- **Variables API:** optional fetch; on HTTP 403, tokens fall back to paints + published styles.
-- **Responsive:** breakpoints in `lib/theme/app_layout.dart` — mobile-small ≤480, mobile-large ≤768, tablet ≤1024; `AppBreakpoints.isWideLayout` reflows columns to rows above 480px.
-- **Animations (MVP):** prototype navigation transitions only (`DISSOLVE`, `SLIDE_IN`, etc.); Lottie and layer micro-animations are post-MVP.
-- **Visual QA:** golden tests compare Flutter renders, not Figma pixels directly. Reference PNG export requires live fetch + token.
-- **WebP:** `assets.webp` defaults to `false`; requires Pillow when enabled.
-- Secrets are masked in verbose logs.
-
----
-
-## Spec interpretation
-
-Production signoff follows these MVP deltas (formal spec is not shipped in this repo):
-
-| Topic | Production behavior |
-|-------|---------------------|
-| **§5.1 styles** | REST/CSS synthesis, not Dev Mode API (`rest_css_synthesis` criterion) |
-| **§7.3 responsive** | `LayoutBuilder` reflow, four-band grids, sidebar chrome, `max_web_width: 1200` |
-| **§10 AI codegen** | LLM screen IR + emitter primary; cached IR / fixtures cover offline validation |
-| **§16–17 preservation** | `// <custom-code>` zones + `strict_preservation`; region-aware sync (not per-node Dart inside layout files) |
-| **§9 quality** | Optional `quality.enforce_spec9_gates`; production profile enables depth/contrast/preservation gates |
-| **§19 IDE** | CLI wizard + `.vscode/*` launch/tasks (no marketplace plugins) |
-| **§21.2 animation** | Prototype link transitions (DISSOLVE/SLIDE_IN → fade/slide); manifest in `.debug/reports/*_animations.json` |
-| **§21.4 AI UX** | Heuristic suggestions in pipeline warnings + `.debug/reports/*_ai_ux.json` |
-| **§3 state management** | `none` default; `riverpod` / `bloc` / `provider` via `state_management.type` in YAML |
-| **§7.6 variables** | Best-effort fetch; 403 → paints/styles fallback |
-| **§9 / §23 production profile** | Applied on `generate` (non-dry-run) via `apply_production_profile()` unless `--allow-dev-profile` |
-
-CI fixture gates: `demo-signoff --strict --signoff-gates` (`apply_signoff_profile()`). Visual QA profile: `--visual-qa` flag or YAML `dark_mode` / `validation` flags.
+## Documentation
+
+| Doc | For |
+|-----|-----|
+| [docs/reference/cli.md](docs/reference/cli.md) | All CLI commands, batch scopes, flags |
+| [docs/reference/debug-artifacts.md](docs/reference/debug-artifacts.md) | `.debug/screen/` triage |
+| [docs/reference/development.md](docs/reference/development.md) | Tests, signoff, widgets, CI smoke |
+| [docs/reference/technical-notes.md](docs/reference/technical-notes.md) | Limitations, sync, spec interpretation |
+| [AGENTS.md](AGENTS.md) | Coding assistant context |
+| [scripts/README.md](scripts/README.md) | Release gates |
+| [docs/README.md](docs/README.md) | Full docs index (incl. localized overviews) |
 
 ---
 

@@ -64,7 +64,9 @@ def _wizard_print_screen_assets_audit(ctx: typer.Context) -> bool:
     from figma_flutter_agent.assets.diagnostics import format_wizard_asset_report
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.project import ensure_project_config
-    from figma_flutter_agent.dev.wizard.preflight import build_run_plan
+    from figma_flutter_agent.dev.wizard.asset_sync import run_export_missing_screen_assets
+    from figma_flutter_agent.dev.wizard.preflight import build_run_plan, collect_screen_preflight
+    from figma_flutter_agent.wizard.prompts import prompt_confirm
     from figma_flutter_agent.wizard.screens import _wizard_resolve_active_dump
     from figma_flutter_agent.wizard.state import (
         _wizard_active_screen_label,
@@ -92,6 +94,9 @@ def _wizard_print_screen_assets_audit(ctx: typer.Context) -> bool:
     config_path = ensure_project_config(root)
     settings = load_settings(config_path)
     plan = build_run_plan(project_dir=root, screen_name=screen)
+    console.print("[dim]Parsing dump and indexing assets/…[/dim]")
+    preflight = collect_screen_preflight(plan)
+    has_token = bool(settings.figma_token().strip())
     passed, lines = format_wizard_asset_report(
         root,
         dump_path=dump_path,
@@ -100,10 +105,104 @@ def _wizard_print_screen_assets_audit(ctx: typer.Context) -> bool:
         file_key=plan.manifest.file_key,
         primary_node_id=plan.screen.node_id,
         assets=settings.agent.assets,
+        dump_prefetch=preflight.dump_prefetch,
+        has_figma_token=has_token,
+        gap_partition=preflight.gap_partition,
     )
     for line in lines:
         console.print(line)
     console.print()
+
+    if preflight.gap_partition is not None:
+        partition = preflight.gap_partition
+        downloadable = partition.downloadable_missing_ids
+        raster_fallback = partition.api_unexportable_ids
+        needs_asset_sync = bool(downloadable or raster_fallback)
+        if needs_asset_sync and has_token:
+            parts: list[str] = []
+            if downloadable:
+                parts.append(f"{len(downloadable)} SVG")
+            if raster_fallback:
+                parts.append(f"{len(raster_fallback)} raster fallback PNG")
+            sync_label = " + ".join(parts)
+            if prompt_confirm(
+                f"Download {sync_label} from Figma now? "
+                f"({len(partition.boundary_missing_ids)} boundary need run → full)",
+                default=True,
+            ):
+                try:
+                    console.print("[dim]Downloading missing icons (screen-scoped)…[/dim]")
+                    result = run_export_missing_screen_assets(
+                        plan,
+                        settings,
+                        gap_partition=partition,
+                        dump_prefetch=preflight.dump_prefetch,
+                    )
+                    console.print(
+                        f"[green]Downloaded[/green] {result.icon_count} SVG, "
+                        f"{result.raster_count} raster"
+                    )
+                    if result.failed_node_ids:
+                        failed = ", ".join(sorted(result.failed_node_ids))
+                        console.print(
+                            f"[yellow]Figma API could not export {len(result.failed_node_ids)} "
+                            f"node(s): {failed}[/yellow]"
+                        )
+                    if result.rate_limited:
+                        console.print(
+                            "[yellow]Figma rate limit hit — retry in a minute or use "
+                            "list → assets[/yellow]"
+                        )
+                    console.print("[dim]Re-checking on-disk coverage…[/dim]")
+                    preflight = collect_screen_preflight(plan)
+                    passed, lines = format_wizard_asset_report(
+                        root,
+                        dump_path=dump_path,
+                        screen=screen,
+                        scope="screen",
+                        file_key=plan.manifest.file_key,
+                        primary_node_id=plan.screen.node_id,
+                        assets=settings.agent.assets,
+                        dump_prefetch=preflight.dump_prefetch,
+                        has_figma_token=has_token,
+                        gap_partition=preflight.gap_partition,
+                    )
+                    for line in lines:
+                        console.print(line)
+                    console.print()
+                    if passed:
+                        console.print("[green]Screen assets OK[/green]")
+                    elif preflight.gap_partition is not None:
+                        part = preflight.gap_partition
+                        if part.check_blocking_missing:
+                            console.print(
+                                f"[yellow]{part.check_blocking_missing} downloadable icon(s) "
+                                "still missing after sync.[/yellow]"
+                            )
+                        elif part.api_unexportable_ids:
+                            console.print(
+                                f"[yellow]{len(part.api_unexportable_ids)} raster fallback icon(s) "
+                                "still missing — try [bold]run → full[/bold].[/yellow]"
+                            )
+                        else:
+                            console.print(
+                                "[green]Downloadable icons complete[/green] — "
+                                "boundary items need [bold]run → full[/bold]."
+                            )
+                            passed = True
+                    console.print()
+                except Exception as exc:
+                    console.print(f"[red]Asset download failed:[/red] {exc}")
+                    return False
+        elif needs_asset_sync and not has_token:
+            console.print(
+                "[yellow]Missing screen assets — set FIGMA_ACCESS_TOKEN, then "
+                "re-run check or use [bold]list → assets[/bold].[/yellow]"
+            )
+            console.print()
+        elif not passed and partition.check_blocking_missing == 0:
+            passed = True
+
     return passed
 
 

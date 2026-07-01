@@ -57,7 +57,7 @@ Human checklist for a **real Figma frame** after offline gates are green (`.\scr
 poetry run figma-flutter live-check --figma-url "<FIGMA_URL>" --dump --project-dir <PROJECT_DIR>
 ```
 
-- Exit 0; dump under `<PROJECT_DIR>/.debug/`; no secrets in console.
+- Exit 0; dump under `<agent_repo>/.debug/screen/<project>/<feature>/raw.json`; no secrets in console.
 
 ### 2. Production generate
 
@@ -92,7 +92,7 @@ Check render at **320px** and **768px** width; navigation if routing enabled; te
 
 ### 6. Incremental sync
 
-1. First `generate` (creates `.figma-flutter/snapshot.json`).
+1. First `generate` (creates per-screen `snapshot.json` under `.debug/screen/<project>/<feature>/`).
 2. Change one repeated component in Figma.
 3. Second `generate` — only expected widget/layout files rewritten; custom-code intact.
 

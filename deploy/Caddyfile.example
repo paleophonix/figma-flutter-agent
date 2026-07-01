@@ -1,0 +1,7 @@
+# Public hostname — DNS must point here before first certificate issue.
+{$FIGMA_CP_PUBLIC_HOST} {
+	encode gzip
+	tls {$FIGMA_CP_TLS_EMAIL}
+
+	reverse_proxy control-panel:8787
+}
