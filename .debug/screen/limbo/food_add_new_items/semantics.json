@@ -1002,10 +1002,10 @@
   "rejectedByInvariant": [
     {
       "figmaId": "602:1222",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 2,
@@ -1047,10 +1047,10 @@
     },
     {
       "figmaId": "602:1229",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "BUTTON": 1

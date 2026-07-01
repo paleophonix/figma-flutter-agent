@@ -432,6 +432,91 @@ def test_collapse_numbered_widget_stem_aliases_rewrites_callsites() -> None:
     assert "IconSalaryWidget(" in updated["lib/generated/screen_layout.dart"]
 
 
+def test_bottom_chrome_not_inside_scroll_extent() -> None:
+    """Static-mode fallback must not wrap the full artboard in an outer scroll host."""
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.layout import render_layout_file
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+
+    debug_root = Path(".debug/screen/limbo/9_3_1_b_transaction_income")
+    if not (debug_root / "processed.json").is_file():
+        pytest.skip("transaction income debug bundle unavailable")
+    proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    norm = normalize_clean_tree(root, screen_ir=screen_ir)
+    layout = render_layout_file(
+        norm,
+        feature_name="9_3_1_b_transaction_income",
+        uses_svg=True,
+        screen_ir=screen_ir,
+        de_archetype_pass=True,
+        responsive_enabled=False,
+    )["lib/generated/9_3_1_b_transaction_income_layout.dart"]
+    bad_outer_scroll = (
+        "Material(color: Colors.transparent, child: Align(alignment: Alignment.topLeft, "
+        "child: SingleChildScrollView(child: SizedBox(width: 430.0, height: 932.0"
+    )
+    assert bad_outer_scroll not in layout
+    assert "Alignment.bottomCenter" in layout
+    assert "ClipRect(" in layout
+
+
+def test_bottom_nav_is_terminal_paint_layer() -> None:
+    """Bottom navigation must be the last painted stack child."""
+    import json
+    import re
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.layout import render_layout_file
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+
+    debug_root = Path(".debug/screen/limbo/9_3_1_b_transaction_income")
+    if not (debug_root / "processed.json").is_file():
+        pytest.skip("transaction income debug bundle unavailable")
+    proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    norm = normalize_clean_tree(root, screen_ir=screen_ir)
+    layout = render_layout_file(
+        norm,
+        feature_name="9_3_1_b_transaction_income",
+        uses_svg=True,
+        screen_ir=screen_ir,
+        de_archetype_pass=True,
+        responsive_enabled=False,
+    )["lib/generated/9_3_1_b_transaction_income_layout.dart"]
+    keys = [match.group(1) for match in re.finditer(r"key: ValueKey\('figma-([^']+)'\)", layout)]
+    assert "7420_7339" in keys
+    nav_index = max(index for index, key in enumerate(keys) if key == "7420_7339")
+    assert all(key != "7420_7339" for key in keys[nav_index + 1 :])
+
+
+def test_icon_glyph_uses_intrinsic_bounds_not_plate() -> None:
+    salary = _salary_icon_stack()
+    emitted = render_node_body(salary, uses_svg=True, theme_variant="material_3")
+    assert "width: 26.0" in emitted
+    assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in emitted
+
+
+def test_icon_badge_emits_plate_and_glyph() -> None:
+    badge = _calendar_badge_stack()
+    emitted = render_node_body(badge, uses_svg=True, theme_variant="material_3")
+    assert "Color(0xFF00D09E)" in emitted
+    assert "width: 17.9" in emitted
+    assert "SvgPicture" in emitted
+
+
 def test_wizard_preview_viewport_pins_bottom_chrome_without_outer_scroll() -> None:
     from figma_flutter_agent.generator.layout.common import (
         artboard_static_wizard_preview,

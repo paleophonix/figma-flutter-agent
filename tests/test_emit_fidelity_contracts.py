@@ -329,7 +329,12 @@ def test_root_viewport_expands_when_bottom_chrome_present() -> None:
     )
     body = render_node_body(root, uses_svg=False, is_layout_root=True)
     assert "LayoutBuilder" in body
-    assert "SingleChildScrollView" in body
+    assert "Alignment.bottomCenter" in body
+    assert "ClipRect(" in body
+    assert (
+        "Material(color: Colors.transparent, child: Align(alignment: Alignment.topLeft, "
+        "child: SingleChildScrollView(child: SizedBox(width: 390.0, height: 844.0"
+    ) not in body
     assert ": 844.0" in body
     assert ": 844;" not in body
     assert "FittedBox" not in body

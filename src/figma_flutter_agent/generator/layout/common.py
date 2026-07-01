@@ -258,6 +258,36 @@ ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth 
 ARTBOARD_PREVIEW_LAYOUT_MARKER = "_artboardPreviewWidth"
 
 
+def bottom_chrome_pinned_live_viewport(
+    *,
+    stack_widget: str,
+    width_token: str,
+    height_token: str,
+) -> str:
+    """Emit a live viewport that pins bottom chrome outside an outer scroll host.
+
+    ``bottom_chrome_pinned_outside_scroll``: docked tab bars stay viewport-fixed;
+    per-layer pin-bottom scroll hosts own scrollable content bands.
+    """
+    return (
+        "LayoutBuilder("
+        "builder: (context, constraints) {"
+        f"final viewportHeight = constraints.maxHeight.isFinite && "
+        f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
+        "return Align("
+        "alignment: Alignment.bottomCenter, "
+        "child: ClipRect("
+        "child: SizedBox("
+        f"width: {width_token}, "
+        "height: viewportHeight, "
+        f"child: SizedBox(width: {width_token}, height: {height_token}, "
+        f"child: {stack_widget}"
+        "))));"
+        "},"
+        ")"
+    )
+
+
 def static_artboard_viewport(
     *,
     child: str,

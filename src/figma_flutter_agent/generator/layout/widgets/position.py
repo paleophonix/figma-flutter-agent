@@ -511,9 +511,7 @@ def _render_leaf_surface(node: CleanDesignTreeNode) -> str | None:
     width = responsive_emit_width(node.sizing.width)
     height = node.sizing.height
     deco_field = f"decoration: {decoration}, " if decoration is not None else ""
-    foreground_field = (
-        f"foregroundDecoration: {foreground}, " if foreground is not None else ""
-    )
+    foreground_field = f"foregroundDecoration: {foreground}, " if foreground is not None else ""
     if width is not None and width > 0 and height is not None and height > 0:
         leaf = f"Container(width: {width}, height: {height}, {deco_field}{foreground_field})"
     elif width is not None and width > 0:
@@ -565,21 +563,10 @@ def _wrap_root_stack_viewport(
         viewport_align = (
             "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
         )
-        from figma_flutter_agent.generator.artboard import is_tall_mobile_artboard
-        from figma_flutter_agent.generator.layout.common import scroll_viewport_child_shell
-        from figma_flutter_agent.generator.layout.flex_policy.stack import (
-            stack_child_is_positioned_only_stack,
+        from figma_flutter_agent.generator.layout.common import (
+            bottom_chrome_pinned_live_viewport,
         )
 
-        pin_artboard_height = stack_child_is_positioned_only_stack(node)
-        artboard = scroll_viewport_child_shell(
-            width_expr=width_token,
-            height_token=height_token,
-            child=stack_widget,
-            alignment=viewport_align,
-            tolerate_metric_drift=is_tall_mobile_artboard(width, height),
-            pin_artboard_height=pin_artboard_height,
-        )
         if responsive_enabled and is_mobile_artboard_width(width):
             fallback = (
                 "LayoutBuilder("
@@ -616,12 +603,13 @@ def _wrap_root_stack_viewport(
                 ")"
             )
         else:
-            viewport = (
-                f"Align(alignment: {viewport_align}, "
-                f"child: SingleChildScrollView(child: {artboard}))"
+            fallback = bottom_chrome_pinned_live_viewport(
+                stack_widget=stack_widget,
+                width_token=width_token,
+                height_token=height_token,
             )
             fallback = wrap_scroll_viewport(
-                viewport,
+                fallback,
                 theme_variant=theme_variant,
                 anchor_top=True,
             )
