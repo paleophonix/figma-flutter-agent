@@ -1,0 +1,33 @@
+{
+  "file_key": "RSWYxSyp6DHy0OtEYw9knl",
+  "node_id": "3:5123",
+  "feature_name": "login_version_1",
+  "tree_hash": "92ef2becd0cc80f5d1cdf5c9c96f32bed10a8205fdfa5b4a01cc6574ef93cfc9",
+  "colors_hash": "64e69f19a3e7af173924e1ffdc247e5eb702173c8b554a8c03c3a9972ce4873f",
+  "typography_hash": "c7bef984a6fc344405d2f7fd18f3a50afa4e4b0e610742ad05ed2fe77dfe6932",
+  "spacing_hash": "43a869b894f74f9d56c902bbeefcb4d0c7800167edfa49b23fc7dc65e0af78a7",
+  "file_hashes": {
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "1d7d678d144ce26a7041279b18a2cd8868d68e4dafe10461b14a64c3bd0468d9",
+    "lib/theme/app_spacing.dart": "5755ab395f5bf460251e26daed0d651e21166c63b0a529dd6eda7b658f367493",
+    "lib/theme/app_typography.dart": "8534e94ccd4331db01be1d1faae212734b261777398241e633dcc642896bd03f",
+    "lib/theme/app_radius.dart": "df1b797367dbcfd4c33c7eee568ef8268e68dff19ebce193a34024ab6aa16d84",
+    "lib/theme/app_edge_insets.dart": "5958acb70cd8d381db53f94e0ca1f41040c5dbb189626317c0c9135808870f18",
+    "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
+    "lib/theme/app_theme.dart": "8a8642eeeb8f556a655b223c2869cb4aafe85893d7150bf76dd38e149b75b9f7",
+    "lib/generated/login_version_1_layout.dart": "caff27e5c3085ae06314c44fe5ca7e2b75838b55d3367d2a594cbb5d60719598",
+    "lib/features/login_version_1/login_version_1_screen.dart": "81aef45b8ada57c0d5bf5ace8fa7e4303eaa5a8f036191eef6045372186cfdba",
+    "test/golden/login_version_1_screen_test.dart": "04a80bcf2d9688450869e60e2dcae060c6ac14a6bfbc69c4003a4ee933c60603",
+    "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
+    "lib/main.dart": "7ae3cc1daf862c94255c304118a86339862a19d3aad91d753552e033e5d09e34"
+  },
+  "layout_region_hash": "4d130769347303c70865d929d58a0637c95d82108701d1f5ea372901d7583139",
+  "cluster_hashes": {
+    "component_3_6008_c0609f94": "8f3ef172d6e5a144d1b6db70994533bf38e05711ffdb9df6bd56a8600df5129d",
+    "component_3_6008_5a6e7389": "61508b486f8ea854c2a8e0be0ea564704a51bdde14c3e357360c21d055e37f11"
+  },
+  "reference_image_hash": "4f536525b20c0be94dc4a11f1454ca68f7e4e91af3dec4c1d96ae0de9dd56b0a",
+  "emitter_version": "2026.06.2",
+  "version": 11,
+  "updated_at": "2026-06-24T16:53:17.353652+00:00"
+}

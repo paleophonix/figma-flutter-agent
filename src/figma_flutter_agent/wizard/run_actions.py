@@ -29,6 +29,16 @@ def report_launch_preflight_failure() -> None:
     )
 
 
+def report_preview_launch_failure() -> None:
+    """Warn when codegen/writeback succeeded but ``flutter run`` preview launch failed."""
+    console.print(
+        "[bold yellow]Codegen complete — preview launch failed (Flutter run did not start).[/bold yellow]"
+    )
+    console.print(
+        "[dim]plan: ok | writeback: committed | launch: failed | served_preview: previous build[/dim]"
+    )
+
+
 def _wizard_run(ctx: typer.Context) -> None:
     """Launch Flutter after optional generate/asset-sync submenu selection."""
     from figma_flutter_agent.dev.project import ensure_project_config
@@ -235,7 +245,12 @@ def _wizard_sync_preview(
             console.print(line)
         console.print()
     print_pipeline_warnings(pipeline_result.warnings)
-    if launched is False:
+    if launched is None:
+        report_preview_launch_failure()
+        console.print(
+            f"[yellow]Codegen complete — preview launch failed.[/yellow] — {screen}"
+        )
+    elif launched is False:
         console.print(f"[yellow]Sync complete — Flutter run stopped.[/yellow] — {screen}")
     else:
         console.print(f"[green]Run complete[/green] — {screen}")

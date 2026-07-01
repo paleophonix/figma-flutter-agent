@@ -1,0 +1,80 @@
+{
+  "stage": "llm_validated",
+  "featureName": "sign_up_and_sign_in",
+  "screenIr": {
+    "root": {
+      "figmaId": "1:3661",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "1:3662",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "1:3665",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "1:3677",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "1:3970",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3971",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "1:3972",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "1:3973",
+              "kind": "text",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3974",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3975",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "1:3976",
+              "kind": "text",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3977",
+          "kind": "auto",
+          "children": []
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "1:3662",
+      "1:3665",
+      "1:3677",
+      "1:3974",
+      "1:3970",
+      "1:3977"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  }
+}

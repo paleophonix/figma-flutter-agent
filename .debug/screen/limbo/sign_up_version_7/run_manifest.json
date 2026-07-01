@@ -1,0 +1,34 @@
+{
+  "feature": "sign_up_version_7",
+  "pipeline_run_id": "b33623cdd2a5",
+  "candidate_build_run_id": "b33623cdd2a5",
+  "committed_build_run_id": "b33623cdd2a5",
+  "served_build_run_id": "b33623cdd2a5",
+  "writeback": "committed",
+  "served_probe_present": true,
+  "verdict": "CAPTURE_FAILED",
+  "case_mode": "FORENSIC",
+  "agent_board": "forensic",
+  "candidate_available": true,
+  "allowed_questions": [
+    "why generation/write/capture failed"
+  ],
+  "forbidden_questions": [
+    "why visible UI is wrong in Chrome"
+  ],
+  "stages": {},
+  "change_proof": {
+    "fix_proven": false
+  },
+  "capture_passport": {
+    "flutterCaptureOk": false,
+    "capture_run_state": "ran_fail",
+    "capture_verified": false,
+    "capture_kind": "blocked",
+    "changedRatio": null,
+    "warnings": [
+      "Multiple exceptions (2) were detected during the running of the current test, and at least one was"
+    ],
+    "failure_class": "PATCH_RUNTIME"
+  }
+}

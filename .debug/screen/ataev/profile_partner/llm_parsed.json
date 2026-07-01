@@ -1,0 +1,1143 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "profile_partner",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:13255",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "281:13256",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "281:13257",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "281:13258",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "281:13259",
+                      "kind": "row",
+                      "children": [
+                        {
+                          "figmaId": "281:13260",
+                          "kind": "container",
+                          "children": [
+                            {
+                              "figmaId": "281:13261",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:13262",
+                          "kind": "stack",
+                          "children": [
+                            {
+                              "figmaId": "281:13263",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13264",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13265",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13266",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13267",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13268",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13269",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13270",
+                                  "kind": "text",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "281:13271",
+                                  "kind": "input",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13272",
+                                      "kind": "row",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:13273",
+                                          "kind": "stack",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:13274",
+                                              "kind": "row",
+                                              "children": [
+                                                {
+                                                  "figmaId": "281:13275",
+                                                  "kind": "text",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "281:13276",
+                                                  "kind": "text",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "281:13277",
+                                                  "kind": "text",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "281:13278",
+                                                  "kind": "text",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "281:13279",
+                                                  "kind": "text",
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "281:13280",
+                                          "kind": "button",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:13281",
+                                              "kind": "column",
+                                              "children": [
+                                                {
+                                                  "figmaId": "281:13282",
+                                                  "kind": "stack",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "281:13283",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "figmaId": "281:13284",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13285",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13286",
+                                      "kind": "row",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:13287",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:13288",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:13289",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13290",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13291",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13292",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13293",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13294",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13295",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13296",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13297",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13298",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13299",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13300",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13301",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13302",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13303",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:13304",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "281:13305",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13306",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13307",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:13308",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:13309",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:13310",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:13311",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:13312",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:13313",
+                              "kind": "button",
+                              "children": [
+                                {
+                                  "figmaId": "281:13314",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13315",
+                              "kind": "button",
+                              "children": [
+                                {
+                                  "figmaId": "281:13316",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13317",
+                              "kind": "button",
+                              "children": [
+                                {
+                                  "figmaId": "281:13318",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:13319",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:13320",
+                          "kind": "button",
+                          "children": [
+                            {
+                              "figmaId": "281:13321",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:13322",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13323",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:13324",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:13325",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13326",
+                              "kind": "stack",
+                              "children": [
+                                {
+                                  "figmaId": "281:13327",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13328",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13329",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13330",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13331",
+                              "kind": "stack",
+                              "children": [
+                                {
+                                  "figmaId": "281:13332",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:13333",
+                          "kind": "button",
+                          "children": [
+                            {
+                              "figmaId": "281:13334",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:13335",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13336",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:13337",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13338",
+                              "kind": "stack",
+                              "children": [
+                                {
+                                  "figmaId": "281:13339",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13340",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13341",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13342",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13343",
+                              "kind": "stack",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:13345",
+                          "kind": "button",
+                          "children": [
+                            {
+                              "figmaId": "281:13346",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:13347",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13348",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:13349",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13350",
+                              "kind": "stack",
+                              "children": [
+                                {
+                                  "figmaId": "281:13351",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13352",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13353",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13354",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13355",
+                              "kind": "stack",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:13357",
+                          "kind": "button",
+                          "children": [
+                            {
+                              "figmaId": "281:13358",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:13359",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13360",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13361",
+                              "kind": "stack",
+                              "children": [
+                                {
+                                  "figmaId": "281:13362",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13363",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13364",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13365",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13366",
+                              "kind": "stack",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:13368",
+                          "kind": "button",
+                          "children": [
+                            {
+                              "figmaId": "281:13369",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:13370",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13371",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:13372",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:13373",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13374",
+                              "kind": "stack",
+                              "children": [
+                                {
+                                  "figmaId": "281:13375",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13376",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13377",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13378",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13379",
+                              "kind": "stack",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "281:13381",
+                              "kind": "button",
+                              "children": [
+                                {
+                                  "figmaId": "281:13382",
+                                  "kind": "row",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "281:13385",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13386",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:13387",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "281:13388",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:13389",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:13390",
+                                  "kind": "stack",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:13392",
+                              "kind": "button",
+                              "children": [
+                                {
+                                  "figmaId": "281:13393",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:13398",
+                                      "kind": "text",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:13394",
+                                      "kind": "stack",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:13395",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "281:13396",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "281:13397",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "611:1291",
+                          "kind": "extracted",
+                          "children": [
+                            {
+                              "figmaId": "I611:1291;605:5729",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I611:1291;605:5730",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I611:1291;605:5731",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I611:1291;605:5732",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I611:1291;605:5733",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I611:1291;605:5734",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I611:1291;605:5735",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I611:1291;605:5736",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I611:1291;605:5737",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I611:1291;605:5738",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I611:1291;605:5739",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "I611:1291;605:5740",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "I611:1291;605:5741",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I611:1291;605:5742",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I611:1291;605:5743",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I611:1291;605:5744",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I611:1291;605:5745",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I611:1291;605:5746",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I611:1291;605:5747",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "I611:1291;605:5748",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "I611:1291;605:5749",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I611:1291;605:5750",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I611:1291;605:5751",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I611:1291;605:5752",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I611:1291;605:5753",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I611:1291;605:5754",
+                                              "kind": "auto",
+                                              "children": []
+                                            },
+                                            {
+                                              "figmaId": "I611:1291;605:5755",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I611:1291;605:5756",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I611:1291;605:5757",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  "ref": {
+                                    "widgetName": "BottomnavbarWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "BottomnavbarWidget",
+      "widgetIr": {
+        "figmaId": "611:1291",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I611:1291;605:5729",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I611:1291;605:5730",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I611:1291;605:5731",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I611:1291;605:5732",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I611:1291;605:5733",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "I611:1291;605:5734",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I611:1291;605:5735",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "figmaId": "I611:1291;605:5736",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I611:1291;605:5737",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I611:1291;605:5738",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "I611:1291;605:5739",
+                                "kind": "auto",
+                                "children": []
+                              },
+                              {
+                                "figmaId": "I611:1291;605:5740",
+                                "kind": "auto",
+                                "children": []
+                              },
+                              {
+                                "figmaId": "I611:1291;605:5741",
+                                "kind": "auto",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "I611:1291;605:5742",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I611:1291;605:5743",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "figmaId": "I611:1291;605:5744",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I611:1291;605:5745",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I611:1291;605:5746",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "I611:1291;605:5747",
+                                "kind": "auto",
+                                "children": []
+                              },
+                              {
+                                "figmaId": "I611:1291;605:5748",
+                                "kind": "auto",
+                                "children": []
+                              },
+                              {
+                                "figmaId": "I611:1291;605:5749",
+                                "kind": "auto",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "I611:1291;605:5750",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I611:1291;605:5751",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "figmaId": "I611:1291;605:5752",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I611:1291;605:5753",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I611:1291;605:5754",
+                            "kind": "auto",
+                            "children": []
+                          },
+                          {
+                            "figmaId": "I611:1291;605:5755",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "I611:1291;605:5756",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I611:1291;605:5757",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "ref": {
+                  "widgetName": "BottomnavbarWidget",
+                  "namedArgs": {}
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "SvgWidget",
+      "widgetIr": {
+        "figmaId": "281:13394",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "281:13395",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "281:13396",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "281:13397",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

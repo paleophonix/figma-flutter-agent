@@ -1,0 +1,643 @@
+{
+  "featureName": "mobile_checkout",
+  "emitterVersion": "2026.06.2",
+  "checkpoints": [
+    "CP0b_reprune",
+    "CP1_guards",
+    "CP1_normalize",
+    "CP2_ir_passes",
+    "CP2_semantic",
+    "CP2_post_classify",
+    "CP2_fidelity_stamp"
+  ],
+  "mutations": [
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6111",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I240:6114;126:1367",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6116",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6118",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "240:6119",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6122",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "240:6123",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6111",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I240:6114;126:1367",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6116",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6118",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6122",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6103",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6103",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 117.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I240:6114;126:1364",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I240:6114;126:1364",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 40.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I240:6115;137:12544",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "I240:6115;137:12544",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 40.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6111",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "I240:6114;126:1367",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6116",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6118",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6122",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "240:6102",
+      "field": "type",
+      "old": "STACK",
+      "new": "COLUMN",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "240:6102",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "sections": 3,
+        "bands": 3,
+        "bottom_chrome": 1,
+        "top_chrome": 1
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "240:6102",
+      "field": "children_count",
+      "old": 6,
+      "new": 5,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6102",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6102",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6124;166:1983;166:1831",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6124;166:1983;166:1831",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6124;166:1984;166:1831",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6124;166:1984;166:1831",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6124;166:1985;166:1836",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6124;166:1985;166:1836",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6124;166:1986;166:1841",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6124;166:1986;166:1841",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6110",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6110",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6111",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6111",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6114;126:1367",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I240:6114;126:1367",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6116",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6116",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6118",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6118",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6122",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6122",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "267:5953",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "267:5953",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    }
+  ],
+  "decisions": [
+    {
+      "nodeId": "240:6102",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "STACK": 3,
+          "ROW": 1,
+          "COLUMN": 1
+        },
+        "child_count": 5
+      }
+    },
+    {
+      "nodeId": "I240:6124;166:1983;166:1831",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
+      "evidence": {
+        "container_list_tile": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "TEXT": 1,
+          "STACK": 1
+        },
+        "child_count": 3
+      }
+    },
+    {
+      "nodeId": "I240:6124;166:1984;166:1831",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
+      "evidence": {
+        "container_list_tile": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "TEXT": 1,
+          "STACK": 1
+        },
+        "child_count": 3
+      }
+    },
+    {
+      "nodeId": "I240:6124;166:1985;166:1836",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
+      "evidence": {
+        "container_list_tile": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "list_tile_shape": true
+      }
+    },
+    {
+      "nodeId": "I240:6124;166:1986;166:1841",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
+      "evidence": {
+        "container_list_tile": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "list_tile_shape": true
+      }
+    },
+    {
+      "nodeId": "240:6110",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "RADIO": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "container_surface": "card"
+      }
+    },
+    {
+      "nodeId": "240:6111",
+      "kind": "control_radio",
+      "confidence": 0.9,
+      "evidence": {
+        "control_radio": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "RADIO",
+        "component_id": "109:2240",
+        "variant.state": "Selected"
+      }
+    },
+    {
+      "nodeId": "I240:6114;126:1367",
+      "kind": "button_icon",
+      "confidence": 0.83,
+      "evidence": {
+        "button_icon": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "CONTAINER": 1
+        },
+        "child_count": 2,
+        "interactive_surface": "button",
+        "component_id": "8:477"
+      }
+    },
+    {
+      "nodeId": "240:6116",
+      "kind": "button_text",
+      "confidence": 0.84,
+      "evidence": {
+        "button_text": true,
+        "child_type_counts": {
+          "STACK": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "interactive_surface": "button",
+        "component_id": "6:968"
+      }
+    },
+    {
+      "nodeId": "240:6118",
+      "kind": "control_checkbox",
+      "confidence": 0.9,
+      "evidence": {
+        "control_checkbox": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "CHECKBOX",
+        "component_id": "8:398",
+        "variant.state": "Selected"
+      }
+    },
+    {
+      "nodeId": "240:6122",
+      "kind": "control_radio",
+      "confidence": 0.9,
+      "evidence": {
+        "control_radio": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "interactive_surface": "RADIO",
+        "component_id": "109:2239"
+      }
+    },
+    {
+      "nodeId": "267:5953",
+      "kind": "button_filled",
+      "confidence": 0.86,
+      "evidence": {
+        "button_filled": true,
+        "child_type_counts": {
+          "TEXT": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "6:786"
+      }
+    }
+  ],
+  "deviations": []
+}

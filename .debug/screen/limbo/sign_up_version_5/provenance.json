@@ -1,0 +1,391 @@
+{
+  "featureName": "sign_up_version_5",
+  "emitterVersion": "2026.06.2",
+  "checkpoints": [
+    "CP0b_reprune",
+    "CP1_guards",
+    "CP1_normalize",
+    "CP2_ir_passes",
+    "CP2_semantic",
+    "CP2_post_classify",
+    "CP2_fidelity_stamp"
+  ],
+  "mutations": [
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "42:2347",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "42:2344",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3661;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3661;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3662;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3662;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3663;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3663;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3664;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3664;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3665;3:6097",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3665;3:6102",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3666;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3666;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3667;3:6045",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "42:2369",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3661;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3661;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "42:2369",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "42:2369",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "42:2369",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "42:2369",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "42:2369",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "42:2368",
+      "field": "type",
+      "old": "STACK",
+      "new": "ROW",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "42:2368",
+      "field": "spacing",
+      "old": 0.0,
+      "new": 220.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "42:2368",
+      "field": "flex_gap_mode",
+      "old": null,
+      "new": "uniform",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "42:2368",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "cross_delta": 1.0,
+        "gap_spread": 0.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "42:2338",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "42:2338",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 90.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "42:2281",
+      "field": "type",
+      "old": "STACK",
+      "new": "COLUMN",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "42:2281",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "sections": 1,
+        "bands": 1,
+        "bottom_chrome": 1,
+        "top_chrome": 1
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I42:3665;3:6101;1715:49004",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I42:3665;3:6101;1715:49004",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:2368;3:6767",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    }
+  ],
+  "decisions": [
+    {
+      "nodeId": "42:2281",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "ROW": 1,
+          "STACK": 2
+        },
+        "child_count": 3
+      }
+    },
+    {
+      "nodeId": "I42:3665;3:6101;1715:49004",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    }
+  ],
+  "deviations": []
+}

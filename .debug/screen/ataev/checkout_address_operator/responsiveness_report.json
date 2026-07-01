@@ -1,0 +1,10 @@
+{
+  "root_layout": "column",
+  "positioned_root_children": 0,
+  "responsive_flow_sections": 0,
+  "scrollable": false,
+  "bottom_panel_mode": "absolute_top",
+  "tier": "reflowed",
+  "verdict": "pass",
+  "law": null
+}

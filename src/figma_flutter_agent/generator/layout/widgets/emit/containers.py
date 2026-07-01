@@ -44,7 +44,9 @@ from ..svg import (
 )
 
 
-def render_simple_controls(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]) -> str | None:
+def render_simple_controls(
+    node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]
+) -> str | None:
     """Render CHECKBOX/SWITCH/RADIO_GROUP/RADIO/DROPDOWN/DIALOG/SLIDER/BUTTON/INPUT/CONTAINER-checkbox.
 
     Returns None if the node type does not match any of these branches.
@@ -612,7 +614,9 @@ class render_misc:
         )
 
     @staticmethod
-    def image_asset_leaf(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]) -> str | None:
+    def image_asset_leaf(
+        node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any]
+    ) -> str | None:
         parent_type = flow["parent_type"]
         parent_node = flow["parent_node"]
         scroll_content_root = flow["scroll_content_root"]

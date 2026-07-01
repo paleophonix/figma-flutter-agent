@@ -1,0 +1,1398 @@
+{
+  "stage": "pre_emit",
+  "featureName": "food_menu",
+  "screenIr": {
+    "root": {
+      "figmaId": "38:0",
+      "kind": "nav_scroll_host",
+      "children": [
+        {
+          "figmaId": "38:38",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "38:39",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "38:40",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "38:41",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "38:42",
+                      "kind": "technical_divider",
+                      "children": [],
+                      "payload": {
+                        "payloadKind": "technical_divider"
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "manifest"
+                    },
+                    {
+                      "figmaId": "38:43",
+                      "kind": "technical_divider",
+                      "children": [],
+                      "payload": {
+                        "payloadKind": "technical_divider"
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "manifest"
+                    },
+                    {
+                      "figmaId": "38:44",
+                      "kind": "technical_divider",
+                      "children": [],
+                      "payload": {
+                        "payloadKind": "technical_divider"
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "manifest"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "38:45",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "38:46",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "38:47",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "38:48",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "38:49",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "ref": {
+            "widgetName": "TopWidget",
+            "namedArgs": {}
+          }
+        },
+        {
+          "figmaId": "137:201",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "137:202",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "137:203",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "137:204",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "137:205",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ],
+              "classificationHint": {
+                "suggestedKind": "media_avatar",
+                "confidence": 0.77,
+                "rationale": "Circular profile avatar cluster."
+              }
+            },
+            {
+              "figmaId": "137:208",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Vishal Khadok",
+                "accessibilityLabel": "Vishal Khadok",
+                "textColor": "0xFF32343E",
+                "fontSize": 20.0
+              }
+            },
+            {
+              "figmaId": "137:209",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "I love fast food",
+                "accessibilityLabel": "I love fast food",
+                "fontSize": 14.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "152:25",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "152:26",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "152:38",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:39",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "152:137",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:41",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "224:1972",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "224:1973",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "224:1974",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "224:1975",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "152:47",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:48",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "152:27",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:28",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "152:136",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:30",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:158",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:33",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "152:34",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "152:36",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:37",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ref": {
+            "widgetName": "N1Widget",
+            "namedArgs": {}
+          }
+        },
+        {
+          "figmaId": "152:138",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "152:139",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "152:176",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:177",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "152:178",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:179",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:185",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:186",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "152:187",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "152:183",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:184",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "152:166",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:167",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "152:168",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:169",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:173",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:174",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "152:175",
+                          "kind": "technical_divider",
+                          "children": [],
+                          "payload": {
+                            "payloadKind": "technical_divider"
+                          },
+                          "fidelityTier": "native_unverified",
+                          "tierSource": "manifest"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "152:171",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:172",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "152:149",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:150",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "152:151",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:152",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:161",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "152:156",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:157",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "152:140",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:141",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "152:142",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:143",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:162",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:163",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "152:164",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "152:165",
+                          "kind": "technical_divider",
+                          "children": [],
+                          "payload": {
+                            "payloadKind": "technical_divider"
+                          },
+                          "fidelityTier": "native_unverified",
+                          "tierSource": "manifest"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "152:147",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:148",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ref": {
+            "widgetName": "N2Widget",
+            "namedArgs": {}
+          }
+        },
+        {
+          "figmaId": "152:121",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "152:120",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "228:60",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "228:61",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "228:62",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "228:63",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "228:64",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "228:65",
+                          "kind": "technical_divider",
+                          "children": [],
+                          "payload": {
+                            "payloadKind": "technical_divider"
+                          },
+                          "fidelityTier": "native_unverified",
+                          "tierSource": "manifest"
+                        },
+                        {
+                          "figmaId": "228:66",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "228:67",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "228:68",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "152:195",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:191",
+                  "kind": "container_list_tile",
+                  "children": [
+                    {
+                      "figmaId": "152:192",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:193",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:194",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ],
+                  "payload": {
+                    "payloadKind": "container_list_tile"
+                  },
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "manifest"
+                },
+                {
+                  "figmaId": "152:188",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:189",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:190",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "152:196",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:125",
+                  "kind": "container_list_tile",
+                  "children": [
+                    {
+                      "figmaId": "152:126",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:128",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:197",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:198",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "152:199",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "152:200",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ],
+                  "payload": {
+                    "payloadKind": "container_list_tile"
+                  },
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "manifest"
+                },
+                {
+                  "figmaId": "152:122",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:123",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:124",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ref": {
+            "widgetName": "N3Widget",
+            "namedArgs": {}
+          }
+        },
+        {
+          "figmaId": "152:49",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "152:50",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "0xFFF6F8FA"
+              }
+            },
+            {
+              "figmaId": "152:51",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "152:52",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:53",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:54",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ],
+                  "ref": {
+                    "widgetName": "IconRightWidget",
+                    "namedArgs": {}
+                  }
+                },
+                {
+                  "figmaId": "152:56",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Log Out",
+                    "accessibilityLabel": "Log Out",
+                    "textColor": "0xFF32343E",
+                    "fontSize": 15.0
+                  }
+                },
+                {
+                  "figmaId": "152:216",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "152:58",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "152:212",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "152:213",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "152:214",
+                          "kind": "technical_divider",
+                          "children": [],
+                          "payload": {
+                            "payloadKind": "technical_divider"
+                          },
+                          "fidelityTier": "native_unverified",
+                          "tierSource": "manifest"
+                        },
+                        {
+                          "figmaId": "152:215",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "classificationHint": {
+                "suggestedKind": "button",
+                "confidence": 0.73,
+                "rationale": "Logout row inside card-like settings surface with trailing chevron and icon."
+              }
+            }
+          ],
+          "classificationHint": {
+            "suggestedKind": "button_outlined",
+            "confidence": 0.7,
+            "rationale": "Large tappable settings/logout card row."
+          }
+        }
+      ],
+      "overrides": {
+        "backgroundColor": "0xFFFFFFFF"
+      },
+      "layoutHints": {
+        "scrollAxis": "vertical"
+      },
+      "payload": {
+        "payloadKind": "nav_scroll_host"
+      },
+      "fidelityTier": "native_unverified",
+      "tierSource": "manifest"
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "152:121",
+      "152:49",
+      "152:138",
+      "152:25",
+      "137:201",
+      "38:38"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "profile_menu",
+      "confidence": 0.93,
+      "explanation": "Screen presents user profile header and grouped navigational settings/actions including personal info, addresses, cart, favourites, notifications, payment, FAQs, reviews, settings, and logout.",
+      "warnings": []
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "38:45",
+        "role": "control",
+        "subtype": "back_button",
+        "controlNodeId": "38:45",
+        "boundaryNodeId": "38:45",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "38:46",
+          "38:47",
+          "38:48"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate_back",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_tap_target_44",
+          "icon_button_centered"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_back"
+        ],
+        "explanation": "Circular back affordance in top bar."
+      },
+      {
+        "nodeId": "38:39",
+        "role": "control",
+        "subtype": "more_button",
+        "controlNodeId": "38:39",
+        "boundaryNodeId": "38:39",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "38:40",
+          "38:41",
+          "38:42",
+          "38:43",
+          "38:44"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "overflow_menu",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_tap_target_44",
+          "icon_button_centered"
+        ],
+        "options": [],
+        "confidence": 0.87,
+        "proposedEffects": [
+          "open_overflow_menu"
+        ],
+        "explanation": "Top-right circular more/overflow icon button."
+      },
+      {
+        "nodeId": "152:27",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "152:27",
+        "boundaryNodeId": "152:27",
+        "labelNodeIds": [
+          "152:28"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:136",
+          "152:30",
+          "152:158",
+          "152:33",
+          "152:34",
+          "152:36",
+          "152:37"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "Personal Info",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "navigate_to_personal_info"
+        ],
+        "explanation": "Row item in settings menu with leading icon, label, trailing chevron."
+      },
+      {
+        "nodeId": "152:38",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "152:38",
+        "boundaryNodeId": "152:38",
+        "labelNodeIds": [
+          "152:39"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:137",
+          "152:41",
+          "224:1972",
+          "224:1973",
+          "224:1974",
+          "224:1975",
+          "152:47",
+          "152:48"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "Addresses",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "navigate_to_addresses"
+        ],
+        "explanation": "Address settings row."
+      },
+      {
+        "nodeId": "152:140",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "152:140",
+        "boundaryNodeId": "152:140",
+        "labelNodeIds": [
+          "152:141"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:142",
+          "152:143",
+          "152:162",
+          "152:163",
+          "152:164",
+          "152:165",
+          "152:147",
+          "152:148"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "Cart",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "navigate_to_cart"
+        ],
+        "explanation": "Cart row in grouped menu."
+      },
+      {
+        "nodeId": "152:149",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "152:149",
+        "boundaryNodeId": "152:149",
+        "labelNodeIds": [
+          "152:150"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:151",
+          "152:152",
+          "152:161",
+          "152:156",
+          "152:157"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "Favourite",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "navigate_to_favourites"
+        ],
+        "explanation": "Favourite row in grouped menu."
+      },
+      {
+        "nodeId": "152:166",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "152:166",
+        "boundaryNodeId": "152:166",
+        "labelNodeIds": [
+          "152:167"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:168",
+          "152:169",
+          "152:173",
+          "152:174",
+          "152:175",
+          "152:171",
+          "152:172"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "Notifications",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "navigate_to_notifications"
+        ],
+        "explanation": "Notifications row in grouped menu."
+      },
+      {
+        "nodeId": "152:176",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "152:176",
+        "boundaryNodeId": "152:176",
+        "labelNodeIds": [
+          "152:177"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:178",
+          "152:179",
+          "152:185",
+          "152:186",
+          "152:187",
+          "152:183",
+          "152:184"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "Payment Method",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "navigate_to_payment_methods"
+        ],
+        "explanation": "Payment method row in grouped menu."
+      },
+      {
+        "nodeId": "152:196",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "152:196",
+        "boundaryNodeId": "152:196",
+        "labelNodeIds": [
+          "152:126"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:125",
+          "152:128",
+          "152:197",
+          "152:198",
+          "152:199",
+          "152:200",
+          "152:122",
+          "152:123",
+          "152:124"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "FAQs",
+        "options": [],
+        "confidence": 0.96,
+        "proposedEffects": [
+          "navigate_to_faq"
+        ],
+        "explanation": "FAQ row in grouped menu."
+      },
+      {
+        "nodeId": "152:195",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "152:195",
+        "boundaryNodeId": "152:195",
+        "labelNodeIds": [
+          "152:192"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:191",
+          "152:193",
+          "152:194",
+          "152:188",
+          "152:189",
+          "152:190"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "User Reviews",
+        "options": [],
+        "confidence": 0.96,
+        "proposedEffects": [
+          "navigate_to_user_reviews"
+        ],
+        "explanation": "User reviews row in grouped menu."
+      },
+      {
+        "nodeId": "228:60",
+        "role": "control",
+        "subtype": "menu_row",
+        "controlNodeId": "228:60",
+        "boundaryNodeId": "228:60",
+        "labelNodeIds": [
+          "228:61"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "228:62",
+          "228:63",
+          "228:64",
+          "228:65",
+          "228:66",
+          "228:67",
+          "228:68"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44"
+        ],
+        "value": "Settings",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "navigate_to_settings"
+        ],
+        "explanation": "Settings row in grouped menu."
+      },
+      {
+        "nodeId": "152:49",
+        "role": "control",
+        "subtype": "menu_row_destructive",
+        "controlNodeId": "152:49",
+        "boundaryNodeId": "152:49",
+        "labelNodeIds": [
+          "152:56"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "152:50",
+          "152:52",
+          "152:53",
+          "152:54",
+          "152:216",
+          "152:58",
+          "152:212",
+          "152:213",
+          "152:214",
+          "152:215"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "logout",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "leading_icon_label_trailing_chevron",
+          "min_tap_target_44",
+          "destructive_action_emphasis"
+        ],
+        "value": "Log Out",
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "trigger_logout"
+        ],
+        "explanation": "Bottom logout action row with destructive red icon styling."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "N2Widget",
+      "widgetIr": {
+        "figmaId": "152:138",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "152:139",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "152:176",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "152:166",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "152:149",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "152:140",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "N1Widget",
+      "widgetIr": {
+        "figmaId": "152:25",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "152:26",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "152:38",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "152:27",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "TopWidget",
+      "widgetIr": {
+        "figmaId": "38:38",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "38:39",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "38:45",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "38:49",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "N3Widget",
+      "widgetIr": {
+        "figmaId": "152:121",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "152:120",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "228:60",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "152:195",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "152:196",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "IconRightWidget",
+      "widgetIr": {
+        "figmaId": "152:52",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "152:53",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "ChevronRightWidget",
+      "widgetIr": {
+        "figmaId": "152:53",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "152:54",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ],
+  "emitterVersion": "2026.06.2"
+}

@@ -1,0 +1,22 @@
+{
+  "routingType": "none",
+  "mvpTransitionTypes": [
+    "DISSOLVE",
+    "FADE",
+    "INSTANT",
+    "MOVE_IN",
+    "MOVE_OUT",
+    "PUSH",
+    "SLIDE_IN",
+    "SLIDE_OUT"
+  ],
+  "postMvpNotes": [
+    "SMART_ANIMATE approximated as scale+fade",
+    "Lottie and implicit widget animations are not auto-generated"
+  ],
+  "prototypeLinks": [],
+  "routeTransitions": [],
+  "suggestions": [
+    "No prototype navigation links detected; route transitions and PrototypeNavigation helpers will not be generated."
+  ]
+}

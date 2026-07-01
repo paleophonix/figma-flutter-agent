@@ -1,0 +1,988 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "chats",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:14252",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "281:14253",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "281:14254",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "281:14328",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "281:14329",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:14330",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:14331",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:14332",
+                                  "kind": "button",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14333",
+                                      "kind": "stack",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14334",
+                                          "kind": "auto",
+                                          "children": [],
+                                          "fidelityTier": "svg_baked",
+                                          "tierSource": "manifest"
+                                        }
+                                      ],
+                                      "fidelityTier": "svg_baked",
+                                      "tierSource": "manifest"
+                                    }
+                                  ],
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            },
+                            {
+                              "figmaId": "281:14335",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:14336",
+                                  "kind": "text",
+                                  "children": [],
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            }
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manual_override"
+                        }
+                      ],
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    }
+                  ],
+                  "fidelityTier": "native_verified",
+                  "tierSource": "manual_override"
+                },
+                {
+                  "figmaId": "281:14255",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "281:14256",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:14257",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:14258",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:14259",
+                                  "kind": "text",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Открытые чаты",
+                                    "accessibilityLabel": "Открытые чаты",
+                                    "textColor": "0xFF09090B",
+                                    "fontSize": 15.0
+                                  },
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            },
+                            {
+                              "figmaId": "281:14260",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:14261",
+                                  "kind": "text",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Новые обращения и диалоги, которые еще\nактивны.",
+                                    "accessibilityLabel": "Новые обращения и диалоги, которые еще\nактивны.",
+                                    "textColor": "0xFF71717B",
+                                    "fontSize": 13.0
+                                  },
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            }
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manual_override"
+                        }
+                      ],
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    },
+                    {
+                      "figmaId": "281:14262",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:14263",
+                          "kind": "button",
+                          "children": [
+                            {
+                              "figmaId": "281:14264",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:14265",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14266",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14267",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14268",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Поддерж…",
+                                                "accessibilityLabel": "Поддерж…",
+                                                "textColor": "0xFF09090B",
+                                                "fontSize": 15.0
+                                              },
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        },
+                                        {
+                                          "figmaId": "281:14269",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14270",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Поддержка",
+                                                "accessibilityLabel": "Поддержка",
+                                                "textColor": "0xFF2E7D32",
+                                                "fontSize": 12.0
+                                              },
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        },
+                                        {
+                                          "figmaId": "281:14271",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14272",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Общий вопрос по\nприложению",
+                                                "accessibilityLabel": "Общий вопрос по\nприложению",
+                                                "textColor": "0xFF71717B",
+                                                "fontSize": 13.0
+                                              },
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        },
+                                        {
+                                          "figmaId": "281:14273",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14274",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Здравствуйте. Чем мож…",
+                                                "accessibilityLabel": "Здравствуйте. Чем мож…",
+                                                "textColor": "0xFF52525C",
+                                                "fontSize": 14.0
+                                              },
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        },
+                                        {
+                                          "figmaId": "281:14275",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14276",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "281:14277",
+                                                  "kind": "text",
+                                                  "children": [],
+                                                  "overrides": {
+                                                    "text": "Сегодня, 11:42",
+                                                    "accessibilityLabel": "Сегодня, 11:42",
+                                                    "textColor": "0xFF000000",
+                                                    "fontSize": 12.0
+                                                  },
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                }
+                                              ],
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            },
+                                            {
+                                              "figmaId": "281:14278",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "281:14279",
+                                                  "kind": "text",
+                                                  "children": [],
+                                                  "overrides": {
+                                                    "text": "1",
+                                                    "accessibilityLabel": "1",
+                                                    "textColor": "0xFF000000",
+                                                    "fontSize": 12.0
+                                                  },
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                }
+                                              ],
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        }
+                                      ],
+                                      "fidelityTier": "native_verified",
+                                      "tierSource": "manual_override"
+                                    }
+                                  ],
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                },
+                                {
+                                  "figmaId": "281:14280",
+                                  "kind": "button",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14281",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14282",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14283",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "281:14284",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "281:14285",
+                                                      "kind": "text",
+                                                      "children": [],
+                                                      "overrides": {
+                                                        "text": "Заказ №2485…",
+                                                        "accessibilityLabel": "Заказ №2485…",
+                                                        "textColor": "0xFF09090B",
+                                                        "fontSize": 15.0
+                                                      },
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    }
+                                                  ],
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                },
+                                                {
+                                                  "figmaId": "281:14286",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "281:14287",
+                                                      "kind": "text",
+                                                      "children": [],
+                                                      "overrides": {
+                                                        "text": "Заказ",
+                                                        "accessibilityLabel": "Заказ",
+                                                        "textColor": "0xFF2E7D32",
+                                                        "fontSize": 12.0
+                                                      },
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    }
+                                                  ],
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                },
+                                                {
+                                                  "figmaId": "281:14288",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "281:14289",
+                                                      "kind": "text",
+                                                      "children": [],
+                                                      "overrides": {
+                                                        "text": "Сборка заказа",
+                                                        "accessibilityLabel": "Сборка заказа",
+                                                        "textColor": "0xFF71717B",
+                                                        "fontSize": 13.0
+                                                      },
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    }
+                                                  ],
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                },
+                                                {
+                                                  "figmaId": "281:14290",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "281:14291",
+                                                      "kind": "text",
+                                                      "children": [],
+                                                      "overrides": {
+                                                        "text": "Да, можно заменить на …",
+                                                        "accessibilityLabel": "Да, можно заменить на …",
+                                                        "textColor": "0xFF52525C",
+                                                        "fontSize": 14.0
+                                                      },
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    }
+                                                  ],
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                },
+                                                {
+                                                  "figmaId": "281:14292",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "281:14293",
+                                                      "kind": "text",
+                                                      "children": [],
+                                                      "overrides": {
+                                                        "text": "Сегодня, 12:16",
+                                                        "accessibilityLabel": "Сегодня, 12:16",
+                                                        "textColor": "0xFF000000",
+                                                        "fontSize": 12.0
+                                                      },
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    }
+                                                  ],
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                }
+                                              ],
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        }
+                                      ],
+                                      "fidelityTier": "native_verified",
+                                      "tierSource": "manual_override"
+                                    }
+                                  ],
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            },
+                            {
+                              "figmaId": "281:14294",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:14295",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14296",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14297",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14298",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Закрытые чаты",
+                                                "accessibilityLabel": "Закрытые чаты",
+                                                "textColor": "0xFF09090B",
+                                                "fontSize": 15.0
+                                              },
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        },
+                                        {
+                                          "figmaId": "281:14299",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14300",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Архив завершенных обращений и решенных\nвопросов.",
+                                                "accessibilityLabel": "Архив завершенных обращений и решенных\nвопросов.",
+                                                "textColor": "0xFF71717B",
+                                                "fontSize": 13.0
+                                              },
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        }
+                                      ],
+                                      "fidelityTier": "native_verified",
+                                      "tierSource": "manual_override"
+                                    }
+                                  ],
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                },
+                                {
+                                  "figmaId": "281:14301",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14302",
+                                      "kind": "button",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14303",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14304",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "281:14305",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "281:14306",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "281:14307",
+                                                          "kind": "text",
+                                                          "children": [],
+                                                          "overrides": {
+                                                            "text": "Оплата зак…",
+                                                            "accessibilityLabel": "Оплата зак…",
+                                                            "textColor": "0xFF09090B",
+                                                            "fontSize": 15.0
+                                                          },
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        }
+                                                      ],
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    },
+                                                    {
+                                                      "figmaId": "281:14308",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "281:14309",
+                                                          "kind": "text",
+                                                          "children": [],
+                                                          "overrides": {
+                                                            "text": "Закрыт",
+                                                            "accessibilityLabel": "Закрыт",
+                                                            "textColor": "0xFF71717B",
+                                                            "fontSize": 12.0
+                                                          },
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        }
+                                                      ],
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    },
+                                                    {
+                                                      "figmaId": "281:14310",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "281:14311",
+                                                          "kind": "text",
+                                                          "children": [],
+                                                          "overrides": {
+                                                            "text": "Онлайн-оплата",
+                                                            "accessibilityLabel": "Онлайн-оплата",
+                                                            "textColor": "0xFF000000",
+                                                            "fontSize": 13.0
+                                                          },
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        }
+                                                      ],
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    },
+                                                    {
+                                                      "figmaId": "281:14312",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "281:14313",
+                                                          "kind": "text",
+                                                          "children": [],
+                                                          "overrides": {
+                                                            "text": "Вопрос решен. Чат зак…",
+                                                            "accessibilityLabel": "Вопрос решен. Чат зак…",
+                                                            "textColor": "0xFF000000",
+                                                            "fontSize": 14.0
+                                                          },
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        }
+                                                      ],
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    },
+                                                    {
+                                                      "figmaId": "281:14314",
+                                                      "kind": "text",
+                                                      "children": [],
+                                                      "overrides": {
+                                                        "text": "25 марта, 16:20",
+                                                        "accessibilityLabel": "25 марта, 16:20",
+                                                        "textColor": "0xFF000000",
+                                                        "fontSize": 12.0
+                                                      },
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    }
+                                                  ],
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                }
+                                              ],
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        },
+                                        {
+                                          "figmaId": "281:14315",
+                                          "kind": "button",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14316",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "281:14317",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "281:14318",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "281:14319",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "281:14320",
+                                                              "kind": "text",
+                                                              "children": [],
+                                                              "overrides": {
+                                                                "text": "Доставка з…",
+                                                                "accessibilityLabel": "Доставка з…",
+                                                                "textColor": "0xFF09090B",
+                                                                "fontSize": 15.0
+                                                              },
+                                                              "fidelityTier": "native_verified",
+                                                              "tierSource": "manual_override"
+                                                            }
+                                                          ],
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        },
+                                                        {
+                                                          "figmaId": "281:14321",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "281:14322",
+                                                              "kind": "text",
+                                                              "children": [],
+                                                              "overrides": {
+                                                                "text": "Закрыт",
+                                                                "accessibilityLabel": "Закрыт",
+                                                                "textColor": "0xFF71717B",
+                                                                "fontSize": 12.0
+                                                              },
+                                                              "fidelityTier": "native_verified",
+                                                              "tierSource": "manual_override"
+                                                            }
+                                                          ],
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        },
+                                                        {
+                                                          "figmaId": "281:14323",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "281:14324",
+                                                              "kind": "text",
+                                                              "children": [],
+                                                              "overrides": {
+                                                                "text": "Закрытый диалог",
+                                                                "accessibilityLabel": "Закрытый диалог",
+                                                                "textColor": "0xFF000000",
+                                                                "fontSize": 13.0
+                                                              },
+                                                              "fidelityTier": "native_verified",
+                                                              "tierSource": "manual_override"
+                                                            }
+                                                          ],
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        },
+                                                        {
+                                                          "figmaId": "281:14325",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "281:14326",
+                                                              "kind": "text",
+                                                              "children": [],
+                                                              "overrides": {
+                                                                "text": "Спасибо за обращение…",
+                                                                "accessibilityLabel": "Спасибо за обращение…",
+                                                                "textColor": "0xFF000000",
+                                                                "fontSize": 14.0
+                                                              },
+                                                              "fidelityTier": "native_verified",
+                                                              "tierSource": "manual_override"
+                                                            }
+                                                          ],
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        },
+                                                        {
+                                                          "figmaId": "281:14327",
+                                                          "kind": "text",
+                                                          "children": [],
+                                                          "overrides": {
+                                                            "text": "18 марта, 09:15",
+                                                            "accessibilityLabel": "18 марта, 09:15",
+                                                            "textColor": "0xFF000000",
+                                                            "fontSize": 12.0
+                                                          },
+                                                          "fidelityTier": "native_verified",
+                                                          "tierSource": "manual_override"
+                                                        }
+                                                      ],
+                                                      "fidelityTier": "native_verified",
+                                                      "tierSource": "manual_override"
+                                                    }
+                                                  ],
+                                                  "fidelityTier": "native_verified",
+                                                  "tierSource": "manual_override"
+                                                }
+                                              ],
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        }
+                                      ],
+                                      "fidelityTier": "native_verified",
+                                      "tierSource": "manual_override"
+                                    }
+                                  ],
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            }
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manual_override"
+                        }
+                      ],
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    }
+                  ],
+                  "fidelityTier": "native_verified",
+                  "tierSource": "manual_override"
+                }
+              ],
+              "fidelityTier": "native_verified",
+              "tierSource": "manual_override"
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "manual_override"
+        }
+      ],
+      "fidelityTier": "native_verified",
+      "tierSource": "manual_override"
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "281:14328",
+      "281:14255",
+      "281:14294"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "Cluster0Card",
+      "widgetIr": {
+        "figmaId": "281:14263",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "281:14264",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "281:14265",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "281:14266",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "281:14267",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "281:14268",
+                            "kind": "text",
+                            "children": [],
+                            "overrides": {
+                              "text": "Поддерж…",
+                              "accessibilityLabel": "Поддерж…",
+                              "textColor": "0xFF09090B",
+                              "fontSize": 15.0
+                            },
+                            "fidelityTier": "native_verified",
+                            "tierSource": "manual_override"
+                          }
+                        ],
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      },
+                      {
+                        "figmaId": "281:14269",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "281:14270",
+                            "kind": "text",
+                            "children": [],
+                            "overrides": {
+                              "text": "Поддержка",
+                              "accessibilityLabel": "Поддержка",
+                              "textColor": "0xFF2E7D32",
+                              "fontSize": 12.0
+                            },
+                            "fidelityTier": "native_verified",
+                            "tierSource": "manual_override"
+                          }
+                        ],
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      },
+                      {
+                        "figmaId": "281:14271",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "281:14272",
+                            "kind": "text",
+                            "children": [],
+                            "overrides": {
+                              "text": "Общий вопрос по\nприложению",
+                              "accessibilityLabel": "Общий вопрос по\nприложению",
+                              "textColor": "0xFF71717B",
+                              "fontSize": 13.0
+                            },
+                            "fidelityTier": "native_verified",
+                            "tierSource": "manual_override"
+                          }
+                        ],
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      },
+                      {
+                        "figmaId": "281:14273",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "281:14274",
+                            "kind": "text",
+                            "children": [],
+                            "overrides": {
+                              "text": "Здравствуйте. Чем мож…",
+                              "accessibilityLabel": "Здравствуйте. Чем мож…",
+                              "textColor": "0xFF52525C",
+                              "fontSize": 14.0
+                            },
+                            "fidelityTier": "native_verified",
+                            "tierSource": "manual_override"
+                          }
+                        ],
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      },
+                      {
+                        "figmaId": "281:14275",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "281:14276",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "281:14277",
+                                "kind": "text",
+                                "children": [],
+                                "overrides": {
+                                  "text": "Сегодня, 11:42",
+                                  "accessibilityLabel": "Сегодня, 11:42",
+                                  "textColor": "0xFF000000",
+                                  "fontSize": 12.0
+                                },
+                                "fidelityTier": "native_verified",
+                                "tierSource": "manual_override"
+                              }
+                            ],
+                            "fidelityTier": "native_verified",
+                            "tierSource": "manual_override"
+                          },
+                          {
+                            "figmaId": "281:14278",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "281:14279",
+                                "kind": "text",
+                                "children": [],
+                                "overrides": {
+                                  "text": "1",
+                                  "accessibilityLabel": "1",
+                                  "textColor": "0xFF000000",
+                                  "fontSize": 12.0
+                                },
+                                "fidelityTier": "native_verified",
+                                "tierSource": "manual_override"
+                              }
+                            ],
+                            "fidelityTier": "native_verified",
+                            "tierSource": "manual_override"
+                          }
+                        ],
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      }
+                    ],
+                    "fidelityTier": "native_verified",
+                    "tierSource": "manual_override"
+                  }
+                ],
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              }
+            ],
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          }
+        ],
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    }
+  ]
+}

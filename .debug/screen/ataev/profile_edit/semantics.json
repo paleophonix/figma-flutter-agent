@@ -1,0 +1,182 @@
+{
+  "accepted": [
+    {
+      "figmaId": "362:327",
+      "kind": "button_filled",
+      "confidence": 0.86,
+      "evidence": {
+        "button_filled": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:328",
+      "kind": "feedback_tooltip",
+      "confidence": 0.8,
+      "evidence": {
+        "feedback_tooltip": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:329",
+      "kind": "feedback_loader",
+      "confidence": 0.84,
+      "evidence": {
+        "feedback_loader": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:341",
+      "kind": "button_filled",
+      "confidence": 0.86,
+      "evidence": {
+        "button_filled": true,
+        "child_type_counts": {
+          "TEXT": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:346",
+      "kind": "input_text_field",
+      "confidence": 0.88,
+      "evidence": {
+        "input_text_field": true,
+        "child_type_counts": {
+          "COLUMN": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "input"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:351",
+      "kind": "input_text_field",
+      "confidence": 0.88,
+      "evidence": {
+        "input_text_field": true,
+        "child_type_counts": {
+          "COLUMN": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "input"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:356",
+      "kind": "input_text_field",
+      "confidence": 0.88,
+      "evidence": {
+        "input_text_field": true,
+        "child_type_counts": {
+          "ROW": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "input"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:359",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 5
+        },
+        "child_count": 5
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:367",
+      "kind": "feedback_tooltip",
+      "confidence": 0.8,
+      "evidence": {
+        "feedback_tooltip": true,
+        "child_type_counts": {
+          "VECTOR": 2
+        },
+        "child_count": 2
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:368",
+      "kind": "feedback_loader",
+      "confidence": 0.84,
+      "evidence": {
+        "feedback_loader": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "362:369",
+      "kind": "feedback_loader",
+      "confidence": 0.84,
+      "evidence": {
+        "feedback_loader": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "611:1338",
+      "kind": "button_filled",
+      "confidence": 0.86,
+      "evidence": {
+        "button_filled": true,
+        "child_type_counts": {
+          "TEXT": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button"
+      },
+      "rejectReason": null
+    }
+  ],
+  "rejectedBelowThreshold": [
+    {
+      "figmaId": "362:365",
+      "kind": "button_fab",
+      "confidence": 0.7,
+      "evidence": {
+        "button_fab": true,
+        "child_type_counts": {
+          "COLUMN": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button"
+      },
+      "rejectReason": "below_confidence_threshold"
+    }
+  ],
+  "rejectedByInvariant": [],
+  "legacySemanticTypeDetected": [],
+  "nameSignalUsed": [],
+  "llmAnnotationUsed": [],
+  "acceptedCount": 12,
+  "totalDecisions": 13
+}

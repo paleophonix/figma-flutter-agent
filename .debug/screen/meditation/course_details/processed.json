@@ -1,0 +1,1669 @@
+{
+  "cleanTree": {
+    "id": "1:1462",
+    "name": "COURSE Details ",
+    "type": "STACK",
+    "sizing": {
+      "widthMode": "FIXED",
+      "heightMode": "FIXED",
+      "width": 414.0,
+      "height": 896.0
+    },
+    "alignment": {
+      "cross": "stretch"
+    },
+    "style": {
+      "backgroundColor": "0xFFFFFFFF"
+    },
+    "children": [
+      {
+        "id": "1:1463",
+        "name": "Mask Group",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 414.0,
+          "height": 288.8
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/mask_group_1_1463.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": -0.4,
+          "right": 0.4,
+          "width": 414.0,
+          "height": 288.8
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "1:1464",
+          "1:1465",
+          "1:1466",
+          "1:1467",
+          "1:1468",
+          "1:1469",
+          "1:1470",
+          "1:1471",
+          "1:1472",
+          "1:1473",
+          "1:1474",
+          "1:1475",
+          "1:1476",
+          "1:1477",
+          "1:1478",
+          "1:1479",
+          "1:1480",
+          "1:1481",
+          "1:1482",
+          "1:1483",
+          "1:1484",
+          "1:1485",
+          "1:1486",
+          "1:1487",
+          "1:1488",
+          "1:1489",
+          "1:1490",
+          "1:1491",
+          "1:1492",
+          "1:1493",
+          "1:1494",
+          "1:1495",
+          "1:1496",
+          "1:1497",
+          "1:1498",
+          "1:1499",
+          "1:1500",
+          "1:1501",
+          "1:1502",
+          "1:1503",
+          "1:1504",
+          "1:1514",
+          "1:1515",
+          "1:1516",
+          "1:1517",
+          "1:1518",
+          "1:1519",
+          "1:1520",
+          "1:1521",
+          "1:1522",
+          "1:1523",
+          "1:1524",
+          "1:1525",
+          "1:1526",
+          "1:1527",
+          "1:1528",
+          "1:1529",
+          "1:1530",
+          "1:1531",
+          "1:1532",
+          "1:1533",
+          "1:1534",
+          "1:1535",
+          "1:1536",
+          "1:1537",
+          "1:1538",
+          "1:1539",
+          "1:1540",
+          "1:1541",
+          "1:1542",
+          "1:1543",
+          "1:1544",
+          "1:1545",
+          "1:1546"
+        ]
+      },
+      {
+        "id": "1:1547",
+        "name": "Happy Morning",
+        "type": "TEXT",
+        "sizing": {
+          "width": 255.4,
+          "height": 38.2
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF3F414E",
+          "fontSize": 34.0,
+          "fontWeight": "w700",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.0,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 6.7,
+          "glyphHeight": 30.9
+        },
+        "text": "Happy Morning",
+        "accessibilityLabel": "Happy Morning",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 276.1,
+          "right": 138.6,
+          "bottom": 537.7,
+          "width": 255.4,
+          "height": 38.2
+        }
+      },
+      {
+        "id": "1:1548",
+        "name": "Pick a Nnrrator",
+        "type": "TEXT",
+        "sizing": {
+          "width": 147.7,
+          "height": 20.8
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF3F414E",
+          "fontSize": 20.0,
+          "fontWeight": "w700",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.0,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 4.7,
+          "glyphHeight": 14.6
+        },
+        "text": "Pick a Nnrrator",
+        "accessibilityLabel": "Pick a Nnrrator",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 495.8,
+          "right": 246.3,
+          "bottom": 335.3,
+          "width": 147.7,
+          "height": 20.8
+        }
+      },
+      {
+        "id": "1:1549",
+        "name": "Vector 12",
+        "type": "VECTOR",
+        "sizing": {
+          "width": 414.0,
+          "height": 0.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderWidth": 1.0,
+          "borderColor": "0xFFE4E6FD",
+          "hasStroke": true
+        },
+        "vectorAssetKey": "assets/icons/vector_12_1_1549.svg",
+        "accessibilityLabel": "Vector 12",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "top": 573.2,
+          "bottom": 278.8,
+          "width": 414.0
+        }
+      },
+      {
+        "id": "1:1550",
+        "name": "MALE VOICE",
+        "type": "TEXT",
+        "sizing": {
+          "width": 104.0,
+          "height": 13.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF000000",
+          "fontSize": 16.0,
+          "fontWeight": "w500",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.8,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 2.3,
+          "glyphHeight": 12.0
+        },
+        "text": "MALE VOICE",
+        "accessibilityLabel": "MALE VOICE",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 541.7,
+          "right": 290.0,
+          "bottom": 297.3,
+          "width": 104.0,
+          "height": 13.0
+        }
+      },
+      {
+        "id": "1:1551",
+        "name": "FEMALE VOICE",
+        "type": "TEXT",
+        "sizing": {
+          "width": 126.3,
+          "height": 13.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF000000",
+          "fontSize": 16.0,
+          "fontWeight": "w500",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.8,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 2.3,
+          "glyphHeight": 12.0
+        },
+        "text": "FEMALE VOICE",
+        "accessibilityLabel": "FEMALE VOICE",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 194.0,
+          "top": 541.7,
+          "right": 93.6,
+          "bottom": 297.3,
+          "width": 126.3,
+          "height": 13.0
+        }
+      },
+      {
+        "id": "1:1552",
+        "name": "Ease the mind into a restful night’s sleep with these deep, amblent tones.",
+        "type": "TEXT",
+        "sizing": {
+          "width": 315.0,
+          "height": 46.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF000000",
+          "fontSize": 16.0,
+          "fontWeight": "w300",
+          "textAlign": "LEFT",
+          "lineHeight": 1.45,
+          "letterSpacing": 0.0,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 6.6,
+          "glyphHeight": 37.5
+        },
+        "text": "Ease the mind into a restful night’s sleep  with\nthese deep, amblent tones.",
+        "accessibilityLabel": "Ease the mind into a restful night’s sleep  with\nthese deep, amblent tones.",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 362.7,
+          "right": 79.0,
+          "bottom": 443.3,
+          "width": 315.0,
+          "height": 46.0
+        }
+      },
+      {
+        "id": "1:1553",
+        "name": "Group 6830",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 317.2,
+          "height": 17.1
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 438.7,
+          "right": 76.8,
+          "bottom": 396.2,
+          "width": 317.2,
+          "height": 17.1
+        },
+        "children": [
+          {
+            "id": "1:1554",
+            "name": "24.234 Favorits",
+            "type": "TEXT",
+            "sizing": {
+              "width": 99.0,
+              "height": 13.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 3.0,
+              "glyphHeight": 10.2
+            },
+            "text": "24.234 Favorits",
+            "accessibilityLabel": "24.234 Favorits",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 28.9,
+              "right": 189.2,
+              "bottom": 3.6,
+              "width": 99.0,
+              "height": 13.0
+            }
+          },
+          {
+            "id": "1:1555",
+            "name": "34.234 Lestening",
+            "type": "TEXT",
+            "sizing": {
+              "width": 110.3,
+              "height": 13.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 3.0,
+              "glyphHeight": 12.9
+            },
+            "text": "34.234 Lestening",
+            "accessibilityLabel": "34.234 Lestening",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 206.9,
+              "bottom": 3.6,
+              "width": 110.3,
+              "height": 13.0
+            }
+          },
+          {
+            "id": "1:1556",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 18.3,
+              "height": 16.1
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFFFF84A2",
+              "borderWidth": 2.0,
+              "borderColor": "0xFFFF84A2",
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/vector_1_1556.svg",
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "top": 1.0,
+              "right": 298.9,
+              "width": 18.3,
+              "height": 16.1
+            }
+          },
+          {
+            "id": "1:1557",
+            "name": "Frame",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 20.0,
+              "height": 16.1
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 176.9,
+              "right": 120.2,
+              "bottom": 1.0,
+              "width": 20.0,
+              "height": 16.1
+            },
+            "children": [
+              {
+                "id": "1:1558",
+                "name": "Group",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 20.0,
+                  "height": 16.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "vectorAssetKey": "assets/icons/group_1_1558.svg",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "top": 0.1,
+                  "width": 20.0,
+                  "height": 16.0
+                },
+                "children": [
+                  {
+                    "id": "1:1559",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 5.0,
+                      "height": 8.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFF7FD2F2"
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "left": 15.0,
+                      "top": 8.0,
+                      "width": 5.0,
+                      "height": 8.0
+                    }
+                  },
+                  {
+                    "id": "1:1560",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 5.0,
+                      "height": 8.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFF7FD2F2"
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "top": 8.0,
+                      "right": 15.0,
+                      "width": 5.0,
+                      "height": 8.0
+                    }
+                  },
+                  {
+                    "id": "1:1561",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 14.0,
+                      "height": 8.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFF7FD2F2",
+                      "borderWidth": 0.25,
+                      "borderColor": "0xFF7FD2F2",
+                      "hasStroke": true
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "left": 3.0,
+                      "right": 3.0,
+                      "bottom": 8.0,
+                      "width": 14.0,
+                      "height": 8.0
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1:1562",
+        "name": "COURSE",
+        "type": "TEXT",
+        "sizing": {
+          "width": 62.6,
+          "height": 13.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF000000",
+          "fontSize": 14.0,
+          "fontWeight": "w500",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.7,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 2.8,
+          "glyphHeight": 10.5
+        },
+        "text": "COURSE",
+        "accessibilityLabel": "COURSE",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 329.7,
+          "right": 331.4,
+          "bottom": 509.3,
+          "width": 62.6,
+          "height": 13.0
+        }
+      },
+      {
+        "id": "1:1563",
+        "name": "Group 6846",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 55.0,
+          "height": 55.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 269.0,
+          "top": 6.0,
+          "right": 90.0,
+          "bottom": 791.0,
+          "width": 55.0,
+          "height": 55.0
+        },
+        "children": [
+          {
+            "id": "1:1564",
+            "name": "Group 6793",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 55.0,
+              "height": 55.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 38.0
+            },
+            "clusterId": "cluster_8",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 55.0,
+              "height": 55.0
+            },
+            "children": [
+              {
+                "id": "1:1565",
+                "name": "Group 6779",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 55.0,
+                  "height": 55.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "borderRadius": 38.0,
+                  "opacity": 0.5
+                },
+                "rotation": -3.14,
+                "clusterId": "cluster_9",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 55.0,
+                  "height": 55.0
+                },
+                "children": [
+                  {
+                    "id": "1:1566",
+                    "name": "Group 6777",
+                    "type": "STACK",
+                    "sizing": {
+                      "widthMode": "FIXED",
+                      "heightMode": "FIXED",
+                      "width": 55.0,
+                      "height": 55.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "borderRadius": 38.0
+                    },
+                    "clusterId": "cluster_10",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "width": 55.0,
+                      "height": 55.0
+                    },
+                    "children": [
+                      {
+                        "id": "1:1567",
+                        "name": "Rectangle 210",
+                        "type": "CONTAINER",
+                        "sizing": {
+                          "width": 55.0,
+                          "height": 55.0
+                        },
+                        "alignment": {
+                          "cross": "stretch"
+                        },
+                        "style": {
+                          "backgroundColor": "0xFF03174C",
+                          "borderRadius": 38.0
+                        },
+                        "layoutPositioning": "ABSOLUTE",
+                        "stackPlacement": {
+                          "width": 55.0,
+                          "height": 55.0
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "1:1568",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 18.3,
+              "height": 16.1
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderWidth": 2.0,
+              "borderColor": "0xFFE6E7F2",
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/vector_1_1568.svg",
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 18.4,
+              "top": 19.4,
+              "right": 18.4,
+              "bottom": 19.4,
+              "width": 18.3,
+              "height": 16.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "1:1569",
+        "name": "Group 6845",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 55.0,
+          "height": 55.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 339.0,
+          "top": 6.0,
+          "right": 20.0,
+          "bottom": 791.0,
+          "width": 55.0,
+          "height": 55.0
+        },
+        "children": [
+          {
+            "id": "1:1570",
+            "name": "Group 6794",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 55.0,
+              "height": 55.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 38.0
+            },
+            "clusterId": "cluster_8",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 55.0,
+              "height": 55.0
+            }
+          },
+          {
+            "id": "1:1574",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 18.0,
+              "height": 18.5
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderWidth": 2.0,
+              "borderColor": "0xFFE6E7F2",
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/vector_1_1574.svg",
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 18.5,
+              "top": 18.2,
+              "right": 18.5,
+              "bottom": 18.3,
+              "width": 18.0,
+              "height": 18.5
+            }
+          }
+        ]
+      },
+      {
+        "id": "1:1575",
+        "name": "Group 6792",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 55.0,
+          "height": 55.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 6.0,
+          "right": 339.0,
+          "bottom": 791.0,
+          "width": 55.0,
+          "height": 55.0
+        },
+        "children": [
+          {
+            "id": "1:1576",
+            "name": "Group 6779",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 55.0,
+              "height": 55.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 38.0
+            },
+            "rotation": -3.14,
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 55.0,
+              "height": 55.0
+            },
+            "children": [
+              {
+                "id": "1:1577",
+                "name": "Group 6777",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 55.0,
+                  "height": 55.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "borderRadius": 38.0
+                },
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 55.0,
+                  "height": 55.0
+                },
+                "children": [
+                  {
+                    "id": "1:1578",
+                    "name": "Rectangle 210",
+                    "type": "CONTAINER",
+                    "sizing": {
+                      "width": 55.0,
+                      "height": 55.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFFF2F2F2",
+                      "borderRadius": 38.0
+                    },
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "width": 55.0,
+                      "height": 55.0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "1:1579",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 18.7,
+              "height": 18.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF3F414E"
+            },
+            "vectorAssetKey": "assets/icons/vector_1_1579.svg",
+            "rotation": -3.14,
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 18.2,
+              "top": 18.5,
+              "right": 18.2,
+              "bottom": 18.5,
+              "width": 18.7,
+              "height": 18.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "1:1580",
+        "name": "Rectangle 229",
+        "type": "CONTAINER",
+        "sizing": {
+          "width": 46.8,
+          "height": 2.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "backgroundColor": "0xFF8E97FD"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 48.6,
+          "top": 570.7,
+          "right": 318.6,
+          "bottom": 279.3,
+          "width": 46.8,
+          "height": 2.0
+        }
+      },
+      {
+        "id": "1:1581",
+        "name": "Group 6850",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 178.4,
+          "height": 40.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 612.7,
+          "right": 215.6,
+          "bottom": 199.3,
+          "width": 178.4,
+          "height": 40.0
+        },
+        "children": [
+          {
+            "id": "1:1582",
+            "name": "Group 6847",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 118.4,
+              "height": 35.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 60.0,
+              "bottom": 2.5,
+              "width": 118.4,
+              "height": 35.0
+            },
+            "children": [
+              {
+                "id": "1:1583",
+                "name": "Group 1",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 39.0,
+                  "height": 12.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "right": 79.4,
+                  "width": 39.0,
+                  "height": 12.0
+                },
+                "children": [
+                  {
+                    "id": "1:1584",
+                    "name": "10 MIN",
+                    "type": "TEXT",
+                    "sizing": {
+                      "width": 39.0,
+                      "height": 12.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "textColor": "0xFF000000",
+                      "fontSize": 12.0,
+                      "fontWeight": "w500",
+                      "textAlign": "LEFT",
+                      "lineHeight": 1.08,
+                      "letterSpacing": 0.55,
+                      "fontFamily": "Helvetica Neue",
+                      "glyphTopOffset": 2.1,
+                      "glyphHeight": 8.0
+                    },
+                    "text": "10 MIN",
+                    "accessibilityLabel": "10 MIN",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "width": 39.0,
+                      "height": 12.0
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "1:1585",
+                "name": "Focus Attention",
+                "type": "TEXT",
+                "sizing": {
+                  "width": 118.0,
+                  "height": 17.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "textColor": "0xFF3F414E",
+                  "fontSize": 16.0,
+                  "fontWeight": "w500",
+                  "textAlign": "LEFT",
+                  "lineHeight": 1.08,
+                  "letterSpacing": 0.0,
+                  "fontFamily": "Helvetica Neue",
+                  "glyphTopOffset": 2.6,
+                  "glyphHeight": 11.6
+                },
+                "text": "Focus Attention",
+                "accessibilityLabel": "Focus Attention",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "left": 0.4,
+                  "bottom": 18.0,
+                  "width": 118.0,
+                  "height": 17.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "1:1586",
+            "name": "Group 6",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 40.0,
+              "height": 40.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "vectorAssetKey": "assets/icons/group_6_1_1586.svg",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 138.4,
+              "width": 40.0,
+              "height": 40.0
+            },
+            "children": [
+              {
+                "id": "1:1587",
+                "name": "Ellipse 2",
+                "type": "CONTAINER",
+                "sizing": {
+                  "width": 40.0,
+                  "height": 40.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFF8E97FD"
+                },
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 40.0,
+                  "height": 40.0
+                }
+              },
+              {
+                "id": "1:1588",
+                "name": "Vector",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 11.0,
+                  "height": 12.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFF6F1FB"
+                },
+                "accessibilityLabel": "Vector",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "left": 15.0,
+                  "top": 14.0,
+                  "right": 14.0,
+                  "bottom": 14.0,
+                  "width": 11.0,
+                  "height": 12.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1:1589",
+        "name": "Group 6851",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 141.4,
+          "height": 40.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 692.7,
+          "right": 252.6,
+          "bottom": 119.3,
+          "width": 141.4,
+          "height": 40.0
+        },
+        "children": [
+          {
+            "id": "1:1590",
+            "name": "Group 6847",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 81.4,
+              "height": 35.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 60.0,
+              "bottom": 2.5,
+              "width": 81.4,
+              "height": 35.0
+            },
+            "children": [
+              {
+                "id": "1:1591",
+                "name": "Group 1",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 33.0,
+                  "height": 12.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "clusterId": "cluster_11",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "right": 48.4,
+                  "width": 33.0,
+                  "height": 12.0
+                },
+                "children": [
+                  {
+                    "id": "1:1592",
+                    "name": "5 MIN",
+                    "type": "TEXT",
+                    "sizing": {
+                      "width": 33.0,
+                      "height": 12.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "textColor": "0xFF000000",
+                      "fontSize": 12.0,
+                      "fontWeight": "w500",
+                      "textAlign": "LEFT",
+                      "lineHeight": 1.08,
+                      "letterSpacing": 0.55,
+                      "fontFamily": "Helvetica Neue",
+                      "glyphTopOffset": 2.1,
+                      "glyphHeight": 8.0
+                    },
+                    "text": "5 MIN",
+                    "accessibilityLabel": "5 MIN",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "width": 33.0,
+                      "height": 12.0
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "1:1593",
+                "name": "Body Scan",
+                "type": "TEXT",
+                "sizing": {
+                  "width": 81.0,
+                  "height": 17.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "textColor": "0xFF3F414E",
+                  "fontSize": 16.0,
+                  "fontWeight": "w500",
+                  "textAlign": "LEFT",
+                  "lineHeight": 1.08,
+                  "letterSpacing": 0.0,
+                  "fontFamily": "Helvetica Neue",
+                  "glyphTopOffset": 2.3,
+                  "glyphHeight": 15.0
+                },
+                "text": "Body Scan",
+                "accessibilityLabel": "Body Scan",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "left": 0.4,
+                  "bottom": 18.0,
+                  "width": 81.0,
+                  "height": 17.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "1:1594",
+            "name": "Group 6",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 40.0,
+              "height": 40.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "vectorAssetKey": "assets/icons/group_6_1_1594.svg",
+            "clusterId": "cluster_12",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 101.4,
+              "width": 40.0,
+              "height": 40.0
+            },
+            "children": [
+              {
+                "id": "1:1595",
+                "name": "Ellipse 2",
+                "type": "CONTAINER",
+                "sizing": {
+                  "width": 40.0,
+                  "height": 40.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "borderWidth": 1.0,
+                  "borderColor": "0xFFA1A4B2",
+                  "hasStroke": true
+                },
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 40.0,
+                  "height": 40.0
+                }
+              },
+              {
+                "id": "1:1596",
+                "name": "Vector",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 11.0,
+                  "height": 12.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFA1A4B2",
+                  "borderWidth": 1.0,
+                  "borderColor": "0xFFA1A4B2",
+                  "hasStroke": true
+                },
+                "accessibilityLabel": "Vector",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "left": 15.0,
+                  "top": 14.0,
+                  "right": 14.0,
+                  "bottom": 14.0,
+                  "width": 11.0,
+                  "height": 12.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1:1597",
+        "name": "Group 6852",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 198.4,
+          "height": 40.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 772.7,
+          "right": 195.6,
+          "bottom": 39.3,
+          "width": 198.4,
+          "height": 40.0
+        },
+        "children": [
+          {
+            "id": "1:1598",
+            "name": "Group 6847",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 138.4,
+              "height": 35.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 60.0,
+              "bottom": 2.5,
+              "width": 138.4,
+              "height": 35.0
+            },
+            "children": [
+              {
+                "id": "1:1599",
+                "name": "Group 1",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 33.0,
+                  "height": 12.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "clusterId": "cluster_11",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "right": 105.4,
+                  "width": 33.0,
+                  "height": 12.0
+                }
+              },
+              {
+                "id": "1:1601",
+                "name": "Making Happiness",
+                "type": "TEXT",
+                "sizing": {
+                  "width": 138.0,
+                  "height": 17.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "textColor": "0xFF3F414E",
+                  "fontSize": 16.0,
+                  "fontWeight": "w500",
+                  "textAlign": "LEFT",
+                  "lineHeight": 1.08,
+                  "letterSpacing": 0.0,
+                  "fontFamily": "Helvetica Neue",
+                  "glyphTopOffset": 2.6,
+                  "glyphHeight": 14.7
+                },
+                "text": "Making Happiness",
+                "accessibilityLabel": "Making Happiness",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "left": 0.4,
+                  "bottom": 18.0,
+                  "width": 138.0,
+                  "height": 17.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "1:1602",
+            "name": "Group 6",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 40.0,
+              "height": 40.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "vectorAssetKey": "assets/icons/group_6_1_1602.svg",
+            "clusterId": "cluster_12",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 158.4,
+              "width": 40.0,
+              "height": 40.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "1:1605",
+        "name": "Vector 13",
+        "type": "VECTOR",
+        "sizing": {
+          "width": 374.2,
+          "height": 0.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderWidth": 1.0,
+          "borderColor": "0xFFADB8D9",
+          "opacity": 0.15,
+          "hasStroke": true
+        },
+        "vectorAssetKey": "assets/icons/vector_13_1_1605.svg",
+        "accessibilityLabel": "Vector 13",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 19.9,
+          "top": 672.7,
+          "right": 19.9,
+          "bottom": 179.3,
+          "width": 374.2
+        }
+      },
+      {
+        "id": "1:1606",
+        "name": "Vector 14",
+        "type": "VECTOR",
+        "sizing": {
+          "width": 374.2,
+          "height": 0.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderWidth": 1.0,
+          "borderColor": "0xFFADB8D9",
+          "opacity": 0.15,
+          "hasStroke": true
+        },
+        "vectorAssetKey": "assets/icons/vector_14_1_1606.svg",
+        "accessibilityLabel": "Vector 14",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 19.9,
+          "top": 752.7,
+          "right": 19.9,
+          "bottom": 99.3,
+          "width": 374.2
+        }
+      },
+      {
+        "id": "1:1607",
+        "name": "Line 1",
+        "type": "CONTAINER",
+        "sizing": {
+          "width": 143.0,
+          "height": 0.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderWidth": 5.0,
+          "borderColor": "0xFFE6E6E6",
+          "hasStroke": true
+        },
+        "vectorAssetKey": "assets/icons/line_1_1_1607.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 136.5,
+          "top": 838.0,
+          "right": 134.5,
+          "bottom": 14.0,
+          "width": 143.0
+        }
+      }
+    ]
+  },
+  "tokens": {
+    "colors": {
+      "primary": "0xFFD1D3D4",
+      "color1": "0xFF3F414E",
+      "color2": "0xFFA1A4B2",
+      "color3": "0xFFFFFFFF",
+      "color4": "0xFF8E97FD",
+      "color5": "0xFF7FD2F2",
+      "color6": "0xFF616077",
+      "color7": "0xFFF38242",
+      "color8": "0xFF03174C",
+      "color9": "0xFF3E476E",
+      "color10": "0xFF444359",
+      "color11": "0xFFFFC773",
+      "color12": "0xFF3B3A55",
+      "color13": "0xFF64637D",
+      "color14": "0xFF7B7B90",
+      "color15": "0xFFFF84A2",
+      "color16": "0xFFF2F2F2",
+      "color17": "0xFFF6F1FB"
+    },
+    "typography": {
+      "happyMorning": {
+        "fontSize": 34.0,
+        "fontWeight": "w700"
+      },
+      "pickANnrrator": {
+        "fontSize": 20.0,
+        "fontWeight": "w700"
+      },
+      "maleVoice": {
+        "fontSize": 16.0
+      },
+      "femaleVoice": {
+        "fontSize": 16.0
+      },
+      "easeTheMindIntoARestfulNightSSleepWithTheseDeepAmblentTones": {
+        "fontSize": 16.0,
+        "fontWeight": "w300"
+      },
+      "t24234Favorits": {
+        "fontSize": 14.0
+      },
+      "t34234Lestening": {
+        "fontSize": 14.0
+      },
+      "course": {
+        "fontSize": 14.0
+      },
+      "t10Min": {
+        "fontSize": 11.0
+      },
+      "focusAttention": {
+        "fontSize": 16.0
+      },
+      "t5Min": {
+        "fontSize": 11.0
+      },
+      "bodyScan": {
+        "fontSize": 16.0
+      },
+      "t3Min": {
+        "fontSize": 11.0
+      },
+      "makingHappiness": {
+        "fontSize": 16.0
+      }
+    },
+    "spacing": {
+      "md": 16.0
+    },
+    "radii": {
+      "md": 38.0
+    },
+    "elevations": {
+      "md": 4.0
+    }
+  }
+}

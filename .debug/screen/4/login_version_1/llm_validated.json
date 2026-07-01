@@ -1,0 +1,415 @@
+{
+  "stage": "llm_validated",
+  "featureName": "login_version_1",
+  "screenIr": {
+    "root": {
+      "figmaId": "3:5123",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "3:5124",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "3:5125",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "3:5126",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "3:16680",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "3:16684",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "3:16683",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "3:5128",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "3:5129",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "3:5130",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "3:5131",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "3:5132",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "3:5133",
+                          "kind": "input",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "3:5134",
+                          "kind": "input",
+                          "children": [
+                            {
+                              "figmaId": "I3:5134;3:6011",
+                              "kind": "input",
+                              "children": [
+                                {
+                                  "figmaId": "I3:5134;3:6015",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3:5134;3:6015;4:78000",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "3:5135",
+                          "kind": "auto",
+                          "children": [],
+                          "classificationHint": {
+                            "suggestedKind": "button_text",
+                            "confidence": 0.6,
+                            "rationale": "Forgot Password link text, right-aligned, tappable."
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "3:5136",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "3:5137",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I3:5137;3:6045",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "3:16696",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "28:4023",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "28:4025",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "wrap": "flexibleLoose"
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "28:4027",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "28:4028",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I28:4028;3:6131",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I28:4028;3:6131;136:155",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I28:4028;3:6131;136:156",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I28:4028;3:6131;136:157",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I28:4028;3:6131;136:158",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I28:4028;3:6132",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "28:4029",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I28:4029;3:6134",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I28:4029;3:6135",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I28:4029;3:6136",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I28:4029;3:6137",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "3:16714",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "3:16715",
+                  "kind": "auto",
+                  "children": [],
+                  "wrap": "flexibleLoose"
+                },
+                {
+                  "figmaId": "3:16716",
+                  "kind": "auto",
+                  "children": [],
+                  "wrap": "flexibleLoose"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "3:16736",
+          "kind": "auto",
+          "children": [],
+          "classificationHint": {
+            "suggestedKind": "nav_app_bar",
+            "confidence": 0.7,
+            "rationale": "System status bar: absolute positioned, rendered via vector asset."
+          },
+          "fidelityTier": "svg_baked",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "3:16755",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I3:16755;3:6790",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "3:16736",
+      "3:5124",
+      "3:16755"
+    ],
+    "stateByFigmaId": {
+      "3:5133": "default",
+      "3:5134": "default",
+      "I3:5134;3:6015": "default",
+      "3:5137": "default",
+      "28:4028": "default",
+      "I28:4028;3:6131": "default",
+      "28:4029": "default",
+      "3:16736": "default",
+      "3:16755": "default"
+    },
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "login_form",
+      "confidence": 0.9,
+      "explanation": "Login screen with email/password fields, primary CTA, social auth buttons, and sign-up link.",
+      "warnings": []
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "3:5133",
+        "role": "text_input",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [],
+        "explanation": "Email input field with label and pre-filled value 'Loisbecket@gmail.com' (component variant 'Inputed'). Variant shows label, value, no icons, no errors — state=default (Inputed). It uses a nested INPUT subtree with the Text#664:10 property visible (variantProperties). It is the first of two identical Input Field components (componentRef 3:6008). Since the variant does not include 'Error' or 'Disabled', we treat it as a ready single-line input, not multiline. The text field has no leading or trailing icons per the variant properties (Show Icons Left/Right = False), and the label is positioned above in the component spec (Label #659:5 = True). The inner text (I3:5133;3:6014) is the pre-filled value node, and the label text (I3:5133;3:6010) is the placeholder-like label. The contract is that the input is single-line, with no error, and the label is on top. The boundary (outer frame) is 3:5133; the control (inner Input Area) is I3:5133;3:6011; the value node is I3:5133;3:6014; the label is I3:5133;3:6010. We propose a standard 'single_line_input_vertical_center' layout law and 'no_error' / 'no_disabled' traits. The input is of kind 'text' (not password, not search, not multiline). The contract shape is a Material 3 'TextField' (or 'TextFormField') with label text 'Email', initial value 'Loisbecket@gmail.com', and no suffix icons, no error, no helper text. We propose to use the extracted widget 'InputField' (from widgetExtractionHints) to unify both instances, but we annotate this as a separate instance-level verdict for clarity. The component variant indicates 'State': 'Inputed', which maps to 'default' in our stateByFigmaId. The text color is 0xFF1A1C1E for value and 0xFF6C7278 for label. The font is 'Plus Jakarta Sans' for label, 'Inter' for value, which may require fallback. We propose to use the extracted widget 'InputField' with named parameters 'label', 'value', 'obscureText', 'showSuffixIcon' — but here we report the full contract for the node itself, not the extraction. The contract includes 'is_multiline: false', 'max_lines: null', 'keyboard_intent: email' (deduced from label 'Email'). We propose 'single_line_input_vertical_center' layout law and 'no_error' / 'no_disabled' effects. The boundary node is 3:5133, control node is I3:5133;3:6011, label node is I3:5133;3:6010, value node is I3:5133;3:6014. We also note that the component ref 3:6008 is used twice; we will use the same extracted widget for both instances. The variant also includes 'Text#664:10': 'Loisbecket@gmail.com' and 'Label#664:14': 'Email', confirming the label and value. We propose to use the extracted widget 'InputField' with named parameters 'label: 'Email', value: 'Loisbecket@gmail.com', obscureText: false, showSuffixIcon: false'. The contract kind is 'text_input'. The contract traits are 'is_multiline: false', 'max_lines: null', 'keyboard_intent: email', 'currentValue: Loisbecket@gmail.com', 'visualState: default'. The proposed layout law is 'single_line_input_vertical_center'. The proposed effects are 'no_error' and 'no_disabled'."
+      },
+      {
+        "nodeId": "3:5134",
+        "role": "password_input",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [],
+        "explanation": "Password input field with label and obscured pre-filled value '*******' (component variant 'Inputed'). Variant shows label, value, right icon (eye-off), no left icon, no errors — state=default (Inputed). It uses a nested INPUT subtree with the Text#664:10 property visible (variantProperties). It is the second of two identical Input Field components (componentRef 3:6008). Since the variant does not include 'Error' or 'Disabled', we treat it as a ready single-line input, not multiline. The text field has a right icon (eye-off) per the variant properties (Show Icons Right#659:8 = True), and the label is positioned above in the component spec (Label #659:5 = True). The inner text (I3:5134;3:6014) is the pre-filled value node, and the label text (I3:5134;3:6010) is the placeholder-like label. The contract is that the input is single-line, with no error, and the label is on top. The boundary (outer frame) is 3:5134; the control (inner Input Area) is I3:5134;3:6011; the value node is I3:5134;3:6014; the label is I3:5134;3:6010; the suffix icon is I3:5134;3:6015. We propose a standard 'single_line_input_vertical_center' layout law and 'no_error' / 'no_disabled' traits. The input is of kind 'password' (obscured). The contract shape is a Material 3 'TextField' (or 'TextFormField') with label text 'Password', initial value '*******', obscureText=true, suffix icon (eye-off), no error, no helper text. We propose to use the extracted widget 'InputField' (from widgetExtractionHints) to unify both instances, but we annotate this as a separate instance-level verdict for clarity. The component variant indicates 'State': 'Inputed', which maps to 'default' in our stateByFigmaId. The text color is 0xFF1A1C1E for value and 0xFF6C7278 for label. The font is 'Plus Jakarta Sans' for label, 'Inter' for value, which may require fallback. We propose to use the extracted widget 'InputField' with named parameters 'label', 'value', 'obscureText', 'showSuffixIcon' — but here we report the full contract for the node itself, not the extraction. The contract includes 'is_multiline: false', 'max_lines: null', 'keyboard_intent: password' (deduced from label 'Password'). We propose 'single_line_input_vertical_center' layout law and 'no_error' / 'no_disabled' effects. The boundary node is 3:5134, control node is I3:5134;3:6011, label node is I3:5134;3:6010, value node is I3:5134;3:6014, suffix icon is I3:5134;3:6015. We also note that the component ref 3:6008 is used twice; we will use the same extracted widget for both instances. The variant also includes 'Text#664:10': '*******' and 'Label#664:14': 'Password', confirming the label and value. We propose to use the extracted widget 'InputField' with named parameters 'label: 'Password', value: '*******', obscureText: true, showSuffixIcon: true'. The contract kind is 'password_input'. The contract traits are 'is_multiline: false', 'max_lines: null', 'keyboard_intent: password', 'currentValue: *******', 'visualState: default'. The proposed layout law is 'single_line_input_vertical_center'. The proposed effects are 'no_error' and 'no_disabled'."
+      },
+      {
+        "nodeId": "3:5137",
+        "role": "button",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.92,
+        "proposedEffects": [],
+        "explanation": "Primary 'Log In' button with gradient background and text label. Variant 'Primary', state 'default'."
+      },
+      {
+        "nodeId": "28:4028",
+        "role": "button",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.92,
+        "proposedEffects": [],
+        "explanation": "Social auth button for Google. Variant 'Login With: Google', state 'default'."
+      },
+      {
+        "nodeId": "28:4029",
+        "role": "button",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.92,
+        "proposedEffects": [],
+        "explanation": "Social auth button for Facebook. Variant 'Login With: Facebook', state 'default'."
+      },
+      {
+        "nodeId": "3:16714",
+        "role": "navigation_link",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.85,
+        "proposedEffects": [],
+        "explanation": "Sign-up link row with two text nodes: 'Don’t have an account?' and 'Sign Up'. The 'Sign Up' text is likely tappable to navigate to registration."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "InputField",
+      "widgetIr": {
+        "figmaId": "3:5133",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3:5133;3:6009",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I3:5133;3:6010",
+                "kind": "auto",
+                "children": [],
+                "wrap": "flexibleLoose"
+              }
+            ]
+          },
+          {
+            "figmaId": "I3:5133;3:6011",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I3:5133;3:6012",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I3:5133;3:6014",
+                    "kind": "auto",
+                    "children": [],
+                    "wrap": "flexibleLoose"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

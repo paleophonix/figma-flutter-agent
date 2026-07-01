@@ -1,0 +1,37 @@
+{
+  "file_key": "nJBqmuLJ1KXSA23yNouMOR",
+  "node_id": "49:1661",
+  "feature_name": "sign_up_version_9",
+  "tree_hash": "8857bcb7e71884da6c4ca6427bc46ee0a4668cc585f3e568ba7eb252ff0f008c",
+  "colors_hash": "be09f834c33eaf96ce4ffe45b367aa0c38748d19116262bc6f4081aa41936aab",
+  "typography_hash": "6f996d3ae88742d09c5fbca9e8692fc27bf61bc915a992be3ef13b50e538771b",
+  "spacing_hash": "c935dcad8d64beaeb536ca0b880a80bc47263ae1842c2e717bc437f2f16cdc30",
+  "file_hashes": {
+    "lib/widgets/native_status_bar_widget.dart": "27f85871840268080abf1ce5492b31cac0ac2b71b4bd2cc6a01843fa8f98f6ad",
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "cc1d6222ece1f85ce1faed54b1d0c3aad4002f99ec810e75c34d1db5547cb677",
+    "lib/theme/app_spacing.dart": "9957ea284fc7101a60e460af4f88e3481259e7662950c70a1597a9333876acf6",
+    "lib/theme/app_typography.dart": "afc36cc30fd3ab2570f1c569218693700350524bda7e224cf9548296724a1ec0",
+    "lib/theme/app_radius.dart": "df1b797367dbcfd4c33c7eee568ef8268e68dff19ebce193a34024ab6aa16d84",
+    "lib/theme/app_edge_insets.dart": "38f188dd39f45b686e5059a758e67b1e58565aa6015afec8446836a607e563ec",
+    "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
+    "lib/theme/app_theme.dart": "ddc8a61524f9ef3afa1e0dd537982f42172fa1528b7cc9adf635163836ca15ff",
+    "lib/generated/sign_up_version_9_layout.dart": "d14dee435c47e90c0b6ac936551e78b4aedd0c7067f5f7bb3821c0c901176ad9",
+    "lib/features/sign_up_version_9/sign_up_version_9_screen.dart": "2ff03ae5c08d12533773a87c916110ec2c2a89ba04b5a52f112845ba2a7853b3",
+    "test/golden/sign_up_version_9_screen_test.dart": "bfbed12a5e293d8c3ce9b79c29937cf118f2f201ba8610e4db6ac5f219bf3bd2",
+    "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
+    "lib/main.dart": "276a8148adafcb71d697d6fe39becc3324e8b33c26e5bc4b362cd13b027dcba0"
+  },
+  "layout_region_hash": "109144e31367424a0c2aaf3d27b22dda638f8098a4b07c75abde51f67e7f8824",
+  "cluster_hashes": {
+    "component_3_6008_01024e72": "49a4e8f1fee291bf544eb0fef7d68b742f41607f95748949770f265d3ffc7b23",
+    "component_3_6008_1e718b17": "6cdffde0886b47737c7aebfcea6ee71f89a28b3e5e45842837aaee2b9be149e8",
+    "component_3_6008_c0609f94": "4ef9dee69bec5bbba518d4eff5962cbad72fdcda433d0d44b40e0713d9911eb4",
+    "component_3_6008_f49bc82d": "4210fb42740526835fa2f7770a5a43a6a08b3b48e8f827f7b19b37f2a6cc0ba5",
+    "component_3_6008_f5c2a942": "42cf9aa97cc6b6b72caa1dc598545774cae2e91af750c05f80a461e92b6598de"
+  },
+  "reference_image_hash": null,
+  "emitter_version": "2026.06.2",
+  "version": 11,
+  "updated_at": "2026-06-29T15:56:14.625256+00:00"
+}

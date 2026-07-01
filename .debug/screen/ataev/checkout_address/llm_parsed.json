@@ -1,0 +1,543 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "checkout_address",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:12697",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "281:12698",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "281:12699",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "281:12700",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "281:12701",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:12702",
+                          "kind": "auto",
+                          "children": [],
+                          "overrides": {
+                            "text": "Как получаете заказ",
+                            "accessibilityLabel": "Как получаете заказ",
+                            "textColor": "0xFF09090B",
+                            "fontSize": 15.0
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12703",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:12704",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12705",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "text": "Доставка",
+                                "accessibilityLabel": "Доставка",
+                                "textColor": "0xFF2E7D32",
+                                "fontSize": 12.0
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12706",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12707",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "text": "Самовывоз",
+                                "accessibilityLabel": "Самовывоз",
+                                "textColor": "0xFF52525C",
+                                "fontSize": 12.0
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12708",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:12709",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12710",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12711",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12712",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:12713",
+                                          "kind": "auto",
+                                          "children": [],
+                                          "overrides": {
+                                            "text": "Дом",
+                                            "accessibilityLabel": "Дом",
+                                            "textColor": "0xFF09090B",
+                                            "fontSize": 15.0
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "281:12714",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:12715",
+                                          "kind": "auto",
+                                          "children": [],
+                                          "overrides": {
+                                            "text": "Махачкала, ул. Шейха М…",
+                                            "accessibilityLabel": "Махачкала, ул. Шейха М…",
+                                            "textColor": "0xFF000000",
+                                            "fontSize": 14.0
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:12716",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12717",
+                                      "kind": "auto",
+                                      "children": [],
+                                      "overrides": {
+                                        "text": "Основной",
+                                        "accessibilityLabel": "Основной",
+                                        "textColor": "0xFF2E7D32",
+                                        "fontSize": 12.0
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12718",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12719",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12720",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12721",
+                                      "kind": "auto",
+                                      "children": [],
+                                      "overrides": {
+                                        "text": "Офис",
+                                        "accessibilityLabel": "Офис",
+                                        "textColor": "0xFF09090B",
+                                        "fontSize": 15.0
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:12722",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12723",
+                                      "kind": "auto",
+                                      "children": [],
+                                      "overrides": {
+                                        "text": "Махачкала, пр. Имама Шамиля, 54",
+                                        "accessibilityLabel": "Махачкала, пр. Имама Шамиля, 54",
+                                        "textColor": "0xFF71717B",
+                                        "fontSize": 14.0
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12724",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12725",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "text": "Добавить новый адрес",
+                                "accessibilityLabel": "Добавить новый адрес",
+                                "textColor": "0xFF27272A",
+                                "fontSize": 14.0
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12726",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:12727",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12728",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "text": "Время доставки",
+                                "accessibilityLabel": "Время доставки",
+                                "textColor": "0xFF09090B",
+                                "fontSize": 15.0
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12729",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12730",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12731",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Сегодня, 13:00–14:00",
+                                    "accessibilityLabel": "Сегодня, 13:00–14:00",
+                                    "textColor": "0xFF2E7D32",
+                                    "fontSize": 12.0
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12732",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12733",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Сегодня, 15:00–16:00",
+                                    "accessibilityLabel": "Сегодня, 15:00–16:00",
+                                    "textColor": "0xFF52525C",
+                                    "fontSize": 12.0
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12734",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12735",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Сегодня, 18:00–19:00",
+                                    "accessibilityLabel": "Сегодня, 18:00–19:00",
+                                    "textColor": "0xFF52525C",
+                                    "fontSize": 12.0
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12736",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12737",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12738",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Дополнительные услуги",
+                                    "accessibilityLabel": "Дополнительные услуги",
+                                    "textColor": "0xFF09090B",
+                                    "fontSize": 15.0
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12739",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12740",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12741",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ],
+                                  "ref": {
+                                    "widgetName": "Cluster0CheckboxRow",
+                                    "namedArgs": {}
+                                  }
+                                },
+                                {
+                                  "figmaId": "281:12742",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Подъем на этаж без лифта · 250 ₽",
+                                    "accessibilityLabel": "Подъем на этаж без лифта · 250 ₽",
+                                    "textColor": "0xFF3F3F46",
+                                    "fontSize": 13.0
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12743",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12744",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12745",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ],
+                                  "ref": {
+                                    "widgetName": "Cluster0CheckboxRow",
+                                    "namedArgs": {}
+                                  }
+                                },
+                                {
+                                  "figmaId": "281:12746",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Негабаритный заказ · 250 ₽",
+                                    "accessibilityLabel": "Негабаритный заказ · 250 ₽",
+                                    "textColor": "0xFF3F3F46",
+                                    "fontSize": 13.0
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12747",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12748",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Комментарий к заказу",
+                                    "accessibilityLabel": "Комментарий к заказу",
+                                    "textColor": "0xFF3F3F46",
+                                    "fontSize": 13.0
+                                  }
+                                },
+                                {
+                                  "figmaId": "281:12749",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12750",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:12751",
+                                          "kind": "auto",
+                                          "children": [],
+                                          "overrides": {
+                                            "text": "Позвонить за 5 минут до доставки.",
+                                            "accessibilityLabel": "Позвонить за 5 минут до доставки.",
+                                            "textColor": "0xFF18181B",
+                                            "fontSize": 14.0
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12752",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12753",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Оформить как операто",
+                                    "accessibilityLabel": "Оформить как операто",
+                                    "textColor": "0xFF27272A",
+                                    "fontSize": 14.0
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12754",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12755",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Дальше к оплате",
+                                    "accessibilityLabel": "Дальше к оплате",
+                                    "textColor": "0xFF000000",
+                                    "fontSize": 14.0
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12756",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12757",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12758",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12759",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:12760",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:12761",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "281:12762",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "281:12763",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:12764",
+                                              "kind": "auto",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Оформление заказа",
+                                                "accessibilityLabel": "Оформление заказа",
+                                                "textColor": "0xFF09090B",
+                                                "fontSize": 17.0
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "Cluster0CheckboxRow",
+      "widgetIr": {
+        "figmaId": "281:12740",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "281:12741",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

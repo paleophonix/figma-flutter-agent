@@ -11,6 +11,7 @@ from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.run import RunScreenPlan, launch_flutter_app
 from figma_flutter_agent.dev.wizard.models import ScreenPreflight
 from figma_flutter_agent.dev.wizard.preflight import build_run_plan, collect_screen_preflight
+from figma_flutter_agent.errors import FlutterPreviewLaunchError
 from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 from figma_flutter_agent.pipeline.result import PipelineResult
 from figma_flutter_agent.pipeline.run import run_pipeline
@@ -150,14 +151,18 @@ async def sync_preview_workflow(
     )
     if skip_launch:
         return plan, None, pipeline_result
-    launched = launch_flutter_app(
-        plan.project_dir,
-        device_id=device_id,
-        flutter_sdk=resolved_settings.flutter_sdk or None,
-        dump_path=plan.dump_path,
-        settings=resolved_settings,
-        feature_name=plan.screen.feature,
-    )
+    try:
+        launched = launch_flutter_app(
+            plan.project_dir,
+            device_id=device_id,
+            flutter_sdk=resolved_settings.flutter_sdk or None,
+            dump_path=plan.dump_path,
+            settings=resolved_settings,
+            feature_name=plan.screen.feature,
+        )
+    except FlutterPreviewLaunchError:
+        logger.exception("Preview launch failed after successful codegen")
+        return plan, None, pipeline_result
     return plan, launched, pipeline_result
 
 

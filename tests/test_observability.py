@@ -10,7 +10,10 @@ from figma_flutter_agent.generator.layout.flex_policy.stack import (
 )
 from figma_flutter_agent.observability import log_stage
 from figma_flutter_agent.observability.api_contract import api_contract_drift_from_type_error
-from figma_flutter_agent.wizard.run_actions import report_plan_failure_stale_preview
+from figma_flutter_agent.wizard.run_actions import (
+    report_plan_failure_stale_preview,
+    report_preview_launch_failure,
+)
 
 
 def test_log_stage_completes_without_error() -> None:
@@ -80,3 +83,12 @@ def test_report_plan_failure_stale_preview_message(capsys) -> None:
     captured = capsys.readouterr().out
     assert "stale" in captured.lower()
     assert "writeback: skipped" in captured
+
+
+def test_report_preview_launch_failure_message(capsys) -> None:
+    """Wizard must not claim codegen failed when only preview launch failed."""
+    report_preview_launch_failure()
+    captured = capsys.readouterr().out
+    assert "preview launch failed" in captured.lower()
+    assert "writeback: committed" in captured
+    assert "writeback: skipped" not in captured

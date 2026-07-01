@@ -1,0 +1,32 @@
+{
+  "feature": "mobile_checkout",
+  "pipeline_run_id": "74f3a99a052b",
+  "candidate_build_run_id": "74f3a99a052b",
+  "committed_build_run_id": "74f3a99a052b",
+  "served_build_run_id": "74f3a99a052b",
+  "writeback": "committed",
+  "served_probe_present": true,
+  "verdict": "CANDIDATE_ONLY",
+  "case_mode": "FORENSIC",
+  "agent_board": "forensic",
+  "candidate_available": true,
+  "allowed_questions": [
+    "why generation/write/capture failed"
+  ],
+  "forbidden_questions": [
+    "why visible UI is wrong in Chrome"
+  ],
+  "stages": {},
+  "change_proof": {
+    "fix_proven": false
+  },
+  "capture_passport": {
+    "flutterCaptureOk": null,
+    "capture_run_state": "not_run",
+    "capture_verified": false,
+    "capture_kind": "not_run",
+    "changedRatio": null,
+    "warnings": [],
+    "failure_class": "PATCH_RUNTIME"
+  }
+}

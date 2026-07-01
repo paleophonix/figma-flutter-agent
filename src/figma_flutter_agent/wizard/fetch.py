@@ -197,7 +197,14 @@ def _wizard_import_figma_frame(
             )
         )
         print_pipeline_warnings(pipeline_result.warnings)
-        if launched is False:
+        if launched is None:
+            from figma_flutter_agent.wizard.run_actions import report_preview_launch_failure
+
+            report_preview_launch_failure()
+            console.print(
+                f"[yellow]Codegen complete — preview launch failed.[/yellow] — {feature}"
+            )
+        elif launched is False:
             console.print(f"[yellow]Sync complete — Flutter run stopped.[/yellow] — {feature}")
         else:
             console.print(f"[green]Sync & preview complete[/green] — {feature}")

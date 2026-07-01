@@ -1,0 +1,38 @@
+{
+  "file_key": "F7D3hhz7vdcIYSCFzTurz6",
+  "node_id": "3:2",
+  "feature_name": "sleep",
+  "tree_hash": "ef0a8af4270ddfab63ae605a46f8bb5be0f12f94d26020297d84da3167e6ee09",
+  "colors_hash": "81df79ccee0dcf3db1817b83c459ea5a24d50c512324cf17267fdc8d037ecb2d",
+  "typography_hash": "12d8854da4a68cfba9bc199f6b14d4b2f376ea9f89511d7cd64998ffb8d4cf77",
+  "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
+  "file_hashes": {
+    "lib/widgets/cluster6_widget.dart": "f0aee9fbffaa122e399016d2b66e3c2545f50400635c90a08734f675862b96e1",
+    "lib/widgets/exclude_widget.dart": "4227e21e0ed46a9d4430f6ce1d666f0c141822c33e9a450e77076538988a7a35",
+    "lib/widgets/group6819_widget.dart": "61ecf92a9c06094e100b1932669ac4dc127e52b4601d251402b3772841b2d3c4",
+    "lib/widgets/group29_widget.dart": "fccd7bba1a561e0d2cb0b2772811c54f81974f5d6d93a8dd4ac67ce05b050d85",
+    "lib/widgets/group28_widget.dart": "109ffac1b07f3955a4ea4704c5e886dc1cd1bbab24b657c8edea8fb1d9797921",
+    "lib/widgets/group27_widget.dart": "db3c2ac8eadb98d7f968cf0225abcb69ba59e23db72c8b3e0dc4f86f7a15b382",
+    "lib/widgets/group6821_widget.dart": "79f10b42036ddf0d75d3fd817949bd6461f50d2b9de9ccd47fa64f1a714a9078",
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "78d2dba447c5298d4e0e2be1f3f1a49c77cfa096421dd480d9a847a31d418397",
+    "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
+    "lib/theme/app_typography.dart": "3825b7facb55093edf0b40503c3cee3cd7e5f20ae88f716b713ec9e19ffad7a8",
+    "lib/theme/app_radius.dart": "399ca041c29e19f2d0cfc1d50536b37e4fdadb703d0c83e6fc7e968565f295ff",
+    "lib/theme/app_elevation.dart": "ec3d05a7adbae5548971debf90b9e2e866b401c7d43fc2e6341cd970f522c4ca",
+    "lib/theme/app_theme.dart": "040ffdcf0daed1d8c4374518de7af2b3a40ef4af6448193dae68b679b2db5cde",
+    "lib/generated/sleep_layout.dart": "839968959b7e425d7d8f080d7875894c4fb7569710fccf556e2bd31ab1f0958d",
+    "lib/features/sleep/sleep_screen.dart": "9ccc15639fc8f39c52a276546d3b02b849f85456f4ca67362e256df07fd9d120",
+    "test/golden/sleep_screen_test.dart": "8c4af05f28a0762a986a64c52a8293aa0da643b2d24a0323936d4a5e953f96a9",
+    "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
+    "lib/main.dart": "62e1630ec80b4166e9b6622a2ab3fa6c540383bbe48890faf0fc89ea609f4fa8"
+  },
+  "layout_region_hash": "2cef0ddae3548dba71bf9bff0ac7c56cf6cd0ee39e3c552998c48c90a14c525b",
+  "cluster_hashes": {
+    "cluster_6": "870e4bcc2f6602803a7d00c4410fc2c8bb80be982bb59e1fd097d86d44bcc586"
+  },
+  "reference_image_hash": "48b6a58096d7db86b34ce00d4e93a817bb61a5451770f82098ef16701c29a156",
+  "emitter_version": "2026.06.2",
+  "version": 11,
+  "updated_at": "2026-06-17T21:05:03.705192+00:00"
+}

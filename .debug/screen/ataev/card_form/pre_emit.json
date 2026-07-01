@@ -1,0 +1,250 @@
+{
+  "stage": "pre_emit",
+  "featureName": "card_form",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:16005",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "281:16067",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "281:16068",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "281:16069",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "281:16070",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "281:16071",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "281:16072",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:16073",
+                                  "kind": "row",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:16074",
+                                      "kind": "button",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:16075",
+                                          "kind": "stack",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:16076",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "281:16077",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:16078",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:16079",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:16080",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:16081",
+                              "kind": "text",
+                              "children": [],
+                              "wrap": "flexibleLoose"
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:16082",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "281:16083",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:16084",
+                                  "kind": "text",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "281:16085",
+                                  "kind": "input",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:16088",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:16089",
+                                  "kind": "text",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "281:16090",
+                                  "kind": "input",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:16093",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:16094",
+                                  "kind": "text",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "281:16095",
+                                  "kind": "input",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:16098",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:16099",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:16100",
+                                      "kind": "text",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:16101",
+                                      "kind": "input",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:16104",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:16105",
+                                      "kind": "text",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:16106",
+                                      "kind": "input",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:16109",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:16110",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:16111",
+                                      "kind": "input",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:16112",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:16113",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "611:1343",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "611:1344",
+              "kind": "row",
+              "children": [
+                {
+                  "figmaId": "611:1345",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "611:1349",
+                      "kind": "button",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "281:16067",
+      "611:1343"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  }
+}

@@ -75,6 +75,10 @@ class FlutterProjectError(FigmaFlutterError):
     """Raised when the target Flutter project path is invalid."""
 
 
+class FlutterPreviewLaunchError(FlutterProjectError):
+    """Raised when ``flutter run`` preview launch fails after codegen succeeded."""
+
+
 class ParseError(FigmaFlutterError):
     """Raised when Figma JSON cannot be converted to a clean design tree."""
 

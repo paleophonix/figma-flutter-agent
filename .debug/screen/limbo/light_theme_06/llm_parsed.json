@@ -1,0 +1,1284 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "light_theme_06",
+  "screenIr": {
+    "root": {
+      "figmaId": "3212:20168",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "3212:20181",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I3212:20181;3207:13474",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20181;3207:13476",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20181;3207:13477",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Page title",
+                        "accessibilityLabel": "Page title",
+                        "textColor": "primary",
+                        "fontSize": 26.0
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20181;3207:13478",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Subtitle",
+                        "accessibilityLabel": "Subtitle",
+                        "textColor": "primary",
+                        "fontSize": 16.0
+                      }
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I3212:20181;3207:13479",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20181;3207:13480",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3212:20181;3207:13480;8:43285",
+                          "kind": "extracted",
+                          "children": [],
+                          "ref": {
+                            "widgetName": "SearchWidget",
+                            "namedArgs": {}
+                          }
+                        }
+                      ],
+                      "overrides": {
+                        "accessibilityLabel": "Icon button"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_icon",
+                        "confidence": 0.77,
+                        "rationale": "40x40 circular icon button in navigation bar."
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20181;3207:13481",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3212:20181;3207:13481;8:43285",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20181;3207:13481;8:43285;3073:10558",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "accessibilityLabel": "vector"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "overrides": {
+                        "accessibilityLabel": "Icon button"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_icon",
+                        "confidence": 0.72,
+                        "rationale": "Secondary 40x40 circular icon button in navigation bar."
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "classificationHint": {
+            "suggestedKind": "nav_app_bar",
+            "confidence": 0.78,
+            "rationale": "Top navigation/header area with page title and actions."
+          }
+        },
+        {
+          "figmaId": "3212:20182",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "StatusBarWidget",
+            "namedArgs": {}
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_app_bar",
+            "confidence": 0.58,
+            "rationale": "Prebuilt status bar subtree."
+          }
+        },
+        {
+          "figmaId": "3212:20183",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I3212:20183;0:420",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "color3"
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "3212:20169",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "3212:20170",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20170;2973:13327",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20170;348:23",
+                      "kind": "extracted",
+                      "children": [],
+                      "ref": {
+                        "widgetName": "ImageCardWidget",
+                        "namedArgs": {}
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "container_card",
+                        "confidence": 0.79,
+                        "rationale": "Reusable image card with media and text."
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20170;348:766",
+                      "kind": "auto",
+                      "children": [],
+                      "classificationHint": {
+                        "suggestedKind": "container_card",
+                        "confidence": 0.72,
+                        "rationale": "Flattened repeated image card instance."
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20170;348:828",
+                      "kind": "auto",
+                      "children": [],
+                      "classificationHint": {
+                        "suggestedKind": "container_card",
+                        "confidence": 0.72,
+                        "rationale": "Flattened repeated image card instance."
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20170;348:914",
+                      "kind": "auto",
+                      "children": [],
+                      "classificationHint": {
+                        "suggestedKind": "container_card",
+                        "confidence": 0.72,
+                        "rationale": "Flattened repeated image card instance."
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20170;348:1024",
+                      "kind": "auto",
+                      "children": [],
+                      "classificationHint": {
+                        "suggestedKind": "container_card",
+                        "confidence": 0.72,
+                        "rationale": "Flattened repeated image card instance."
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20170;348:1158",
+                      "kind": "auto",
+                      "children": [],
+                      "classificationHint": {
+                        "suggestedKind": "container_card",
+                        "confidence": 0.72,
+                        "rationale": "Flattened repeated image card instance."
+                      }
+                    }
+                  ],
+                  "layoutHints": {
+                    "scrollAxis": "horizontal"
+                  }
+                }
+              ],
+              "overrides": {
+                "backgroundColor": "color1"
+              },
+              "layoutHints": {
+                "scrollAxis": "horizontal"
+              },
+              "classificationHint": {
+                "suggestedKind": "container_carousel",
+                "confidence": 0.79,
+                "rationale": "Horizontal scrolling row of repeated cards."
+              }
+            },
+            {
+              "figmaId": "3212:20786",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "SectionHeaderWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "3212:20171",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "ContentRowWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "3212:20172",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20172;2921:13752",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I3212:20172;2921:13758",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "ArrowRightWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ],
+              "overrides": {
+                "backgroundColor": "color1"
+              },
+              "classificationHint": {
+                "suggestedKind": "container_list_tile",
+                "confidence": 0.73,
+                "rationale": "Interactive row item with trailing chevron."
+              }
+            },
+            {
+              "figmaId": "3212:20173",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20173;2921:13752",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I3212:20173;2921:13758",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "ArrowRightWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ],
+              "overrides": {
+                "backgroundColor": "color1"
+              },
+              "classificationHint": {
+                "suggestedKind": "container_list_tile",
+                "confidence": 0.73,
+                "rationale": "Interactive row item with trailing chevron."
+              }
+            },
+            {
+              "figmaId": "3212:20174",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "ContentRowWidgetDetailed",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "3212:20175",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "SectionHeaderWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "3212:20176",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20176;2921:13752",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20176;2921:13753",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I3212:20176;2921:13754",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3212:20176;2921:13755",
+                          "kind": "auto",
+                          "children": [],
+                          "overrides": {
+                            "text": "Row Header",
+                            "accessibilityLabel": "Row Header",
+                            "textColor": "primary",
+                            "fontSize": 16.0
+                          }
+                        },
+                        {
+                          "figmaId": "I3212:20176;2921:13756",
+                          "kind": "auto",
+                          "children": [],
+                          "overrides": {
+                            "text": "Body copy description",
+                            "accessibilityLabel": "Body copy description",
+                            "textColor": "primary",
+                            "fontSize": 16.0
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I3212:20176;2921:13758",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "ArrowRightWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ],
+              "overrides": {
+                "backgroundColor": "color1"
+              },
+              "classificationHint": {
+                "suggestedKind": "container_list_tile",
+                "confidence": 0.76,
+                "rationale": "Interactive row item with image, copy and trailing chevron."
+              }
+            },
+            {
+              "figmaId": "3212:20177",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20177;2921:13752",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I3212:20177;2921:13758",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "ArrowRightWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ],
+              "overrides": {
+                "backgroundColor": "color1"
+              },
+              "classificationHint": {
+                "suggestedKind": "container_list_tile",
+                "confidence": 0.73,
+                "rationale": "Interactive row item with trailing chevron."
+              }
+            },
+            {
+              "figmaId": "3212:20178",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20178;2921:13752",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I3212:20178;2921:13758",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "ArrowRightWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ],
+              "overrides": {
+                "backgroundColor": "color1"
+              },
+              "classificationHint": {
+                "suggestedKind": "container_list_tile",
+                "confidence": 0.73,
+                "rationale": "Interactive row item with trailing chevron."
+              }
+            },
+            {
+              "figmaId": "3212:20179",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20179;2921:13752",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I3212:20179;2921:13758",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "ArrowRightWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ],
+              "overrides": {
+                "backgroundColor": "color1"
+              },
+              "classificationHint": {
+                "suggestedKind": "container_list_tile",
+                "confidence": 0.73,
+                "rationale": "Interactive row item with trailing chevron."
+              }
+            }
+          ],
+          "layoutHints": {
+            "scrollAxis": "vertical"
+          }
+        },
+        {
+          "figmaId": "3212:20180",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "FooterWidget",
+            "namedArgs": {}
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_bottom_bar",
+            "confidence": 0.76,
+            "rationale": "Fixed bottom footer with five icon buttons."
+          }
+        }
+      ],
+      "overrides": {
+        "backgroundColor": "color1"
+      },
+      "layoutHints": {
+        "scrollAxis": "vertical"
+      }
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "3212:20169",
+      "3212:20181",
+      "3212:20182",
+      "3212:20180",
+      "3212:20183"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "content_feed",
+      "confidence": 0.84,
+      "explanation": "Screen presents a titled page with a horizontally scrollable card carousel, section headers with actions, and a vertical list of tappable content rows above a fixed bottom navigation/footer.",
+      "warnings": [
+        "Several repeated row/card instances are flattened or partially specified in cleanTree; semantic roles inferred from repeated components and visible siblings.",
+        "Footer and status bar are represented as extracted prebuilt widgets; inner control semantics are not expanded here."
+      ]
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "3212:20181",
+        "role": "navigation",
+        "subtype": "top_app_bar",
+        "controlNodeId": "3212:20181",
+        "boundaryNodeId": "3212:20181",
+        "labelNodeIds": [
+          "I3212:20181;3207:13477",
+          "I3212:20181;3207:13478"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "system_chrome",
+        "contractTraits": {
+          "actionKind": "page_title",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "title_subtitle_vertical_group",
+          "actions_trailing_align"
+        ],
+        "options": [],
+        "confidence": 0.83,
+        "proposedEffects": [
+          "sticky_top_bar"
+        ],
+        "explanation": "Top navigation area with page title, subtitle, and trailing icon actions."
+      },
+      {
+        "nodeId": "I3212:20181;3207:13480",
+        "role": "control",
+        "subtype": "icon_button",
+        "controlNodeId": "I3212:20181;3207:13480",
+        "boundaryNodeId": "I3212:20181;3207:13480",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I3212:20181;3207:13480;8:43285"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "icon",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "minimum_tap_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.87,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Circular search icon button in the navigation bar."
+      },
+      {
+        "nodeId": "I3212:20181;3207:13481",
+        "role": "control",
+        "subtype": "icon_button",
+        "controlNodeId": "I3212:20181;3207:13481",
+        "boundaryNodeId": "I3212:20181;3207:13481",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I3212:20181;3207:13481;8:43285"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "icon",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "minimum_tap_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.72,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Secondary circular icon button in the navigation bar."
+      },
+      {
+        "nodeId": "3212:20170",
+        "role": "control",
+        "subtype": "carousel",
+        "controlNodeId": "I3212:20170;2973:13327",
+        "boundaryNodeId": "3212:20170",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [
+          "I3212:20170;348:23",
+          "I3212:20170;348:766",
+          "I3212:20170;348:828",
+          "I3212:20170;348:914",
+          "I3212:20170;348:1024",
+          "I3212:20170;348:1158"
+        ],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "actionKind": "horizontal_scroll",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "horizontal_scroll_collection"
+        ],
+        "options": [
+          {
+            "nodeId": "I3212:20170;348:23",
+            "label": "Header",
+            "confidence": 0.8
+          },
+          {
+            "nodeId": "I3212:20170;348:766",
+            "confidence": 0.55
+          },
+          {
+            "nodeId": "I3212:20170;348:828",
+            "confidence": 0.55
+          },
+          {
+            "nodeId": "I3212:20170;348:914",
+            "confidence": 0.55
+          },
+          {
+            "nodeId": "I3212:20170;348:1024",
+            "confidence": 0.55
+          },
+          {
+            "nodeId": "I3212:20170;348:1158",
+            "confidence": 0.55
+          }
+        ],
+        "confidence": 0.8,
+        "proposedEffects": [
+          "horizontal_drag"
+        ],
+        "explanation": "Horizontally scrollable collection of repeated image cards."
+      },
+      {
+        "nodeId": "I3212:20786;257:6602",
+        "role": "control",
+        "subtype": "text_button",
+        "controlNodeId": "I3212:20786;257:6602",
+        "boundaryNodeId": "I3212:20786;257:6602",
+        "labelNodeIds": [
+          "I3212:20786;257:6602;3016:10288;3016:10138"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I3212:20786;257:6602;3016:10288"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "view_all",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "pill_button_center_label",
+          "minimum_tap_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.91,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Section header action button labeled 'View all'."
+      },
+      {
+        "nodeId": "3212:20171",
+        "role": "control",
+        "subtype": "list_row",
+        "controlNodeId": "3212:20171",
+        "boundaryNodeId": "3212:20171",
+        "labelNodeIds": [
+          "I3212:20171;2921:13755"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I3212:20171;2921:13756"
+        ],
+        "decorationNodeIds": [
+          "I3212:20171;2921:13753",
+          "I3212:20171;2921:13758"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 2,
+          "actionKind": "list_navigation",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "list_tile_leading_media_trailing_chevron",
+          "minimum_tap_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.88,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Tappable content row with leading image, title/description, and trailing chevron."
+      },
+      {
+        "nodeId": "3212:20174",
+        "role": "control",
+        "subtype": "list_row",
+        "controlNodeId": "3212:20174",
+        "boundaryNodeId": "3212:20174",
+        "labelNodeIds": [
+          "I3212:20174;2921:13755"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I3212:20174;2921:13756"
+        ],
+        "decorationNodeIds": [
+          "I3212:20174;2921:13753",
+          "I3212:20174;2921:13758"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 2,
+          "actionKind": "list_navigation",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "list_tile_leading_media_trailing_chevron",
+          "minimum_tap_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.88,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Repeated tappable content row with explicit title and description."
+      },
+      {
+        "nodeId": "3212:20176",
+        "role": "control",
+        "subtype": "list_row",
+        "controlNodeId": "3212:20176",
+        "boundaryNodeId": "3212:20176",
+        "labelNodeIds": [
+          "I3212:20176;2921:13755"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I3212:20176;2921:13756"
+        ],
+        "decorationNodeIds": [
+          "I3212:20176;2921:13753",
+          "I3212:20176;2921:13758"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 2,
+          "actionKind": "list_navigation",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "list_tile_leading_media_trailing_chevron",
+          "minimum_tap_target_44dp"
+        ],
+        "options": [],
+        "confidence": 0.88,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Repeated tappable content row with explicit title and description."
+      },
+      {
+        "nodeId": "3212:20180",
+        "role": "navigation",
+        "subtype": "bottom_nav",
+        "controlNodeId": "3212:20180",
+        "boundaryNodeId": "3212:20180",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [
+          "I3212:20180;0:580",
+          "I3212:20180;0:578",
+          "I3212:20180;0:576",
+          "I3212:20180;14:11937",
+          "I3212:20180;0:577"
+        ],
+        "stateNodeIds": [],
+        "contractKind": "navigation_bar",
+        "contractTraits": {
+          "actionKind": "bottom_navigation",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "five_item_bottom_navigation",
+          "minimum_tap_target_44dp"
+        ],
+        "options": [
+          {
+            "nodeId": "I3212:20180;0:580",
+            "label": "home",
+            "value": "home",
+            "confidence": 0.82
+          },
+          {
+            "nodeId": "I3212:20180;0:578",
+            "label": "favorites",
+            "value": "favorites",
+            "confidence": 0.78
+          },
+          {
+            "nodeId": "I3212:20180;0:576",
+            "label": "cart",
+            "value": "cart",
+            "confidence": 0.8
+          },
+          {
+            "nodeId": "I3212:20180;14:11937",
+            "label": "search",
+            "value": "search",
+            "confidence": 0.84
+          },
+          {
+            "nodeId": "I3212:20180;0:577",
+            "label": "profile",
+            "value": "profile",
+            "confidence": 0.8
+          }
+        ],
+        "confidence": 0.86,
+        "proposedEffects": [
+          "tap_select_tab"
+        ],
+        "explanation": "Fixed footer presents five evenly spaced icon navigation actions."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "SectionHeaderWidget",
+      "widgetIr": {
+        "figmaId": "3212:20786",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20786;0:1039",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "text": "Section Header",
+              "accessibilityLabel": "Section Header",
+              "textColor": "primary",
+              "fontSize": 18.0
+            }
+          },
+          {
+            "figmaId": "I3212:20786;257:6414",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I3212:20786;257:6602",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I3212:20786;257:6602;3016:10288",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I3212:20786;257:6602;3016:10288;3016:10138",
+                        "kind": "auto",
+                        "children": [],
+                        "overrides": {
+                          "text": "View all",
+                          "accessibilityLabel": "View all",
+                          "textColor": "primary",
+                          "fontSize": 14.0
+                        }
+                      }
+                    ],
+                    "overrides": {
+                      "backgroundColor": "color4"
+                    }
+                  }
+                ],
+                "overrides": {
+                  "accessibilityLabel": "Button"
+                },
+                "classificationHint": {
+                  "suggestedKind": "button_filled",
+                  "confidence": 0.69,
+                  "rationale": "Small pill action button in section header."
+                }
+              }
+            ]
+          }
+        ],
+        "overrides": {
+          "backgroundColor": "color1"
+        },
+        "classificationHint": {
+          "suggestedKind": "container_list_tile",
+          "confidence": 0.64,
+          "rationale": "Section header row with title and action button."
+        }
+      }
+    },
+    {
+      "widgetName": "ArrowRightWidget",
+      "widgetIr": {
+        "figmaId": "I3212:20171;2921:13758",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20171;2921:13758;3073:9943",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "vector"
+            }
+          }
+        ],
+        "classificationHint": {
+          "suggestedKind": "button_icon",
+          "confidence": 0.66,
+          "rationale": "Chevron icon used as trailing action affordance."
+        }
+      }
+    },
+    {
+      "widgetName": "ImageCardWidget",
+      "widgetIr": {
+        "figmaId": "I3212:20170;348:23",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20170;348:23;2248:23869",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I3212:20170;348:23;2248:23869;2248:17249",
+                "kind": "auto",
+                "children": [],
+                "overrides": {
+                  "accessibilityLabel": "image"
+                }
+              }
+            ]
+          },
+          {
+            "figmaId": "I3212:20170;348:23;1920:5901",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I3212:20170;348:23;348:19",
+                "kind": "auto",
+                "children": [],
+                "overrides": {
+                  "text": "Header",
+                  "accessibilityLabel": "Header",
+                  "textColor": "primary",
+                  "fontSize": 16.0
+                }
+              },
+              {
+                "figmaId": "I3212:20170;348:23;348:20",
+                "kind": "auto",
+                "children": [],
+                "overrides": {
+                  "text": "Lorem ipsum dolor sit amet, consectetur",
+                  "accessibilityLabel": "Lorem ipsum dolor sit amet, consectetur",
+                  "textColor": "primary",
+                  "fontSize": 16.0
+                }
+              }
+            ]
+          }
+        ],
+        "classificationHint": {
+          "suggestedKind": "container_card",
+          "confidence": 0.8,
+          "rationale": "Card with top image and supporting text copy."
+        }
+      }
+    },
+    {
+      "widgetName": "ContentRowWidget",
+      "widgetIr": {
+        "figmaId": "3212:20171",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20171;2921:13752",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I3212:20171;2921:13753",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "I3212:20171;2921:13754",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I3212:20171;2921:13755",
+                    "kind": "auto",
+                    "children": [],
+                    "overrides": {
+                      "text": "Row Header",
+                      "accessibilityLabel": "Row Header",
+                      "textColor": "primary",
+                      "fontSize": 16.0
+                    }
+                  },
+                  {
+                    "figmaId": "I3212:20171;2921:13756",
+                    "kind": "auto",
+                    "children": [],
+                    "overrides": {
+                      "text": "Body copy description",
+                      "accessibilityLabel": "Body copy description",
+                      "textColor": "primary",
+                      "fontSize": 16.0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "figmaId": "I3212:20171;2921:13758",
+            "kind": "extracted",
+            "children": [],
+            "ref": {
+              "widgetName": "ArrowRightWidget",
+              "namedArgs": {}
+            }
+          }
+        ],
+        "overrides": {
+          "backgroundColor": "color1"
+        },
+        "classificationHint": {
+          "suggestedKind": "container_list_tile",
+          "confidence": 0.77,
+          "rationale": "Standard content row with media, copy, and trailing chevron."
+        }
+      }
+    },
+    {
+      "widgetName": "ContentRowWidgetDetailed",
+      "widgetIr": {
+        "figmaId": "3212:20174",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20174;2921:13752",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I3212:20174;2921:13753",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "I3212:20174;2921:13754",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I3212:20174;2921:13755",
+                    "kind": "auto",
+                    "children": [],
+                    "overrides": {
+                      "text": "Row Header",
+                      "accessibilityLabel": "Row Header",
+                      "textColor": "primary",
+                      "fontSize": 16.0
+                    }
+                  },
+                  {
+                    "figmaId": "I3212:20174;2921:13756",
+                    "kind": "auto",
+                    "children": [],
+                    "overrides": {
+                      "text": "Body copy description",
+                      "accessibilityLabel": "Body copy description",
+                      "textColor": "primary",
+                      "fontSize": 16.0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "figmaId": "I3212:20174;2921:13758",
+            "kind": "extracted",
+            "children": [],
+            "ref": {
+              "widgetName": "ArrowRightWidget",
+              "namedArgs": {}
+            }
+          }
+        ],
+        "overrides": {
+          "backgroundColor": "color1"
+        },
+        "classificationHint": {
+          "suggestedKind": "container_list_tile",
+          "confidence": 0.77,
+          "rationale": "Repeated content row variant with explicit media and copy subtree."
+        }
+      }
+    },
+    {
+      "widgetName": "StatusBarWidget",
+      "widgetIr": {
+        "figmaId": "3212:20182",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20182;368:2442",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "text": "9:41",
+              "accessibilityLabel": "9:41",
+              "textColor": "color3",
+              "fontSize": 15.0
+            }
+          },
+          {
+            "figmaId": "I3212:20182;3033:12404",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "FooterWidget",
+      "widgetIr": {
+        "figmaId": "3212:20180",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20180;0:580",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Icon button"
+            },
+            "classificationHint": {
+              "suggestedKind": "button_icon",
+              "confidence": 0.76,
+              "rationale": "Bottom footer navigation icon button."
+            }
+          },
+          {
+            "figmaId": "I3212:20180;0:578",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Icon button"
+            },
+            "classificationHint": {
+              "suggestedKind": "button_icon",
+              "confidence": 0.76,
+              "rationale": "Bottom footer navigation icon button."
+            }
+          },
+          {
+            "figmaId": "I3212:20180;0:576",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Icon button"
+            },
+            "classificationHint": {
+              "suggestedKind": "button_icon",
+              "confidence": 0.76,
+              "rationale": "Bottom footer navigation icon button."
+            }
+          },
+          {
+            "figmaId": "I3212:20180;14:11937",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Icon button"
+            },
+            "classificationHint": {
+              "suggestedKind": "button_icon",
+              "confidence": 0.76,
+              "rationale": "Bottom footer navigation icon button."
+            }
+          },
+          {
+            "figmaId": "I3212:20180;0:577",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "Icon button"
+            },
+            "classificationHint": {
+              "suggestedKind": "button_icon",
+              "confidence": 0.76,
+              "rationale": "Bottom footer navigation icon button."
+            }
+          }
+        ],
+        "overrides": {
+          "backgroundColor": "color1"
+        },
+        "classificationHint": {
+          "suggestedKind": "nav_bottom_bar",
+          "confidence": 0.75,
+          "rationale": "Prebuilt footer with repeated navigation buttons."
+        }
+      }
+    },
+    {
+      "widgetName": "SearchWidget",
+      "widgetIr": {
+        "figmaId": "I3212:20181;3207:13480;8:43285",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20181;3207:13480;8:43285;3073:9901",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "accessibilityLabel": "vector"
+            }
+          }
+        ],
+        "classificationHint": {
+          "suggestedKind": "button_icon",
+          "confidence": 0.68,
+          "rationale": "Reusable search icon glyph subtree."
+        }
+      }
+    }
+  ]
+}

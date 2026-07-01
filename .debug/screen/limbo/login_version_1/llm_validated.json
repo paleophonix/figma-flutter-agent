@@ -1,0 +1,364 @@
+{
+  "stage": "llm_validated",
+  "featureName": "login_version_1",
+  "screenIr": {
+    "root": {
+      "figmaId": "3:5123",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "3:16755",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I3:16755;3:6790",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "3:5124",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "3:5125",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "3:5126",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "3:16680",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "3:16684",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "3:16683",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "3:5128",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "3:5129",
+                          "kind": "text",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "3:5130",
+                          "kind": "text",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "3:5131",
+                  "kind": "input",
+                  "children": [
+                    {
+                      "figmaId": "3:5132",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "3:5134",
+                          "kind": "input",
+                          "children": [
+                            {
+                              "figmaId": "I3:5134;3:6011",
+                              "kind": "input",
+                              "children": [
+                                {
+                                  "figmaId": "I3:5134;3:6015",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3:5134;3:6015;4:78000",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "3:5136",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "3:16696",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "28:4027",
+                              "kind": "button",
+                              "children": [
+                                {
+                                  "figmaId": "28:4028",
+                                  "kind": "button",
+                                  "children": [
+                                    {
+                                      "figmaId": "I28:4028;3:6131",
+                                      "kind": "stack",
+                                      "children": [
+                                        {
+                                          "figmaId": "I28:4028;3:6131;136:155",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I28:4028;3:6131;136:156",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I28:4028;3:6131;136:157",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I28:4028;3:6131;136:158",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "28:4029",
+                                  "kind": "button",
+                                  "children": [
+                                    {
+                                      "figmaId": "I28:4029;3:6134",
+                                      "kind": "stack",
+                                      "children": [
+                                        {
+                                          "figmaId": "I28:4029;3:6135",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I28:4029;3:6136",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "3:16714",
+              "kind": "row",
+              "children": [
+                {
+                  "figmaId": "3:16715",
+                  "kind": "text",
+                  "children": [],
+                  "wrap": "flexibleLoose"
+                },
+                {
+                  "figmaId": "3:16716",
+                  "kind": "text",
+                  "children": [],
+                  "wrap": "flexibleLoose"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "3:16736",
+          "kind": "stack",
+          "children": []
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {
+      "3:16755": "default",
+      "3:5133": "default",
+      "3:5134": "default",
+      "I3:5134;3:6015": "default",
+      "3:5137": "default",
+      "28:4028": "default",
+      "I28:4028;3:6131": "default",
+      "28:4029": "default",
+      "3:16736": "default"
+    },
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "login_version_1",
+      "confidence": 0.95,
+      "explanation": "Account sign-in screen containing login fields (email, password), forgot password option, primary log-in submission button, social OAuth steps (Google, Facebook), and a sign-up redirection link.",
+      "warnings": []
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "3:5133",
+        "role": "text_input",
+        "controlNodeId": "3:5133",
+        "boundaryNodeId": "3:5133",
+        "labelNodeIds": [
+          "I3:5133;3:6010"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I3:5133;3:6014"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": []
+      },
+      {
+        "nodeId": "3:5134",
+        "role": "password_input",
+        "controlNodeId": "3:5134",
+        "boundaryNodeId": "3:5134",
+        "labelNodeIds": [
+          "I3:5134;3:6010"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I3:5134;3:6014"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": []
+      },
+      {
+        "nodeId": "3:5137",
+        "role": "button",
+        "controlNodeId": "3:5137",
+        "boundaryNodeId": "3:5137",
+        "labelNodeIds": [
+          "I3:5137;3:6045"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": []
+      },
+      {
+        "nodeId": "3:5135",
+        "role": "button",
+        "controlNodeId": "3:5135",
+        "boundaryNodeId": "3:5135",
+        "labelNodeIds": [
+          "3:5135"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": []
+      },
+      {
+        "nodeId": "28:4028",
+        "role": "button",
+        "controlNodeId": "28:4028",
+        "boundaryNodeId": "28:4028",
+        "labelNodeIds": [
+          "I28:4028;3:6132"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": []
+      },
+      {
+        "nodeId": "28:4029",
+        "role": "button",
+        "controlNodeId": "28:4029",
+        "boundaryNodeId": "28:4029",
+        "labelNodeIds": [
+          "I28:4029;3:6137"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": []
+      },
+      {
+        "nodeId": "3:16716",
+        "role": "button",
+        "controlNodeId": "3:16716",
+        "boundaryNodeId": "3:16716",
+        "labelNodeIds": [
+          "3:16716"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": []
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "CleanInputField",
+      "widgetIr": {
+        "figmaId": "3:6008",
+        "kind": "column",
+        "children": []
+      }
+    }
+  ]
+}

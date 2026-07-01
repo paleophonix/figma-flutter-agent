@@ -1,0 +1,370 @@
+{
+  "featureName": "sign_up_version_9",
+  "emitterVersion": "2026.06.2",
+  "checkpoints": [
+    "CP0b_reprune",
+    "CP1_guards",
+    "CP1_normalize",
+    "CP2_ir_passes",
+    "CP2_semantic",
+    "CP2_post_classify",
+    "CP2_fidelity_stamp"
+  ],
+  "mutations": [
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I49:1744;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I49:1744;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I49:1745;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I49:1745;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I49:1746;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I49:1746;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I49:1685;3:6045",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "49:1662",
+      "field": "stack_placement",
+      "old": {
+        "left": -233.0,
+        "top": -43.7
+      },
+      "new": {
+        "left": -20.0,
+        "top": -20.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "49:1665",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "49:1662",
+      "field": "stack_placement",
+      "old": {
+        "left": -233.0,
+        "top": -43.7
+      },
+      "new": {
+        "left": -20.0,
+        "top": -20.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "49:1665",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "49:1662",
+      "field": "stack_placement",
+      "old": {
+        "left": -233.0,
+        "top": -43.7
+      },
+      "new": {
+        "left": -20.0,
+        "top": -20.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "49:1665",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "49:1662",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": -43.7
+      },
+      "new": {
+        "left": 0.0,
+        "top": -20.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "49:1665",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 778.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 775.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "49:1664",
+      "field": "type",
+      "old": "STACK",
+      "new": "ROW",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "49:1664",
+      "field": "spacing",
+      "old": 0.0,
+      "new": 220.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "49:1664",
+      "field": "flex_gap_mode",
+      "old": null,
+      "new": "uniform",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "49:1664",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "cross_delta": 1.0,
+        "gap_spread": 0.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "49:1661",
+      "field": "type",
+      "old": "STACK",
+      "new": "COLUMN",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "49:1661",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "sections": 1,
+        "bands": 1,
+        "bottom_chrome": 1,
+        "top_chrome": 1
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "49:1661",
+      "field": "children_count",
+      "old": 6,
+      "new": 3,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "49:1661",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "49:1661",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "49:1811",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "49:1811",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I49:1748;3:6101;1715:49004",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I49:1748;3:6101;1715:49004",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I49:1664;3:6767",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    }
+  ],
+  "decisions": [
+    {
+      "nodeId": "49:1661",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "ROW": 1,
+          "STACK": 2
+        },
+        "child_count": 3
+      }
+    },
+    {
+      "nodeId": "49:1811",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I49:1748;3:6101;1715:49004",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    }
+  ],
+  "deviations": []
+}

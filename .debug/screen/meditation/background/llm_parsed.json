@@ -1,0 +1,421 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "background",
+  "screenIr": {
+    "root": {
+      "figmaId": "362:319",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "362:320",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "362:321",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "362:322",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "362:323",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "362:324",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "362:325",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "362:326",
+                                  "kind": "row",
+                                  "children": [
+                                    {
+                                      "figmaId": "362:327",
+                                      "kind": "button",
+                                      "children": [
+                                        {
+                                          "figmaId": "362:328",
+                                          "kind": "stack",
+                                          "children": [
+                                            {
+                                              "figmaId": "362:329",
+                                              "kind": "auto",
+                                              "children": [],
+                                              "ref": {
+                                                "widgetName": "BackButtonIcon",
+                                                "namedArgs": {}
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "362:330",
+                                          "kind": "column",
+                                          "children": [
+                                            {
+                                              "figmaId": "362:331",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Личные данные",
+                                                "accessibilityLabel": "Личные данные",
+                                                "textColor": "0xFF09090B",
+                                                "fontSize": 17.0
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "362:332",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "362:333",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "362:334",
+                              "kind": "text",
+                              "children": [],
+                              "overrides": {
+                                "text": "Редактирование профиля",
+                                "accessibilityLabel": "Редактирование профиля",
+                                "textColor": "0xFF09090B",
+                                "fontSize": 15.0
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "362:335",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "362:336",
+                              "kind": "container",
+                              "children": [
+                                {
+                                  "figmaId": "362:337",
+                                  "kind": "text",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "И",
+                                    "accessibilityLabel": "И",
+                                    "textColor": "0xFF2E7D32",
+                                    "fontSize": 24.0
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "362:338",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "362:339",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "362:340",
+                                      "kind": "text",
+                                      "children": [],
+                                      "overrides": {
+                                        "text": "Аватар, ФИО, e-mail и дата\nрождения",
+                                        "accessibilityLabel": "Аватар, ФИО, e-mail и дата\nрождения",
+                                        "textColor": "0xFF71717B",
+                                        "fontSize": 14.0
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "362:341",
+                                  "kind": "button",
+                                  "children": [
+                                    {
+                                      "figmaId": "362:342",
+                                      "kind": "text",
+                                      "children": [],
+                                      "overrides": {
+                                        "text": "Обновить аватар",
+                                        "accessibilityLabel": "Обновить аватар",
+                                        "textColor": "0xFF27272A",
+                                        "fontSize": 14.0
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "362:343",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "362:344",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "362:345",
+                                  "kind": "text",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "ФИО",
+                                    "accessibilityLabel": "ФИО",
+                                    "textColor": "0xFF3F3F46",
+                                    "fontSize": 13.0
+                                  }
+                                },
+                                {
+                                  "figmaId": "362:346",
+                                  "kind": "input",
+                                  "children": [
+                                    {
+                                      "figmaId": "362:347",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "362:348",
+                                          "kind": "text",
+                                          "children": [],
+                                          "overrides": {
+                                            "text": "Иван Иванов",
+                                            "accessibilityLabel": "Иван Иванов",
+                                            "textColor": "0xFF18181B",
+                                            "fontSize": 14.0
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "362:349",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "362:350",
+                                  "kind": "text",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "E-mail",
+                                    "accessibilityLabel": "E-mail",
+                                    "textColor": "0xFF3F3F46",
+                                    "fontSize": 13.0
+                                  }
+                                },
+                                {
+                                  "figmaId": "362:351",
+                                  "kind": "input",
+                                  "children": [
+                                    {
+                                      "figmaId": "362:352",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "362:353",
+                                          "kind": "text",
+                                          "children": [],
+                                          "overrides": {
+                                            "text": "client@ataev.ru",
+                                            "accessibilityLabel": "client@ataev.ru",
+                                            "textColor": "0xFF18181B",
+                                            "fontSize": 14.0
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "362:354",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "362:355",
+                                  "kind": "text",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Дата рождения",
+                                    "accessibilityLabel": "Дата рождения",
+                                    "textColor": "0xFF3F3F46",
+                                    "fontSize": 13.0
+                                  }
+                                },
+                                {
+                                  "figmaId": "362:356",
+                                  "kind": "input",
+                                  "children": [
+                                    {
+                                      "figmaId": "362:357",
+                                      "kind": "row",
+                                      "children": [
+                                        {
+                                          "figmaId": "362:358",
+                                          "kind": "row",
+                                          "children": [
+                                            {
+                                              "figmaId": "362:359",
+                                              "kind": "row",
+                                              "children": [
+                                                {
+                                                  "figmaId": "362:360",
+                                                  "kind": "text",
+                                                  "children": [],
+                                                  "overrides": {
+                                                    "text": "14",
+                                                    "accessibilityLabel": "14",
+                                                    "textColor": "0xFF18181B",
+                                                    "fontSize": 14.0
+                                                  }
+                                                },
+                                                {
+                                                  "figmaId": "362:361",
+                                                  "kind": "text",
+                                                  "children": [],
+                                                  "overrides": {
+                                                    "text": ".",
+                                                    "accessibilityLabel": ".",
+                                                    "textColor": "0xFF18181B",
+                                                    "fontSize": 14.0
+                                                  }
+                                                },
+                                                {
+                                                  "figmaId": "362:362",
+                                                  "kind": "text",
+                                                  "children": [],
+                                                  "overrides": {
+                                                    "text": "06",
+                                                    "accessibilityLabel": "06",
+                                                    "textColor": "0xFF18181B",
+                                                    "fontSize": 14.0
+                                                  }
+                                                },
+                                                {
+                                                  "figmaId": "362:363",
+                                                  "kind": "text",
+                                                  "children": [],
+                                                  "overrides": {
+                                                    "text": ".",
+                                                    "accessibilityLabel": ".",
+                                                    "textColor": "0xFF18181B",
+                                                    "fontSize": 14.0
+                                                  }
+                                                },
+                                                {
+                                                  "figmaId": "362:364",
+                                                  "kind": "text",
+                                                  "children": [],
+                                                  "overrides": {
+                                                    "text": "1995",
+                                                    "accessibilityLabel": "1995",
+                                                    "textColor": "0xFF18181B",
+                                                    "fontSize": 14.0
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "362:365",
+                                          "kind": "button",
+                                          "children": [
+                                            {
+                                              "figmaId": "362:366",
+                                              "kind": "column",
+                                              "children": [
+                                                {
+                                                  "figmaId": "362:367",
+                                                  "kind": "stack",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "362:368",
+                                                      "kind": "auto",
+                                                      "children": [],
+                                                      "ref": {
+                                                        "widgetName": "CalendarIcon",
+                                                        "namedArgs": {}
+                                                      }
+                                                    },
+                                                    {
+                                                      "figmaId": "362:369",
+                                                      "kind": "auto",
+                                                      "children": [],
+                                                      "ref": {
+                                                        "widgetName": "CalendarIcon",
+                                                        "namedArgs": {}
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "362:320",
+      "611:1330"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "BackButtonIcon",
+      "widgetIr": {
+        "figmaId": "362:329",
+        "kind": "image",
+        "children": []
+      }
+    },
+    {
+      "widgetName": "CalendarIcon",
+      "widgetIr": {
+        "figmaId": "362:368",
+        "kind": "image",
+        "children": []
+      }
+    }
+  ]
+}

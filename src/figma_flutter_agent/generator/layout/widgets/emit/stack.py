@@ -163,7 +163,11 @@ def _render_vector_logo_mark_stack(
 
 
 def render_stack(
-    node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, Any], *, recurse: Callable[..., str]
+    node: CleanDesignTreeNode,
+    ctx: dict[str, Any],
+    flow: dict[str, Any],
+    *,
+    recurse: Callable[..., str],
 ) -> str:
     """Render a NodeType.STACK node (the non-early-return path)."""
     parent_type = flow["parent_type"]

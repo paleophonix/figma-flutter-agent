@@ -1,0 +1,1447 @@
+{
+  "cleanTree": {
+    "id": "1:1192",
+    "name": "Meditate v2",
+    "type": "STACK",
+    "sizing": {
+      "widthMode": "FIXED",
+      "heightMode": "FIXED",
+      "width": 414.0,
+      "height": 896.0
+    },
+    "alignment": {
+      "cross": "stretch"
+    },
+    "style": {
+      "backgroundColor": "0xFFFFFFFF"
+    },
+    "children": [
+      {
+        "id": "1:1193",
+        "name": "Mask Group",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 176.4,
+          "height": 210.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/mask_group_1_1193.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 218.6,
+          "top": 568.2,
+          "right": 19.0,
+          "width": 176.4,
+          "height": 210.0
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "1:1194",
+          "1:1195",
+          "1:1196",
+          "1:1197",
+          "1:1198",
+          "1:1199",
+          "1:1200",
+          "1:1201",
+          "1:1202",
+          "1:1203",
+          "1:1204",
+          "1:1205",
+          "1:1206",
+          "1:1207",
+          "1:1208",
+          "1:1209",
+          "1:1210",
+          "1:1211",
+          "1:1212",
+          "1:1213",
+          "1:1214",
+          "1:1215",
+          "1:1216",
+          "1:1217",
+          "1:1218",
+          "1:1219",
+          "1:1220",
+          "1:1221",
+          "1:1222",
+          "1:1223",
+          "1:1224",
+          "1:1225",
+          "1:1226",
+          "1:1227",
+          "1:1228",
+          "1:1229",
+          "1:1230",
+          "1:1231",
+          "1:1232",
+          "1:1233",
+          "1:1234",
+          "1:1235",
+          "1:1236"
+        ]
+      },
+      {
+        "id": "1:1237",
+        "name": "Mask Group",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 176.4,
+          "height": 167.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/mask_group_1_1237.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 21.0,
+          "top": 612.0,
+          "right": 216.6,
+          "width": 176.4,
+          "height": 167.0
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "1:1238",
+          "1:1239",
+          "1:1240",
+          "1:1241",
+          "1:1242",
+          "1:1243",
+          "1:1244",
+          "1:1245",
+          "1:1246",
+          "1:1247",
+          "1:1248",
+          "1:1249",
+          "1:1250",
+          "1:1251",
+          "1:1252",
+          "1:1253",
+          "1:1254",
+          "1:1255",
+          "1:1256",
+          "1:1257",
+          "1:1258",
+          "1:1259",
+          "1:1260",
+          "1:1261",
+          "1:1262",
+          "1:1263",
+          "1:1264",
+          "1:1265",
+          "1:1266",
+          "1:1267",
+          "1:1268",
+          "1:1269",
+          "1:1270",
+          "1:1271",
+          "1:1272",
+          "1:1273",
+          "1:1274",
+          "1:1275",
+          "1:1276",
+          "1:1277",
+          "1:1278",
+          "1:1279",
+          "1:1280",
+          "1:1281",
+          "1:1282",
+          "1:1283",
+          "1:1284",
+          "1:1285",
+          "1:1286",
+          "1:1287",
+          "1:1288"
+        ]
+      },
+      {
+        "id": "1:1289",
+        "name": "Group 7",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 176.4,
+          "height": 210.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/group_7_1_1289.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 18.0,
+          "top": 382.0,
+          "right": 219.6,
+          "width": 176.4,
+          "height": 210.0
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "1:1290",
+          "1:1291",
+          "1:1292",
+          "1:1294",
+          "1:1295",
+          "1:1296",
+          "1:1297",
+          "1:1298",
+          "1:1299",
+          "1:1300",
+          "1:1301",
+          "1:1302",
+          "1:1303",
+          "1:1304",
+          "1:1305",
+          "1:1306",
+          "1:1307",
+          "1:1308",
+          "1:1309",
+          "1:1310",
+          "1:1311",
+          "1:1312",
+          "1:1313",
+          "1:1314",
+          "1:1315",
+          "1:1316",
+          "1:1317",
+          "1:1318",
+          "1:1319",
+          "1:1320",
+          "1:1321",
+          "1:1322",
+          "1:1323",
+          "1:1324",
+          "1:1325",
+          "1:1326",
+          "1:1327",
+          "1:1328",
+          "1:1329",
+          "1:1330",
+          "1:1331"
+        ]
+      },
+      {
+        "id": "1:1332",
+        "name": "Group 4",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 147.0,
+          "height": 49.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 36.0,
+          "top": 713.0,
+          "right": 231.0,
+          "bottom": 90.0,
+          "width": 147.0,
+          "height": 49.0
+        },
+        "children": [
+          {
+            "id": "1:1333",
+            "name": "How to Meditate",
+            "type": "TEXT",
+            "sizing": {
+              "width": 147.0,
+              "height": 49.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF000000",
+              "fontSize": 18.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.35,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 30.1,
+              "glyphHeight": 13.1
+            },
+            "text": "\nHow to Meditate",
+            "accessibilityLabel": "How to Meditate",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 147.0,
+              "height": 49.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "1:1334",
+        "name": "Rectangle 7",
+        "type": "CONTAINER",
+        "sizing": {
+          "width": 176.4,
+          "height": 167.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderRadius": 10.0,
+          "gradient": {
+            "type": "linear",
+            "stops": [
+              {
+                "position": 0.0,
+                "color": "0xFFFF7C6B"
+              },
+              {
+                "position": 1.0,
+                "color": "0xFFFAC978"
+              }
+            ],
+            "angle": 90.0
+          }
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 218.6,
+          "top": 382.0,
+          "right": 19.0,
+          "bottom": 303.0,
+          "width": 176.4,
+          "height": 167.0
+        }
+      },
+      {
+        "id": "1:1335",
+        "name": "Mask Group",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 176.4,
+          "height": 167.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/mask_group_1_1335.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 218.6,
+          "top": 382.0,
+          "right": 19.0,
+          "width": 176.4,
+          "height": 167.0
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "1:1336",
+          "1:1337",
+          "1:1338",
+          "1:1339",
+          "1:1340",
+          "1:1341",
+          "1:1342",
+          "1:1343",
+          "1:1344",
+          "1:1345",
+          "1:1346",
+          "1:1347",
+          "1:1348",
+          "1:1349",
+          "1:1350",
+          "1:1351",
+          "1:1352",
+          "1:1353",
+          "1:1354",
+          "1:1355",
+          "1:1356",
+          "1:1357",
+          "1:1358",
+          "1:1359",
+          "1:1360",
+          "1:1361",
+          "1:1362",
+          "1:1363",
+          "1:1364",
+          "1:1365",
+          "1:1366"
+        ]
+      },
+      {
+        "id": "1:1367",
+        "name": "Group 4",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 141.0,
+          "height": 22.6
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 234.0,
+          "top": 510.4,
+          "right": 39.0,
+          "bottom": 319.0,
+          "width": 141.0,
+          "height": 22.6
+        },
+        "children": [
+          {
+            "id": "1:1368",
+            "name": "Anxiet Release",
+            "type": "TEXT",
+            "sizing": {
+              "width": 141.0,
+              "height": 22.6
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF000000",
+              "fontSize": 18.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.35,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 6.1,
+              "glyphHeight": 13.1
+            },
+            "text": "Anxiet Release",
+            "accessibilityLabel": "Anxiet Release",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 141.0,
+              "height": 22.6
+            }
+          }
+        ]
+      },
+      {
+        "id": "1:1370",
+        "name": "Line 1",
+        "type": "CONTAINER",
+        "sizing": {
+          "width": 143.0,
+          "height": 0.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderWidth": 5.0,
+          "borderColor": "0xFFE6E6E6",
+          "hasStroke": true
+        },
+        "vectorAssetKey": "assets/icons/line_1_1_1370.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 136.0,
+          "top": 838.0,
+          "right": 135.0,
+          "bottom": 14.0,
+          "width": 143.0
+        }
+      },
+      {
+        "id": "1:1371",
+        "name": "Group 32",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 39.0,
+          "height": 54.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 23.0,
+          "top": 762.0,
+          "right": 352.0,
+          "bottom": 36.0,
+          "width": 39.0,
+          "height": 54.0
+        },
+        "children": [
+          {
+            "id": "1:1372",
+            "name": "Group 31",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 39.0,
+              "height": 54.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 39.0,
+              "height": 54.0
+            },
+            "children": [
+              {
+                "id": "1:1373",
+                "name": "Vector",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 21.5,
+                  "height": 22.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFA0A3B1"
+                },
+                "vectorAssetKey": "assets/icons/vector_1_1373.svg",
+                "accessibilityLabel": "Vector",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "left": 9.0,
+                  "right": 8.5,
+                  "bottom": 32.0,
+                  "width": 21.5,
+                  "height": 22.0
+                }
+              },
+              {
+                "id": "1:1374",
+                "name": "Home",
+                "type": "TEXT",
+                "sizing": {
+                  "width": 39.0,
+                  "height": 15.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "textColor": "0xFF000000",
+                  "fontSize": 14.0,
+                  "fontWeight": "w500",
+                  "textAlign": "LEFT",
+                  "lineHeight": 1.08,
+                  "letterSpacing": 0.0,
+                  "fontFamily": "Helvetica Neue",
+                  "glyphTopOffset": 3.0,
+                  "glyphHeight": 10.2
+                },
+                "text": "Home",
+                "accessibilityLabel": "Home",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 39.0,
+                  "height": 15.0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1:1375",
+        "name": "Group 29",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 58.0,
+          "height": 66.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 175.0,
+          "top": 750.0,
+          "right": 181.0,
+          "bottom": 36.0,
+          "width": 58.0,
+          "height": 66.0
+        },
+        "children": [
+          {
+            "id": "1:1376",
+            "name": "Rectangle 18",
+            "type": "CONTAINER",
+            "sizing": {
+              "width": 46.0,
+              "height": 46.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF8E97FD",
+              "borderRadius": 18.0
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 8.0,
+              "right": 4.0,
+              "bottom": 20.0,
+              "width": 46.0,
+              "height": 46.0
+            }
+          },
+          {
+            "id": "1:1377",
+            "name": "Group",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 18.0,
+              "height": 22.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "vectorAssetKey": "assets/icons/group_1_1377.svg",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 22.0,
+              "top": 12.0,
+              "right": 18.0,
+              "bottom": 32.0,
+              "width": 18.0,
+              "height": 22.0
+            },
+            "children": [
+              {
+                "id": "1:1378",
+                "name": "Vector",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 16.4,
+                  "height": 16.2
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFE6E7F2"
+                },
+                "accessibilityLabel": "Vector",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "top": 5.8,
+                  "right": 1.6,
+                  "width": 16.4,
+                  "height": 16.2
+                }
+              },
+              {
+                "id": "1:1379",
+                "name": "Vector",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 7.0,
+                  "height": 7.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFE6E7F2"
+                },
+                "accessibilityLabel": "Vector",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "left": 11.0,
+                  "bottom": 15.0,
+                  "width": 7.0,
+                  "height": 7.0
+                }
+              }
+            ]
+          },
+          {
+            "id": "1:1380",
+            "name": "Meditate",
+            "type": "TEXT",
+            "sizing": {
+              "width": 58.0,
+              "height": 15.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "CENTER",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 3.0,
+              "glyphHeight": 10.2
+            },
+            "text": "Meditate",
+            "accessibilityLabel": "Meditate",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "LEFT_RIGHT",
+              "top": 7.0,
+              "width": 58.0,
+              "height": 15.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "1:1381",
+        "name": "Group 28",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 39.0,
+          "height": 54.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 271.0,
+          "top": 762.0,
+          "right": 104.0,
+          "bottom": 36.0,
+          "width": 39.0,
+          "height": 54.0
+        },
+        "children": [
+          {
+            "id": "1:1382",
+            "name": "Music",
+            "type": "TEXT",
+            "sizing": {
+              "width": 39.0,
+              "height": 15.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "CENTER",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 3.0,
+              "glyphHeight": 10.2
+            },
+            "text": "Music",
+            "accessibilityLabel": "Music",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "LEFT_RIGHT",
+              "width": 39.0,
+              "height": 15.0
+            }
+          },
+          {
+            "id": "1:1383",
+            "name": "Group",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 25.8,
+              "height": 22.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 7.0,
+              "right": 6.2,
+              "bottom": 32.0,
+              "width": 25.8,
+              "height": 22.0
+            },
+            "children": [
+              {
+                "id": "1:1384",
+                "name": "Vector",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 11.8,
+                  "height": 11.5
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFA0A3B1"
+                },
+                "vectorAssetKey": "assets/icons/vector_1_1384.svg",
+                "accessibilityLabel": "Vector",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "top": 10.5,
+                  "right": 14.1,
+                  "width": 11.8,
+                  "height": 11.5
+                }
+              },
+              {
+                "id": "1:1385",
+                "name": "Group",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 15.9,
+                  "height": 19.2
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "left": 10.0,
+                  "bottom": 2.8,
+                  "width": 15.9,
+                  "height": 19.2
+                },
+                "children": [
+                  {
+                    "id": "1:1386",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 15.9,
+                      "height": 19.2
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFFA0A3B1"
+                    },
+                    "vectorAssetKey": "assets/icons/vector_1_1386.svg",
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "width": 15.9,
+                      "height": 19.2
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1:1387",
+        "name": "Group 30",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 37.0,
+          "height": 54.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 100.0,
+          "top": 762.0,
+          "right": 277.0,
+          "bottom": 36.0,
+          "width": 37.0,
+          "height": 54.0
+        },
+        "children": [
+          {
+            "id": "1:1388",
+            "name": "Sleep",
+            "type": "TEXT",
+            "sizing": {
+              "width": 37.0,
+              "height": 15.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 2.8,
+              "glyphHeight": 12.9
+            },
+            "text": "Sleep",
+            "accessibilityLabel": "Sleep",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 37.0,
+              "height": 15.0
+            }
+          },
+          {
+            "id": "1:1389",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 22.8,
+              "height": 22.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFFA0A3B1"
+            },
+            "vectorAssetKey": "assets/icons/vector_1_1389.svg",
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 8.0,
+              "right": 6.2,
+              "bottom": 32.0,
+              "width": 22.8,
+              "height": 22.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "1:1390",
+        "name": "Group 27",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 34.0,
+          "height": 54.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 348.0,
+          "top": 762.0,
+          "right": 32.0,
+          "bottom": 36.0,
+          "width": 34.0,
+          "height": 54.0
+        },
+        "children": [
+          {
+            "id": "1:1391",
+            "name": "Afsar",
+            "type": "TEXT",
+            "sizing": {
+              "width": 34.0,
+              "height": 15.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "CENTER",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 3.0,
+              "glyphHeight": 10.2
+            },
+            "text": "Afsar",
+            "accessibilityLabel": "Afsar",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "LEFT_RIGHT",
+              "width": 34.0,
+              "height": 15.0
+            }
+          },
+          {
+            "id": "1:1392",
+            "name": "Group",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 19.5,
+              "height": 23.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "vectorAssetKey": "assets/icons/group_1_1392.svg",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 8.0,
+              "right": 6.5,
+              "bottom": 31.0,
+              "width": 19.5,
+              "height": 23.0
+            },
+            "children": [
+              {
+                "id": "1:1393",
+                "name": "Vector",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 10.6,
+                  "height": 10.6
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFA0A3B1",
+                  "borderWidth": 0.20000000298023224,
+                  "borderColor": "0xFF98A1BD",
+                  "hasStroke": true
+                },
+                "accessibilityLabel": "Vector",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "left": 4.4,
+                  "right": 4.4,
+                  "bottom": 12.4,
+                  "width": 10.6,
+                  "height": 10.6
+                }
+              },
+              {
+                "id": "1:1394",
+                "name": "Vector",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 19.5,
+                  "height": 10.6
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFA0A3B1"
+                },
+                "accessibilityLabel": "Vector",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "top": 12.4,
+                  "width": 19.5,
+                  "height": 10.6
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1:1395",
+        "name": "Meditate",
+        "type": "TEXT",
+        "sizing": {
+          "width": 118.0,
+          "height": 30.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF3F414E",
+          "fontSize": 28.0,
+          "fontWeight": "w700",
+          "textAlign": "CENTER",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.0,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 6.0,
+          "glyphHeight": 20.4
+        },
+        "text": "Meditate",
+        "accessibilityLabel": "Meditate",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "horizontal": "LEFT_RIGHT",
+          "top": 22.0,
+          "bottom": 800.0,
+          "width": 118.0,
+          "height": 30.0
+        }
+      },
+      {
+        "id": "1:1396",
+        "name": "we can learn how to recognize when our minds are doing their normal everyday acrobatics.",
+        "type": "TEXT",
+        "sizing": {
+          "width": 336.0,
+          "height": 44.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF000000",
+          "fontSize": 16.0,
+          "fontWeight": "w300",
+          "textAlign": "CENTER",
+          "lineHeight": 1.35,
+          "letterSpacing": 0.0,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 5.6,
+          "glyphHeight": 36.7
+        },
+        "text": "we can learn how to recognize when our minds are doing their normal everyday acrobatics.",
+        "accessibilityLabel": "we can learn how to recognize when our minds are doing their normal everyday acrobatics.",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "horizontal": "LEFT_RIGHT",
+          "top": 67.0,
+          "bottom": 741.0,
+          "width": 336.0,
+          "height": 44.0
+        }
+      },
+      {
+        "id": "1:1397",
+        "name": "Group 6819",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 404.0,
+          "height": 92.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/group_6819_1_1397.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 145.0,
+          "right": -10.0,
+          "width": 404.0,
+          "height": 92.0
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "1:1398",
+          "1:1399",
+          "1:1400",
+          "1:1401",
+          "1:1402",
+          "1:1403",
+          "1:1404",
+          "1:1405",
+          "1:1406",
+          "1:1408",
+          "1:1409",
+          "1:1410",
+          "1:1411",
+          "1:1412",
+          "1:1413",
+          "1:1414",
+          "1:1415",
+          "1:1416",
+          "1:1417",
+          "1:1418",
+          "1:1419",
+          "1:1420",
+          "1:1421",
+          "1:1422",
+          "1:1423",
+          "1:1424",
+          "1:1425",
+          "1:1426",
+          "1:1427",
+          "1:1428",
+          "1:1429",
+          "1:1430",
+          "1:1431",
+          "1:1432",
+          "1:1433",
+          "1:1434",
+          "1:1435",
+          "1:1436",
+          "1:1437",
+          "1:1438",
+          "1:1439",
+          "1:1440",
+          "1:1441",
+          "1:1442",
+          "1:1443",
+          "1:1444",
+          "1:1445"
+        ]
+      },
+      {
+        "id": "1:1446",
+        "name": "Group 19",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 374.0,
+          "height": 95.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/group_19_1_1446.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.5,
+          "top": 267.0,
+          "right": 19.5,
+          "width": 374.0,
+          "height": 95.0
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "1:1447",
+          "1:1448",
+          "1:1449",
+          "1:1450",
+          "1:1451",
+          "1:1452",
+          "1:1453",
+          "1:1454",
+          "1:1455",
+          "1:1456",
+          "1:1457",
+          "1:1458",
+          "1:1459",
+          "1:1460",
+          "1:1461"
+        ]
+      },
+      {
+        "id": "1:1369",
+        "name": "Rectangle 11",
+        "type": "CONTAINER",
+        "sizing": {
+          "width": 414.0,
+          "height": 112.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "backgroundColor": "0xFFFFFFFF",
+          "elevation": 4.25,
+          "effects": [
+            {
+              "offsetX": 2.0,
+              "offsetY": -5.0,
+              "blur": 17.0,
+              "color": "0x1A54575C"
+            }
+          ]
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "top": 740.0,
+          "width": 414.0,
+          "height": 112.0
+        }
+      }
+    ]
+  },
+  "tokens": {
+    "colors": {
+      "primary": "0xFFA0A3B1",
+      "color1": "0xFFFFFFFF",
+      "color2": "0xFFCACB68",
+      "color3": "0xFF5F4122",
+      "color4": "0xFF40EBD2",
+      "color5": "0xFF2F497C",
+      "color6": "0xFF496AAA",
+      "color7": "0xFFCC691E",
+      "color8": "0xFF3F414E",
+      "color9": "0xFF8E97FD",
+      "color10": "0xFF5A6175",
+      "color11": "0xFFADB010",
+      "color12": "0xFF4B766F",
+      "color13": "0xFFD3D265",
+      "color14": "0xFF6E700A",
+      "color15": "0xFFD3FDE7",
+      "color16": "0xFF4FA4C0",
+      "color17": "0xFF627BB3",
+      "color18": "0xFF2F79AA",
+      "color19": "0xFFF7F9ED",
+      "color20": "0xFFFE9A4F",
+      "color21": "0xFFE6E7F2",
+      "color22": "0xFFF6EECA",
+      "color23": "0xFFFBAD82",
+      "color24": "0xFFF6E6A4",
+      "color25": "0xFF146357",
+      "color26": "0xFFDEFDED",
+      "color27": "0xFFC7FDE2",
+      "color28": "0xFF9DEFB6",
+      "color29": "0xFFFFDA8C",
+      "color30": "0xFF6AF8E4",
+      "color31": "0xFFB2F8EE",
+      "color32": "0xFFFDC88B",
+      "color33": "0xFF7A55B7",
+      "color34": "0xFFECE7FF",
+      "color35": "0xFF4A1971",
+      "color36": "0xFF6E7015",
+      "color37": "0xFF50520F",
+      "color38": "0xFFA5C0EA",
+      "color39": "0xFF92B3EA",
+      "color40": "0xFFCEE0FF",
+      "color41": "0xFF8DA5EA",
+      "color42": "0xFFF2EFE4",
+      "color43": "0xFFF2EBD6",
+      "color44": "0xFFF2E8C8",
+      "color45": "0xFFF2D88A",
+      "color46": "0xFF9E4927",
+      "color47": "0xFFFEC956",
+      "color48": "0xFFCE4C52",
+      "color49": "0xFFEB7D41",
+      "color50": "0xFFFEF9F3",
+      "color51": "0xFFF1DDCF",
+      "color52": "0xFF333242",
+      "color53": "0xFFECD3C2",
+      "color54": "0xFFFAC978",
+      "color55": "0xFFFF7C6B",
+      "color56": "0xFFF0F1F2"
+    },
+    "typography": {
+      "t7DaysOfCalm": {
+        "fontSize": 18.0,
+        "fontWeight": "w700"
+      },
+      "howToMeditate": {
+        "fontSize": 18.0,
+        "fontWeight": "w700"
+      },
+      "anxietRelease": {
+        "fontSize": 18.0,
+        "fontWeight": "w700"
+      },
+      "home": {
+        "fontSize": 14.0
+      },
+      "meditate": {
+        "fontSize": 14.0
+      },
+      "music": {
+        "fontSize": 14.0
+      },
+      "sleep": {
+        "fontSize": 14.0
+      },
+      "afsar": {
+        "fontSize": 14.0
+      },
+      "meditate2": {
+        "fontSize": 28.0,
+        "fontWeight": "w700"
+      },
+      "weCanLearnHowToRecognizeWhenOurMindsAreDoingTheirNormalEverydayAcrobatics": {
+        "fontSize": 16.0,
+        "fontWeight": "w300"
+      },
+      "all": {
+        "fontSize": 16.0
+      },
+      "my": {
+        "fontSize": 16.0
+      },
+      "sleep2": {
+        "fontSize": 16.0
+      },
+      "anxious": {
+        "fontSize": 16.0
+      },
+      "kids": {
+        "fontSize": 16.0
+      },
+      "dailyCalm": {
+        "fontSize": 18.0,
+        "fontWeight": "w700"
+      },
+      "apr30": {
+        "fontSize": 11.0
+      },
+      "pausePractice": {
+        "fontSize": 11.0
+      }
+    },
+    "spacing": {
+      "md": 16.0
+    },
+    "radii": {
+      "md": 10.0,
+      "radius1": 18.0,
+      "radius2": 20.0,
+      "radius3": 25.0
+    },
+    "elevations": {
+      "md": 17.0
+    }
+  }
+}

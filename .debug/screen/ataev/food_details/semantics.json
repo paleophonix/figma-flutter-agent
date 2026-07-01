@@ -1,0 +1,262 @@
+{
+  "accepted": [
+    {
+      "figmaId": "38:1023",
+      "kind": "chip_choice",
+      "confidence": 0.85,
+      "evidence": {
+        "chip_choice": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "chip_row": true
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "38:1026",
+      "kind": "chip_choice",
+      "confidence": 0.85,
+      "evidence": {
+        "chip_choice": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "chip_row": true
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "38:1029",
+      "kind": "chip_choice",
+      "confidence": 0.85,
+      "evidence": {
+        "chip_choice": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "chip_row": true
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "38:1049",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
+      "evidence": {
+        "container_list_tile": true,
+        "child_type_counts": {
+          "TEXT": 1,
+          "VECTOR": 1
+        },
+        "child_count": 2,
+        "list_tile_shape": true
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "38:1054",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
+      "evidence": {
+        "container_list_tile": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "TEXT": 1,
+          "IMAGE": 1
+        },
+        "child_count": 3
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "103:602",
+      "kind": "button_text",
+      "confidence": 0.84,
+      "evidence": {
+        "button_text": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "interactive_surface": "button"
+      },
+      "rejectReason": null
+    }
+  ],
+  "rejectedBelowThreshold": [
+    {
+      "figmaId": "38:1038",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 2
+        },
+        "child_count": 2
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "38:1039",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "38:1045",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "38:1051",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "38:1057",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "38:1062",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "103:585",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "103:593",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "STACK": 1
+        },
+        "child_count": 2
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "103:594",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "103:595",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 2
+        },
+        "child_count": 2
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "224:1782",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 2
+        },
+        "child_count": 2
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "103:591",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    }
+  ],
+  "rejectedByInvariant": [
+    {
+      "figmaId": "229:64",
+      "kind": "overlay_banner",
+      "confidence": 0.82,
+      "evidence": {
+        "overlay_banner": true,
+        "overlayVeto": true,
+        "child_type_counts": {
+          "STACK": 3,
+          "TEXT": 1
+        },
+        "child_count": 4,
+        "chip_row": true
+      },
+      "rejectReason": "overlay_without_t1_signal"
+    }
+  ],
+  "legacySemanticTypeDetected": [],
+  "nameSignalUsed": [],
+  "llmAnnotationUsed": [],
+  "acceptedCount": 6,
+  "totalDecisions": 19
+}

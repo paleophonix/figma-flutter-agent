@@ -29,7 +29,7 @@ from figma_flutter_agent.dev.preview_size import (
     prepare_artboard_chrome_launch,
     responsive_config_preview_size,
 )
-from figma_flutter_agent.errors import FlutterProjectError
+from figma_flutter_agent.errors import FlutterPreviewLaunchError, FlutterProjectError
 from figma_flutter_agent.generator.render_surface import resolve_chrome_preview_size
 from figma_flutter_agent.tools.process_run import (
     FLUTTER_PUB_GET_TIMEOUT_SEC,
@@ -445,6 +445,51 @@ def _run_flutter_interactive(
     return True
 
 
+def _run_preview_launch_interactive(
+    run_cmd: list[str],
+    *,
+    project_dir: Path,
+    device_id: str | None,
+    device_label: str,
+    feature_name: str | None,
+    fail_on_render_errors: bool,
+    flutter: str,
+    preview_size: tuple[int, int] | None,
+    preview_kind: LaunchPreviewKind,
+    responsive: ResponsiveConfig | None,
+) -> bool:
+    """Run ``flutter run`` and fall back from Chrome to ``web-server`` on launch failure."""
+    try:
+        return _run_flutter_interactive(
+            run_cmd,
+            project_dir=project_dir,
+            device_label=device_label,
+            feature_name=feature_name,
+            fail_on_render_errors=fail_on_render_errors,
+        )
+    except FlutterProjectError as exc:
+        if not is_chrome_device(device_id):
+            raise FlutterPreviewLaunchError(str(exc)) from exc
+        logger.warning("Chrome preview launch failed; retrying with web-server")
+        fallback_cmd = _build_flutter_run_cmd(
+            flutter,
+            device_id="web-server",
+            preview_size=preview_size,
+            preview_kind=preview_kind,
+            responsive=responsive,
+        )
+        try:
+            return _run_flutter_interactive(
+                fallback_cmd,
+                project_dir=project_dir,
+                device_label="web-server",
+                feature_name=feature_name,
+                fail_on_render_errors=fail_on_render_errors,
+            )
+        except FlutterProjectError as fallback_exc:
+            raise FlutterPreviewLaunchError(str(fallback_exc)) from exc
+
+
 def launch_flutter_app(
     project_dir: Path,
     *,
@@ -568,10 +613,15 @@ def launch_flutter_app(
         preview_kind=preview_kind,
         responsive=responsive,
     )
-    return _run_flutter_interactive(
+    return _run_preview_launch_interactive(
         run_cmd,
         project_dir=project_dir,
+        device_id=device_id,
         device_label=device_label,
         feature_name=feature_name,
         fail_on_render_errors=fail_on_render_errors,
+        flutter=flutter,
+        preview_size=preview_size,
+        preview_kind=preview_kind,
+        responsive=responsive,
     )

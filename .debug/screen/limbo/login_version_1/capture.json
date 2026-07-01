@@ -1,0 +1,23 @@
+{
+  "featureName": "login_version_1",
+  "capturedAt": "2026-06-22T17:23:54.354528+00:00",
+  "figmaReferenceOk": true,
+  "flutterCaptureOk": false,
+  "diffOk": false,
+  "changedRatio": null,
+  "warnings": [
+    "A RenderFlex overflowed by 1.1 pixels on the right."
+  ],
+  "sourceMode": "exact_bundle",
+  "targetSource": "pipeline_planned",
+  "bundlePath": null,
+  "bundleHash": null,
+  "layoutHash": "80b051e9da9cd7aa047b59f649e4e6129a13ab4574832ccbc49f1feb9b06c61a",
+  "screenHash": "1f6aaf71d6cfa01d76f9c62b26f2cd09e701bae0c427e075883f8ce69fa32680",
+  "visualRepairEligible": true,
+  "artifacts": {
+    "figmaReference": ".debug/limbo/login_version_1/figma.png",
+    "capture": "capture.png",
+    "diffHeatmap": "diff_heatmap.png"
+  }
+}

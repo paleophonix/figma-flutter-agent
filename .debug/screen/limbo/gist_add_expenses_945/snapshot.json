@@ -1,0 +1,31 @@
+{
+  "file_key": "PAAwM6FLg7gXd1FYRI7rLy",
+  "node_id": "7110:3327",
+  "feature_name": "gist_add_expenses_945",
+  "tree_hash": "cb59709cab5d50cf588cbd2c02e55c7a1a02abb989a251ff696e69161f5b9b7c",
+  "colors_hash": "63c405793300e1f7ba0c9784da45659e611a9099ca3a491cb52d7c568fb1d78e",
+  "typography_hash": "1092e676551b44ec9e8296ca4bba9f3252c6f8d9f6399c1355830dc6b8124974",
+  "spacing_hash": "d763a4d209f6805b1cb5dd7657d9d8d90278d9fd9da771bbec799c6d0f0fa492",
+  "file_hashes": {
+    "lib/widgets/icon_notification_widget.dart": "fd8b2ad5e159887ca4c59ac9453f734cd0807e21c1d0227d833b401efa3bb61c",
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "2b98fd62bf9cccc1cd54e718814b6b71051da840c761731af4322e26df3714e9",
+    "lib/theme/app_spacing.dart": "5da95559f29d0205f98ef21bbee6f92b4f120c1251ef84197021b8180bc007ab",
+    "lib/theme/app_typography.dart": "38b512da08889f9238d8e140e0c0fb4022db483ae90d9c0a13795ea2d059ceef",
+    "lib/theme/app_radius.dart": "c98766945d1a039cd7e24bebcf86a6654b666cbc4111583acc181a708242f468",
+    "lib/theme/app_edge_insets.dart": "8b42de91283e9b3cfa36f2ef69a495aa680b3a75609f474a8f3880f4c54e650d",
+    "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
+    "lib/theme/app_theme.dart": "7e0e98d3ed0d571263a05802c88de677dfe170e2981a2d28c4f1fa22a90e553a",
+    "lib/generated/gist_add_expenses_945_layout.dart": "731cac0d1177fe1f061fb336a665b7b64d1f96fb8d05e6a8276eb09be2ad42a8",
+    "lib/features/gist_add_expenses_945/gist_add_expenses_945_screen.dart": "7e7740d4d4e448d1e602ebc6252ab093f55a9f0d3e2e46e5e22b9c57bea29f97",
+    "test/golden/gist_add_expenses_945_screen_test.dart": "b342c989837d033c752be881a3135b0afbf0718d9657984421a0e725a378a623",
+    "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
+    "lib/main.dart": "b745eeac2f884d5712edffc0f8a3cde1de113b6b4444cc487c6e6e555896cf4b"
+  },
+  "layout_region_hash": "fbba683fb63372c20c1bd13d2a50c7df6bc289993d2d3bad166bf8f91d9e3ae0",
+  "cluster_hashes": {},
+  "reference_image_hash": null,
+  "emitter_version": "2026.06.2",
+  "version": 5,
+  "updated_at": "2026-06-25T21:31:21.658401+00:00"
+}

@@ -22,7 +22,7 @@ from figma_flutter_agent.dev.run import (
     launch_flutter_app,
     plan_run_screen,
 )
-from figma_flutter_agent.errors import FlutterProjectError
+from figma_flutter_agent.errors import FlutterPreviewLaunchError, FlutterProjectError
 
 
 def test_find_screen_entry_exact_and_alias() -> None:
@@ -181,9 +181,42 @@ def test_launch_flutter_app_raises_on_build_failure(tmp_path: Path) -> None:
             "figma_flutter_agent.dev.flutter_launch.run_interactive_subprocess",
             return_value=subprocess.CompletedProcess(["flutter", "run"], 1),
         ),
-        pytest.raises(FlutterProjectError, match="flutter run failed"),
+        pytest.raises(FlutterPreviewLaunchError, match="flutter run failed"),
     ):
         launch_flutter_app(project)
+
+
+def test_launch_flutter_app_chrome_falls_back_to_web_server_on_failure(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    calls: list[list[str]] = []
+
+    def _record_interactive(
+        command: list[str], **kwargs: object
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(list(command))
+        return subprocess.CompletedProcess(list(command), 1 if len(calls) == 1 else 0)
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
+            return_value="flutter",
+        ),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
+        patch("figma_flutter_agent.dev.flutter_launch.run_flutter_command"),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.run_interactive_subprocess",
+            side_effect=_record_interactive,
+        ),
+    ):
+        launched = launch_flutter_app(project, device_id="chrome")
+
+    assert launched is True
+    assert calls[0][calls[0].index("-d") + 1] == "chrome"
+    assert calls[1][calls[1].index("-d") + 1] == "web-server"
 
 
 def test_launch_flutter_app_uses_no_pub_for_run(tmp_path: Path) -> None:
@@ -277,3 +310,72 @@ def test_reap_stale_flutter_web_processes_is_best_effort() -> None:
         side_effect=OSError("boom"),
     ):
         assert run_module.reap_stale_flutter_web_processes() == 0
+
+
+@pytest.mark.asyncio
+async def test_sync_preview_workflow_returns_none_when_preview_launch_fails(
+    tmp_path: Path,
+) -> None:
+    from figma_flutter_agent.config import Settings
+    from unittest.mock import AsyncMock
+
+    from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
+    from figma_flutter_agent.dev.run import RunScreenPlan
+    from figma_flutter_agent.dev.wizard.models import ScreenPreflight
+    from figma_flutter_agent.dev.wizard.sync import sync_preview_workflow
+    from figma_flutter_agent.pipeline.result import PipelineResult
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
+
+    project = tmp_path / "demo"
+    project.mkdir()
+    screen = ScreenEntry(feature="home", node_id="1:2")
+    manifest = BatchManifest(file_key="fk", project_dir=project, screens=(screen,))
+    dump_path = project / "dump.json"
+    plan = RunScreenPlan(
+        project_dir=project,
+        config_path=project / ".ai-figma-flutter.yml",
+        manifest=manifest,
+        screen=screen,
+        dump_path=dump_path,
+        figma_url="https://figma.com/x",
+    )
+    preflight = ScreenPreflight(
+        feature="home",
+        dump_exists=True,
+        dump_path=dump_path,
+        wired_feature=None,
+        wired_matches=False,
+        exportable_icons=0,
+        local_icons=0,
+        missing_asset_exports=0,
+    )
+    pipeline_result = PipelineResult(
+        clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.COLUMN),
+        tokens=DesignTokens(),
+        warnings=[],
+    )
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.wizard.sync.build_run_plan",
+            return_value=plan,
+        ),
+        patch(
+            "figma_flutter_agent.dev.wizard.sync.generate_screen_for_preview",
+            new=AsyncMock(return_value=pipeline_result),
+        ),
+        patch(
+            "figma_flutter_agent.dev.wizard.sync.launch_flutter_app",
+            side_effect=FlutterPreviewLaunchError("flutter run failed (exit 1)"),
+        ),
+    ):
+        _, launched, result = await sync_preview_workflow(
+            project_dir=project,
+            screen_name="home",
+            prefer_live=False,
+            preflight=preflight,
+            settings=Settings(),
+        )
+
+    assert launched is None
+    assert result is pipeline_result

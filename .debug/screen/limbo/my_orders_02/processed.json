@@ -1,0 +1,4826 @@
+{
+  "parserVersion": "2026.06.1",
+  "cleanTree": {
+    "id": "133:561",
+    "name": "My Orders_02",
+    "type": "STACK",
+    "sizing": {
+      "widthMode": "FIXED",
+      "heightMode": "FIXED",
+      "width": 375.0,
+      "height": 812.0
+    },
+    "alignment": {
+      "cross": "stretch"
+    },
+    "style": {
+      "backgroundColor": "0xFFFFFFFF",
+      "borderRadius": 20.0,
+      "strokeAlign": "INSIDE"
+    },
+    "children": [
+      {
+        "id": "149:20",
+        "name": "Food 01",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 327.0,
+          "height": 171.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderRadiusCorners": {
+            "topLeft": 0.0,
+            "topRight": 0.0,
+            "bottomRight": 0.0,
+            "bottomLeft": 0.0
+          },
+          "strokeAlign": "INSIDE"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 24.0,
+          "top": 184.0,
+          "right": 24.0,
+          "bottom": 457.0,
+          "width": 327.0,
+          "height": 171.0
+        },
+        "children": [
+          {
+            "id": "142:10",
+            "name": "Food",
+            "type": "TEXT",
+            "sizing": {
+              "width": 35.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF181C2E",
+              "fontSize": 14.0,
+              "fontWeight": "w400",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 10.0
+            },
+            "text": "Food",
+            "accessibilityLabel": "Food",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 292.0,
+              "bottom": 154.0,
+              "width": 35.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "layoutRect": {
+                "width": 35.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 35.0,
+                "height": 17.0
+              },
+              "placementAabb": {
+                "width": 35.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4235.0,
+                "width": 35.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4235.0,
+                "width": 35.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4235.0,
+                "width": 35.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 10.0,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "142:11",
+            "name": "Completed",
+            "type": "TEXT",
+            "sizing": {
+              "width": 74.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 13.1
+            },
+            "text": "Completed",
+            "accessibilityLabel": "Completed",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 63.0,
+              "right": 190.0,
+              "bottom": 154.0,
+              "width": 74.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 63.0
+              },
+              "layoutRect": {
+                "x": 63.0,
+                "width": 74.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 74.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 63.0
+              },
+              "placementAabb": {
+                "x": 63.0,
+                "width": 74.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5031.0,
+                "y": 4235.0,
+                "width": 74.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5031.0,
+                "y": 4235.0,
+                "width": 74.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5031.0,
+                "y": 4235.0,
+                "width": 74.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 13.1,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "142:12",
+            "name": "Rectangle 4154",
+            "type": "CONTAINER",
+            "sizing": {
+              "width": 60.0,
+              "height": 60.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF98A8B8",
+              "borderRadius": 8.0,
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "top": 49.0,
+              "right": 267.0,
+              "bottom": 62.0,
+              "width": 60.0,
+              "height": 60.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 49.0
+              },
+              "layoutRect": {
+                "y": 49.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "intrinsicSize": {
+                "width": 60.0,
+                "height": 60.0
+              },
+              "placementOrigin": {
+                "y": 49.0
+              },
+              "placementAabb": {
+                "y": 49.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4284.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4284.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4284.0,
+                "width": 60.0,
+                "height": 60.0
+              }
+            }
+          },
+          {
+            "id": "142:13",
+            "name": "Line 1694",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 327.0,
+              "height": 0.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "borderWidth": 1.0,
+              "borderColor": "0xFFEEF2F6",
+              "renderBoundsExpand": {
+                "top": 1.0
+              },
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/line_1694_142_13.svg",
+            "vectorSvgPathCount": 1,
+            "rotation": 0.0,
+            "rotationRad": 0.0,
+            "accessibilityLabel": "Line 1694",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "top": 33.0,
+              "bottom": 138.0,
+              "width": 327.0,
+              "height": 0.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 33.0
+              },
+              "layoutRect": {
+                "y": 33.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "intrinsicSize": {
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "placementOrigin": {
+                "y": 33.0
+              },
+              "placementAabb": {
+                "y": 33.0,
+                "width": 327.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4268.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4268.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4267.0,
+                "width": 327.0,
+                "height": 1.00002858724838
+              }
+            }
+          },
+          {
+            "id": "133:517",
+            "name": "Name",
+            "type": "TEXT",
+            "sizing": {
+              "width": 67.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "textColor": "0xFF181C2E",
+              "fontSize": 14.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 2.5,
+              "glyphHeight": 10.7
+            },
+            "text": "Pizza Hut",
+            "accessibilityLabel": "Pizza Hut",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 74.0,
+              "top": 57.0,
+              "right": 186.0,
+              "bottom": 97.0,
+              "width": 67.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 74.0,
+                "ty": 57.0
+              },
+              "layoutRect": {
+                "x": 74.0,
+                "y": 57.0,
+                "width": 67.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 67.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 74.0,
+                "y": 57.0
+              },
+              "placementAabb": {
+                "x": 74.0,
+                "y": 57.0,
+                "width": 67.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5020.0,
+                "y": 4292.0,
+                "width": 67.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5020.0,
+                "y": 4292.0,
+                "width": 67.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5020.0,
+                "y": 4292.0,
+                "width": 67.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 2.5,
+              "glyphHeight": 10.7,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "133:518",
+            "name": "#162432",
+            "type": "TEXT",
+            "sizing": {
+              "width": 56.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF6B6E82",
+              "fontSize": 14.0,
+              "fontWeight": "w400",
+              "textAlign": "RIGHT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "textDecoration": "underline",
+              "glyphTopOffset": 3.6,
+              "glyphHeight": 11.8
+            },
+            "text": "#162432",
+            "accessibilityLabel": "#162432",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 271.0,
+              "top": 57.0,
+              "bottom": 97.0,
+              "width": 56.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 271.0,
+                "ty": 57.0
+              },
+              "layoutRect": {
+                "x": 271.0,
+                "y": 57.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 56.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 271.0,
+                "y": 57.0
+              },
+              "placementAabb": {
+                "x": 271.0,
+                "y": 57.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -4823.0,
+                "y": 4292.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -4823.0,
+                "y": 4292.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -4823.0,
+                "y": 4292.0,
+                "width": 56.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.6,
+              "glyphHeight": 11.8,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:217",
+            "name": "Frame 3137",
+            "type": "ROW",
+            "spacing": 14.0,
+            "sizing": {
+              "widthMode": "FIXED",
+              "width": 216.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "main": "center",
+              "cross": "center"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 74.0,
+              "top": 84.0,
+              "right": 37.0,
+              "bottom": 70.0,
+              "width": 216.0,
+              "height": 17.0
+            },
+            "children": [
+              {
+                "id": "142:29",
+                "name": "$35.25",
+                "type": "TEXT",
+                "sizing": {
+                  "width": 43.0,
+                  "height": 17.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "strokeAlign": "OUTSIDE",
+                  "textColor": "0xFF181C2E",
+                  "fontSize": 14.0,
+                  "fontWeight": "w700",
+                  "textAlign": "LEFT",
+                  "lineHeight": 1.2,
+                  "letterSpacing": 0.0,
+                  "fontFamily": "Sen",
+                  "glyphTopOffset": 3.4,
+                  "glyphHeight": 10.3
+                },
+                "text": "$35.25",
+                "accessibilityLabel": "$35.25",
+                "geometryFrame": {
+                  "layoutRect": {
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "intrinsicSize": {
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "parsedWorldAabb": {
+                    "x": -5020.0,
+                    "y": 4319.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "worldAabb": {
+                    "x": -5020.0,
+                    "y": 4319.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "paintRect": {
+                    "x": -5020.0,
+                    "y": 4319.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  }
+                },
+                "textMetricsFrame": {
+                  "lineHeightPx": 16.8,
+                  "glyphTopOffset": 3.4,
+                  "glyphHeight": 10.3,
+                  "fontSize": 14.0,
+                  "strutHeightRatio": 1.2,
+                  "baselineVerifiable": true
+                }
+              },
+              {
+                "id": "148:0",
+                "name": "Line 1695",
+                "type": "VECTOR",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 0.0,
+                  "height": 16.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "strokeAlign": "CENTER",
+                  "borderWidth": 1.0,
+                  "borderColor": "0xFFCACCDA",
+                  "renderBoundsExpand": {
+                    "right": 1.0
+                  },
+                  "hasStroke": true
+                },
+                "vectorAssetKey": "assets/icons/line_1695_148_0.svg",
+                "vectorSvgPathCount": 1,
+                "rotation": 1.57,
+                "rotationRad": 0.03,
+                "accessibilityLabel": "Line 1695",
+                "geometryFrame": {
+                  "localTransform": {
+                    "tx": 57.0,
+                    "ty": 0.5
+                  },
+                  "layoutRect": {
+                    "x": 57.0,
+                    "y": 0.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "intrinsicSize": {
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "placementOrigin": {
+                    "x": 57.0,
+                    "y": 0.5
+                  },
+                  "parsedWorldAabb": {
+                    "x": -4963.0,
+                    "y": 4319.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "worldAabb": {
+                    "x": -4963.0,
+                    "y": 4319.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "paintRect": {
+                    "x": -4963.0,
+                    "y": 4319.5,
+                    "width": 1.0000006993814168,
+                    "height": 16.0
+                  }
+                }
+              },
+              {
+                "id": "133:492",
+                "name": "Frame 8",
+                "type": "ROW",
+                "spacing": 8.0,
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "width": 145.0,
+                  "height": 14.0
+                },
+                "alignment": {
+                  "main": "center",
+                  "cross": "center"
+                },
+                "style": {
+                  "strokeAlign": "INSIDE"
+                },
+                "children": [
+                  {
+                    "id": "133:493",
+                    "name": "29 Jan, 12:30",
+                    "type": "TEXT",
+                    "sizing": {
+                      "width": 74.0,
+                      "height": 14.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "OUTSIDE",
+                      "textColor": "0xFF6B6E82",
+                      "fontSize": 12.0,
+                      "fontWeight": "w400",
+                      "textAlign": "LEFT",
+                      "lineHeight": 1.2,
+                      "letterSpacing": 0.0,
+                      "fontFamily": "Sen",
+                      "textCase": "UPPER",
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 11.0
+                    },
+                    "text": "29 Jan, 12:30",
+                    "accessibilityLabel": "29 Jan, 12:30",
+                    "geometryFrame": {
+                      "layoutRect": {
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "intrinsicSize": {
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4949.0,
+                        "y": 4320.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "worldAabb": {
+                        "x": -4949.0,
+                        "y": 4320.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "paintRect": {
+                        "x": -4949.0,
+                        "y": 4320.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      }
+                    },
+                    "textMetricsFrame": {
+                      "lineHeightPx": 14.399999999999999,
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 11.0,
+                      "fontSize": 12.0,
+                      "strutHeightRatio": 1.2,
+                      "baselineVerifiable": true
+                    }
+                  },
+                  {
+                    "id": "133:494",
+                    "name": "Ellipse 110",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "widthMode": "FIXED",
+                      "heightMode": "FIXED",
+                      "width": 4.0,
+                      "height": 4.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFF6B6E82",
+                      "strokeAlign": "INSIDE"
+                    },
+                    "vectorAssetKey": "assets/icons/ellipse_110_133_494.svg",
+                    "vectorSvgPathCount": 1,
+                    "accessibilityLabel": "Ellipse 110",
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 82.0,
+                        "ty": 5.0
+                      },
+                      "layoutRect": {
+                        "x": 82.0,
+                        "y": 5.0,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "intrinsicSize": {
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "placementOrigin": {
+                        "x": 82.0,
+                        "y": 5.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4867.0,
+                        "y": 4325.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "worldAabb": {
+                        "x": -4867.0,
+                        "y": 4325.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "paintRect": {
+                        "x": -4867.0,
+                        "y": 4325.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      }
+                    }
+                  },
+                  {
+                    "id": "133:495",
+                    "name": "03 Items",
+                    "type": "TEXT",
+                    "sizing": {
+                      "width": 51.0,
+                      "height": 14.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "OUTSIDE",
+                      "textColor": "0xFF6B6E82",
+                      "fontSize": 12.0,
+                      "fontWeight": "w400",
+                      "textAlign": "LEFT",
+                      "lineHeight": 1.2,
+                      "letterSpacing": 0.0,
+                      "fontFamily": "Sen",
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 8.2
+                    },
+                    "text": "03 Items",
+                    "accessibilityLabel": "03 Items",
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 94.0
+                      },
+                      "layoutRect": {
+                        "x": 94.0,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "intrinsicSize": {
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "placementOrigin": {
+                        "x": 94.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4855.0,
+                        "y": 4320.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "worldAabb": {
+                        "x": -4855.0,
+                        "y": 4320.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "paintRect": {
+                        "x": -4855.0,
+                        "y": 4320.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      }
+                    },
+                    "textMetricsFrame": {
+                      "lineHeightPx": 14.399999999999999,
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 8.2,
+                      "fontSize": 12.0,
+                      "strutHeightRatio": 1.2,
+                      "baselineVerifiable": true
+                    }
+                  }
+                ],
+                "geometryFrame": {
+                  "localTransform": {
+                    "tx": 71.0,
+                    "ty": 1.5
+                  },
+                  "layoutRect": {
+                    "x": 71.0,
+                    "y": 1.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "intrinsicSize": {
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "placementOrigin": {
+                    "x": 71.0,
+                    "y": 1.5
+                  },
+                  "parsedWorldAabb": {
+                    "x": -4949.0,
+                    "y": 4320.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "worldAabb": {
+                    "x": -4949.0,
+                    "y": 4320.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "paintRect": {
+                    "x": -4949.0,
+                    "y": 4320.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  }
+                }
+              }
+            ],
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 74.0,
+                "ty": 84.0
+              },
+              "layoutRect": {
+                "x": 74.0,
+                "y": 84.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 216.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 74.0,
+                "y": 84.0
+              },
+              "placementAabb": {
+                "x": 74.0,
+                "y": 84.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5020.0,
+                "y": 4319.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5020.0,
+                "y": 4319.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5020.0,
+                "y": 4319.0,
+                "width": 216.0,
+                "height": 17.0
+              }
+            }
+          },
+          {
+            "id": "149:13",
+            "name": "Button/ Re-order",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 139.0,
+              "height": 38.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "clusterId": "cluster_0",
+            "accessibilityLabel": "Re-Order",
+            "accessibilityHint": "Button/ Re-order",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 188.0,
+              "top": 133.0,
+              "width": 139.0,
+              "height": 38.0
+            },
+            "flattenFigmaNodeIds": [
+              "149:14",
+              "149:15"
+            ],
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 188.0,
+                "ty": 133.0
+              },
+              "layoutRect": {
+                "x": 188.0,
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "intrinsicSize": {
+                "width": 139.0,
+                "height": 38.0
+              },
+              "placementOrigin": {
+                "x": 188.0,
+                "y": 133.0
+              },
+              "placementAabb": {
+                "x": 188.0,
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "parsedWorldAabb": {
+                "x": -4906.0,
+                "y": 4368.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "worldAabb": {
+                "x": -4906.0,
+                "y": 4368.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "paintRect": {
+                "x": -4906.0,
+                "y": 4368.0,
+                "width": 139.0,
+                "height": 38.0
+              }
+            }
+          },
+          {
+            "id": "149:10",
+            "name": "Button/ Rate",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 139.0,
+              "height": 38.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "clusterId": "cluster_1",
+            "accessibilityLabel": "Rate",
+            "accessibilityHint": "Button/ Rate",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "top": 133.0,
+              "right": 188.0,
+              "width": 139.0,
+              "height": 38.0
+            },
+            "flattenFigmaNodeIds": [
+              "149:11",
+              "149:12"
+            ],
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 133.0
+              },
+              "layoutRect": {
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "intrinsicSize": {
+                "width": 139.0,
+                "height": 38.0
+              },
+              "placementOrigin": {
+                "y": 133.0
+              },
+              "placementAabb": {
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4368.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4368.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4368.0,
+                "width": 139.0,
+                "height": 38.0
+              }
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "tx": 24.0,
+            "ty": 184.0
+          },
+          "layoutRect": {
+            "x": 24.0,
+            "y": 184.0,
+            "width": 327.00006103515625,
+            "height": 171.0
+          },
+          "intrinsicSize": {
+            "width": 327.00006103515625,
+            "height": 171.0
+          },
+          "placementOrigin": {
+            "x": 24.0,
+            "y": 184.0
+          },
+          "placementAabb": {
+            "x": 24.0,
+            "y": 184.0,
+            "width": 327.0,
+            "height": 171.0
+          },
+          "parsedWorldAabb": {
+            "x": -5094.0,
+            "y": 4235.0,
+            "width": 327.00006103515625,
+            "height": 171.0
+          },
+          "worldAabb": {
+            "x": -5094.0,
+            "y": 4235.0,
+            "width": 327.00006103515625,
+            "height": 171.0
+          },
+          "paintRect": {
+            "x": -5094.0,
+            "y": 4235.0,
+            "width": 327.00006103515625,
+            "height": 171.0
+          }
+        }
+      },
+      {
+        "id": "142:2",
+        "name": "Tab",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 375.0,
+          "height": 33.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderRadiusCorners": {
+            "topLeft": 0.0,
+            "topRight": 0.0,
+            "bottomRight": 0.0,
+            "bottomLeft": 0.0
+          },
+          "strokeAlign": "INSIDE"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "top": 119.0,
+          "bottom": 660.0,
+          "width": 375.0,
+          "height": 33.0
+        },
+        "children": [
+          {
+            "id": "142:4",
+            "name": "Ongoing",
+            "type": "TEXT",
+            "sizing": {
+              "width": 57.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w400",
+              "textAlign": "CENTER",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 2.9,
+              "glyphHeight": 13.6
+            },
+            "text": "Ongoing",
+            "accessibilityLabel": "Ongoing",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 68.0,
+              "right": 250.0,
+              "bottom": 16.0,
+              "width": 57.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 68.0
+              },
+              "layoutRect": {
+                "x": 68.0,
+                "width": 57.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 57.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 68.0
+              },
+              "placementAabb": {
+                "x": 68.0,
+                "width": 57.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5050.0,
+                "y": 4170.0,
+                "width": 57.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5050.0,
+                "y": 4170.0,
+                "width": 57.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5050.0,
+                "y": 4170.0,
+                "width": 57.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 2.9,
+              "glyphHeight": 13.6,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "142:6",
+            "name": "History",
+            "type": "TEXT",
+            "sizing": {
+              "width": 51.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w700",
+              "textAlign": "CENTER",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 2.5,
+              "glyphHeight": 13.8
+            },
+            "text": "History",
+            "accessibilityLabel": "History",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 252.0,
+              "right": 72.0,
+              "bottom": 16.0,
+              "width": 51.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 252.0
+              },
+              "layoutRect": {
+                "x": 252.0,
+                "width": 51.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 51.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 252.0
+              },
+              "placementAabb": {
+                "x": 252.0,
+                "width": 51.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -4866.0,
+                "y": 4170.0,
+                "width": 51.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -4866.0,
+                "y": 4170.0,
+                "width": 51.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -4866.0,
+                "y": 4170.0,
+                "width": 51.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 2.5,
+              "glyphHeight": 13.8,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "142:7",
+            "name": "Line 4",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 375.0,
+              "height": 0.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "borderWidth": 1.0,
+              "borderColor": "0xFFCED7DF",
+              "opacity": 0.5,
+              "renderBoundsExpand": {
+                "top": 1.0
+              },
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/line_4_142_7.svg",
+            "vectorSvgPathCount": 1,
+            "rotation": 0.0,
+            "rotationRad": 0.0,
+            "accessibilityLabel": "Line 4",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "top": 33.0,
+              "width": 375.0,
+              "height": 0.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 33.0
+              },
+              "layoutRect": {
+                "y": 33.0,
+                "width": 375.0,
+                "height": 3.278354142821627e-05
+              },
+              "intrinsicSize": {
+                "width": 375.0,
+                "height": 3.278354142821627e-05
+              },
+              "placementOrigin": {
+                "y": 33.0
+              },
+              "placementAabb": {
+                "y": 33.0,
+                "width": 375.0
+              },
+              "parsedWorldAabb": {
+                "x": -5118.0,
+                "y": 4203.0,
+                "width": 375.0,
+                "height": 3.278354142821627e-05
+              },
+              "worldAabb": {
+                "x": -5118.0,
+                "y": 4203.0,
+                "width": 375.0,
+                "height": 3.278354142821627e-05
+              },
+              "paintRect": {
+                "x": -5118.0,
+                "y": 4202.0,
+                "width": 375.0,
+                "height": 1.0000327835414282
+              }
+            }
+          },
+          {
+            "id": "142:8",
+            "name": "Line 5",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 146.0,
+              "height": 0.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "borderWidth": 2.0,
+              "borderColor": "0xFFFF7622",
+              "renderBoundsExpand": {
+                "top": 2.0
+              },
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/line_5_142_8.svg",
+            "vectorSvgPathCount": 1,
+            "rotation": -0.0,
+            "rotationRad": -0.0,
+            "accessibilityLabel": "Line 5",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 205.0,
+              "top": 33.0,
+              "right": 24.0,
+              "width": 146.0,
+              "height": 0.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 205.0,
+                "ty": 32.99998723627505
+              },
+              "layoutRect": {
+                "x": 205.0,
+                "y": 32.99998723627505,
+                "width": 146.0,
+                "height": 1.2763724953401834e-05
+              },
+              "intrinsicSize": {
+                "width": 146.0,
+                "height": 1.2763724953401834e-05
+              },
+              "placementOrigin": {
+                "x": 205.0,
+                "y": 33.0
+              },
+              "placementAabb": {
+                "x": 205.0,
+                "y": 33.0,
+                "width": 146.0
+              },
+              "parsedWorldAabb": {
+                "x": -4913.0,
+                "y": 4202.999987236275,
+                "width": 146.0,
+                "height": 1.2763724953401834e-05
+              },
+              "worldAabb": {
+                "x": -4913.0,
+                "y": 4202.999987236275,
+                "width": 146.0,
+                "height": 1.2763724953401834e-05
+              },
+              "paintRect": {
+                "x": -4913.0,
+                "y": 4200.999987236275,
+                "width": 146.0,
+                "height": 2.0000127637249534
+              }
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "ty": 119.0
+          },
+          "layoutRect": {
+            "y": 119.0,
+            "width": 375.0,
+            "height": 33.00003433227539
+          },
+          "intrinsicSize": {
+            "width": 375.0,
+            "height": 33.00003433227539
+          },
+          "placementOrigin": {
+            "y": 119.0
+          },
+          "placementAabb": {
+            "y": 119.0,
+            "width": 375.0,
+            "height": 33.0
+          },
+          "parsedWorldAabb": {
+            "x": -5118.0,
+            "y": 4170.0,
+            "width": 375.0,
+            "height": 33.00003433227539
+          },
+          "worldAabb": {
+            "x": -5118.0,
+            "y": 4170.0,
+            "width": 375.0,
+            "height": 33.00003433227539
+          },
+          "paintRect": {
+            "x": -5118.0,
+            "y": 4170.0,
+            "width": 375.0,
+            "height": 33.00003433227539
+          }
+        }
+      },
+      {
+        "id": "133:660",
+        "name": "Top",
+        "type": "BUTTON",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 327.0,
+          "height": 45.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "strokeAlign": "INSIDE"
+        },
+        "accessibilityLabel": "My Orders",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 24.0,
+          "top": 50.0,
+          "right": 24.0,
+          "bottom": 717.0,
+          "width": 327.0,
+          "height": 45.0
+        },
+        "children": [
+          {
+            "id": "133:661",
+            "name": "Back",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 45.0,
+              "height": 45.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 282.0,
+              "width": 45.0,
+              "height": 45.0
+            },
+            "children": [
+              {
+                "id": "133:662",
+                "name": "Back",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 45.0,
+                  "height": 45.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "strokeAlign": "INSIDE"
+                },
+                "vectorAssetKey": "assets/icons/back_133_662.svg",
+                "vectorSvgPathCount": 2,
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 45.0,
+                  "height": 45.0
+                },
+                "children": [
+                  {
+                    "id": "133:663",
+                    "name": "Ellipse 1294",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 45.0,
+                      "height": 45.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFFECF0F4",
+                      "strokeAlign": "INSIDE"
+                    },
+                    "accessibilityLabel": "Ellipse 1294",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "width": 45.0,
+                      "height": 45.0
+                    },
+                    "geometryFrame": {
+                      "layoutRect": {
+                        "width": 45.0,
+                        "height": 45.0
+                      },
+                      "intrinsicSize": {
+                        "width": 45.0,
+                        "height": 45.0
+                      },
+                      "placementAabb": {
+                        "width": 45.0,
+                        "height": 45.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -5094.0,
+                        "y": 4101.0,
+                        "width": 45.0,
+                        "height": 45.0
+                      },
+                      "worldAabb": {
+                        "x": -5094.0,
+                        "y": 4101.0,
+                        "width": 45.0,
+                        "height": 45.0
+                      },
+                      "paintRect": {
+                        "x": -5094.0,
+                        "y": 4101.0,
+                        "width": 45.0,
+                        "height": 45.0
+                      }
+                    }
+                  },
+                  {
+                    "id": "133:664",
+                    "name": "Back",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 5.0,
+                      "height": 10.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "CENTER",
+                      "borderWidth": 2.0,
+                      "borderColor": "0xFF181C2E",
+                      "renderBoundsExpand": {
+                        "top": 1.0,
+                        "bottom": 1.0,
+                        "left": 1.0,
+                        "right": 1.0
+                      },
+                      "hasStroke": true
+                    },
+                    "accessibilityLabel": "Back",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "left": 20.0,
+                      "top": 17.0,
+                      "right": 20.0,
+                      "bottom": 18.0,
+                      "width": 5.0,
+                      "height": 10.0
+                    },
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 20.0,
+                        "ty": 17.0
+                      },
+                      "layoutRect": {
+                        "x": 20.0,
+                        "y": 17.0,
+                        "width": 5.0,
+                        "height": 10.0
+                      },
+                      "intrinsicSize": {
+                        "width": 5.0,
+                        "height": 10.0
+                      },
+                      "placementOrigin": {
+                        "x": 20.0,
+                        "y": 17.0
+                      },
+                      "placementAabb": {
+                        "x": 20.0,
+                        "y": 17.0,
+                        "width": 5.0,
+                        "height": 10.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -5074.0,
+                        "y": 4118.0,
+                        "width": 5.0,
+                        "height": 10.0
+                      },
+                      "worldAabb": {
+                        "x": -5074.0,
+                        "y": 4118.0,
+                        "width": 5.0,
+                        "height": 10.0
+                      },
+                      "paintRect": {
+                        "x": -5075.0,
+                        "y": 4117.0,
+                        "width": 7.0,
+                        "height": 12.0
+                      }
+                    }
+                  }
+                ],
+                "geometryFrame": {
+                  "layoutRect": {
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "intrinsicSize": {
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "placementAabb": {
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "parsedWorldAabb": {
+                    "x": -5094.0,
+                    "y": 4101.0,
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "worldAabb": {
+                    "x": -5094.0,
+                    "y": 4101.0,
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "paintRect": {
+                    "x": -5094.0,
+                    "y": 4101.0,
+                    "width": 45.0,
+                    "height": 45.0
+                  }
+                }
+              }
+            ],
+            "geometryFrame": {
+              "layoutRect": {
+                "width": 45.0,
+                "height": 45.0
+              },
+              "intrinsicSize": {
+                "width": 45.0,
+                "height": 45.0
+              },
+              "placementAabb": {
+                "width": 45.0,
+                "height": 45.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4101.0,
+                "width": 45.0,
+                "height": 45.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4101.0,
+                "width": 45.0,
+                "height": 45.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4101.0,
+                "width": 45.0,
+                "height": 45.0
+              }
+            }
+          },
+          {
+            "id": "133:665",
+            "name": "More",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 45.0,
+              "height": 45.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 282.0,
+              "width": 45.0,
+              "height": 45.0
+            },
+            "children": [
+              {
+                "id": "133:666",
+                "name": "Ellipse 1294",
+                "type": "VECTOR",
+                "sizing": {
+                  "width": 45.0,
+                  "height": 45.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "backgroundColor": "0xFFECF0F4",
+                  "strokeAlign": "INSIDE"
+                },
+                "vectorAssetKey": "assets/icons/ellipse_1294_133_666.svg",
+                "vectorSvgPathCount": 1,
+                "accessibilityLabel": "Ellipse 1294",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 45.0,
+                  "height": 45.0
+                },
+                "geometryFrame": {
+                  "layoutRect": {
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "intrinsicSize": {
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "placementAabb": {
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "parsedWorldAabb": {
+                    "x": -4812.0,
+                    "y": 4101.0,
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "worldAabb": {
+                    "x": -4812.0,
+                    "y": 4101.0,
+                    "width": 45.0,
+                    "height": 45.0
+                  },
+                  "paintRect": {
+                    "x": -4812.0,
+                    "y": 4101.0,
+                    "width": 45.0,
+                    "height": 45.0
+                  }
+                }
+              },
+              {
+                "id": "133:667",
+                "name": "More",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 16.0,
+                  "height": 2.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "strokeAlign": "INSIDE",
+                  "renderBoundsExpand": {
+                    "top": 1.0,
+                    "bottom": 1.0,
+                    "left": 1.0,
+                    "right": 1.0
+                  }
+                },
+                "vectorAssetKey": "assets/icons/more_133_667.svg",
+                "vectorSvgPathCount": 3,
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "left": 14.4,
+                  "top": 21.3,
+                  "right": 14.6,
+                  "bottom": 21.7,
+                  "width": 16.0,
+                  "height": 2.0
+                },
+                "children": [
+                  {
+                    "id": "133:668",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 2.0,
+                      "height": 2.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "CENTER",
+                      "borderWidth": 2.0,
+                      "borderColor": "0xFF181C2E",
+                      "renderBoundsExpand": {
+                        "top": 1.0,
+                        "bottom": 1.0,
+                        "left": 1.0,
+                        "right": 1.0
+                      },
+                      "hasStroke": true
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "left": 7.0,
+                      "right": 7.0,
+                      "width": 2.0,
+                      "height": 2.0
+                    },
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 7.0
+                      },
+                      "layoutRect": {
+                        "x": 7.0,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "intrinsicSize": {
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "placementOrigin": {
+                        "x": 7.0
+                      },
+                      "placementAabb": {
+                        "x": 7.0,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4790.5908203125,
+                        "y": 4122.32568359375,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "worldAabb": {
+                        "x": -4790.5908203125,
+                        "y": 4122.32568359375,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "paintRect": {
+                        "x": -4791.5908203125,
+                        "y": 4121.32568359375,
+                        "width": 4.0,
+                        "height": 4.0
+                      }
+                    }
+                  },
+                  {
+                    "id": "133:669",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 2.0,
+                      "height": 2.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "CENTER",
+                      "borderWidth": 2.0,
+                      "borderColor": "0xFF181C2E",
+                      "renderBoundsExpand": {
+                        "top": 1.0,
+                        "bottom": 1.0,
+                        "left": 1.0,
+                        "right": 1.0
+                      },
+                      "hasStroke": true
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "left": 14.0,
+                      "width": 2.0,
+                      "height": 2.0
+                    },
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 14.0
+                      },
+                      "layoutRect": {
+                        "x": 14.0,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "intrinsicSize": {
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "placementOrigin": {
+                        "x": 14.0
+                      },
+                      "placementAabb": {
+                        "x": 14.0,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4783.5908203125,
+                        "y": 4122.32568359375,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "worldAabb": {
+                        "x": -4783.5908203125,
+                        "y": 4122.32568359375,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "paintRect": {
+                        "x": -4784.5908203125,
+                        "y": 4121.32568359375,
+                        "width": 4.0,
+                        "height": 4.0
+                      }
+                    }
+                  },
+                  {
+                    "id": "133:670",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 2.0,
+                      "height": 2.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "CENTER",
+                      "borderWidth": 2.0,
+                      "borderColor": "0xFF181C2E",
+                      "renderBoundsExpand": {
+                        "top": 1.0,
+                        "bottom": 1.0,
+                        "left": 1.0,
+                        "right": 1.0
+                      },
+                      "hasStroke": true
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "right": 14.0,
+                      "width": 2.0,
+                      "height": 2.0
+                    },
+                    "geometryFrame": {
+                      "layoutRect": {
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "intrinsicSize": {
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "placementAabb": {
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4797.5908203125,
+                        "y": 4122.32568359375,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "worldAabb": {
+                        "x": -4797.5908203125,
+                        "y": 4122.32568359375,
+                        "width": 2.0,
+                        "height": 2.0
+                      },
+                      "paintRect": {
+                        "x": -4798.5908203125,
+                        "y": 4121.32568359375,
+                        "width": 4.0,
+                        "height": 4.0
+                      }
+                    }
+                  }
+                ],
+                "geometryFrame": {
+                  "localTransform": {
+                    "tx": 14.4091796875,
+                    "ty": 21.32568359375
+                  },
+                  "layoutRect": {
+                    "x": 14.4091796875,
+                    "y": 21.32568359375,
+                    "width": 16.0,
+                    "height": 2.0
+                  },
+                  "intrinsicSize": {
+                    "width": 16.0,
+                    "height": 2.0
+                  },
+                  "placementOrigin": {
+                    "x": 14.4,
+                    "y": 21.3
+                  },
+                  "placementAabb": {
+                    "x": 14.4,
+                    "y": 21.3,
+                    "width": 16.0,
+                    "height": 2.0
+                  },
+                  "parsedWorldAabb": {
+                    "x": -4797.5908203125,
+                    "y": 4122.32568359375,
+                    "width": 16.0,
+                    "height": 2.0
+                  },
+                  "worldAabb": {
+                    "x": -4797.5908203125,
+                    "y": 4122.32568359375,
+                    "width": 16.0,
+                    "height": 2.0
+                  },
+                  "paintRect": {
+                    "x": -4798.5908203125,
+                    "y": 4121.32568359375,
+                    "width": 18.0,
+                    "height": 4.0
+                  }
+                }
+              }
+            ],
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 282.0
+              },
+              "layoutRect": {
+                "x": 282.0,
+                "width": 45.0,
+                "height": 45.0
+              },
+              "intrinsicSize": {
+                "width": 45.0,
+                "height": 45.0
+              },
+              "placementOrigin": {
+                "x": 282.0
+              },
+              "placementAabb": {
+                "x": 282.0,
+                "width": 45.0,
+                "height": 45.0
+              },
+              "parsedWorldAabb": {
+                "x": -4812.0,
+                "y": 4101.0,
+                "width": 45.0,
+                "height": 45.0
+              },
+              "worldAabb": {
+                "x": -4812.0,
+                "y": 4101.0,
+                "width": 45.0,
+                "height": 45.0
+              },
+              "paintRect": {
+                "x": -4812.0,
+                "y": 4101.0,
+                "width": 45.0,
+                "height": 45.0
+              }
+            }
+          },
+          {
+            "id": "133:671",
+            "name": "My Orders",
+            "type": "TEXT",
+            "sizing": {
+              "width": 82.0,
+              "height": 22.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "textColor": "0xFF181C2E",
+              "fontSize": 17.0,
+              "fontWeight": "w400",
+              "textAlign": "LEFT",
+              "lineHeight": 1.29,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 5.0,
+              "glyphHeight": 15.9
+            },
+            "text": "My Orders",
+            "accessibilityLabel": "My Orders",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 61.0,
+              "top": 12.0,
+              "right": 184.0,
+              "bottom": 11.0,
+              "width": 82.0,
+              "height": 22.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 61.0,
+                "ty": 12.0
+              },
+              "layoutRect": {
+                "x": 61.0,
+                "y": 12.0,
+                "width": 82.0,
+                "height": 22.0
+              },
+              "intrinsicSize": {
+                "width": 82.0,
+                "height": 22.0
+              },
+              "placementOrigin": {
+                "x": 61.0,
+                "y": 12.0
+              },
+              "placementAabb": {
+                "x": 61.0,
+                "y": 12.0,
+                "width": 82.0,
+                "height": 22.0
+              },
+              "parsedWorldAabb": {
+                "x": -5033.0,
+                "y": 4113.0,
+                "width": 82.0,
+                "height": 22.0
+              },
+              "worldAabb": {
+                "x": -5033.0,
+                "y": 4113.0,
+                "width": 82.0,
+                "height": 22.0
+              },
+              "paintRect": {
+                "x": -5033.0,
+                "y": 4113.0,
+                "width": 82.0,
+                "height": 22.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 21.93,
+              "glyphTopOffset": 5.0,
+              "glyphHeight": 15.9,
+              "fontSize": 17.0,
+              "strutHeightRatio": 1.29,
+              "baselineVerifiable": true
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "tx": 24.0,
+            "ty": 50.0
+          },
+          "layoutRect": {
+            "x": 24.0,
+            "y": 50.0,
+            "width": 327.0,
+            "height": 45.0
+          },
+          "intrinsicSize": {
+            "width": 327.0,
+            "height": 45.0
+          },
+          "placementOrigin": {
+            "x": 24.0,
+            "y": 50.0
+          },
+          "placementAabb": {
+            "x": 24.0,
+            "y": 50.0,
+            "width": 327.0,
+            "height": 45.0
+          },
+          "parsedWorldAabb": {
+            "x": -5094.0,
+            "y": 4101.0,
+            "width": 327.0,
+            "height": 45.0
+          },
+          "worldAabb": {
+            "x": -5094.0,
+            "y": 4101.0,
+            "width": 327.0,
+            "height": 45.0
+          },
+          "paintRect": {
+            "x": -5094.0,
+            "y": 4101.0,
+            "width": 327.0,
+            "height": 45.0
+          }
+        }
+      },
+      {
+        "id": "149:241",
+        "name": "Food 03",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 327.0,
+          "height": 171.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderRadiusCorners": {
+            "topLeft": 0.0,
+            "topRight": 0.0,
+            "bottomRight": 0.0,
+            "bottomLeft": 0.0
+          },
+          "strokeAlign": "INSIDE"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 24.0,
+          "top": 574.0,
+          "right": 24.0,
+          "bottom": 67.0,
+          "width": 327.0,
+          "height": 171.0
+        },
+        "children": [
+          {
+            "id": "149:243",
+            "name": "Drink",
+            "type": "TEXT",
+            "sizing": {
+              "width": 36.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF181C2E",
+              "fontSize": 14.0,
+              "fontWeight": "w400",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 2.9,
+              "glyphHeight": 10.3
+            },
+            "text": "Drink",
+            "accessibilityLabel": "Drink",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 291.0,
+              "bottom": 154.0,
+              "width": 36.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "layoutRect": {
+                "width": 36.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 36.0,
+                "height": 17.0
+              },
+              "placementAabb": {
+                "width": 36.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4625.0,
+                "width": 36.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4625.0,
+                "width": 36.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4625.0,
+                "width": 36.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 2.9,
+              "glyphHeight": 10.3,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:244",
+            "name": "Canceled",
+            "type": "TEXT",
+            "sizing": {
+              "width": 61.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 10.0
+            },
+            "text": "Canceled",
+            "accessibilityLabel": "Canceled",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 63.0,
+              "right": 203.0,
+              "bottom": 154.0,
+              "width": 61.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 63.0
+              },
+              "layoutRect": {
+                "x": 63.0,
+                "width": 61.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 61.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 63.0
+              },
+              "placementAabb": {
+                "x": 63.0,
+                "width": 61.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5031.0,
+                "y": 4625.0,
+                "width": 61.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5031.0,
+                "y": 4625.0,
+                "width": 61.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5031.0,
+                "y": 4625.0,
+                "width": 61.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 10.0,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:245",
+            "name": "image",
+            "type": "CONTAINER",
+            "sizing": {
+              "width": 60.0,
+              "height": 60.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF98A8B8",
+              "borderRadius": 8.0,
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "top": 49.0,
+              "right": 267.0,
+              "bottom": 62.0,
+              "width": 60.0,
+              "height": 60.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 49.0
+              },
+              "layoutRect": {
+                "y": 49.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "intrinsicSize": {
+                "width": 60.0,
+                "height": 60.0
+              },
+              "placementOrigin": {
+                "y": 49.0
+              },
+              "placementAabb": {
+                "y": 49.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4674.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4674.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4674.0,
+                "width": 60.0,
+                "height": 60.0
+              }
+            }
+          },
+          {
+            "id": "149:246",
+            "name": "Line 1694",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 327.0,
+              "height": 0.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "borderWidth": 1.0,
+              "borderColor": "0xFFEEF2F6",
+              "renderBoundsExpand": {
+                "top": 1.0
+              },
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/line_1694_149_246.svg",
+            "vectorSvgPathCount": 1,
+            "rotation": 0.0,
+            "rotationRad": 0.0,
+            "accessibilityLabel": "Line 1694",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "top": 33.0,
+              "bottom": 138.0,
+              "width": 327.0,
+              "height": 0.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 33.0
+              },
+              "layoutRect": {
+                "y": 33.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "intrinsicSize": {
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "placementOrigin": {
+                "y": 33.0
+              },
+              "placementAabb": {
+                "y": 33.0,
+                "width": 327.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4658.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4658.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4657.0,
+                "width": 327.0,
+                "height": 1.00002858724838
+              }
+            }
+          },
+          {
+            "id": "149:248",
+            "name": "Name",
+            "type": "TEXT",
+            "sizing": {
+              "width": 66.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "textColor": "0xFF181C2E",
+              "fontSize": 14.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 10.0
+            },
+            "text": "Starbucks",
+            "accessibilityLabel": "Starbucks",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 74.0,
+              "top": 57.0,
+              "right": 187.0,
+              "bottom": 97.0,
+              "width": 66.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 74.0,
+                "ty": 57.0
+              },
+              "layoutRect": {
+                "x": 74.0,
+                "y": 57.0,
+                "width": 66.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 66.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 74.0,
+                "y": 57.0
+              },
+              "placementAabb": {
+                "x": 74.0,
+                "y": 57.0,
+                "width": 66.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5020.0,
+                "y": 4682.0,
+                "width": 66.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5020.0,
+                "y": 4682.0,
+                "width": 66.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5020.0,
+                "y": 4682.0,
+                "width": 66.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 10.0,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:249",
+            "name": "#240112",
+            "type": "TEXT",
+            "sizing": {
+              "width": 56.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF6B6E82",
+              "fontSize": 14.0,
+              "fontWeight": "w400",
+              "textAlign": "RIGHT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "textDecoration": "underline",
+              "glyphTopOffset": 3.6,
+              "glyphHeight": 11.8
+            },
+            "text": "#240112",
+            "accessibilityLabel": "#240112",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 271.0,
+              "top": 57.0,
+              "bottom": 97.0,
+              "width": 56.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 271.0,
+                "ty": 57.0
+              },
+              "layoutRect": {
+                "x": 271.0,
+                "y": 57.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 56.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 271.0,
+                "y": 57.0
+              },
+              "placementAabb": {
+                "x": 271.0,
+                "y": 57.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -4823.0,
+                "y": 4682.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -4823.0,
+                "y": 4682.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -4823.0,
+                "y": 4682.0,
+                "width": 56.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.6,
+              "glyphHeight": 11.8,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:250",
+            "name": "Frame 3137",
+            "type": "ROW",
+            "spacing": 14.0,
+            "sizing": {
+              "widthMode": "FIXED",
+              "width": 216.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "main": "center",
+              "cross": "center"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 74.0,
+              "top": 84.0,
+              "right": 37.0,
+              "bottom": 70.0,
+              "width": 216.0,
+              "height": 17.0
+            },
+            "children": [
+              {
+                "id": "149:251",
+                "name": "$10.20",
+                "type": "TEXT",
+                "sizing": {
+                  "width": 43.0,
+                  "height": 17.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "strokeAlign": "OUTSIDE",
+                  "textColor": "0xFF181C2E",
+                  "fontSize": 14.0,
+                  "fontWeight": "w700",
+                  "textAlign": "LEFT",
+                  "lineHeight": 1.2,
+                  "letterSpacing": 0.0,
+                  "fontFamily": "Sen",
+                  "glyphTopOffset": 3.4,
+                  "glyphHeight": 10.3
+                },
+                "text": "$10.20",
+                "accessibilityLabel": "$10.20",
+                "geometryFrame": {
+                  "layoutRect": {
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "intrinsicSize": {
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "parsedWorldAabb": {
+                    "x": -5020.0,
+                    "y": 4709.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "worldAabb": {
+                    "x": -5020.0,
+                    "y": 4709.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "paintRect": {
+                    "x": -5020.0,
+                    "y": 4709.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  }
+                },
+                "textMetricsFrame": {
+                  "lineHeightPx": 16.8,
+                  "glyphTopOffset": 3.4,
+                  "glyphHeight": 10.3,
+                  "fontSize": 14.0,
+                  "strutHeightRatio": 1.2,
+                  "baselineVerifiable": true
+                }
+              },
+              {
+                "id": "149:252",
+                "name": "Line 1695",
+                "type": "VECTOR",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 0.0,
+                  "height": 16.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "strokeAlign": "CENTER",
+                  "borderWidth": 1.0,
+                  "borderColor": "0xFFCACCDA",
+                  "renderBoundsExpand": {
+                    "right": 1.0
+                  },
+                  "hasStroke": true
+                },
+                "vectorAssetKey": "assets/icons/line_1695_149_252.svg",
+                "vectorSvgPathCount": 1,
+                "rotation": 1.57,
+                "rotationRad": 0.03,
+                "accessibilityLabel": "Line 1695",
+                "geometryFrame": {
+                  "localTransform": {
+                    "tx": 57.0,
+                    "ty": 0.5
+                  },
+                  "layoutRect": {
+                    "x": 57.0,
+                    "y": 0.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "intrinsicSize": {
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "placementOrigin": {
+                    "x": 57.0,
+                    "y": 0.5
+                  },
+                  "parsedWorldAabb": {
+                    "x": -4963.0,
+                    "y": 4709.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "worldAabb": {
+                    "x": -4963.0,
+                    "y": 4709.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "paintRect": {
+                    "x": -4963.0,
+                    "y": 4709.5,
+                    "width": 1.0000006993814168,
+                    "height": 16.0
+                  }
+                }
+              },
+              {
+                "id": "149:253",
+                "name": "Frame 8",
+                "type": "ROW",
+                "spacing": 8.0,
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "width": 145.0,
+                  "height": 14.0
+                },
+                "alignment": {
+                  "main": "center",
+                  "cross": "center"
+                },
+                "style": {
+                  "strokeAlign": "INSIDE"
+                },
+                "children": [
+                  {
+                    "id": "149:254",
+                    "name": "30 Jan, 12:30",
+                    "type": "TEXT",
+                    "sizing": {
+                      "width": 74.0,
+                      "height": 14.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "OUTSIDE",
+                      "textColor": "0xFF6B6E82",
+                      "fontSize": 12.0,
+                      "fontWeight": "w400",
+                      "textAlign": "LEFT",
+                      "lineHeight": 1.2,
+                      "letterSpacing": 0.0,
+                      "fontFamily": "Sen",
+                      "textCase": "UPPER",
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 11.0
+                    },
+                    "text": "30 Jan, 12:30",
+                    "accessibilityLabel": "30 Jan, 12:30",
+                    "geometryFrame": {
+                      "layoutRect": {
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "intrinsicSize": {
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4949.0,
+                        "y": 4710.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "worldAabb": {
+                        "x": -4949.0,
+                        "y": 4710.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "paintRect": {
+                        "x": -4949.0,
+                        "y": 4710.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      }
+                    },
+                    "textMetricsFrame": {
+                      "lineHeightPx": 14.399999999999999,
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 11.0,
+                      "fontSize": 12.0,
+                      "strutHeightRatio": 1.2,
+                      "baselineVerifiable": true
+                    }
+                  },
+                  {
+                    "id": "149:255",
+                    "name": "Ellipse 110",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "widthMode": "FIXED",
+                      "heightMode": "FIXED",
+                      "width": 4.0,
+                      "height": 4.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFF6B6E82",
+                      "strokeAlign": "INSIDE"
+                    },
+                    "vectorAssetKey": "assets/icons/ellipse_110_149_255.svg",
+                    "vectorSvgPathCount": 1,
+                    "accessibilityLabel": "Ellipse 110",
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 82.0,
+                        "ty": 5.0
+                      },
+                      "layoutRect": {
+                        "x": 82.0,
+                        "y": 5.0,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "intrinsicSize": {
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "placementOrigin": {
+                        "x": 82.0,
+                        "y": 5.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4867.0,
+                        "y": 4715.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "worldAabb": {
+                        "x": -4867.0,
+                        "y": 4715.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "paintRect": {
+                        "x": -4867.0,
+                        "y": 4715.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      }
+                    }
+                  },
+                  {
+                    "id": "149:256",
+                    "name": "01 Items",
+                    "type": "TEXT",
+                    "sizing": {
+                      "width": 51.0,
+                      "height": 14.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "OUTSIDE",
+                      "textColor": "0xFF6B6E82",
+                      "fontSize": 12.0,
+                      "fontWeight": "w400",
+                      "textAlign": "LEFT",
+                      "lineHeight": 1.2,
+                      "letterSpacing": 0.0,
+                      "fontFamily": "Sen",
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 8.2
+                    },
+                    "text": "01 Items",
+                    "accessibilityLabel": "01 Items",
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 94.0
+                      },
+                      "layoutRect": {
+                        "x": 94.0,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "intrinsicSize": {
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "placementOrigin": {
+                        "x": 94.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4855.0,
+                        "y": 4710.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "worldAabb": {
+                        "x": -4855.0,
+                        "y": 4710.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "paintRect": {
+                        "x": -4855.0,
+                        "y": 4710.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      }
+                    },
+                    "textMetricsFrame": {
+                      "lineHeightPx": 14.399999999999999,
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 8.2,
+                      "fontSize": 12.0,
+                      "strutHeightRatio": 1.2,
+                      "baselineVerifiable": true
+                    }
+                  }
+                ],
+                "geometryFrame": {
+                  "localTransform": {
+                    "tx": 71.0,
+                    "ty": 1.5
+                  },
+                  "layoutRect": {
+                    "x": 71.0,
+                    "y": 1.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "intrinsicSize": {
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "placementOrigin": {
+                    "x": 71.0,
+                    "y": 1.5
+                  },
+                  "parsedWorldAabb": {
+                    "x": -4949.0,
+                    "y": 4710.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "worldAabb": {
+                    "x": -4949.0,
+                    "y": 4710.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "paintRect": {
+                    "x": -4949.0,
+                    "y": 4710.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  }
+                }
+              }
+            ],
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 74.0,
+                "ty": 84.0
+              },
+              "layoutRect": {
+                "x": 74.0,
+                "y": 84.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 216.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 74.0,
+                "y": 84.0
+              },
+              "placementAabb": {
+                "x": 74.0,
+                "y": 84.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5020.0,
+                "y": 4709.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5020.0,
+                "y": 4709.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5020.0,
+                "y": 4709.0,
+                "width": 216.0,
+                "height": 17.0
+              }
+            }
+          },
+          {
+            "id": "149:261",
+            "name": "Button/ Re-order",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 139.0,
+              "height": 38.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "clusterId": "cluster_0",
+            "accessibilityLabel": "Re-Order",
+            "accessibilityHint": "Button/ Re-order",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 188.0,
+              "top": 133.0,
+              "width": 139.0,
+              "height": 38.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 188.0,
+                "ty": 133.0
+              },
+              "layoutRect": {
+                "x": 188.0,
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "intrinsicSize": {
+                "width": 139.0,
+                "height": 38.0
+              },
+              "placementOrigin": {
+                "x": 188.0,
+                "y": 133.0
+              },
+              "placementAabb": {
+                "x": 188.0,
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "parsedWorldAabb": {
+                "x": -4906.0,
+                "y": 4758.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "worldAabb": {
+                "x": -4906.0,
+                "y": 4758.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "paintRect": {
+                "x": -4906.0,
+                "y": 4758.0,
+                "width": 139.0,
+                "height": 38.0
+              }
+            }
+          },
+          {
+            "id": "149:258",
+            "name": "Button/ Rate",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 139.0,
+              "height": 38.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "clusterId": "cluster_1",
+            "accessibilityLabel": "Rate",
+            "accessibilityHint": "Button/ Rate",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "top": 133.0,
+              "right": 188.0,
+              "width": 139.0,
+              "height": 38.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 133.0
+              },
+              "layoutRect": {
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "intrinsicSize": {
+                "width": 139.0,
+                "height": 38.0
+              },
+              "placementOrigin": {
+                "y": 133.0
+              },
+              "placementAabb": {
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4758.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4758.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4758.0,
+                "width": 139.0,
+                "height": 38.0
+              }
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "tx": 24.0,
+            "ty": 574.0
+          },
+          "layoutRect": {
+            "x": 24.0,
+            "y": 574.0,
+            "width": 327.0,
+            "height": 171.00003051757812
+          },
+          "intrinsicSize": {
+            "width": 327.0,
+            "height": 171.00003051757812
+          },
+          "placementOrigin": {
+            "x": 24.0,
+            "y": 574.0
+          },
+          "placementAabb": {
+            "x": 24.0,
+            "y": 574.0,
+            "width": 327.0,
+            "height": 171.0
+          },
+          "parsedWorldAabb": {
+            "x": -5094.0,
+            "y": 4625.0,
+            "width": 327.0,
+            "height": 171.00003051757812
+          },
+          "worldAabb": {
+            "x": -5094.0,
+            "y": 4625.0,
+            "width": 327.0,
+            "height": 171.00003051757812
+          },
+          "paintRect": {
+            "x": -5094.0,
+            "y": 4625.0,
+            "width": 327.0,
+            "height": 171.00003051757812
+          }
+        }
+      },
+      {
+        "id": "149:218",
+        "name": "Food 02",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 327.0,
+          "height": 171.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderRadiusCorners": {
+            "topLeft": 0.0,
+            "topRight": 0.0,
+            "bottomRight": 0.0,
+            "bottomLeft": 0.0
+          },
+          "strokeAlign": "INSIDE"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 24.0,
+          "top": 379.0,
+          "right": 24.0,
+          "bottom": 262.0,
+          "width": 327.0,
+          "height": 171.0
+        },
+        "children": [
+          {
+            "id": "149:220",
+            "name": "Drink",
+            "type": "TEXT",
+            "sizing": {
+              "width": 36.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF181C2E",
+              "fontSize": 14.0,
+              "fontWeight": "w400",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 2.9,
+              "glyphHeight": 10.3
+            },
+            "text": "Drink",
+            "accessibilityLabel": "Drink",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 291.0,
+              "bottom": 154.0,
+              "width": 36.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "layoutRect": {
+                "width": 36.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 36.0,
+                "height": 17.0
+              },
+              "placementAabb": {
+                "width": 36.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4430.0,
+                "width": 36.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4430.0,
+                "width": 36.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4430.0,
+                "width": 36.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 2.9,
+              "glyphHeight": 10.3,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:221",
+            "name": "Completed",
+            "type": "TEXT",
+            "sizing": {
+              "width": 74.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF000000",
+              "fontSize": 14.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 13.1
+            },
+            "text": "Completed",
+            "accessibilityLabel": "Completed",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 63.0,
+              "right": 190.0,
+              "bottom": 154.0,
+              "width": 74.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 63.0
+              },
+              "layoutRect": {
+                "x": 63.0,
+                "width": 74.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 74.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 63.0
+              },
+              "placementAabb": {
+                "x": 63.0,
+                "width": 74.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5031.0,
+                "y": 4430.0,
+                "width": 74.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5031.0,
+                "y": 4430.0,
+                "width": 74.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5031.0,
+                "y": 4430.0,
+                "width": 74.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 13.1,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:222",
+            "name": "Rectangle 4154",
+            "type": "CONTAINER",
+            "sizing": {
+              "width": 60.0,
+              "height": 60.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF98A8B8",
+              "borderRadius": 8.0,
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "top": 49.0,
+              "right": 267.0,
+              "bottom": 62.0,
+              "width": 60.0,
+              "height": 60.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 49.0
+              },
+              "layoutRect": {
+                "y": 49.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "intrinsicSize": {
+                "width": 60.0,
+                "height": 60.0
+              },
+              "placementOrigin": {
+                "y": 49.0
+              },
+              "placementAabb": {
+                "y": 49.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4479.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4479.0,
+                "width": 60.0,
+                "height": 60.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4479.0,
+                "width": 60.0,
+                "height": 60.0
+              }
+            }
+          },
+          {
+            "id": "149:223",
+            "name": "Line 1694",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 327.0,
+              "height": 0.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "borderWidth": 1.0,
+              "borderColor": "0xFFEEF2F6",
+              "renderBoundsExpand": {
+                "top": 1.0
+              },
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/line_1694_149_223.svg",
+            "vectorSvgPathCount": 1,
+            "rotation": 0.0,
+            "rotationRad": 0.0,
+            "accessibilityLabel": "Line 1694",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "top": 33.0,
+              "bottom": 138.0,
+              "width": 327.0,
+              "height": 0.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 33.0
+              },
+              "layoutRect": {
+                "y": 33.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "intrinsicSize": {
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "placementOrigin": {
+                "y": 33.0
+              },
+              "placementAabb": {
+                "y": 33.0,
+                "width": 327.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4463.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4463.0,
+                "width": 327.0,
+                "height": 2.85872483800631e-05
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4462.0,
+                "width": 327.0,
+                "height": 1.00002858724838
+              }
+            }
+          },
+          {
+            "id": "149:225",
+            "name": "Name",
+            "type": "TEXT",
+            "sizing": {
+              "width": 68.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "CENTER",
+              "textColor": "0xFF181C2E",
+              "fontSize": 14.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 10.0
+            },
+            "text": "McDonald",
+            "accessibilityLabel": "McDonald",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 74.0,
+              "top": 57.0,
+              "right": 185.0,
+              "bottom": 97.0,
+              "width": 68.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 74.0,
+                "ty": 57.0
+              },
+              "layoutRect": {
+                "x": 74.0,
+                "y": 57.0,
+                "width": 68.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 68.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 74.0,
+                "y": 57.0
+              },
+              "placementAabb": {
+                "x": 74.0,
+                "y": 57.0,
+                "width": 68.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5020.0,
+                "y": 4487.0,
+                "width": 68.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5020.0,
+                "y": 4487.0,
+                "width": 68.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5020.0,
+                "y": 4487.0,
+                "width": 68.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.2,
+              "glyphHeight": 10.0,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:226",
+            "name": "#242432",
+            "type": "TEXT",
+            "sizing": {
+              "width": 56.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFF6B6E82",
+              "fontSize": 14.0,
+              "fontWeight": "w400",
+              "textAlign": "RIGHT",
+              "lineHeight": 1.2,
+              "letterSpacing": 0.0,
+              "fontFamily": "Sen",
+              "textDecoration": "underline",
+              "glyphTopOffset": 3.6,
+              "glyphHeight": 11.8
+            },
+            "text": "#242432",
+            "accessibilityLabel": "#242432",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 271.0,
+              "top": 57.0,
+              "bottom": 97.0,
+              "width": 56.0,
+              "height": 17.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 271.0,
+                "ty": 57.0
+              },
+              "layoutRect": {
+                "x": 271.0,
+                "y": 57.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 56.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 271.0,
+                "y": 57.0
+              },
+              "placementAabb": {
+                "x": 271.0,
+                "y": 57.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -4823.0,
+                "y": 4487.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -4823.0,
+                "y": 4487.0,
+                "width": 56.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -4823.0,
+                "y": 4487.0,
+                "width": 56.0,
+                "height": 17.0
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 16.8,
+              "glyphTopOffset": 3.6,
+              "glyphHeight": 11.8,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.2,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "149:227",
+            "name": "Frame 3137",
+            "type": "ROW",
+            "spacing": 14.0,
+            "sizing": {
+              "widthMode": "FIXED",
+              "width": 216.0,
+              "height": 17.0
+            },
+            "alignment": {
+              "main": "center",
+              "cross": "center"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 74.0,
+              "top": 84.0,
+              "right": 37.0,
+              "bottom": 70.0,
+              "width": 216.0,
+              "height": 17.0
+            },
+            "children": [
+              {
+                "id": "149:228",
+                "name": "$40.15",
+                "type": "TEXT",
+                "sizing": {
+                  "width": 43.0,
+                  "height": 17.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "strokeAlign": "OUTSIDE",
+                  "textColor": "0xFF181C2E",
+                  "fontSize": 14.0,
+                  "fontWeight": "w700",
+                  "textAlign": "LEFT",
+                  "lineHeight": 1.2,
+                  "letterSpacing": 0.0,
+                  "fontFamily": "Sen",
+                  "glyphTopOffset": 3.4,
+                  "glyphHeight": 10.3
+                },
+                "text": "$40.15",
+                "accessibilityLabel": "$40.15",
+                "geometryFrame": {
+                  "layoutRect": {
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "intrinsicSize": {
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "parsedWorldAabb": {
+                    "x": -5020.0,
+                    "y": 4514.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "worldAabb": {
+                    "x": -5020.0,
+                    "y": 4514.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  },
+                  "paintRect": {
+                    "x": -5020.0,
+                    "y": 4514.0,
+                    "width": 43.0,
+                    "height": 17.0
+                  }
+                },
+                "textMetricsFrame": {
+                  "lineHeightPx": 16.8,
+                  "glyphTopOffset": 3.4,
+                  "glyphHeight": 10.3,
+                  "fontSize": 14.0,
+                  "strutHeightRatio": 1.2,
+                  "baselineVerifiable": true
+                }
+              },
+              {
+                "id": "149:229",
+                "name": "Line 1695",
+                "type": "VECTOR",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 0.0,
+                  "height": 16.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "strokeAlign": "CENTER",
+                  "borderWidth": 1.0,
+                  "borderColor": "0xFFCACCDA",
+                  "renderBoundsExpand": {
+                    "right": 1.0
+                  },
+                  "hasStroke": true
+                },
+                "vectorAssetKey": "assets/icons/line_1695_149_229.svg",
+                "vectorSvgPathCount": 1,
+                "rotation": 1.57,
+                "rotationRad": 0.03,
+                "accessibilityLabel": "Line 1695",
+                "geometryFrame": {
+                  "localTransform": {
+                    "tx": 57.0,
+                    "ty": 0.5
+                  },
+                  "layoutRect": {
+                    "x": 57.0,
+                    "y": 0.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "intrinsicSize": {
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "placementOrigin": {
+                    "x": 57.0,
+                    "y": 0.5
+                  },
+                  "parsedWorldAabb": {
+                    "x": -4963.0,
+                    "y": 4514.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "worldAabb": {
+                    "x": -4963.0,
+                    "y": 4514.5,
+                    "width": 6.993814167799428e-07,
+                    "height": 16.0
+                  },
+                  "paintRect": {
+                    "x": -4963.0,
+                    "y": 4514.5,
+                    "width": 1.0000006993814168,
+                    "height": 16.0
+                  }
+                }
+              },
+              {
+                "id": "149:230",
+                "name": "Frame 8",
+                "type": "ROW",
+                "spacing": 8.0,
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "width": 145.0,
+                  "height": 14.0
+                },
+                "alignment": {
+                  "main": "center",
+                  "cross": "center"
+                },
+                "style": {
+                  "strokeAlign": "INSIDE"
+                },
+                "children": [
+                  {
+                    "id": "149:231",
+                    "name": "30 Jan, 12:30",
+                    "type": "TEXT",
+                    "sizing": {
+                      "width": 74.0,
+                      "height": 14.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "OUTSIDE",
+                      "textColor": "0xFF6B6E82",
+                      "fontSize": 12.0,
+                      "fontWeight": "w400",
+                      "textAlign": "LEFT",
+                      "lineHeight": 1.2,
+                      "letterSpacing": 0.0,
+                      "fontFamily": "Sen",
+                      "textCase": "UPPER",
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 11.0
+                    },
+                    "text": "30 Jan, 12:30",
+                    "accessibilityLabel": "30 Jan, 12:30",
+                    "geometryFrame": {
+                      "layoutRect": {
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "intrinsicSize": {
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4949.0,
+                        "y": 4515.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "worldAabb": {
+                        "x": -4949.0,
+                        "y": 4515.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      },
+                      "paintRect": {
+                        "x": -4949.0,
+                        "y": 4515.5,
+                        "width": 74.0,
+                        "height": 14.0
+                      }
+                    },
+                    "textMetricsFrame": {
+                      "lineHeightPx": 14.399999999999999,
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 11.0,
+                      "fontSize": 12.0,
+                      "strutHeightRatio": 1.2,
+                      "baselineVerifiable": true
+                    }
+                  },
+                  {
+                    "id": "149:232",
+                    "name": "Ellipse 110",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "widthMode": "FIXED",
+                      "heightMode": "FIXED",
+                      "width": 4.0,
+                      "height": 4.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFF6B6E82",
+                      "strokeAlign": "INSIDE"
+                    },
+                    "vectorAssetKey": "assets/icons/ellipse_110_149_232.svg",
+                    "vectorSvgPathCount": 1,
+                    "accessibilityLabel": "Ellipse 110",
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 82.0,
+                        "ty": 5.0
+                      },
+                      "layoutRect": {
+                        "x": 82.0,
+                        "y": 5.0,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "intrinsicSize": {
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "placementOrigin": {
+                        "x": 82.0,
+                        "y": 5.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4867.0,
+                        "y": 4520.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "worldAabb": {
+                        "x": -4867.0,
+                        "y": 4520.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      },
+                      "paintRect": {
+                        "x": -4867.0,
+                        "y": 4520.5,
+                        "width": 4.0,
+                        "height": 4.0
+                      }
+                    }
+                  },
+                  {
+                    "id": "149:233",
+                    "name": "02 Items",
+                    "type": "TEXT",
+                    "sizing": {
+                      "width": 51.0,
+                      "height": 14.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "strokeAlign": "OUTSIDE",
+                      "textColor": "0xFF6B6E82",
+                      "fontSize": 12.0,
+                      "fontWeight": "w400",
+                      "textAlign": "LEFT",
+                      "lineHeight": 1.2,
+                      "letterSpacing": 0.0,
+                      "fontFamily": "Sen",
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 8.2
+                    },
+                    "text": "02 Items",
+                    "accessibilityLabel": "02 Items",
+                    "geometryFrame": {
+                      "localTransform": {
+                        "tx": 94.0
+                      },
+                      "layoutRect": {
+                        "x": 94.0,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "intrinsicSize": {
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "placementOrigin": {
+                        "x": 94.0
+                      },
+                      "parsedWorldAabb": {
+                        "x": -4855.0,
+                        "y": 4515.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "worldAabb": {
+                        "x": -4855.0,
+                        "y": 4515.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      },
+                      "paintRect": {
+                        "x": -4855.0,
+                        "y": 4515.5,
+                        "width": 51.0,
+                        "height": 14.0
+                      }
+                    },
+                    "textMetricsFrame": {
+                      "lineHeightPx": 14.399999999999999,
+                      "glyphTopOffset": 3.0,
+                      "glyphHeight": 8.2,
+                      "fontSize": 12.0,
+                      "strutHeightRatio": 1.2,
+                      "baselineVerifiable": true
+                    }
+                  }
+                ],
+                "geometryFrame": {
+                  "localTransform": {
+                    "tx": 71.0,
+                    "ty": 1.5
+                  },
+                  "layoutRect": {
+                    "x": 71.0,
+                    "y": 1.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "intrinsicSize": {
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "placementOrigin": {
+                    "x": 71.0,
+                    "y": 1.5
+                  },
+                  "parsedWorldAabb": {
+                    "x": -4949.0,
+                    "y": 4515.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "worldAabb": {
+                    "x": -4949.0,
+                    "y": 4515.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  },
+                  "paintRect": {
+                    "x": -4949.0,
+                    "y": 4515.5,
+                    "width": 145.0,
+                    "height": 14.0
+                  }
+                }
+              }
+            ],
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 74.0,
+                "ty": 84.0
+              },
+              "layoutRect": {
+                "x": 74.0,
+                "y": 84.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "intrinsicSize": {
+                "width": 216.0,
+                "height": 17.0
+              },
+              "placementOrigin": {
+                "x": 74.0,
+                "y": 84.0
+              },
+              "placementAabb": {
+                "x": 74.0,
+                "y": 84.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "parsedWorldAabb": {
+                "x": -5020.0,
+                "y": 4514.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "worldAabb": {
+                "x": -5020.0,
+                "y": 4514.0,
+                "width": 216.0,
+                "height": 17.0
+              },
+              "paintRect": {
+                "x": -5020.0,
+                "y": 4514.0,
+                "width": 216.0,
+                "height": 17.0
+              }
+            }
+          },
+          {
+            "id": "149:238",
+            "name": "Button/ Re-order",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 139.0,
+              "height": 38.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "clusterId": "cluster_0",
+            "accessibilityLabel": "Re-Order",
+            "accessibilityHint": "Button/ Re-order",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 188.0,
+              "top": 133.0,
+              "width": 139.0,
+              "height": 38.0
+            },
+            "flattenFigmaNodeIds": [
+              "149:239",
+              "149:240"
+            ],
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 188.0,
+                "ty": 133.0
+              },
+              "layoutRect": {
+                "x": 188.0,
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "intrinsicSize": {
+                "width": 139.0,
+                "height": 38.0
+              },
+              "placementOrigin": {
+                "x": 188.0,
+                "y": 133.0
+              },
+              "placementAabb": {
+                "x": 188.0,
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "parsedWorldAabb": {
+                "x": -4906.0,
+                "y": 4563.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "worldAabb": {
+                "x": -4906.0,
+                "y": 4563.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "paintRect": {
+                "x": -4906.0,
+                "y": 4563.0,
+                "width": 139.0,
+                "height": 38.0
+              }
+            }
+          },
+          {
+            "id": "149:235",
+            "name": "Button/ Rate",
+            "type": "BUTTON",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 139.0,
+              "height": 38.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "INSIDE"
+            },
+            "clusterId": "cluster_1",
+            "accessibilityLabel": "Rate",
+            "accessibilityHint": "Button/ Rate",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "top": 133.0,
+              "right": 188.0,
+              "width": 139.0,
+              "height": 38.0
+            },
+            "flattenFigmaNodeIds": [
+              "149:236",
+              "149:237"
+            ],
+            "geometryFrame": {
+              "localTransform": {
+                "ty": 133.0
+              },
+              "layoutRect": {
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "intrinsicSize": {
+                "width": 139.0,
+                "height": 38.0
+              },
+              "placementOrigin": {
+                "y": 133.0
+              },
+              "placementAabb": {
+                "y": 133.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "parsedWorldAabb": {
+                "x": -5094.0,
+                "y": 4563.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "worldAabb": {
+                "x": -5094.0,
+                "y": 4563.0,
+                "width": 139.0,
+                "height": 38.0
+              },
+              "paintRect": {
+                "x": -5094.0,
+                "y": 4563.0,
+                "width": 139.0,
+                "height": 38.0
+              }
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "tx": 24.0,
+            "ty": 379.0
+          },
+          "layoutRect": {
+            "x": 24.0,
+            "y": 379.0,
+            "width": 327.0,
+            "height": 171.0
+          },
+          "intrinsicSize": {
+            "width": 327.0,
+            "height": 171.0
+          },
+          "placementOrigin": {
+            "x": 24.0,
+            "y": 379.0
+          },
+          "placementAabb": {
+            "x": 24.0,
+            "y": 379.0,
+            "width": 327.0,
+            "height": 171.0
+          },
+          "parsedWorldAabb": {
+            "x": -5094.0,
+            "y": 4430.0,
+            "width": 327.0,
+            "height": 171.0
+          },
+          "worldAabb": {
+            "x": -5094.0,
+            "y": 4430.0,
+            "width": 327.0,
+            "height": 171.0
+          },
+          "paintRect": {
+            "x": -5094.0,
+            "y": 4430.0,
+            "width": 327.0,
+            "height": 171.0
+          }
+        }
+      }
+    ],
+    "geometryFrame": {
+      "layoutRect": {
+        "width": 375.0,
+        "height": 812.0
+      },
+      "intrinsicSize": {
+        "width": 375.0,
+        "height": 812.0
+      },
+      "parsedWorldAabb": {
+        "x": -5118.0,
+        "y": 4051.0,
+        "width": 375.0,
+        "height": 812.0
+      },
+      "worldAabb": {
+        "x": -5118.0,
+        "y": 4051.0,
+        "width": 375.0,
+        "height": 812.0
+      },
+      "paintRect": {
+        "x": -5118.0,
+        "y": 4051.0,
+        "width": 375.0,
+        "height": 812.0
+      }
+    }
+  },
+  "tokens": {
+    "colors": {
+      "primary": "0xFF6B6E82",
+      "color1": "0xFF181C2E",
+      "color2": "0xFFFF7622",
+      "color3": "0xFFFFFFFF",
+      "color4": "0xFF98A8B8",
+      "color5": "0xFF059C6A",
+      "color6": "0xFFECF0F4",
+      "color7": "0xFFFF0000",
+      "color8": "0xFFA5A7B9",
+      "color9": "0xFFFB6D3A"
+    },
+    "typography": {
+      "drink": {
+        "fontSize": 14.0
+      },
+      "canceled": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "name": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "t240112": {
+        "fontSize": 14.0
+      },
+      "t1020": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "t30Jan1230": {
+        "fontSize": 12.0
+      },
+      "t01Items": {
+        "fontSize": 12.0
+      },
+      "text": {
+        "fontSize": 12.0,
+        "fontWeight": "w700"
+      },
+      "text2": {
+        "fontSize": 12.0,
+        "fontWeight": "w700"
+      },
+      "drink2": {
+        "fontSize": 14.0
+      },
+      "completed": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "name2": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "t242432": {
+        "fontSize": 14.0
+      },
+      "t4015": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "t30Jan12302": {
+        "fontSize": 12.0
+      },
+      "t02Items": {
+        "fontSize": 12.0
+      },
+      "text3": {
+        "fontSize": 12.0,
+        "fontWeight": "w700"
+      },
+      "text4": {
+        "fontSize": 12.0,
+        "fontWeight": "w700"
+      },
+      "food": {
+        "fontSize": 14.0
+      },
+      "completed2": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "name3": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "t162432": {
+        "fontSize": 14.0
+      },
+      "t3525": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "t29Jan1230": {
+        "fontSize": 12.0
+      },
+      "t03Items": {
+        "fontSize": 12.0
+      },
+      "text5": {
+        "fontSize": 12.0,
+        "fontWeight": "w700"
+      },
+      "text6": {
+        "fontSize": 12.0,
+        "fontWeight": "w700"
+      },
+      "ongoing": {
+        "fontSize": 14.0
+      },
+      "history": {
+        "fontSize": 14.0,
+        "fontWeight": "w700"
+      },
+      "myOrders": {
+        "fontSize": 17.0
+      }
+    },
+    "spacing": {
+      "md": 8.0,
+      "space1": 14.0
+    },
+    "radii": {
+      "md": 8.0,
+      "radius1": 20.0
+    },
+    "elevations": {
+      "md": 4.0
+    }
+  }
+}

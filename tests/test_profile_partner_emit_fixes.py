@@ -801,11 +801,7 @@ def test_notification_badge_stack_emits_positioned_overlay() -> None:
     )
     body = render_node_body(host, uses_svg=True)
     assert "Stack(" in body or "Column(" in body
-    assert (
-        "Positioned.fill" in body
-        or body.count("Positioned(") >= 2
-        or "Text('3'" in body
-    )
+    assert "Positioned.fill" in body or body.count("Positioned(") >= 2 or "Text('3'" in body
     assert "SvgPicture.asset('assets/icons/bell.svg'" in body
     assert "Text('3'" in body
     assert "forceStrutHeight" not in body
