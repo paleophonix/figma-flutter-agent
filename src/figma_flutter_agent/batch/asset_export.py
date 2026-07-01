@@ -221,9 +221,7 @@ def asset_export_gap_hint(
         document,
         illustrations_enabled=assets.illustrations,
     )
-    expected_icon_ids = frozenset(
-        node_id for node_id, _name, kind in exportables if kind == "icon"
-    )
+    expected_icon_ids = frozenset(node_id for node_id, _name, kind in exportables if kind == "icon")
     if not expected_icon_ids:
         return None
     covered = expected_icon_ids & result.exported_node_ids

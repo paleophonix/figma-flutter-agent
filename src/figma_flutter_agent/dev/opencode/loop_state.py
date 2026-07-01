@@ -66,7 +66,10 @@ class LoopBudgetState:
         if not self.last_root_hash:
             return False
         repeats = self.root_hash_counts.get(self.last_root_hash, 0)
-        return repeats >= loops.same_root_hash_repeat_without_improvement and not self.last_root_improved
+        return (
+            repeats >= loops.same_root_hash_repeat_without_improvement
+            and not self.last_root_improved
+        )
 
     def increment_for_route(self, route: str) -> None:
         """Bump the budget counter associated with a dispatch route."""
@@ -106,7 +109,10 @@ class LoopBudgetState:
             return True
         if route == "check.retry" and self.toolchain_retries >= loops.max_toolchain_retries:
             return True
-        if route == "capture.verify" and self.capture_produce_attempts >= loops.max_toolchain_retries:
+        if (
+            route == "capture.verify"
+            and self.capture_produce_attempts >= loops.max_toolchain_retries
+        ):
             return True
         if self.total_candidate_patches >= loops.max_total_candidate_patches:
             return True

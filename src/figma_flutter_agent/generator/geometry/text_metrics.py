@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.geometry.baseline import flutter_baseline_offset
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, StackPlacement, TextMetricsFrame
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeType,
+    StackPlacement,
+    TextMetricsFrame,
+)
 
 _BASELINE_EPSILON = 0.5
 _SPACING_SLACK_FRACTION = 0.25
@@ -74,9 +79,7 @@ def positioned_text_allows_metric_slack(
     """Return True when absolute TEXT may widen its positioned slot for glyph bounds."""
     if node.type != NodeType.TEXT:
         return False
-    if placement_is_center_pinned_horizontal(placement):
-        return False
-    return True
+    return not placement_is_center_pinned_horizontal(placement)
 
 
 def positioned_text_width_with_metric_slack(figma_width: float) -> float:

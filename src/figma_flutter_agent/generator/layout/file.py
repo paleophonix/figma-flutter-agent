@@ -153,7 +153,6 @@ def render_layout_file(
             )
             from figma_flutter_agent.generator.layout.flex_policy.stack import (
                 stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll,
-                stack_child_should_use_pin_bottom_scroll_host,
             )
 
             for method in methods:

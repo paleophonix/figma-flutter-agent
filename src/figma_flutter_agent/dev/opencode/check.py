@@ -71,9 +71,7 @@ def compiler_repair_verified(
     if not isinstance(touched, list) or not touched:
         return False
     touched_set = {str(p) for p in touched}
-    compiler_touched = {
-        path for path in touched_set if path.startswith("src/figma_flutter_agent/")
-    }
+    compiler_touched = {path for path in touched_set if path.startswith("src/figma_flutter_agent/")}
     if repair_payload.get("salvaged"):
         return bool(compiler_touched)
     if not plan_payload:
@@ -239,10 +237,7 @@ def run_check_gate(
             payload=payload,
         )
 
-    if (
-        allow_stale_mirror_bypass
-        and compiler_repair_verified(repair_payload, plan_payload)
-    ):
+    if allow_stale_mirror_bypass and compiler_repair_verified(repair_payload, plan_payload):
         root_hash = same_root_hash(
             failure_class=FailureClass.FRESH_OK.value,
             normalized_stage="repair_gates",
@@ -287,9 +282,7 @@ def run_check_gate(
             passed = False
             failure = missing_class
             failed_stage = (
-                "toolchain"
-                if failure == FailureClass.TOOLCHAIN_FLAKE
-                else "pre_write_analyze"
+                "toolchain" if failure == FailureClass.TOOLCHAIN_FLAKE else "pre_write_analyze"
             )
             evidence.append("dart-errors.json:missing")
 

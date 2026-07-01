@@ -62,9 +62,7 @@ def _bounded_growable_scroll_position(child: CleanDesignTreeNode) -> str | None:
     if not fields:
         return None
     joined = ", ".join(fields)
-    has_vertical_pin = any(
-        token in joined for token in ("top:", "bottom:", "height:")
-    )
+    has_vertical_pin = any(token in joined for token in ("top:", "bottom:", "height:"))
     if not has_vertical_pin:
         return None
     return joined

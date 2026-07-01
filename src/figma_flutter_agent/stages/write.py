@@ -216,9 +216,7 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
             preview = "; ".join(stale_imports[:5])
             if len(stale_imports) > 5:
                 preview += f" (+{len(stale_imports) - 5} more)"
-            raise GenerationError(
-                f"Write stage blocked by planned widget import graph: {preview}"
-            )
+            raise GenerationError(f"Write stage blocked by planned widget import graph: {preview}")
 
         planned_for_analyze = resolve_planned_for_write_analyze(
             analyze_paths,

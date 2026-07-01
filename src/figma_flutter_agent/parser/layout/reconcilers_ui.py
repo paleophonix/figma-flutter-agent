@@ -45,6 +45,7 @@ def weekday_chip_row_synthesized_node_ids(root: CleanDesignTreeNode) -> frozense
     walk(root)
     return frozenset(collected)
 
+
 _CTA_SURFACE_FOOTER_GAP_PX = 4.0
 _MIN_CTA_SURFACE_HEIGHT_PX = 32.0
 

@@ -83,8 +83,7 @@ def layout_fact_favorite_overlay_stack(node: CleanDesignTreeNode) -> bool:
     if any(layout_fact_favorite_glyph_vector(item) for item in local_nodes):
         return True
     return any(
-        item.vector_asset_key
-        and item.type in {NodeType.VECTOR, NodeType.STACK, NodeType.CONTAINER}
+        item.vector_asset_key and item.type in {NodeType.VECTOR, NodeType.STACK, NodeType.CONTAINER}
         for item in local_nodes
     )
 
@@ -524,10 +523,7 @@ def _vertical_chip_painted_surface(child: CleanDesignTreeNode) -> bool:
     height = child.sizing.height
     if width is None or height is None:
         return False
-    if not (
-        40.0 <= float(width) <= 80.0
-        and 40.0 <= float(height) <= 80.0
-    ):
+    if not (40.0 <= float(width) <= 80.0 and 40.0 <= float(height) <= 80.0):
         return False
     placement = child.stack_placement
     if placement is None:

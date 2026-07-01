@@ -194,9 +194,7 @@ def test_select_files_for_sync_writes_when_reconcile_changed_planned_but_snapsho
         spacing_hash=spacing_hash,
         file_hashes={
             widget_path: hash_file_contents(fossil),
-            "lib/features/light_theme_06/light_theme_06_screen.dart": hash_file_contents(
-                "screen"
-            ),
+            "lib/features/light_theme_06/light_theme_06_screen.dart": hash_file_contents("screen"),
         },
     )
     disk_file = tmp_path / widget_path

@@ -100,12 +100,8 @@ def subtitle_stack_bounded_height(node: CleanDesignTreeNode) -> float:
     if line_height is None or line_height <= 0:
         line_height = child.sizing.height
     line_height = float(line_height or 21.0)
-    top_inset = (
-        abs(float(placement.top)) if placement and placement.top is not None else 0.0
-    )
-    bottom_inset = (
-        float(placement.bottom) if placement and placement.bottom is not None else 0.0
-    )
+    top_inset = abs(float(placement.top)) if placement and placement.top is not None else 0.0
+    bottom_inset = float(placement.bottom) if placement and placement.bottom is not None else 0.0
     extent = line_height + top_inset + bottom_inset + SUBTITLE_STACK_STRUT_BUFFER
     frame_height = node.sizing.height
     if frame_height is not None and float(frame_height) > extent:
@@ -175,9 +171,7 @@ def stack_uses_shared_body_scroll_host(
         return False
     body_children = _stack_flow_body_children(stack)
     if growable_panels is None:
-        growable_panels = sum(
-            1 for child in body_children if stack_child_is_growable_panel(child)
-        )
+        growable_panels = sum(1 for child in body_children if stack_child_is_growable_panel(child))
     if growable_panels < 2:
         return False
     growable_body = [child for child in body_children if stack_child_is_growable_panel(child)]
@@ -257,10 +251,7 @@ def stack_child_should_emit_positioned(
 
         if button_compiles_body_as_flex_row(parent_node):
             return False
-        if (
-            button_is_pill_with_centered_label(parent_node)
-            and node.type == NodeType.TEXT
-        ):
+        if button_is_pill_with_centered_label(parent_node) and node.type == NodeType.TEXT:
             return False
     if parent_node is not None and parent_node.type == NodeType.STACK:
         from figma_flutter_agent.generator.layout.flex_policy.row import (
@@ -466,10 +457,7 @@ def layout_fact_icon_badge_stack(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return False
-    if (
-        float(width) > _ICON_BADGE_STACK_MAX_EXTENT
-        or float(height) > _ICON_BADGE_STACK_MAX_EXTENT
-    ):
+    if float(width) > _ICON_BADGE_STACK_MAX_EXTENT or float(height) > _ICON_BADGE_STACK_MAX_EXTENT:
         return False
     has_fill_surface = False
     has_glyph = False
@@ -528,11 +516,7 @@ def layout_fact_stack_card_metadata_host(
         return False
     height = node.sizing.height
     if height is not None and height > 0:
-        if (
-            CARD_METADATA_STACK_MIN_HEIGHT
-            <= float(height)
-            <= CARD_METADATA_STACK_MAX_HEIGHT
-        ):
+        if CARD_METADATA_STACK_MIN_HEIGHT <= float(height) <= CARD_METADATA_STACK_MAX_HEIGHT:
             if len(node.children) >= 2 and not tree_children_are_vertically_sequential(
                 node.children
             ):
@@ -577,9 +561,7 @@ def _stack_has_vector_export(node: CleanDesignTreeNode, *, depth: int = 0) -> bo
         return False
     if node.vector_asset_key:
         return True
-    return any(
-        _stack_has_vector_export(child, depth=depth + 1) for child in node.children
-    )
+    return any(_stack_has_vector_export(child, depth=depth + 1) for child in node.children)
 
 
 def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
@@ -596,9 +578,7 @@ def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
     def walk_badge(current: CleanDesignTreeNode, depth: int = 0) -> bool:
         if depth > 5:
             return False
-        if layout_fact_row_numeric_counter_badge(current) or _is_notification_dot_badge(
-            current
-        ):
+        if layout_fact_row_numeric_counter_badge(current) or _is_notification_dot_badge(current):
             return True
         for child in current.children:
             if walk_badge(child, depth=depth + 1):
@@ -616,10 +596,7 @@ def layout_fact_stack_numeric_glyph_overlay_host(node: CleanDesignTreeNode) -> b
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return False
-    if (
-        float(width) > SUBTITLE_LINE_MAX_HEIGHT
-        or float(height) > SUBTITLE_LINE_MAX_HEIGHT
-    ):
+    if float(width) > SUBTITLE_LINE_MAX_HEIGHT or float(height) > SUBTITLE_LINE_MAX_HEIGHT:
         return False
     text_nodes = [
         child
@@ -632,8 +609,7 @@ def layout_fact_stack_numeric_glyph_overlay_host(node: CleanDesignTreeNode) -> b
     if not glyph.isdigit() or len(glyph) > 3:
         return False
     has_vector = any(
-        child.type == NodeType.VECTOR or child.vector_asset_key
-        for child in node.children
+        child.type == NodeType.VECTOR or child.vector_asset_key for child in node.children
     )
     return has_vector
 
@@ -712,13 +688,9 @@ def layout_fact_stack_metric_icon_label_band(node: CleanDesignTreeNode) -> bool:
     if node.type != NodeType.STACK:
         return False
     metric_children = [
-        child
-        for child in node.children
-        if layout_fact_stack_compact_icon_label_metric(child)
+        child for child in node.children if layout_fact_stack_compact_icon_label_metric(child)
     ]
-    if not (
-        _METRIC_BAND_MIN_CHILDREN <= len(metric_children) <= _METRIC_BAND_MAX_CHILDREN
-    ):
+    if not (_METRIC_BAND_MIN_CHILDREN <= len(metric_children) <= _METRIC_BAND_MAX_CHILDREN):
         return False
     if len(metric_children) != len(node.children):
         return False
@@ -853,9 +825,7 @@ def _stack_is_phone_shell_layout(
     """True for status bar + scrollable body + home-indicator phone shells."""
     if stack.type != NodeType.STACK:
         return False
-    return _children_form_phone_shell_layout(
-        stack.children, growable_panels=growable_panels
-    )
+    return _children_form_phone_shell_layout(stack.children, growable_panels=growable_panels)
 
 
 def _column_is_phone_shell_layout(
@@ -866,9 +836,7 @@ def _column_is_phone_shell_layout(
     """True when a decomposed ``COLUMN`` root mirrors a phone chrome shell."""
     if column.type != NodeType.COLUMN:
         return False
-    return _children_form_phone_shell_layout(
-        column.children, growable_panels=growable_panels
-    )
+    return _children_form_phone_shell_layout(column.children, growable_panels=growable_panels)
 
 
 def _children_form_phone_shell_layout(
@@ -1031,17 +999,13 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     if stack_has_absolute_overlay_form_slots(stack):
         return False
 
-    if is_tag_option_chip_group(stack) or stack_should_preserve_absolute_tag_chips(
-        stack
-    ):
+    if is_tag_option_chip_group(stack) or stack_should_preserve_absolute_tag_chips(stack):
         return False
 
     if stack.type != NodeType.STACK or len(stack.children) < 2:
         return False
     body_children = _stack_flow_body_children(stack)
-    growable_panels = sum(
-        1 for child in body_children if stack_child_is_growable_panel(child)
-    )
+    growable_panels = sum(1 for child in body_children if stack_child_is_growable_panel(child))
     if _stack_is_phone_shell_layout(stack, growable_panels=growable_panels):
         return True
     if stack_uses_shared_body_scroll_host(stack, growable_panels=growable_panels):
@@ -1064,9 +1028,7 @@ def stack_child_is_pill_button(child: CleanDesignTreeNode) -> bool:
 
     if child.type != NodeType.BUTTON:
         return False
-    return button_is_pill_with_centered_label(child) or button_should_fitted_box_label(
-        child
-    )
+    return button_is_pill_with_centered_label(child) or button_should_fitted_box_label(child)
 
 
 def stack_child_ordinal_left(child: CleanDesignTreeNode) -> float:
@@ -1172,9 +1134,7 @@ def stack_flow_child_horizontal_wrap(
     if stack_child_is_absolute_overlay(child):
         return widget
 
-    if parent_node is not None and layout_fact_stack_bottom_nav_tab_glyph_column(
-        parent_node
-    ):
+    if parent_node is not None and layout_fact_stack_bottom_nav_tab_glyph_column(parent_node):
         width = child.sizing.width
         if width is not None and float(width) > 0:
             width_lit = format_geometry_literal(float(width))
@@ -1188,11 +1148,12 @@ def stack_flow_child_horizontal_wrap(
             width_lit = format_geometry_literal(float(width))
             align = (
                 "Alignment.bottomCenter"
-                if child.stack_placement is not None
-                and child.stack_placement.vertical == "BOTTOM"
+                if child.stack_placement is not None and child.stack_placement.vertical == "BOTTOM"
                 else "Alignment.topCenter"
             )
-            return f"Align(alignment: {align}, child: SizedBox(width: {width_lit}, child: {widget}))"
+            return (
+                f"Align(alignment: {align}, child: SizedBox(width: {width_lit}, child: {widget}))"
+            )
     placement = child.stack_placement
     if child.sizing.width_mode == SizingMode.FILL:
         return f"SizedBox(width: double.infinity, child: {widget})"
@@ -1218,8 +1179,7 @@ def stack_flow_child_vertical_extent_wrap(
         height_lit = format_geometry_literal(height)
         align = (
             "Alignment.bottomCenter"
-            if child.stack_placement is not None
-            and child.stack_placement.vertical == "BOTTOM"
+            if child.stack_placement is not None and child.stack_placement.vertical == "BOTTOM"
             else "Alignment.topCenter"
         )
         return f"SizedBox(height: {height_lit}, child: Align(alignment: {align}, child: {widget}))"
@@ -1258,8 +1218,7 @@ def stack_flow_child_vertical_extent_wrap(
             align = "Alignment.center"
     if child.type == NodeType.COLUMN and _column_is_text_primary(child):
         if all(
-            item.type == NodeType.TEXT
-            and (item.style.text_align or "LEFT").upper() == "CENTER"
+            item.type == NodeType.TEXT and (item.style.text_align or "LEFT").upper() == "CENTER"
             for item in child.children
         ):
             align = "Alignment.topCenter"
@@ -1337,10 +1296,7 @@ def _bound_stack_sized_box(
 
         width_lit = responsive_host_width_literal(width)
         trimmed = widget.lstrip()
-        if (
-            trimmed.startswith("SizedBox(")
-            and ", height:" in trimmed.split(", child:", 1)[0]
-        ):
+        if trimmed.startswith("SizedBox(") and ", height:" in trimmed.split(", child:", 1)[0]:
             return widget
         return hoist_flex_parent_data(
             lambda inner: wrap_subtitle_stack_sized_box(
@@ -1378,9 +1334,7 @@ def _bound_stack_sized_box(
             return f"SizedBox(width: {width_lit}, child: {inner})"
         if height is not None and height > 0:
             height_lit = format_geometry_literal(height)
-            return (
-                f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
-            )
+            return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
         return f"SizedBox(width: {width_lit}, child: {widget})"
     if height is None or height <= 0:
         if layout_fact_back_nav_stack(node) or layout_fact_skip_control_stack(node):
@@ -1466,13 +1420,9 @@ def bound_stack_scroll_list_item(
         child_marker = ", child: "
         marker_idx = trimmed.find(child_marker)
         if marker_idx < 0:
-            return (
-                f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
-            )
+            return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
         inner = _extract_balanced_prefix_child(trimmed, marker_idx + len(child_marker))
         if inner is None:
-            return (
-                f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
-            )
+            return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
         return f"{prefix}{head}, height: {height_lit}, child: {inner})"
     return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"

@@ -201,9 +201,8 @@ class OpenRouterStepRunner:
         """Resolve the direct OpenRouter slug used for structured-output parse retries."""
         pipeline = self._settings.agent.debug_pipeline
         if primary_invocation.use_fusion:
-            return (
-                primary_invocation.judge_model
-                or pipeline.single_model_for_step(step, board=board)
+            return primary_invocation.judge_model or pipeline.single_model_for_step(
+                step, board=board
             )
         return pipeline.single_model_for_step(step, board=board)
 
@@ -332,7 +331,9 @@ class OpenRouterStepRunner:
                 flutter_render_png=flutter_render_png if step == "recognise" else None,
                 analytics_span_name=f"{span}.fusion_fallback",
             )
-            logger.info("Fusion transport fallback succeeded for repair.{} via {}", step, judge_model)
+            logger.info(
+                "Fusion transport fallback succeeded for repair.{} via {}", step, judge_model
+            )
             return _StructuredStepResponse(content=content, invocation=fallback)
 
 

@@ -60,12 +60,10 @@ def build_preview_session(
     scheme = config.companion_scheme
     static_port, adaptive_port = allocate_preview_ports(job_id=job_id, config=config)
     fixed_url = (
-        f"{scheme}://preview/{quote(job_id, safe='')}"
-        f"?mode=fixed&token={quote(token, safe='')}"
+        f"{scheme}://preview/{quote(job_id, safe='')}?mode=fixed&token={quote(token, safe='')}"
     )
     adaptive_url = (
-        f"{scheme}://preview/{quote(job_id, safe='')}"
-        f"?mode=adaptive&token={quote(token, safe='')}"
+        f"{scheme}://preview/{quote(job_id, safe='')}?mode=adaptive&token={quote(token, safe='')}"
     )
     expires_at = datetime.now(UTC) + timedelta(seconds=config.token_ttl_sec)
     return PreviewSession(

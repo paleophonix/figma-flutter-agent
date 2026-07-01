@@ -128,9 +128,7 @@ def _parent_compiler_package_exists(worktree: Path, path: str) -> bool:
 
 def _step_allows_create_target(item: dict[str, Any], path: str, *, worktree: Path) -> bool:
     action_kind = str(item.get("actionKind") or _CODE_CHANGE_KIND).upper()
-    if action_kind not in {_CODE_CHANGE_KIND, _CREATE_MODULE_KIND} and not item.get(
-        "createTarget"
-    ):
+    if action_kind not in {_CODE_CHANGE_KIND, _CREATE_MODULE_KIND} and not item.get("createTarget"):
         return False
     if not path.startswith(_COMPILER_PREFIX):
         return False
@@ -245,9 +243,7 @@ def validate_plan_law_linkage(
             continue
         law_id = str(item.get("lawId") or "").strip()
         if law_id and law_id not in allowed:
-            raise FigmaFlutterError(
-                f"plan step lawId {law_id!r} is not declared in diagnose.laws"
-            )
+            raise FigmaFlutterError(f"plan step lawId {law_id!r} is not declared in diagnose.laws")
 
 
 def normalize_plan_target_files(plan_payload: dict[str, Any], *, worktree: Path) -> None:
@@ -476,9 +472,7 @@ def validate_plan(
         if action_kind == _CODE_CHANGE_KIND and not item.get("tests"):
             raise FigmaFlutterError("plan step missing tests[]")
         if action_kind in _NON_COMPILER_ACTION_KINDS and item.get("targetFiles"):
-            raise FigmaFlutterError(
-                f"plan step {action_kind} must not name compiler targetFiles"
-            )
+            raise FigmaFlutterError(f"plan step {action_kind} must not name compiler targetFiles")
 
     invalid = collect_invalid_plan_targets(plan_payload, worktree=worktree)
     if invalid:
@@ -499,9 +493,7 @@ def validate_plan(
         )
 
     compiler_targets = {
-        p
-        for p in collect_plan_target_files(plan_payload)
-        if p.startswith(_COMPILER_PREFIX)
+        p for p in collect_plan_target_files(plan_payload) if p.startswith(_COMPILER_PREFIX)
     }
     if not compiler_targets:
         raise FigmaFlutterError(

@@ -168,7 +168,11 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
         assert "candidate/flutter_project" in sandbox.replace("\\", "/")
         assert sandbox.replace("\\", "/") != project_dir.resolve().as_posix()
         assert request.get("pipeline_invocation") == "repair_regenerate"
-        return {"passed": True, "written_files": ["lib/generated/login_layout.dart"], "run_id": "r2"}
+        return {
+            "passed": True,
+            "written_files": ["lib/generated/login_layout.dart"],
+            "run_id": "r2",
+        }
 
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.regenerate_mirror._run_pipeline_in_worktree",
@@ -191,12 +195,12 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     assert result.passed
     assert (debug_mirror / "screen.dart").is_file()
     assert result.payload.get("worktree_isolated") is True
-    assert "screen/flutter_project/login" in str(result.payload.get("mirror_source_dir", "")).replace(
-        "\\", "/"
-    )
-    assert "candidate/flutter_project" in str(result.payload.get("sandbox_project_dir", "")).replace(
-        "\\", "/"
-    )
+    assert "screen/flutter_project/login" in str(
+        result.payload.get("mirror_source_dir", "")
+    ).replace("\\", "/")
+    assert "candidate/flutter_project" in str(
+        result.payload.get("sandbox_project_dir", "")
+    ).replace("\\", "/")
 
 
 def test_resolve_regenerate_debug_screen_root_prefers_worktree_v12_screen_layout(
@@ -335,9 +339,7 @@ def test_resolve_regenerate_proof_mode_cached_ir_for_emit_targets() -> None:
         "steps": [
             {
                 "actionKind": "CODE_CHANGE",
-                "targetFiles": [
-                    "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
-                ],
+                "targetFiles": ["src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"],
                 "tests": ["tests/test_flex.py"],
             }
         ]
@@ -394,9 +396,7 @@ async def test_regenerate_parser_plan_disables_cached_ir(
         "figma_flutter_agent.dev.opencode.regenerate_mirror.ensure_flutter_project_sandbox",
         lambda workspace, source: worktree / ".repair" / "candidate" / "flutter_project",
     )
-    worktree_sandbox_debug = (
-        worktree / ".debug" / "screen" / "flutter_project" / "login"
-    )
+    worktree_sandbox_debug = worktree / ".debug" / "screen" / "flutter_project" / "login"
     worktree_sandbox_debug.mkdir(parents=True)
     (worktree_sandbox_debug / "screen.dart").write_text("// generated\n", encoding="utf-8")
 

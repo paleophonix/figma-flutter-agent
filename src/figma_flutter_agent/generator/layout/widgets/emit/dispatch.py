@@ -502,10 +502,9 @@ def render_node_body(
             layout_fact_success_check_glyph_host,
         )
 
-        if (
-            layout_fact_compact_trailing_selection_glyph(node)
-            or layout_fact_success_check_glyph_host(node)
-        ):
+        if layout_fact_compact_trailing_selection_glyph(
+            node
+        ) or layout_fact_success_check_glyph_host(node):
             prefer_cluster_widget = False
     if prefer_cluster_widget:
         from figma_flutter_agent.generator.cluster_variants import (

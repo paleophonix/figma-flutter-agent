@@ -10,7 +10,10 @@ from figma_flutter_agent.debug.paths import screen_ir_dump_path
 from figma_flutter_agent.errors import GenerationError, LlmError
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.llm.clients import BaseLlmClient
-from figma_flutter_agent.llm.ir_payload import dump_screen_ir_blueprint, dump_screen_ir_blueprint_for_llm
+from figma_flutter_agent.llm.ir_payload import (
+    dump_screen_ir_blueprint,
+    dump_screen_ir_blueprint_for_llm,
+)
 from figma_flutter_agent.llm.prompts import build_system_prompt
 from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.llm.schema import generation_json_schema

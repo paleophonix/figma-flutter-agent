@@ -71,9 +71,7 @@ async def test_capture_verify_runs_after_mirror_regenerated(
                     "order": 1,
                     "actionKind": "CODE_CHANGE",
                     "lawId": "law_row",
-                    "targetFiles": [
-                        "src/figma_flutter_agent/generator/layout/flex_policy/row.py"
-                    ],
+                    "targetFiles": ["src/figma_flutter_agent/generator/layout/flex_policy/row.py"],
                     "tests": ["tests/test_flex_emitter.py"],
                 }
             ],
@@ -85,9 +83,7 @@ async def test_capture_verify_runs_after_mirror_regenerated(
             "step": "repair",
             "skipped": False,
             "salvaged": True,
-            "filesTouched": [
-                "src/figma_flutter_agent/generator/layout/flex_policy/row.py"
-            ],
+            "filesTouched": ["src/figma_flutter_agent/generator/layout/flex_policy/row.py"],
             "gates": {"passed": True, "ruff": True, "pytest": True},
             "scope": {"passed": True},
         },
@@ -199,15 +195,19 @@ async def test_capture_verify_runs_after_mirror_regenerated(
         lambda workspace, source: tmp_path / "flutter_stub",
     )
 
-    with patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.evaluate_run_gate",
-        return_value=gate,
-    ), patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_step_gate",
-        return_value=None,
-    ), patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_round_gate",
-        return_value=None,
+    with (
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.evaluate_run_gate",
+            return_value=gate,
+        ),
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_step_gate",
+            return_value=None,
+        ),
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_round_gate",
+            return_value=None,
+        ),
     ):
         outcome = await run_repair_pipeline(
             settings=settings,

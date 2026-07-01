@@ -285,9 +285,9 @@ def _strip_hash_comment(line: str) -> str:
 
 
 def strip_jinja_comments(text: str) -> str:
-  text = re.sub(r"\{#.*?#\}", "", text, flags=re.DOTALL)
-  text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
-  return strip_c_style_keep_code(text)
+    text = re.sub(r"\{#.*?#\}", "", text, flags=re.DOTALL)
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+    return strip_c_style_keep_code(text)
 
 
 def count_lines_for_language(language: str, source: str) -> int:
@@ -328,9 +328,7 @@ def scan_repo(
     by_dir: dict[str, CountResult] = defaultdict(CountResult)
 
     for rel in list_git_files(repo_root, include_untracked=include_untracked):
-        if is_excluded_path(
-            rel, include_json=include_json, include_debug=include_debug
-        ):
+        if is_excluded_path(rel, include_json=include_json, include_debug=include_debug):
             continue
 
         abs_path = repo_root / rel

@@ -77,11 +77,7 @@ def _should_hydrate_pruned_instance(node: CleanDesignTreeNode) -> bool:
         return False
     if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
         return False
-    if (
-        node.type == NodeType.CARD
-        and node.flatten_figma_node_ids
-        and node.cluster_id
-    ):
+    if node.type == NodeType.CARD and node.flatten_figma_node_ids and node.cluster_id:
         return True
     if node.vector_asset_key or node.image_asset_key:
         from figma_flutter_agent.generator.layout.widgets import _sizing_like_skip_control
@@ -105,9 +101,7 @@ def hydrate_pruned_cluster_instances(root: CleanDesignTreeNode) -> None:
         key = _component_instance_key(node)
         if key and node.children:
             existing = templates.get(key)
-            if existing is None or _inline_content_score(node) > _inline_content_score(
-                existing
-            ):
+            if existing is None or _inline_content_score(node) > _inline_content_score(existing):
                 templates[key] = node
         for child in node.children:
             collect(child)

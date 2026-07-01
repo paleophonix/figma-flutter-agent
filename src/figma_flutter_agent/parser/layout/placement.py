@@ -217,12 +217,7 @@ def sync_absolute_stack_placement_from_layout_rect(
     )
     if not top_drift and not left_drift:
         return child
-    if not (
-        vertical == "CENTER"
-        or horizontal == "CENTER"
-        or top_drift
-        or left_drift
-    ):
+    if not (vertical == "CENTER" or horizontal == "CENTER" or top_drift or left_drift):
         return child
     updates: dict[str, object] = {}
     if top_drift:
@@ -236,9 +231,7 @@ def sync_absolute_stack_placement_from_layout_rect(
             updates["horizontal"] = "LEFT"
     if not updates:
         return child
-    return child.model_copy(
-        update={"stack_placement": placement.model_copy(update=updates)}
-    )
+    return child.model_copy(update={"stack_placement": placement.model_copy(update=updates)})
 
 
 def reconcile_stack_placements_in_tree(

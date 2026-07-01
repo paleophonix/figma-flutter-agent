@@ -103,10 +103,8 @@ def build_release_web_preview(
     )
     if result.returncode != 0:
         detail = (result.stderr or result.stdout or "").strip()
-        msg = (
-            f"flutter build web --release failed for mode={mode} "
-            f"(exit {result.returncode})"
-            + (f": {detail[:500]}" if detail else "")
+        msg = f"flutter build web --release failed for mode={mode} (exit {result.returncode})" + (
+            f": {detail[:500]}" if detail else ""
         )
         raise FigmaFlutterError(msg)
     if not release_build_ready(project_dir, mode):

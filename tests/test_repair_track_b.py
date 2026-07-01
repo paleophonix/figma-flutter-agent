@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
-
 from figma_flutter_agent.config.profiles import apply_signoff_profile
 from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.generator.ir.passes import apply_ir_layout_passes
 from figma_flutter_agent.generator.ir.passes.manager import PassManager
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 from figma_flutter_agent.validation.spec23.emit_contracts import _criterion_emit_fidelity_contracts
 
 

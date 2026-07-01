@@ -53,7 +53,9 @@ def main() -> int:
         outcome = asyncio.run(_run_request(payload))
     except Exception as exc:
         outcome = {"passed": False, "error": str(exc)}
-    result_path.write_text(json.dumps(outcome, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    result_path.write_text(
+        json.dumps(outcome, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     return 0 if outcome.get("passed") else 1
 
 

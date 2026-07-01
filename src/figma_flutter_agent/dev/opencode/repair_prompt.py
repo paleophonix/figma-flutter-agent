@@ -22,6 +22,7 @@ def sanitize_prompt_blob(text: str) -> str:
     """Escape fenced-code patterns in untrusted artifact excerpts."""
     return text.replace("```", "'''")
 
+
 _REPAIR_RUN_CONTEXT_KEYS: frozenset[str] = frozenset(
     {
         "case_mode",

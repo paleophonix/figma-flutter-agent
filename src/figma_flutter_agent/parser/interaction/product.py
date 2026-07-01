@@ -200,6 +200,7 @@ def layout_fact_stack_hero_full_bleed_scrim(node: CleanDesignTreeNode) -> bool:
 def layout_fact_stack_product_recommendation_hero(node: CleanDesignTreeNode) -> bool:
     """Square product-card imagery hosts with optional badge and wishlist affordances."""
     from figma_flutter_agent.generator.ir.passes.sectionize import is_sectionize_band_wrapper_id
+
     from .enrichment import find_raster_photo_leaf
 
     if is_sectionize_band_wrapper_id(node.id):
@@ -236,9 +237,7 @@ def layout_fact_stack_product_purchase_footer_panel(node: CleanDesignTreeNode) -
         return False
     if not _subtree_has_product_price_copy(node):
         return False
-    has_cta = any(
-        item.type == NodeType.BUTTON for item in _descendant_nodes(node, max_depth=2)
-    )
+    has_cta = any(item.type == NodeType.BUTTON for item in _descendant_nodes(node, max_depth=2))
     has_stepper = any(
         layout_fact_stack_compact_quantity_stepper(item)
         for item in _descendant_nodes(node, max_depth=3)
@@ -279,7 +278,9 @@ def layout_fact_stack_detail_hero_banner(node: CleanDesignTreeNode) -> bool:
     """Wide product-detail hero hosts with edge-to-edge raster imagery."""
     from .enrichment import find_raster_photo_leaf
 
-    return layout_fact_stack_detail_hero_banner_host(node) and find_raster_photo_leaf(node) is not None
+    return (
+        layout_fact_stack_detail_hero_banner_host(node) and find_raster_photo_leaf(node) is not None
+    )
 
 
 def layout_fact_stack_compact_quantity_stepper(node: CleanDesignTreeNode) -> bool:
@@ -346,9 +347,7 @@ def layout_fact_row_leading_glyph_value_row(node: CleanDesignTreeNode) -> bool:
         return False
     if not _row_child_hosts_vector_glyph(node.children[0]):
         return False
-    return any(
-        _row_child_hosts_right_aligned_value_text(child) for child in node.children[1:]
-    )
+    return any(_row_child_hosts_right_aligned_value_text(child) for child in node.children[1:])
 
 
 def layout_fact_row_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:
@@ -361,7 +360,9 @@ def layout_fact_row_product_card_price_footer_row(node: CleanDesignTreeNode) -> 
     def _hosts_stepper(host: CleanDesignTreeNode) -> bool:
         if layout_fact_stack_compact_quantity_stepper(host):
             return True
-        return any(layout_fact_stack_compact_quantity_stepper(item) for item in _descendant_nodes(host, 3))
+        return any(
+            layout_fact_stack_compact_quantity_stepper(item) for item in _descendant_nodes(host, 3)
+        )
 
     return _subtree_has_currency_price(price_side) and _hosts_stepper(action_side)
 

@@ -384,7 +384,11 @@ def _trace_debug_root(project_dir: Path, feature: str) -> str:
             "finish",
             status="ok" if not outcome.get("stopped") else "blocked",
             trace_id=self.trace_id,
-            **{k: v for k, v in outcome.items() if k in {"stop_reason", "loop_rounds", "gate_verdict"}},
+            **{
+                k: v
+                for k, v in outcome.items()
+                if k in {"stop_reason", "loop_rounds", "gate_verdict"}
+            },
         )
 
     def _build_rollup(self, outcome: dict[str, Any]) -> dict[str, Any]:
@@ -408,6 +412,8 @@ def _trace_debug_root(project_dir: Path, feature: str) -> str:
             "cost_per_completed_case": {
                 "tokens_in": self._total_tokens_in if completed else None,
                 "tokens_out": self._total_tokens_out if completed else None,
-                "cost_usd": round(self._total_cost_usd, 8) if completed and self._total_cost_usd else None,
+                "cost_usd": round(self._total_cost_usd, 8)
+                if completed and self._total_cost_usd
+                else None,
             },
         }

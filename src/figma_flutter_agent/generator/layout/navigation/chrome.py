@@ -98,9 +98,7 @@ def ensure_layout_chrome_nav_helpers(
         source = _strip_icon_nav_stateful_helpers(source)
         source = _inject_icon_nav_stateful_helpers(source)
     if "app_layout.dart" not in source and (
-        "_LayoutChromeNav(" in source
-        or "_LayoutPillNav(" in source
-        or "_LayoutIconNav(" in source
+        "_LayoutChromeNav(" in source or "_LayoutPillNav(" in source or "_LayoutIconNav(" in source
     ):
         package_name = "demo_app"
         package_match = re.search(r"import 'package:([^/]+)/theme/", source)

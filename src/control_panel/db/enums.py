@@ -45,6 +45,7 @@ QUALITY_LABELS: dict[Quality, str] = {
     Quality.GOOD: "норм качество",
 }
 
+
 class AutocloseMode(StrEnum):
     """Who may close a feedback issue."""
 

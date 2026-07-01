@@ -2,10 +2,23 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.geometry.text_metrics import (
+    placement_is_center_pinned_horizontal,
+    positioned_text_allows_metric_slack,
+    positioned_text_width_with_metric_slack,
+)
 from figma_flutter_agent.generator.layout.cupertino import wrap_scroll_viewport
+from figma_flutter_agent.generator.layout.navigation.constants import (
+    TOP_NAV_BACK_AFFORDANCE_MAX_LEFT,
+    TOP_NAV_TRAILING_AFFORDANCE_MIN_CENTER_RATIO,
+)
 from figma_flutter_agent.generator.layout.style import (
     box_decoration_expr,
     has_box_decoration,
+)
+from figma_flutter_agent.parser.interaction.buttons import (
+    _child_is_nav_icon_affordance,
+    button_hosts_top_navigation_bar,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import (
@@ -20,19 +33,6 @@ from .layout import (
     _resolved_bottom_offset,
     _should_pin_bottom,
     _stack_has_bottom_anchored_child,
-)
-from figma_flutter_agent.generator.geometry.text_metrics import (
-    placement_is_center_pinned_horizontal,
-    positioned_text_allows_metric_slack,
-    positioned_text_width_with_metric_slack,
-)
-from figma_flutter_agent.generator.layout.navigation.constants import (
-    TOP_NAV_BACK_AFFORDANCE_MAX_LEFT,
-    TOP_NAV_TRAILING_AFFORDANCE_MIN_CENTER_RATIO,
-)
-from figma_flutter_agent.parser.interaction.buttons import (
-    _child_is_nav_icon_affordance,
-    button_hosts_top_navigation_bar,
 )
 from .shared import (
     _node_layout_size,
@@ -249,23 +249,15 @@ def _resolved_positioned_left_top(
     layout_left, layout_top = _layout_rect_edge_origin(node)
     origin_left, origin_top = _placement_origin_edges(node)
     placement_matches_origin = (
-        top is not None
-        and origin_top is not None
-        and abs(float(top) - origin_top) < 1.5
-    ) or (
-        left is not None
-        and origin_left is not None
-        and abs(float(left) - origin_left) < 1.5
-    )
+        top is not None and origin_top is not None and abs(float(top) - origin_top) < 1.5
+    ) or (left is not None and origin_left is not None and abs(float(left) - origin_left) < 1.5)
     if layout_left is not None and (
         placement_dual_horizontal_insets_overconstrain(placement, parent_width)
         or (
             (placement.horizontal or "").upper() == "CENTER"
             and placement.left is not None
             and abs(float(placement.left) - layout_left) > 8.0
-            and not (
-                origin_left is not None and abs(float(placement.left) - origin_left) < 1.5
-            )
+            and not (origin_left is not None and abs(float(placement.left) - origin_left) < 1.5)
         )
     ):
         left = layout_left
@@ -366,12 +358,7 @@ def _ensure_positioned_stack_bounds(
         parent_height=parent_height,
         prefer_top_pin=prefer_top_pin,
     ) or any(field.startswith("bottom:") for field in fields)
-    if (
-        left is not None
-        and top is not None
-        and width is not None
-        and height is not None
-    ):
+    if left is not None and top is not None and width is not None and height is not None:
         if should_stretch_artboard_positioned_horizontal(placement, width):
             height_token = format_geometry_literal(height)
             fields[:] = [
@@ -401,16 +388,20 @@ def _ensure_positioned_stack_bounds(
                     f"width: {width_token}",
                     f"height: {height_token}",
                 ]
-            elif placement.right is not None and (
-                horizontal == "LEFT_RIGHT"
-                or (
-                    placement_is_center_pinned_horizontal(placement)
-                    and not placement_dual_horizontal_insets_overconstrain(
-                        placement,
-                        parent_width,
+            elif (
+                placement.right is not None
+                and (
+                    horizontal == "LEFT_RIGHT"
+                    or (
+                        placement_is_center_pinned_horizontal(placement)
+                        and not placement_dual_horizontal_insets_overconstrain(
+                            placement,
+                            parent_width,
+                        )
                     )
                 )
-            ) and not prefer_fixed_width:
+                and not prefer_fixed_width
+            ):
                 fields[:] = [
                     f"left: {format_geometry_literal(left)}",
                     f"right: {format_geometry_literal(placement.right)}",
@@ -558,9 +549,7 @@ def _wrap_root_stack_viewport(
 
     if _stack_has_bottom_anchored_child(node):
         viewport_align = (
-            "Alignment.topLeft"
-            if is_mobile_artboard_width(width)
-            else "Alignment.topCenter"
+            "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
         )
         from figma_flutter_agent.generator.artboard import is_tall_mobile_artboard
         from figma_flutter_agent.generator.layout.common import scroll_viewport_child_shell
@@ -637,9 +626,7 @@ def _wrap_root_stack_viewport(
         stack_child_is_positioned_only_stack,
     )
 
-    growable_panels = sum(
-        1 for child in node.children if stack_child_is_growable_panel(child)
-    )
+    growable_panels = sum(1 for child in node.children if stack_child_is_growable_panel(child))
     if node.type == NodeType.STACK and _stack_is_phone_shell_layout(
         node,
         growable_panels=growable_panels,
@@ -664,9 +651,7 @@ def _wrap_root_stack_viewport(
             )
         else:
             shell_alignment = (
-                "Alignment.topLeft"
-                if is_mobile_artboard_width(width)
-                else "Alignment.topCenter"
+                "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
             )
             from figma_flutter_agent.generator.layout.common import static_artboard_viewport
 
@@ -687,9 +672,7 @@ def _wrap_root_stack_viewport(
     )
 
     stack_alignment = (
-        "Alignment.topLeft"
-        if is_mobile_artboard_width(width)
-        else "Alignment.topCenter"
+        "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
     )
     pin_artboard_height = stack_child_is_positioned_only_stack(node)
     artboard = scroll_viewport_child_shell(
@@ -701,7 +684,6 @@ def _wrap_root_stack_viewport(
         pin_artboard_height=pin_artboard_height,
     )
     if responsive_enabled:
-
         fallback = live_scroll_stack_viewport(
             stack_widget=stack_widget,
             artboard_height_token=height_token,
@@ -710,9 +692,7 @@ def _wrap_root_stack_viewport(
         preview_child = artboard_preview_sized_box(
             child=stack_widget,
             alignment=(
-                "Alignment.topLeft"
-                if is_mobile_artboard_width(width)
-                else "Alignment.topCenter"
+                "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
             ),
             bounded_child=True,
         )
@@ -722,9 +702,7 @@ def _wrap_root_stack_viewport(
         )
     if not responsive_enabled and not is_tall_mobile_artboard(width, height):
         shell_alignment = (
-            "Alignment.topLeft"
-            if is_mobile_artboard_width(width)
-            else "Alignment.topCenter"
+            "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
         )
         from figma_flutter_agent.generator.layout.common import static_artboard_viewport
 
@@ -769,13 +747,17 @@ def _wrap_root_column_viewport(
 
     width, height = _node_layout_size(node, None)
     if not is_tall_mobile_artboard(width, height):
-        if not responsive_enabled and width is not None and height is not None and width > 0 and height > 0:
+        if (
+            not responsive_enabled
+            and width is not None
+            and height is not None
+            and width > 0
+            and height > 0
+        ):
             width_token = format_geometry_literal(width)
             height_token = format_geometry_literal(height)
             column_alignment = (
-                "Alignment.topLeft"
-                if is_mobile_artboard_width(width)
-                else "Alignment.topCenter"
+                "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
             )
             from figma_flutter_agent.generator.layout.common import static_artboard_viewport
 
@@ -844,7 +826,9 @@ def _wrap_root_column_viewport(
             column_widget=column_widget,
         )
     else:
-        artboard_width = f"constraints.maxWidth < {width_token} ? constraints.maxWidth : {width_token}"
+        artboard_width = (
+            f"constraints.maxWidth < {width_token} ? constraints.maxWidth : {width_token}"
+        )
         artboard = scroll_viewport_child_shell(
             width_expr=artboard_width,
             height_token=height_token,

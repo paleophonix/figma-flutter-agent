@@ -212,12 +212,7 @@ def render_phone_composite_field_host(
             box_decoration=box_decoration,
         )
         if outer_radius > 0:
-            row = (
-                f"ClipRRect("
-                f"borderRadius: BorderRadius.circular({radius_lit}), "
-                f"child: {row}"
-                ")"
-            )
+            row = f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), child: {row})"
     external_label = None
     for child in label.children:
         if child.type == NodeType.TEXT and (child.text or "").strip():
@@ -241,9 +236,7 @@ def render_phone_composite_field_host(
         trailing = text_widget_trailing_params(external_label.style, soft_wrap=False)
         label_widget = f"Text('{label_text}', style: {style_expr}, {trailing})"
         spacing = node.spacing or 0.0
-        spacing_field = (
-            f"spacing: {format_geometry_literal(spacing)}, " if spacing > 0 else ""
-        )
+        spacing_field = f"spacing: {format_geometry_literal(spacing)}, " if spacing > 0 else ""
         row = (
             f"Column(mainAxisSize: MainAxisSize.min, "
             f"crossAxisAlignment: CrossAxisAlignment.stretch, "

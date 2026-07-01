@@ -207,9 +207,7 @@ def test_board_override_takes_precedence_over_per_step() -> None:
             },
         },
     )
-    assert config.model_for_step("recognise", board="forensic") == (
-        "deepseek/deepseek-v4-pro"
-    )
+    assert config.model_for_step("recognise", board="forensic") == ("deepseek/deepseek-v4-pro")
     assert config.model_for_step("recognise", board="screen") == (
         "qwen/qwen3-vl-235b-a22b-thinking"
     )

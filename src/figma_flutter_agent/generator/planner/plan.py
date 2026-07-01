@@ -341,9 +341,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     semantics = settings.agent.semantics
     generation_cfg = settings.agent.generation
-    strict_fidelity = (
-        semantics.strict_fidelity or generation_cfg.strict_visual_fidelity
-    )
+    strict_fidelity = semantics.strict_fidelity or generation_cfg.strict_visual_fidelity
     strict_l10n = semantics.strict_l10n or generation_cfg.strict_product_fidelity
     strict_a11y = semantics.strict_a11y or generation_cfg.strict_product_fidelity
     ir_emit_ctx = IrEmitContext(

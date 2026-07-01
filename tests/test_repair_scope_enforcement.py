@@ -172,12 +172,8 @@ def test_repair_scope_allows_agent_test_path_when_plan_hallucinates_prefix() -> 
         "steps": [
             {
                 "actionKind": "CODE_CHANGE",
-                "targetFiles": [
-                    "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
-                ],
-                "tests": [
-                    "src/figma_flutter_agent/tests/generator/layout/test_flex_emitter.py"
-                ],
+                "targetFiles": ["src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"],
+                "tests": ["src/figma_flutter_agent/tests/generator/layout/test_flex_emitter.py"],
             },
         ],
     }
@@ -213,9 +209,7 @@ def test_collect_repair_gate_paths_uses_git_touched_test_over_missing_plan_path(
             {
                 "actionKind": "CODE_CHANGE",
                 "targetFiles": [flex_rel],
-                "tests": [
-                    "src/figma_flutter_agent/tests/generator/layout/test_flex_emitter.py"
-                ],
+                "tests": ["src/figma_flutter_agent/tests/generator/layout/test_flex_emitter.py"],
             },
         ],
     }
@@ -284,9 +278,7 @@ def test_broad_test_scope_only_when_explicit_flag() -> None:
         ],
     }
     assert plan_declares_broad_test_scope(broad_plan) is True
-    allowed_broad = allowed_paths_for_step(
-        "repair", worktree=Path("/tmp"), plan_payload=broad_plan
-    )
+    allowed_broad = allowed_paths_for_step("repair", worktree=Path("/tmp"), plan_payload=broad_plan)
     assert "tests/" in allowed_broad
 
 

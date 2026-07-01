@@ -381,7 +381,7 @@ def _build_relationship_hints(indexed: dict[str, _NodeContext]) -> list[dict[str
                 if _parent_is_column(ctx.parent_id, indexed):
                     hints.append(_column_sibling_hint(ctx, next_id, "next_sibling_in_column"))
 
-  # RelationshipHintStructuralOnlyLaw: never emit O(n^2) above/below/left_of for all pairs.
+    # RelationshipHintStructuralOnlyLaw: never emit O(n^2) above/below/left_of for all pairs.
     node_ids = list(indexed.keys())
     for left_index, left_id in enumerate(node_ids):
         left_ctx = indexed[left_id]
@@ -458,7 +458,6 @@ def _column_sibling_hint(ctx: _NodeContext, other_id: str, kind: str) -> dict[st
         "distance_px": _center_distance(ctx.bounds, _node_bounds(other_node)),
         "parent_id": ctx.parent_id,
     }
-
 
 
 def _contains(outer: dict[str, float], inner: dict[str, float]) -> bool:

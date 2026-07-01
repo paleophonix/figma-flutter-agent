@@ -29,7 +29,9 @@ def register_telegram_command(bot: commands.InteractionBot) -> None:
             return
         channels = bot.settings.yaml.telegram.channels
         if not channels:
-            await inter.response.send_message("Пул каналов пуст (telegram.channels).", ephemeral=True)
+            await inter.response.send_message(
+                "Пул каналов пуст (telegram.channels).", ephemeral=True
+            )
             return
 
         prefs = await bot.job_store.get_user_preferences(inter.author.id)
@@ -41,7 +43,9 @@ def register_telegram_command(bot: commands.InteractionBot) -> None:
         default_repo = ""
         keys = list_user_repo_keys(bot.settings, inter.author.id)
         if keys:
-            default_repo = await resolve_active_repo_key(bot.settings, bot.job_store, inter.author.id)
+            default_repo = await resolve_active_repo_key(
+                bot.settings, bot.job_store, inter.author.id
+            )
         await bot.job_store.set_telegram_prefs(
             inter.author.id,
             enabled=enabled,

@@ -46,9 +46,7 @@ def _changed_clean_tree_tokens(
     for field, token in _CLEAN_FIELD_TOKENS:
         if before_dump.get(field) != after_dump.get(field):
             changed.add(token)
-    if [child.id for child in before.children] != [
-        child.id for child in after.children
-    ]:
+    if [child.id for child in before.children] != [child.id for child in after.children]:
         changed.add("children")
     return changed
 

@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import re
 
-_FEATURE_RE = re.compile(
-    r"lib/(?:features/([^/]+)(?:/|$)|screens/([^/_]+)(?:_screen)?\.dart)"
-)
+_FEATURE_RE = re.compile(r"lib/(?:features/([^/]+)(?:/|$)|screens/([^/_]+)(?:_screen)?\.dart)")
 
 
 def infer_feature_slug(written_files: list[str]) -> str | None:

@@ -102,8 +102,8 @@ from .hydrate import (
     absorb_disk_widget_alias_bodies,
     align_widget_class_with_file_stem,
     hydrate_planned_widget_files_from_project,
-    prune_disk_widget_stem_aliases,
     prune_disk_unplanned_agent_widgets,
+    prune_disk_widget_stem_aliases,
 )
 from .imports import (
     _LLM_WIDGET_IMPORT_COMMENT_RE,

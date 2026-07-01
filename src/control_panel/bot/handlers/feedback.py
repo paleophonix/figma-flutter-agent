@@ -96,10 +96,14 @@ async def _enqueue_publish(
 ) -> None:
     from control_panel.db import Quality
 
-    await store.update_job(job.id, status=JobStatus.ACCEPTED.value, feedback_quality=Quality.GOOD.value)
+    await store.update_job(
+        job.id, status=JobStatus.ACCEPTED.value, feedback_quality=Quality.GOOD.value
+    )
     pool = bot.arq_pool
     if pool is None:
         await inter.edit_original_response(content="Publish queue unavailable.")
         return
     await pool.enqueue_job("publish_job", job.id)
-    await inter.edit_original_response(content="Publish queued. You will be notified when the PR is ready.")
+    await inter.edit_original_response(
+        content="Publish queued. You will be notified when the PR is ready."
+    )

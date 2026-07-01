@@ -79,9 +79,7 @@ def build_l6_bindings(
         "agent_board": board,
         "debug_root": debug_root,
         "manifest_path": workspace.manifest_path.as_posix(),
-        "run_manifest_path": str(
-            (workspace.debug_mirror / "run_manifest.json").as_posix()
-        ),
+        "run_manifest_path": str((workspace.debug_mirror / "run_manifest.json").as_posix()),
         "schema_path": schema_path,
         "output_path": str((state_dir / f"{step}.json").as_posix()),
         "detail_log_path": str((state_dir / f"{step}.detail.log").as_posix()),
@@ -109,9 +107,7 @@ def build_l6_bindings(
     }
 
     vision_bundle = run_context.get("vision_bundle") or {}
-    check_payload = (
-        chain.steps.get("check") if isinstance(chain.steps.get("check"), dict) else {}
-    )
+    check_payload = chain.steps.get("check") if isinstance(chain.steps.get("check"), dict) else {}
     capture_payload = (
         chain.steps.get("capture") if isinstance(chain.steps.get("capture"), dict) else {}
     )
@@ -136,9 +132,7 @@ def build_l6_bindings(
             "semantic_hints_json": _json_text(vision_bundle.get("semanticHints") or {}),
             "check_summary_json": _json_text(check_payload),
             "analyze_errors_json": _json_text(run_context.get("analyze_errors") or []),
-            "allowed_edit_files_json": _json_text(
-                run_context.get("allowed_edit_files") or []
-            ),
+            "allowed_edit_files_json": _json_text(run_context.get("allowed_edit_files") or []),
             "frozen_context_json": _json_text(run_context.get("frozen_context") or {}),
             "fix_attempt": str(run_context.get("fix_attempt") or 1),
             "max_fix_attempts": str(run_context.get("max_fix_attempts") or 1),
@@ -163,12 +157,8 @@ def build_l6_bindings(
             "ticket_summary_path": str(
                 (workspace.repair_root / "reports" / "ticket.md").as_posix()
             ),
-            "dev_summary_path": str(
-                (workspace.repair_root / "reports" / "dev.md").as_posix()
-            ),
-            "data_context_path": str(
-                (workspace.repair_root / "data_context.json").as_posix()
-            ),
+            "dev_summary_path": str((workspace.repair_root / "reports" / "dev.md").as_posix()),
+            "data_context_path": str((workspace.repair_root / "data_context.json").as_posix()),
         }
     )
 

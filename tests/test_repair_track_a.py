@@ -9,14 +9,25 @@ from figma_flutter_agent.config.fidelity_policy import (
 )
 from figma_flutter_agent.config.profiles import apply_pixel_fidelity_profile
 from figma_flutter_agent.config.settings import Settings
-from figma_flutter_agent.generator.ir.fidelity.router import EmitPath, FidelityRoutePolicy, route_with_policy
+from figma_flutter_agent.generator.ir.fidelity.router import (
+    EmitPath,
+    FidelityRoutePolicy,
+    route_with_policy,
+)
 from figma_flutter_agent.generator.visual.renderer import should_use_visual_renderer
 from figma_flutter_agent.parser.truth_snapshot import (
     VISUAL_PIXEL_FORBIDDEN_MUTATIONS,
     capture_truth_snapshot,
     forbidden_mutation,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, FidelityTier, NodeType, Sizing, WidgetIrKind, WidgetIrNode
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    FidelityTier,
+    NodeType,
+    Sizing,
+    WidgetIrKind,
+    WidgetIrNode,
+)
 from figma_flutter_agent.validation.pixel.models import SplitPixelDiffResult
 from figma_flutter_agent.validation.pixel.perfect_gate import passed_pixel_perfect_gate
 

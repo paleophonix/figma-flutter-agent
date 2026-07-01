@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
 from pathlib import Path
 
 from figma_flutter_agent.dev.opencode.checkpoint import (
@@ -48,7 +47,6 @@ def _write_worktree(
 
 
 def test_list_repair_worktrees_filters_project_screen(tmp_path: Path) -> None:
-    when = datetime(2026, 6, 20, 21, 33, tzinfo=UTC)
     _write_worktree(
         tmp_path,
         case_id="0620-2133-limbo-login_version_1",

@@ -37,9 +37,7 @@ def _catalog_planned(
 
 
 def test_cluster_text_change_rewrites_widget_not_layout() -> None:
-    root = json.loads(
-        Path("tests/fixtures/figma_cards_sample.json").read_text(encoding="utf-8")
-    )
+    root = json.loads(Path("tests/fixtures/figma_cards_sample.json").read_text(encoding="utf-8"))
     planned_v1, region_v1, feature = _catalog_planned(root)
     tree_v1, _, _, _ = build_clean_tree(root)
     tokens = DesignTokens(colors={"primary": "0xFF6750A4"})
@@ -54,9 +52,7 @@ def test_cluster_text_change_rewrites_widget_not_layout() -> None:
         colors_hash=colors_hash,
         typography_hash=typography_hash,
         spacing_hash=spacing_hash,
-        file_hashes={
-            path: hash_file_contents(content) for path, content in planned_v1.items()
-        },
+        file_hashes={path: hash_file_contents(content) for path, content in planned_v1.items()},
         layout_region_hash=region_v1.layout_region_hash,
         cluster_hashes=region_v1.cluster_hashes,
         emitter_version=EMITTER_VERSION,
@@ -98,9 +94,7 @@ def test_cluster_text_change_rewrites_widget_not_layout() -> None:
 
 
 def test_non_cluster_change_rewrites_layout() -> None:
-    root = json.loads(
-        Path("tests/fixtures/figma_cards_sample.json").read_text(encoding="utf-8")
-    )
+    root = json.loads(Path("tests/fixtures/figma_cards_sample.json").read_text(encoding="utf-8"))
     planned_v1, region_v1, feature = _catalog_planned(root)
     tree_v1, _, _, cluster_summary = build_clean_tree(root)
 
@@ -131,9 +125,7 @@ def test_non_cluster_change_rewrites_layout() -> None:
         colors_hash=colors_hash,
         typography_hash=typography_hash,
         spacing_hash=spacing_hash,
-        file_hashes={
-            path: hash_file_contents(content) for path, content in planned_v1.items()
-        },
+        file_hashes={path: hash_file_contents(content) for path, content in planned_v1.items()},
         layout_region_hash=region_v1.layout_region_hash,
         cluster_hashes=region_v1.cluster_hashes,
         emitter_version=EMITTER_VERSION,
@@ -180,10 +172,7 @@ def test_screen_paths_use_planner_path_not_substring() -> None:
     )
     expected = screen_file_path("user", architecture="feature_first")
     assert bindings.screen_paths == frozenset({expected})
-    assert (
-        "lib/features/user_settings/user_settings_screen.dart"
-        not in bindings.screen_paths
-    )
+    assert "lib/features/user_settings/user_settings_screen.dart" not in bindings.screen_paths
 
 
 def test_screen_path_rewrites_when_content_changes_without_layout_delta() -> None:
@@ -224,9 +213,7 @@ def test_screen_path_rewrites_when_content_changes_without_layout_delta() -> Non
         colors_hash=colors_hash,
         typography_hash=typography_hash,
         spacing_hash=spacing_hash,
-        file_hashes={
-            path: hash_file_contents(content) for path, content in planned_v1.items()
-        },
+        file_hashes={path: hash_file_contents(content) for path, content in planned_v1.items()},
         layout_region_hash=region.layout_region_hash,
         cluster_hashes=region.cluster_hashes,
         emitter_version=EMITTER_VERSION,
@@ -288,9 +275,7 @@ def test_layout_rewrites_when_planned_content_changes_without_region_delta() -> 
         colors_hash=colors_hash,
         typography_hash=typography_hash,
         spacing_hash=spacing_hash,
-        file_hashes={
-            path: hash_file_contents(content) for path, content in planned_v1.items()
-        },
+        file_hashes={path: hash_file_contents(content) for path, content in planned_v1.items()},
         layout_region_hash=region.layout_region_hash,
         cluster_hashes=region.cluster_hashes,
         emitter_version=EMITTER_VERSION,

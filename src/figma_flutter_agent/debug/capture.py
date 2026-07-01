@@ -11,7 +11,6 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.dev.opencode.capture_policy import repair_proof_capture_enabled
 from figma_flutter_agent.debug.paths import (
     RENDERS_SUBDIR,
     debug_capture_artifact_path,
@@ -20,6 +19,7 @@ from figma_flutter_agent.debug.paths import (
     screen_capture_dir,
     screen_root,
 )
+from figma_flutter_agent.dev.opencode.capture_policy import repair_proof_capture_enabled
 from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
 from figma_flutter_agent.dev.view_render_plan import (
     MIXED_SOURCE_ORACLE_WARNING,
@@ -134,6 +134,8 @@ def _invalidate_stale_capture_visuals(project_dir: Path, feature_name: str) -> N
         path = debug_capture_artifact_path(project_dir, feature_name, artifact)
         if path.is_file():
             path.unlink()
+
+
 def _write_manifest(
     project_dir: Path,
     *,

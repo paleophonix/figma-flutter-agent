@@ -91,13 +91,12 @@ from figma_flutter_agent.generator.layout.flex_policy.stack import (
     stack_child_ordinal_left,
     stack_child_ordinal_top,
     stack_child_should_use_pin_bottom_scroll_host,
-    stack_flow_child_is_shared_scroll_body,
-    stack_flow_column_child_sort_key,
-    stack_uses_shared_body_scroll_host,
     stack_children_are_vertically_sequential,
     stack_flow_child_horizontal_wrap,
+    stack_flow_child_is_shared_scroll_body,
     stack_flow_child_needs_vertical_extent_bind,
     stack_flow_child_vertical_extent_wrap,
+    stack_flow_column_child_sort_key,
     stack_has_non_sequential_raster_overlay,
     stack_hosts_notification_badge_overlay,
     stack_metadata_timestamp_host,
@@ -107,6 +106,7 @@ from figma_flutter_agent.generator.layout.flex_policy.stack import (
     stack_should_emit_surface_decoration,
     stack_should_flow_as_centered_wrap,
     stack_should_flow_as_column,
+    stack_uses_shared_body_scroll_host,
     tree_children_are_vertically_sequential,
 )
 from figma_flutter_agent.generator.layout.flex_policy.text import (

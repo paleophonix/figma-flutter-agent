@@ -252,7 +252,9 @@ def test_tab_switcher_emits_row_with_expanded_cells() -> None:
     bottom_idx = compact.find("bottom: 0.0")
     assert row_idx >= 0 and bottom_idx >= 0
     assert row_idx < bottom_idx
-    assert "Positioned(top: -1.0" not in compact or bottom_idx < compact.find("Positioned(top: -1.0")
+    assert "Positioned(top: -1.0" not in compact or bottom_idx < compact.find(
+        "Positioned(top: -1.0"
+    )
 
 
 def test_composite_icon_button_interaction_preserves_glyph_stack() -> None:
@@ -281,8 +283,7 @@ def test_composite_icon_button_interaction_preserves_glyph_stack() -> None:
 def test_processed_more_stack_kebab_survives_button_wrap() -> None:
     """Law: circular_icon_button_must_emit_full_composite_glyph_stack (fixture tree)."""
     processed_path = (
-        Path(__file__).resolve().parents[1]
-        / ".debug/screen/limbo/my_orders_02/processed.json"
+        Path(__file__).resolve().parents[1] / ".debug/screen/limbo/my_orders_02/processed.json"
     )
     if not processed_path.is_file():
         return

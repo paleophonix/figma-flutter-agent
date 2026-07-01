@@ -113,9 +113,7 @@ def test_attempt_worktree_compiler_salvage_returns_payload_when_gates_pass(
     assert salvage is not None
     assert salvage["salvaged"] is True
     assert salvage["noop"] is False
-    assert "src/figma_flutter_agent/generator/layout/flex_policy/row.py" in salvage[
-        "filesTouched"
-    ]
+    assert "src/figma_flutter_agent/generator/layout/flex_policy/row.py" in salvage["filesTouched"]
     assert compiler_repair_verified(salvage, {"blocked": True, "steps": []})
 
 
@@ -169,8 +167,6 @@ def test_salvage_requires_diagnose_law_ownership_when_plan_not_blocked(
     salvage = attempt_worktree_compiler_salvage(
         workspace,
         plan_payload={"steps": []},
-        diagnose_payload={
-            "laws": [{"lawId": "FlexRowOverflowLaw", "layer": "emit"}]
-        },
+        diagnose_payload={"laws": [{"lawId": "FlexRowOverflowLaw", "layer": "emit"}]},
     )
     assert salvage is not None

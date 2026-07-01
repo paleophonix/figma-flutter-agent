@@ -146,10 +146,7 @@ def _ensure_opencode_serve(settings) -> None:
             reasoning_effort=repair_prompt["reasoning_effort"],
         )
     )
-    console.print(
-        "[green]OpenCode → OpenRouter preflight OK[/green] "
-        f"({repair_prompt['model']})"
-    )
+    console.print(f"[green]OpenCode → OpenRouter preflight OK[/green] ({repair_prompt['model']})")
 
 
 def _print_pipeline_outcome(outcome, settings) -> None:
@@ -304,7 +301,6 @@ def _wizard_debug(ctx: typer.Context) -> None:
     from figma_flutter_agent.debug.context import collect_screen_debug_context
     from figma_flutter_agent.debug.paths import debug_path_display, screen_debug_safe_project
     from figma_flutter_agent.dev.opencode import OpenCodeClient, evaluate_run_gate
-    from figma_flutter_agent.dev.opencode.failure_class import FailureClass
     from figma_flutter_agent.dev.opencode.run_gate import gate_blocks_pipeline
     from figma_flutter_agent.dev.opencode.workspace import load_repair_workspace
     from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path

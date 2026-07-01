@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from figma_flutter_agent.config import load_settings
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_code_from_ir
 from figma_flutter_agent.generator.ir.passes import apply_ir_layout_passes
@@ -40,7 +41,6 @@ from figma_flutter_agent.schemas import (
     WidgetIrKind,
     WidgetIrNode,
 )
-from figma_flutter_agent.config import load_settings
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _LIMBO_PROCESSED = _REPO_ROOT / ".debug" / "screen" / "limbo" / "reminders" / "processed.json"
@@ -426,9 +426,7 @@ def test_layout_skips_wheel_helpers_for_extracted_roots() -> None:
     wheel = wheel.model_copy(update={"extracted_widget_ref": "Group6804Widget"})
     patched = reconciled.model_copy(
         update={
-            "children": [
-                wheel if child.id == wheel.id else child for child in reconciled.children
-            ]
+            "children": [wheel if child.id == wheel.id else child for child in reconciled.children]
         }
     )
     layout = render_layout_file(
@@ -455,9 +453,7 @@ def test_wheel_extracted_materialization_never_references_undefined_helpers() ->
     wheel = wheel.model_copy(update={"extracted_widget_ref": "Group6804Widget"})
     patched = reconciled.model_copy(
         update={
-            "children": [
-                wheel if child.id == wheel.id else child for child in reconciled.children
-            ]
+            "children": [wheel if child.id == wheel.id else child for child in reconciled.children]
         }
     )
     layout = render_layout_file(
@@ -482,9 +478,7 @@ def test_weekday_chip_row_uses_dual_palette_not_border_as_fill() -> None:
     if tree is None:
         pytest.skip("limbo reminders processed dump not available")
     reconciled = reconcile_layout_tree(tree)
-    row = next(
-        child for child in reconciled.children if layout_fact_compact_chip_row(child)
-    )
+    row = next(child for child in reconciled.children if layout_fact_compact_chip_row(child))
     emitted = render_weekday_chip_row(row)
     assert "selectedBg:" in emitted
     assert "unselectedBg:" in emitted
@@ -505,9 +499,7 @@ def test_weekday_chip_row_body_is_row_without_inner_positioned() -> None:
     if tree is None:
         pytest.skip("limbo reminders processed dump not available")
     reconciled = reconcile_layout_tree(tree)
-    row = next(
-        child for child in reconciled.children if layout_fact_compact_chip_row(child)
-    )
+    row = next(child for child in reconciled.children if layout_fact_compact_chip_row(child))
     emitted = render_weekday_chip_row(row)
     assert emitted.startswith("_GeneratedWeekdayChipRow(")
     assert "Positioned(" not in emitted
@@ -522,9 +514,7 @@ def test_weekday_chip_label_uses_bounded_typography_fields() -> None:
     if tree is None:
         pytest.skip("limbo reminders processed dump not available")
     reconciled = reconcile_layout_tree(tree)
-    row = next(
-        child for child in reconciled.children if layout_fact_compact_chip_row(child)
-    )
+    row = next(child for child in reconciled.children if layout_fact_compact_chip_row(child))
     emitted = render_weekday_chip_row(row)
     assert "fontSize: 14.0" in emitted
     assert "fontWeight: FontWeight.w500" in emitted

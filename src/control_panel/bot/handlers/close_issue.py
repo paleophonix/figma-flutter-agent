@@ -27,7 +27,9 @@ async def handle_close_issue(*, inter: disnake.MessageInteraction, job_id: str) 
         await inter.response.send_message("Job not found.", ephemeral=True)
         return
     if inter.author.id != job.discord_user_id:
-        await inter.response.send_message("Only the job author can close this issue.", ephemeral=True)
+        await inter.response.send_message(
+            "Only the job author can close this issue.", ephemeral=True
+        )
         return
     mode = await store.get_autoclose_mode(inter.author.id)
     if mode != AutocloseMode.USER.value:

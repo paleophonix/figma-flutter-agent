@@ -66,7 +66,9 @@ def list_repair_worktrees_for_screen(
         state_dir = worktree / ".repair" / "state"
         checkpoint = load_last_checkpoint(state_dir)
         last_step = str(checkpoint.get("step")) if checkpoint else None
-        loop_round = int(checkpoint["loop_round"]) if checkpoint and checkpoint.get("loop_round") else None
+        loop_round = (
+            int(checkpoint["loop_round"]) if checkpoint and checkpoint.get("loop_round") else None
+        )
         entries.append(
             RepairWorktreeEntry(
                 case_id=str(manifest.get("case_id") or worktree.name),

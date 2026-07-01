@@ -88,16 +88,15 @@ def render_text_node(
         parent_node,
         parent_type=parent_type,
     )
-    nav_tab_column_parent = (
-        parent_node is not None
-        and (
-            layout_fact_column_compact_nav_tab(parent_node)
-            or layout_fact_stack_bottom_nav_tab_glyph_column(parent_node)
-        )
+    nav_tab_column_parent = parent_node is not None and (
+        layout_fact_column_compact_nav_tab(parent_node)
+        or layout_fact_stack_bottom_nav_tab_glyph_column(parent_node)
     )
     bounded_single_line_label_slot = nav_tab_column_parent
 
-    centered_glyph_parent = parent_node is not None and layout_fact_centered_glyph_badge(parent_node)
+    centered_glyph_parent = parent_node is not None and layout_fact_centered_glyph_badge(
+        parent_node
+    )
     from figma_flutter_agent.generator.layout.flex_policy import (
         button_is_pill_with_centered_label,
     )
@@ -135,10 +134,14 @@ def render_text_node(
             and button_is_pill_with_centered_label(parent_node)
         )
     )
-    strut = None if omit_glyph_strut else strut_style_expr(
-        node.style,
-        omit_leading=metadata_rail,
-        node=node,
+    strut = (
+        None
+        if omit_glyph_strut
+        else strut_style_expr(
+            node.style,
+            omit_leading=metadata_rail,
+            node=node,
+        )
     )
     explicit_multiline = False
     if node.text_spans:
@@ -192,9 +195,7 @@ def render_text_node(
             if pill_label and parent_node is not None and is_tag_component_chip_row(parent_node):
                 pill_label = False
             painted_pill_label = (
-                pill_label
-                and parent_node is not None
-                and bool(parent_node.style.background_color)
+                pill_label and parent_node is not None and bool(parent_node.style.background_color)
             )
             guard_label_row = (
                 parent_node is not None
@@ -205,9 +206,8 @@ def render_text_node(
                 layout_fact_step_indicator_title_column,
             )
 
-            step_title_label = (
-                parent_node is not None
-                and layout_fact_step_indicator_title_column(parent_node)
+            step_title_label = parent_node is not None and layout_fact_step_indicator_title_column(
+                parent_node
             )
             single_line_clipped_label = (
                 guard_label_row
@@ -289,7 +289,10 @@ def render_text_node(
                 metadata_rail
                 and not notification_counter_glyph
                 and not nav_tab_column_parent
-                and not (parent_node is not None and layout_fact_stack_category_component_tile(parent_node))
+                and not (
+                    parent_node is not None
+                    and layout_fact_stack_category_component_tile(parent_node)
+                )
                 and not (
                     parent_node is not None
                     and layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
@@ -398,9 +401,7 @@ def render_text_node(
     elif layout_fact_static_screen_heading_text(node, parent_node):
         pass
     elif (
-        not parent_is_primary_cta_row
-        and parent_type != NodeType.BUTTON
-        and is_link_text(node.text)
+        not parent_is_primary_cta_row and parent_type != NodeType.BUTTON and is_link_text(node.text)
     ):
         channels = _argb_rgb_channels(node.style.text_color)
         if channels is not None and min(channels) >= 240:
@@ -438,7 +439,10 @@ def render_text_node(
     )
 
     if parent_node is not None and layout_fact_step_indicator_glyph_stack(parent_node):
-        if layout_fact_step_indicator_completed(parent_node) and (node.text or "").strip().isdigit():
+        if (
+            layout_fact_step_indicator_completed(parent_node)
+            and (node.text or "").strip().isdigit()
+        ):
             return "const SizedBox.shrink()"
         if (node.text or "").strip().isdigit():
             style_expr = text_style_expr(
@@ -453,9 +457,7 @@ def render_text_node(
                 node.style,
                 text_align_suffix=", textAlign: TextAlign.center",
             )
-            widget = (
-                f"Text('{text}', style: {style_expr}, {trailing})"
-            )
+            widget = f"Text('{text}', style: {style_expr}, {trailing})"
             widget = _wrap_accessibility(
                 node_with_display_accessibility(node),
                 f"Center(child: {widget})",

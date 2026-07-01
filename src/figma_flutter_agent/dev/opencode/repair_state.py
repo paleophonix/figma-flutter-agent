@@ -26,6 +26,4 @@ def repair_needs_retry(repair: dict[str, Any] | None) -> bool:
     gates = repair.get("gates")
     if isinstance(gates, dict) and gates.get("passed"):
         return False
-    if repair.get("blocked"):
-        return False
-    return True
+    return not repair.get("blocked")

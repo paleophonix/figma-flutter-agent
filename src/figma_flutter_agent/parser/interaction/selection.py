@@ -5,7 +5,6 @@ from __future__ import annotations
 from figma_flutter_agent.generator.layout.style.colors import is_greenish_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-
 _FLEX_LABEL_HOST_TYPES = frozenset({NodeType.ROW, NodeType.COLUMN, NodeType.CARD, NodeType.STACK})
 
 
@@ -107,7 +106,9 @@ def button_is_payment_option_card(node: CleanDesignTreeNode) -> bool:
         return False
     if not button_has_composite_row_body(node):
         return False
-    return any(layout_fact_hosts_payment_selection_indicator(item) for item in _descendant_nodes(node, 6))
+    return any(
+        layout_fact_hosts_payment_selection_indicator(item) for item in _descendant_nodes(node, 6)
+    )
 
 
 _COMPACT_TRAILING_SELECTION_MAX_PX = 20.0
@@ -123,7 +124,10 @@ def layout_fact_compact_trailing_selection_glyph(node: CleanDesignTreeNode) -> b
         return False
     if float(width) <= 0 or float(height) <= 0:
         return False
-    if float(width) > _COMPACT_TRAILING_SELECTION_MAX_PX or float(height) > _COMPACT_TRAILING_SELECTION_MAX_PX:
+    if (
+        float(width) > _COMPACT_TRAILING_SELECTION_MAX_PX
+        or float(height) > _COMPACT_TRAILING_SELECTION_MAX_PX
+    ):
         return False
     if len(node.children) != 1:
         return False
@@ -163,8 +167,7 @@ def _radio_has_bounded_glyph_slot(node: CleanDesignTreeNode) -> bool:
     if float(width) <= 0 or float(height) <= 0:
         return False
     return (
-        float(width) <= _BOUNDED_RADIO_GLYPH_MAX_PX
-        and float(height) <= _BOUNDED_RADIO_GLYPH_MAX_PX
+        float(width) <= _BOUNDED_RADIO_GLYPH_MAX_PX and float(height) <= _BOUNDED_RADIO_GLYPH_MAX_PX
     )
 
 
@@ -172,9 +175,7 @@ def _host_has_external_text_label(
     host: CleanDesignTreeNode,
     radio_id: str,
 ) -> bool:
-    return any(
-        child.type == NodeType.TEXT and child.id != radio_id for child in host.children
-    )
+    return any(child.type == NodeType.TEXT and child.id != radio_id for child in host.children)
 
 
 def layout_fact_compact_radio_glyph(

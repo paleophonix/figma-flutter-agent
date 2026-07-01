@@ -8,7 +8,6 @@ from figma_flutter_agent.dev.opencode.chain_compact import compact_chain_for_ste
 from figma_flutter_agent.dev.opencode.prompt_context import build_read_step_user_prompt
 from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
 
-
 _REPEAT_SYMPTOM = (
     "Capture phase failed: Flutter capture test exited with code 1 due to a "
     "RenderFlex overflow by 1.5 pixels. The generated Row widget at "

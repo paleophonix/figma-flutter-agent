@@ -183,7 +183,9 @@ async def stream_repair_job_events(
                     payload = json.loads(data)
                 except json.JSONDecodeError:
                     continue
-                status = str(payload.get("status") or payload.get("payload", {}).get("status") or "")
+                status = str(
+                    payload.get("status") or payload.get("payload", {}).get("status") or ""
+                )
                 if is_terminal_repair_status(status):
                     break
         finally:

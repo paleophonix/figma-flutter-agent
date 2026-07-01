@@ -303,11 +303,11 @@ def render_row(
             scroll_content_root=scroll_content_root,
         )
     if layout_fact_row_tight_horizontal_pill_label(node) and child_widgets:
-        from figma_flutter_agent.parser.interaction.inline_input_hosts import (
-            layout_fact_phone_prefix_chrome_row,
-        )
         from figma_flutter_agent.parser.interaction.chip_variant import (
             is_tag_component_chip_row,
+        )
+        from figma_flutter_agent.parser.interaction.inline_input_hosts import (
+            layout_fact_phone_prefix_chrome_row,
         )
 
         if not layout_fact_phone_prefix_chrome_row(node):

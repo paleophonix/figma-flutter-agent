@@ -411,14 +411,14 @@ async def run_pipeline(
     if ctx.analyze_repair_exhausted:
         from figma_flutter_agent.errors import GenerationError
 
-        preview = "; ".join(
-            warning
-            for warning in ctx.warnings
-            if "analyze repair exhausted" in warning.lower()
-        ) or "planned Dart analyze failed after repair loop"
+        preview = (
+            "; ".join(
+                warning for warning in ctx.warnings if "analyze repair exhausted" in warning.lower()
+            )
+            or "planned Dart analyze failed after repair loop"
+        )
         raise GenerationError(
-            "Skipping write: planned Dart still fails analyze after repair exhaustion "
-            f"({preview})"
+            f"Skipping write: planned Dart still fails analyze after repair exhaustion ({preview})"
         )
 
     run_write_phase(

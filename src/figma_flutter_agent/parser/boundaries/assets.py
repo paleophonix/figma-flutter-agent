@@ -111,11 +111,7 @@ def _best_descendant_vector_asset(node: CleanDesignTreeNode) -> str | None:
     """Pick the most component-faithful vector export under a compact icon host."""
     from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
 
-    keys = [
-        item.vector_asset_key
-        for item in _descendant_nodes(node, 4)
-        if item.vector_asset_key
-    ]
+    keys = [item.vector_asset_key for item in _descendant_nodes(node, 4) if item.vector_asset_key]
     if not keys:
         return None
     return min(keys, key=_vector_asset_discovery_rank)

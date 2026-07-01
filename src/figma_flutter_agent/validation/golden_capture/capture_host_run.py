@@ -123,7 +123,9 @@ def _run_golden_test_in_workspace(
     test_timeout = _resolve_flutter_test_timeout(settings)
     render_args = _flutter_test_render_args(capture_dir, golden_test_rel, settings)
     test_started = time.monotonic()
-    log_project_dir = project_dir if project_dir is not None else (capture_dir if in_project else None)
+    log_project_dir = (
+        project_dir if project_dir is not None else (capture_dir if in_project else None)
+    )
     if fast_capture:
         test_outcome = _run_screen_capture_flutter_test(
             flutter,

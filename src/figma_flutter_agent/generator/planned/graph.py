@@ -26,9 +26,7 @@ class PlannedDartGraph:
 def planned_graph_content_hash(files: Mapping[str, str]) -> str:
     """Return a stable SHA-256 digest over sorted path/content pairs."""
     digest = hashlib.sha256()
-    for path, content in sorted(
-        (key.replace("\\", "/"), value) for key, value in files.items()
-    ):
+    for path, content in sorted((key.replace("\\", "/"), value) for key, value in files.items()):
         digest.update(path.encode("utf-8"))
         digest.update(b"\0")
         digest.update(content.encode("utf-8"))

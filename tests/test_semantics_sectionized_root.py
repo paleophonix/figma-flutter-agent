@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.parser.semantics import classify_screen_ir
 from figma_flutter_agent.generator.ir.passes.sectionize import sectionize_root_stack
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
+from figma_flutter_agent.parser.semantics import classify_screen_ir
 from figma_flutter_agent.schemas import WidgetIrKind
 
 

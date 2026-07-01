@@ -151,7 +151,9 @@ def test_send_capture_gives_up_after_max_attempts() -> None:
         side_effect=httpx.ReadTimeout("timed out"),
     ):
         with patch("figma_flutter_agent.observability.posthog_transport.time.sleep"):
-            with patch("figma_flutter_agent.observability.posthog_transport.logger.warning") as mock_warning:
+            with patch(
+                "figma_flutter_agent.observability.posthog_transport.logger.warning"
+            ) as mock_warning:
                 posthog_llm._send_llm_capture(job)
     assert mock_warning.call_count >= _settings_with_posthog().posthog_capture_max_attempts
     assert "gave up" in mock_warning.call_args.args[0].lower()

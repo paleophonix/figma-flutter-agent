@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.navigation.constants import (
+    TOP_NAV_BACK_AFFORDANCE_MAX_LEFT as _BACK_AFFORDANCE_MAX_LEFT,
+)
+from figma_flutter_agent.generator.layout.navigation.constants import (
+    TOP_NAV_TRAILING_AFFORDANCE_MIN_CENTER_RATIO as _TRAILING_AFFORDANCE_MIN_CENTER_RATIO,
+)
 from figma_flutter_agent.generator.layout.style.colors import fill_luminance, is_greenish_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
@@ -28,10 +34,6 @@ _ROW_BODY_SEARCH_DEPTH = 8
 _TOP_NAV_BAR_MIN_WIDTH = 320.0
 _TOP_NAV_BAR_MIN_HEIGHT = 40.0
 _TOP_NAV_BAR_MAX_HEIGHT = 64.0
-from figma_flutter_agent.generator.layout.navigation.constants import (
-    TOP_NAV_BACK_AFFORDANCE_MAX_LEFT as _BACK_AFFORDANCE_MAX_LEFT,
-    TOP_NAV_TRAILING_AFFORDANCE_MIN_CENTER_RATIO as _TRAILING_AFFORDANCE_MIN_CENTER_RATIO,
-)
 
 
 def _is_structural_button_shell(child: CleanDesignTreeNode) -> bool:
@@ -524,9 +526,7 @@ def button_hosts_stacked_text_column(node: CleanDesignTreeNode) -> bool:
 
 def _child_is_nav_icon_affordance(child: CleanDesignTreeNode) -> bool:
     """Return True when a stack/vector child is a circular icon affordance."""
-    if child.type == NodeType.VECTOR and (
-        child.vector_asset_key or child.image_asset_key
-    ):
+    if child.type == NodeType.VECTOR and (child.vector_asset_key or child.image_asset_key):
         return True
     if child.type != NodeType.STACK:
         return False
@@ -647,9 +647,7 @@ def button_has_icon_label_inline_affordance(node: CleanDesignTreeNode) -> bool:
         if child.type == NodeType.TEXT:
             text_child = child
             continue
-        if child.type == NodeType.VECTOR and (
-            child.vector_asset_key or child.image_asset_key
-        ):
+        if child.type == NodeType.VECTOR and (child.vector_asset_key or child.image_asset_key):
             icon_child = child
             continue
         if child.type == NodeType.STACK and _stack_has_vector_icon([child]):

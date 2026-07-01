@@ -266,7 +266,9 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
 
     for path, content in list(updated.items()):
         normalized = path.replace("\\", "/")
-        if not normalized.endswith(".dart") or not _consumer_paths_needing_widget_imports(normalized):
+        if not normalized.endswith(".dart") or not _consumer_paths_needing_widget_imports(
+            normalized
+        ):
             continue
         if normalized.startswith("lib/widgets/"):
             continue
@@ -416,6 +418,7 @@ def repair_self_referential_widget_builds(planned: dict[str, str]) -> dict[str, 
         return _is_self_referential_widget_build(
             content, class_name
         ) or _is_foreign_delegate_widget_build(content, class_name)
+
     for class_name, paths in _group_paths_by_class(planned).items():
         if len(paths) < 2:
             continue

@@ -11,9 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineConfig
 
-AnalyzeScopeSetting = Literal[
-    "written_only", "all_planned", "project", "generated_only"
-]
+AnalyzeScopeSetting = Literal["written_only", "all_planned", "project", "generated_only"]
 
 GeometryPrecision = Literal["standard", "full"]
 
@@ -345,9 +343,7 @@ class GenerationConfig(BaseModel):
     )
     strict_product_fidelity: bool = Field(
         default=False,
-        description=(
-            "Product profile: block baked tiers on localizable and a11y-critical text."
-        ),
+        description=("Product profile: block baked tiers on localizable and a11y-critical text."),
     )
     geometry_precision: GeometryPrecision = Field(
         default="standard",
@@ -655,9 +651,7 @@ class AgentYamlConfig(BaseModel):
     semantics: SemanticsSettings = Field(default_factory=SemanticsSettings)
     quality: QualityConfig = Field(default_factory=QualityConfig)
     generation: GenerationConfig = Field(default_factory=GenerationConfig)
-    state_management: StateManagementConfig = Field(
-        default_factory=StateManagementConfig
-    )
+    state_management: StateManagementConfig = Field(default_factory=StateManagementConfig)
     ux: UxConfig = Field(default_factory=UxConfig)
     animations: AnimationConfig = Field(default_factory=AnimationConfig)
     assets: AssetsConfig = Field(default_factory=AssetsConfig)

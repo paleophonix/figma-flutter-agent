@@ -79,7 +79,10 @@ def test_telegram_webhook_callback_url() -> None:
 @pytest.mark.control_panel
 def test_should_register_requires_https_and_channels() -> None:
     assert should_register_telegram_webhook(_settings()) is True
-    assert should_register_telegram_webhook(_settings(control_panel_url="http://127.0.0.1:8787")) is False
+    assert (
+        should_register_telegram_webhook(_settings(control_panel_url="http://127.0.0.1:8787"))
+        is False
+    )
     assert should_register_telegram_webhook(_settings(channels=False)) is False
     assert should_register_telegram_webhook(_settings(telegram_token="")) is False
 
@@ -97,7 +100,9 @@ async def test_register_telegram_webhook_posts_set_webhook() -> None:
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=None)
 
-    with patch("control_panel.services.telegram_webhook.httpx.AsyncClient", return_value=mock_client):
+    with patch(
+        "control_panel.services.telegram_webhook.httpx.AsyncClient", return_value=mock_client
+    ):
         ok = await register_telegram_webhook(settings)
 
     assert ok is True

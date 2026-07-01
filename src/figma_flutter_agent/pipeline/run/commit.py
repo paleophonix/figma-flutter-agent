@@ -134,8 +134,7 @@ def run_write_phase(
             clean_tree=clean_tree,
             feature_name=ctx.resolved_feature,
             routing_on=any(
-                path.replace("\\", "/").startswith("lib/core/app_router")
-                for path in planned_files
+                path.replace("\\", "/").startswith("lib/core/app_router") for path in planned_files
             ),
             on_parse_gate_failure=_persist_dart_debug_bug,
         )
@@ -160,8 +159,7 @@ def run_write_phase(
             validate_graph_only=True,
             widget_suffix=settings.agent.naming.widget_suffix,
             uses_svg=any(
-                item.asset_path.lower().endswith(".svg")
-                for item in ctx.asset_manifest.entries
+                item.asset_path.lower().endswith(".svg") for item in ctx.asset_manifest.entries
             ),
             cluster_summary=ctx.cluster_summary,
             cluster_min_count=gen_cfg.cluster_min_count,
@@ -190,8 +188,7 @@ def run_write_phase(
             feature_name=ctx.resolved_feature,
             app_title=clean_tree.name if clean_tree is not None else None,
             routing_on=any(
-                path.replace("\\", "/").startswith("lib/core/app_router")
-                for path in planned_files
+                path.replace("\\", "/").startswith("lib/core/app_router") for path in planned_files
             ),
         )
         with log_stage(log, "write"):

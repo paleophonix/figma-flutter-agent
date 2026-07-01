@@ -157,7 +157,8 @@ def tunnel_matches_target(tunnel: dict[str, object], *, target: NgrokTunnelTarge
 def has_active_tunnel(*, target: NgrokTunnelTarget, api_base: str | None = None) -> bool:
     """Return True when ngrok already exposes ``target.public_host`` to the local port."""
     return any(
-        tunnel_matches_target(tunnel, target=target) for tunnel in fetch_ngrok_tunnels(api_base=api_base)
+        tunnel_matches_target(tunnel, target=target)
+        for tunnel in fetch_ngrok_tunnels(api_base=api_base)
     )
 
 

@@ -184,9 +184,7 @@ def _append_chrome_preview_flags(
     if preview_size is None or not is_chrome_device(device_id):
         return
     artboard_width, artboard_height = preview_size
-    adaptive = preview_kind == "responsive" and (
-        responsive is not None and responsive.enabled
-    )
+    adaptive = preview_kind == "responsive" and (responsive is not None and responsive.enabled)
     if adaptive and responsive is not None:
         width, height = resolve_chrome_preview_size(
             artboard_width=artboard_width,
@@ -218,9 +216,7 @@ def _append_chrome_preview_flags(
         )
         if preview_kind == "static":
             run_cmd.extend(chrome_preview_dart_defines(width, height))
-            logger.info(
-                "Chrome artboard preview {}x{} (1:1 golden frame)", width, height
-            )
+            logger.info("Chrome artboard preview {}x{} (1:1 golden frame)", width, height)
         else:
             logger.info(
                 "Chrome live preview artboard {}x{} (scroll fallback; no artboard dart-defines)",
@@ -483,18 +479,14 @@ def launch_flutter_app(
         artboard_preview=artboard_preview,
     )
     fail_on_render_errors = (
-        settings.agent.validation.fail_on_render_errors
-        if settings is not None
-        else False
+        settings.agent.validation.fail_on_render_errors if settings is not None else False
     )
     from figma_flutter_agent.errors import PlannedDartGraphError
     from figma_flutter_agent.generator.dart.static_contract_gates import (
         gate_disk_widget_import_closure,
     )
 
-    architecture = (
-        settings.agent.flutter.architecture if settings is not None else "feature_first"
-    )
+    architecture = settings.agent.flutter.architecture if settings is not None else "feature_first"
 
     try:
         gate_disk_widget_import_closure(
@@ -568,9 +560,7 @@ def launch_flutter_app(
         finally:
             _terminate_background_flutter(static_proc)
 
-    preview_kind: LaunchPreviewKind = (
-        "static" if launch_mode == "static" else "responsive"
-    )
+    preview_kind: LaunchPreviewKind = "static" if launch_mode == "static" else "responsive"
     run_cmd = _build_flutter_run_cmd(
         flutter,
         device_id=device_id,

@@ -75,7 +75,12 @@ async def enqueue_repair(
         raise FigmaFlutterError("Could not resolve parent generation job for repair")
     active = await repair_store.find_active_job()
     queued_behind = None
-    if active is not None and active.status == RepairJobStatus.RUNNING or active is not None and active.status == RepairJobStatus.QUEUED:
+    if (
+        active is not None
+        and active.status == RepairJobStatus.RUNNING
+        or active is not None
+        and active.status == RepairJobStatus.QUEUED
+    ):
         queued_behind = active.id
     job_id = f"repair_{uuid.uuid4().hex[:16]}"
     job = await repair_store.create_job(

@@ -21,13 +21,21 @@ def upgrade() -> None:
         "generation_jobs",
         sa.Column("principal", sa.String(length=128), nullable=True),
     )
-    op.alter_column("generation_jobs", "discord_user_id", existing_type=sa.BigInteger(), nullable=True)
-    op.alter_column("generation_jobs", "discord_channel_id", existing_type=sa.BigInteger(), nullable=True)
+    op.alter_column(
+        "generation_jobs", "discord_user_id", existing_type=sa.BigInteger(), nullable=True
+    )
+    op.alter_column(
+        "generation_jobs", "discord_channel_id", existing_type=sa.BigInteger(), nullable=True
+    )
 
 
 def downgrade() -> None:
     """Revert origin/principal and Discord nullability."""
-    op.alter_column("generation_jobs", "discord_channel_id", existing_type=sa.BigInteger(), nullable=False)
-    op.alter_column("generation_jobs", "discord_user_id", existing_type=sa.BigInteger(), nullable=False)
+    op.alter_column(
+        "generation_jobs", "discord_channel_id", existing_type=sa.BigInteger(), nullable=False
+    )
+    op.alter_column(
+        "generation_jobs", "discord_user_id", existing_type=sa.BigInteger(), nullable=False
+    )
     op.drop_column("generation_jobs", "principal")
     op.drop_column("generation_jobs", "origin")

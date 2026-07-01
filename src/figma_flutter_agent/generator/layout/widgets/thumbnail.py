@@ -36,7 +36,12 @@ def find_media_avatar_paint_substrate(
     """Return a full-extent paint sibling that sits beneath a raster avatar mask."""
     host_width = host.sizing.width
     host_height = host.sizing.height
-    if host_width is None or host_height is None or float(host_width) <= 0 or float(host_height) <= 0:
+    if (
+        host_width is None
+        or host_height is None
+        or float(host_width) <= 0
+        or float(host_height) <= 0
+    ):
         return None
     substrate: CleanDesignTreeNode | None = None
     for child in host.children:
@@ -77,9 +82,7 @@ def _render_avatar_paint_layer(
         decoration = box_decoration_expr(node.style)
         if decoration is None:
             return None
-        return (
-            f"Container(width: {width_lit}, height: {height_lit}, decoration: {decoration})"
-        )
+        return f"Container(width: {width_lit}, height: {height_lit}, decoration: {decoration})"
     return None
 
 

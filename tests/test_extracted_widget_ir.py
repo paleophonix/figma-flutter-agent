@@ -12,8 +12,8 @@ from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ExtractedWidget,
     FlutterGenerationResponse,
-    NodeType,
     NodeStyle,
+    NodeType,
     ScreenIr,
     Sizing,
     StackPlacement,
@@ -65,7 +65,9 @@ def test_empty_widget_ir_emits_full_clean_subtree() -> None:
             name=f"Chip {index}",
             type=NodeType.TEXT,
             text=f"Label {index}",
-            stack_placement=StackPlacement(left=float(index * 70), top=0.0, width=60.0, height=32.0),
+            stack_placement=StackPlacement(
+                left=float(index * 70), top=0.0, width=60.0, height=32.0
+            ),
         )
         for index in range(3)
     ]

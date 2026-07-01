@@ -577,7 +577,9 @@ async def test_run_analyze_repair_loop_retries_analyzer_timeout_before_llm(
         fake_analyze,
     )
     mock_client = MagicMock()
-    mock_client.repair_async = AsyncMock(return_value=FlutterGenerationResponse(screen_code="class Ok {}"))
+    mock_client.repair_async = AsyncMock(
+        return_value=FlutterGenerationResponse(screen_code="class Ok {}")
+    )
 
     await run_analyze_repair_loop(
         _repair_request(

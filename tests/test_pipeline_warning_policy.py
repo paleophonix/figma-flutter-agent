@@ -116,7 +116,9 @@ def test_actionable_asset_warnings_are_never_quiet() -> None:
     assert not is_actionable_user_warning("Skipped LLM IR regeneration")
 
 
-def test_emit_user_warnings_keeps_asset_failures_at_warning(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_emit_user_warnings_keeps_asset_failures_at_warning(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     levels: list[str] = []
 
     class _Logger:

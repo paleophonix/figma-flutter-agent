@@ -12,16 +12,16 @@ from pydantic import SecretStr
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineConfig, DebugPipelineTraceConfig
 from figma_flutter_agent.config.models import AgentYamlConfig
 from figma_flutter_agent.config.settings import Settings
+from figma_flutter_agent.dev.opencode.failure_class import FailureClass
+from figma_flutter_agent.dev.opencode.run_gate import RunGateResult
 from figma_flutter_agent.dev.opencode.trace import RepairTraceRecorder
 from figma_flutter_agent.dev.opencode.workspace import (
     WORKTREE_TRACE_ID_KEY,
     assign_worktree_trace_id,
-    load_worktree_trace_id,
     load_repair_workspace,
+    load_worktree_trace_id,
     prepare_workspace,
 )
-from figma_flutter_agent.dev.opencode.failure_class import FailureClass
-from figma_flutter_agent.dev.opencode.run_gate import RunGateResult
 
 
 def _gate(tmp_path: Path) -> RunGateResult:
@@ -48,14 +48,19 @@ def _gate(tmp_path: Path) -> RunGateResult:
     )
 
 
-def test_prepare_workspace_assigns_posthog_trace_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_prepare_workspace_assigns_posthog_trace_id(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.workspace.agent_repo_root",
         lambda: tmp_path,
     )
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.workspace.create_repair_worktree",
-        lambda repo, case_id: (tmp_path / ".worktrees" / case_id).mkdir(parents=True) or tmp_path / ".worktrees" / case_id,
+        lambda repo, case_id: (
+            (tmp_path / ".worktrees" / case_id).mkdir(parents=True)
+            or tmp_path / ".worktrees" / case_id
+        ),
     )
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.workspace.allocate_repair_case_id",
@@ -81,7 +86,9 @@ def test_assign_worktree_trace_id_is_stable(tmp_path: Path) -> None:
     assert second == "trace-abc123456789"
 
 
-def test_maybe_start_reuses_worktree_trace_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_maybe_start_reuses_worktree_trace_id(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.trace.agent_repo_root",
         lambda: tmp_path,

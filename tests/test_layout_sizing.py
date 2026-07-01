@@ -1,7 +1,6 @@
 """Tests for Figma layoutGrow and sizing extraction."""
 
 from figma_flutter_agent.parser.layout import (
-    adjust_sizing_for_visible_children,
     enforce_fixed_sizing_for_stack_and_button,
     extract_sizing,
 )

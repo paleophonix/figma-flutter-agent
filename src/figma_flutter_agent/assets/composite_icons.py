@@ -54,10 +54,7 @@ def _figma_subtree_has_visible_text(node: dict[str, Any]) -> bool:
     if node.get("type") == "TEXT":
         characters = str(node.get("characters") or "").strip()
         return bool(characters)
-    for child in node.get("children") or []:
-        if _figma_subtree_has_visible_text(child):
-            return True
-    return False
+    return any(_figma_subtree_has_visible_text(child) for child in node.get("children") or [])
 
 
 def is_figma_composite_icon_node(node: dict[str, Any]) -> bool:

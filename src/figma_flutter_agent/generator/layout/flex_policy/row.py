@@ -142,7 +142,6 @@ def row_child_summary_text_leaf(child: CleanDesignTreeNode) -> CleanDesignTreeNo
     return None
 
 
-
 def layout_fact_row_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
     """Checkout-style label/value rows without a painted row background."""
     if node.type != NodeType.ROW or len(node.children) != 2:
@@ -241,7 +240,10 @@ def layout_fact_row_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> 
     if not layout_fact_row_tight_horizontal_chip(parent):
         return False
     height = parent.sizing.height
-    if height_within_band(height, max_height=TIGHT_PILL_MAX_HEIGHT) and parent.style.background_color:
+    if (
+        height_within_band(height, max_height=TIGHT_PILL_MAX_HEIGHT)
+        and parent.style.background_color
+    ):
         return True
     if parent.padding is not None:
         from figma_flutter_agent.generator.layout.geometry_facts import horizontal_padding_sum
@@ -734,9 +736,8 @@ def apply_row_rigid_overflow_relief(
     parent_node: CleanDesignTreeNode | None = None,
 ) -> list[str]:
     """Wrap rigid peers in ``Expanded`` when a bounded ROW would overflow at runtime."""
-    if (
-        row_rigid_main_axis_overflow(row, parent_node=parent_node) <= 0
-        or len(child_widgets) != len(row.children)
+    if row_rigid_main_axis_overflow(row, parent_node=parent_node) <= 0 or len(child_widgets) != len(
+        row.children
     ):
         return child_widgets
     result = list(child_widgets)
@@ -750,9 +751,7 @@ def apply_row_rigid_overflow_relief(
                     result[index] = widget.replace("flex: 0", "flex: 1", 1)
                     return result
             elif not _widget_has_flex_parent_data(widget):
-                result[index] = (
-                    f"Flexible(fit: FlexFit.loose, flex: 1, child: {widget})"
-                )
+                result[index] = f"Flexible(fit: FlexFit.loose, flex: 1, child: {widget})"
                 return result
     vector_indices = [
         index for index, child in enumerate(row.children) if child.type == NodeType.VECTOR
@@ -782,10 +781,9 @@ def apply_row_rigid_overflow_relief(
                 layout_fact_row_leading_glyph_value_row,
             )
 
-            if (
-                layout_fact_row_leading_glyph_value_row(row)
-                and _row_child_hosts_right_aligned_value_text(row.children[index])
-            ):
+            if layout_fact_row_leading_glyph_value_row(
+                row
+            ) and _row_child_hosts_right_aligned_value_text(row.children[index]):
                 widget = f"Align(alignment: Alignment.centerRight, child: {widget})"
             result[index] = f"Expanded(child: {widget})"
         return result
@@ -799,9 +797,7 @@ def apply_row_rigid_overflow_relief(
         eligible.append((span or 0.0, index))
     if eligible:
         text_eligible = [
-            (span, idx)
-            for span, idx in eligible
-            if row.children[idx].type == NodeType.TEXT
+            (span, idx) for span, idx in eligible if row.children[idx].type == NodeType.TEXT
         ]
         pool = text_eligible if text_eligible else eligible
         pool.sort(reverse=True)
@@ -845,26 +841,18 @@ def resolve_row_emit_spacing_body(
                 if "flex: 0" in widget:
                     adjusted[index] = widget.replace("flex: 0", "flex: 1", 1)
             else:
-                adjusted[index] = (
-                    f"Flexible(fit: FlexFit.loose, flex: 1, child: {widget})"
-                )
+                adjusted[index] = f"Flexible(fit: FlexFit.loose, flex: 1, child: {widget})"
         child_widgets = adjusted
 
     if len(row.children) >= 2 and (spacing_field or has_explicit_gaps):
         row_available = row_overflow_budget(row, parent_node)
         child_total = _row_intrinsic_main_axis_total(row)
-        if (
-            row_available is not None
-            and row_available > 0
-            and child_total is not None
-        ):
+        if row_available is not None and row_available > 0 and child_total is not None:
             n_gaps = len(row.children) - 1
             gap_total = float(row.spacing) * n_gaps if spacing_field else 0.0
             if has_explicit_gaps and row.flex_explicit_gaps:
                 gaps = row.flex_explicit_gaps
-                gap_total = sum(
-                    float(gaps[min(index, len(gaps) - 1)]) for index in range(n_gaps)
-                )
+                gap_total = sum(float(gaps[min(index, len(gaps) - 1)]) for index in range(n_gaps))
             text_buffer = _text_runtime_main_axis_buffer(row)
             if child_total + gap_total > row_available + geom_epsilon() - text_buffer:
                 spacing_field = ""
@@ -914,7 +902,9 @@ def resolve_row_emit_spacing_body(
         gaps = row.flex_explicit_gaps
         gap_total = sum(float(gaps[min(index, len(gaps) - 1)]) for index in range(n_gaps))
 
-    if child_total + gap_total <= row_available + geom_epsilon() - _text_runtime_main_axis_buffer(row):
+    if child_total + gap_total <= row_available + geom_epsilon() - _text_runtime_main_axis_buffer(
+        row
+    ):
         return spacing_field, flex_children_body(row, relieved, axis="horizontal"), False
 
     spacing_field = ""

@@ -11,8 +11,8 @@ from figma_flutter_agent.dev.opencode.failure_class import FailureClass
 from figma_flutter_agent.dev.opencode.pipeline.orchestrator import run_repair_pipeline
 from figma_flutter_agent.dev.opencode.run_gate import (
     RunGateResult,
-    gate_blocks_pipeline,
     gate_blocks_new_run,
+    gate_blocks_pipeline,
     resume_safe_gate_verdicts,
 )
 
@@ -77,15 +77,19 @@ async def test_orchestrator_resumes_on_no_serve_with_existing_workspace(
     )
     gate = _gate(FailureClass.NO_SERVE, tmp_path)
 
-    with patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.evaluate_run_gate",
-        return_value=gate,
-    ), patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_step_gate",
-        return_value=None,
-    ), patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_round_gate",
-        return_value=None,
+    with (
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.evaluate_run_gate",
+            return_value=gate,
+        ),
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_step_gate",
+            return_value=None,
+        ),
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_round_gate",
+            return_value=None,
+        ),
     ):
         outcome = await run_repair_pipeline(
             settings=load_settings(),

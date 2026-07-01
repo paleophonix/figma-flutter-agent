@@ -314,9 +314,7 @@ def _sort_positioned_stack_subset(
     backdrops = [
         child
         for child in children
-        if (
-            child.type in backdrop_types and _stack_child_area(child) >= area_threshold
-        )
+        if (child.type in backdrop_types and _stack_child_area(child) >= area_threshold)
         or _is_full_bleed_vector_backdrop(
             child,
             viewport_width=viewport_width,

@@ -33,11 +33,7 @@ def layout_fact_step_indicator_glyph_stack(node: CleanDesignTreeNode) -> bool:
         return False
     has_background = any(
         child.type in {NodeType.VECTOR, NodeType.CONTAINER, NodeType.STACK}
-        and (
-            child.vector_asset_key
-            or child.style.background_color
-            or child.children
-        )
+        and (child.vector_asset_key or child.style.background_color or child.children)
         for child in node.children
     )
     if not has_background:
@@ -65,9 +61,7 @@ def layout_fact_step_indicator_title_column(parent_node: CleanDesignTreeNode) ->
     """Column hosting a step glyph stack and a title label beneath it."""
     if parent_node.type != NodeType.COLUMN:
         return False
-    has_glyph = any(
-        layout_fact_step_indicator_glyph_stack(child) for child in parent_node.children
-    )
+    has_glyph = any(layout_fact_step_indicator_glyph_stack(child) for child in parent_node.children)
     has_title = any(child.type == NodeType.TEXT for child in parent_node.children)
     return has_glyph and has_title
 

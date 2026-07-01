@@ -191,8 +191,7 @@ def test_cp1_normalize_allows_weekday_chip_row_synthesis() -> None:
     )
 
     processed_path = (
-        Path(__file__).resolve().parents[1]
-        / ".debug/screen/limbo/reminders/processed.json"
+        Path(__file__).resolve().parents[1] / ".debug/screen/limbo/reminders/processed.json"
     )
     if not processed_path.is_file():
         pytest.skip("reminders processed dump not available")
@@ -216,8 +215,7 @@ def test_normalize_clean_tree_passes_for_reminders_weekday_row() -> None:
     from figma_flutter_agent.generator.normalize import normalize_clean_tree
 
     processed_path = (
-        Path(__file__).resolve().parents[1]
-        / ".debug/screen/limbo/reminders/processed.json"
+        Path(__file__).resolve().parents[1] / ".debug/screen/limbo/reminders/processed.json"
     )
     if not processed_path.is_file():
         pytest.skip("reminders processed dump not available")

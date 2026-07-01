@@ -12,7 +12,6 @@ from loguru import logger
 from redis.asyncio import Redis
 
 from control_panel.api.middleware import PrometheusMiddleware
-from control_panel.preview.middleware import PreviewRootAssetMiddleware
 from control_panel.api.routers import (
     health,
     internal,
@@ -32,6 +31,7 @@ from control_panel.db.engine import create_engine, create_session_factory
 from control_panel.db.models import Base
 from control_panel.db.repair_store import RepairJobStore
 from control_panel.db.store import JobStore
+from control_panel.preview.middleware import PreviewRootAssetMiddleware
 from control_panel.services.telegram_webhook import register_telegram_webhook
 
 

@@ -567,7 +567,6 @@ def test_login_card_clips_decorative_children_to_radius() -> None:
     layout = render_layout_file(root, feature_name="login_card_clip", uses_svg=True)[
         "lib/generated/login_card_clip_layout.dart"
     ]
-    card_chunk = layout.split("card:host")[0]
     assert "ClipRRect(borderRadius: BorderRadius.circular(12.0)" in layout
 
 
@@ -874,10 +873,7 @@ def test_column_wallpaper_lead_has_bounded_main_axis_extent() -> None:
         artboard_background_lead="_buildBackground(context)",
     )
     compact = layout.replace("\n", "").replace(" ", "")
-    assert (
-        "SizedBox(width:double.infinity,height:812.0,child:_buildBackground(context))"
-        in compact
-    )
+    assert "SizedBox(width:double.infinity,height:812.0,child:_buildBackground(context))" in compact
     assert (
         "SizedBox(height:44.0,child:Align(alignment:Alignment.topCenter,child:_buildNativeStatusBar(context))"
         in compact

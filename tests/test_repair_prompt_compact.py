@@ -76,9 +76,7 @@ def test_repair_write_prompt_does_not_ask_for_repair_json(tmp_path: Path) -> Non
     debug_mirror = worktree / ".repair" / "debug" / "limbo" / "login"
     debug_mirror.mkdir(parents=True)
     chain = ReasoningChain()
-    chain.append(
-        "recognise", {"symptoms": [{"id": "s1", "description": "overflow " * 200}]}
-    )
+    chain.append("recognise", {"symptoms": [{"id": "s1", "description": "overflow " * 200}]})
     chain.append(
         "inspect",
         {
@@ -86,9 +84,7 @@ def test_repair_write_prompt_does_not_ask_for_repair_json(tmp_path: Path) -> Non
                 {
                     "id": "e1",
                     "summary": "x" * 5000,
-                    "repoPaths": [
-                        "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
-                    ],
+                    "repoPaths": ["src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"],
                 }
             ],
         },
@@ -111,9 +107,7 @@ def test_repair_write_prompt_does_not_ask_for_repair_json(tmp_path: Path) -> Non
                 "order": 1,
                 "actionKind": "CODE_CHANGE",
                 "lawId": "law-flex",
-                "targetFiles": [
-                    "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
-                ],
+                "targetFiles": ["src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"],
                 "tests": [{"path": "tests/test_flex.py"}],
                 "expectedChange": "z" * 2000,
             }

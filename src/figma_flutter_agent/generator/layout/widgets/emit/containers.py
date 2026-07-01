@@ -352,7 +352,9 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
                 hero_h_lit = format_geometry_literal(float(hero_height))
                 hero_radius = hero.style.border_radius
                 hero_radius_lit = format_geometry_literal(
-                    float(hero_radius) if hero_radius is not None and float(hero_radius) > 0 else 0.0
+                    float(hero_radius)
+                    if hero_radius is not None and float(hero_radius) > 0
+                    else 0.0
                 )
                 hero_slot = (
                     f"SizedBox(width: {hero_w_lit}, height: {hero_h_lit}, "

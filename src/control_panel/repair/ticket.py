@@ -127,9 +127,7 @@ def render_ticket_markdown(ticket: RepairTicket, *, repair_job_id: str) -> str:
     if ticket.suspected_layers:
         lines.append("**Suspected layers:**")
         for layer in ticket.suspected_layers:
-            lines.append(
-                f"- `{layer.layer}` ({layer.confidence:.0%}) — {layer.rationale}".rstrip()
-            )
+            lines.append(f"- `{layer.layer}` ({layer.confidence:.0%}) — {layer.rationale}".rstrip())
         lines.append("")
     if ticket.evidence:
         lines.append("**Evidence:**")

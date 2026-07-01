@@ -84,7 +84,9 @@ def test_context_packet_has_no_forbidden_semantic_keys(feedback_tree: CleanDesig
     assert forbidden == []
 
 
-def test_model_dump_for_llm_omits_redundant_tree_sections(feedback_tree: CleanDesignTreeNode) -> None:
+def test_model_dump_for_llm_omits_redundant_tree_sections(
+    feedback_tree: CleanDesignTreeNode,
+) -> None:
     packet = assemble_semantic_context(feedback_tree)
     llm_payload = packet.model_dump_for_llm()
     assert "rawContext" not in llm_payload
@@ -93,7 +95,9 @@ def test_model_dump_for_llm_omits_redundant_tree_sections(feedback_tree: CleanDe
     assert "treeOutline" in llm_payload
 
 
-def test_model_dump_for_debug_keeps_slim_triage_sections(feedback_tree: CleanDesignTreeNode) -> None:
+def test_model_dump_for_debug_keeps_slim_triage_sections(
+    feedback_tree: CleanDesignTreeNode,
+) -> None:
     packet = assemble_semantic_context(feedback_tree)
     debug_payload = packet.model_dump_for_debug()
     assert "rawContext" in debug_payload

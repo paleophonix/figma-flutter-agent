@@ -12,10 +12,7 @@ from figma_flutter_agent.errors import FigmaUrlError
 
 
 def test_extract_first_figma_frame_url_from_description() -> None:
-    text = (
-        "Please generate this screen\n\n"
-        "https://www.figma.com/design/abc123/App?node-id=12-34\n"
-    )
+    text = "Please generate this screen\n\nhttps://www.figma.com/design/abc123/App?node-id=12-34\n"
     url = extract_first_figma_frame_url(text)
     assert "abc123" in url
     assert "node-id=12-34" in url

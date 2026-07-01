@@ -34,9 +34,7 @@ def test_row_fill_child_gets_expanded() -> None:
         text="Hi",
         sizing=Sizing(width_mode=SizingMode.FILL),
     )
-    assert (
-        resolve_flex_wrap(parent_type=NodeType.ROW, node=node) == FlexWrapKind.EXPANDED
-    )
+    assert resolve_flex_wrap(parent_type=NodeType.ROW, node=node) == FlexWrapKind.EXPANDED
 
 
 def test_row_fixed_text_gets_flexible_loose() -> None:
@@ -47,10 +45,7 @@ def test_row_fixed_text_gets_flexible_loose() -> None:
         text="Hi",
         sizing=Sizing(width_mode=SizingMode.FIXED, width=120.0),
     )
-    assert (
-        resolve_flex_wrap(parent_type=NodeType.ROW, node=node)
-        == FlexWrapKind.FLEXIBLE_LOOSE
-    )
+    assert resolve_flex_wrap(parent_type=NodeType.ROW, node=node) == FlexWrapKind.FLEXIBLE_LOOSE
 
 
 def test_row_fixed_text_renders_flexible_in_layout() -> None:
@@ -112,9 +107,7 @@ def test_apply_flex_wrap_expanded_expression() -> None:
     assert wrapped == "Expanded(child: Text('A'))"
 
 
-def test_bottom_anchored_fixed_height_stack_under_column_uses_sized_box_not_expanded() -> (
-    None
-):
+def test_bottom_anchored_fixed_height_stack_under_column_uses_sized_box_not_expanded() -> None:
     """BottomAnchoredStackColumnBoundLaw: finite logo stacks must not flex-expand."""
     logo = CleanDesignTreeNode(
         id="logo",
@@ -176,9 +169,7 @@ def test_bottom_anchored_fill_height_stack_under_column_still_expands() -> None:
                 name="CTA",
                 type=NodeType.BUTTON,
                 sizing=Sizing(width=327.0, height=48.0),
-                stack_placement=StackPlacement(
-                    vertical="BOTTOM", bottom=0.0, height=48.0
-                ),
+                stack_placement=StackPlacement(vertical="BOTTOM", bottom=0.0, height=48.0),
             ),
         ],
     )
@@ -379,10 +370,7 @@ def test_column_with_cross_stretch_expands_under_row() -> None:
         alignment=Alignment(cross="stretch"),
         children=[title],
     )
-    assert (
-        resolve_flex_wrap(parent_type=NodeType.ROW, node=column)
-        == FlexWrapKind.EXPANDED
-    )
+    assert resolve_flex_wrap(parent_type=NodeType.ROW, node=column) == FlexWrapKind.EXPANDED
 
 
 def test_nested_row_with_flexible_child_expands_under_parent_row() -> None:
@@ -399,9 +387,7 @@ def test_nested_row_with_flexible_child_expands_under_parent_row() -> None:
         type=NodeType.ROW,
         children=[label],
     )
-    assert (
-        resolve_flex_wrap(parent_type=NodeType.ROW, node=inner) == FlexWrapKind.EXPANDED
-    )
+    assert resolve_flex_wrap(parent_type=NodeType.ROW, node=inner) == FlexWrapKind.EXPANDED
     wrapped = apply_flex_wrap_to_widget(
         "Row(children: [])",
         parent_type=NodeType.ROW,
@@ -477,10 +463,7 @@ def test_relax_row_cross_stretch_preserves_nested_column_stretch() -> None:
         "Row(mainAxisAlignment: MainAxisAlignment.start, "
         "crossAxisAlignment: CrossAxisAlignment.start, "
     )
-    assert (
-        "Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch"
-        in relaxed
-    )
+    assert "Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch" in relaxed
 
 
 def test_stack_title_subtitle_block_flows_as_column() -> None:
@@ -590,8 +573,7 @@ def test_fixed_width_nav_tabs_are_not_equal_metric_cards() -> None:
     )
     assert row_hosts_equal_metric_cards(row) is False
     assert (
-        resolve_flex_wrap(parent_type=NodeType.ROW, node=tab, parent_node=row)
-        == FlexWrapKind.NONE
+        resolve_flex_wrap(parent_type=NodeType.ROW, node=tab, parent_node=row) == FlexWrapKind.NONE
     )
 
 
@@ -812,9 +794,7 @@ def test_phone_shell_detects_status_bar_without_vertical_placement() -> None:
         sizing=Sizing(width=375.0, height=812.0),
         children=[status, content, home],
     )
-    growable = sum(
-        1 for child in screen.children if stack_child_is_growable_panel(child)
-    )
+    growable = sum(1 for child in screen.children if stack_child_is_growable_panel(child))
     assert growable == 1
     assert _stack_is_phone_shell_layout(screen, growable_panels=growable)
 
@@ -831,9 +811,7 @@ def test_phone_shell_body_column_stretches_without_footer_link_heuristic() -> No
         alignment=Alignment(main="spaceBetween"),
         sizing=Sizing(width=375.0, height=710.0),
         children=[
-            CleanDesignTreeNode(
-                id="form", name="Form", type=NodeType.COLUMN, children=[]
-            ),
+            CleanDesignTreeNode(id="form", name="Form", type=NodeType.COLUMN, children=[]),
             CleanDesignTreeNode(
                 id="footer",
                 name="Footer",
@@ -889,9 +867,7 @@ def test_native_chrome_vertical_fill_emits_expanded_body() -> None:
         type=NodeType.COLUMN,
         alignment=Alignment(main="spaceBetween", cross="stretch"),
         sizing=Sizing(width=375.0, height=710.0, height_mode=SizingMode.FIXED),
-        stack_placement=StackPlacement(
-            top=68.0, bottom=34.0, width=375.0, height=710.0
-        ),
+        stack_placement=StackPlacement(top=68.0, bottom=34.0, width=375.0, height=710.0),
         children=[
             CleanDesignTreeNode(
                 id="form",
@@ -914,9 +890,7 @@ def test_native_chrome_vertical_fill_emits_expanded_body() -> None:
         name="Native / Home Indicator",
         type=NodeType.STACK,
         sizing=Sizing(width=375.0, height=34.0),
-        stack_placement=StackPlacement(
-            vertical="BOTTOM", top=778.0, width=375.0, height=34.0
-        ),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=778.0, width=375.0, height=34.0),
         children=[],
     )
     screen = CleanDesignTreeNode(
@@ -953,9 +927,7 @@ def test_phone_shell_static_viewport_law_skips_outer_scroll_wrap() -> None:
         type=NodeType.COLUMN,
         alignment=Alignment(main="spaceBetween", cross="stretch"),
         sizing=Sizing(width=375.0, height=710.0, height_mode=SizingMode.FIXED),
-        stack_placement=StackPlacement(
-            top=68.0, bottom=34.0, width=375.0, height=710.0
-        ),
+        stack_placement=StackPlacement(top=68.0, bottom=34.0, width=375.0, height=710.0),
         children=[
             CleanDesignTreeNode(
                 id="form",
@@ -978,9 +950,7 @@ def test_phone_shell_static_viewport_law_skips_outer_scroll_wrap() -> None:
         name="Native / Home Indicator",
         type=NodeType.STACK,
         sizing=Sizing(width=375.0, height=34.0),
-        stack_placement=StackPlacement(
-            vertical="BOTTOM", top=778.0, width=375.0, height=34.0
-        ),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=778.0, width=375.0, height=34.0),
         children=[],
     )
     screen = CleanDesignTreeNode(
@@ -1001,10 +971,7 @@ def test_phone_shell_static_viewport_law_skips_outer_scroll_wrap() -> None:
     assert "LayoutBuilder" in layout
     assert "Expanded(child:" not in layout
     assert "SizedBox(height: 24.0" in layout
-    assert (
-        "SingleChildScrollView(child: SizedBox(width: 375.0, height: 812.0"
-        not in layout
-    )
+    assert "SingleChildScrollView(child: SizedBox(width: 375.0, height: 812.0" not in layout
     assert "SizedBox(width: 375.0, height: 812.0" in layout
     assert "constraints.maxWidth" not in layout
 
@@ -1031,9 +998,7 @@ def test_decomposed_column_phone_shell_expands_content() -> None:
         alignment=Alignment(main="spaceBetween", cross="stretch"),
         sizing=Sizing(width=375.0, height=710.0, height_mode=SizingMode.FIXED),
         children=[
-            CleanDesignTreeNode(
-                id="form", name="Form", type=NodeType.COLUMN, children=[]
-            ),
+            CleanDesignTreeNode(id="form", name="Form", type=NodeType.COLUMN, children=[]),
             CleanDesignTreeNode(
                 id="footer",
                 name="Footer",
@@ -1466,9 +1431,7 @@ def test_pin_bottom_scroll_host_uses_bounded_position_for_growable_text() -> Non
         sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
         children=[description, chips, action, home],
     )
-    body = render_node_body(
-        screen, is_layout_root=False, uses_svg=False, responsive_enabled=True
-    )
+    body = render_node_body(screen, is_layout_root=False, uses_svg=False, responsive_enabled=True)
     compact = body.replace("\n", "")
     assert "Positioned.fill(child: SingleChildScrollView" not in compact
     assert "SingleChildScrollView" in compact
@@ -1476,9 +1439,7 @@ def test_pin_bottom_scroll_host_uses_bounded_position_for_growable_text() -> Non
     assert "SingleChildScrollView(child: Positioned" not in compact
 
 
-def test_pin_bottom_scroll_host_suppresses_inner_positioned_for_growable_column() -> (
-    None
-):
+def test_pin_bottom_scroll_host_suppresses_inner_positioned_for_growable_column() -> None:
     """Growable COLUMN stack panels must not emit ``ScrollView > Positioned``."""
     headline = CleanDesignTreeNode(
         id="headline",
@@ -1487,12 +1448,8 @@ def test_pin_bottom_scroll_host_suppresses_inner_positioned_for_growable_column(
         sizing=Sizing(width=327.0, height=121.0, height_mode=SizingMode.FIXED),
         stack_placement=StackPlacement(left=24.0, top=68.0, width=327.0, height=121.0),
         children=[
-            CleanDesignTreeNode(
-                id="logo", name="Logo", type=NodeType.STACK, children=[]
-            ),
-            CleanDesignTreeNode(
-                id="title", name="Title", type=NodeType.TEXT, text="Get Started"
-            ),
+            CleanDesignTreeNode(id="logo", name="Logo", type=NodeType.STACK, children=[]),
+            CleanDesignTreeNode(id="title", name="Title", type=NodeType.TEXT, text="Get Started"),
         ],
     )
     content = CleanDesignTreeNode(
@@ -1503,9 +1460,7 @@ def test_pin_bottom_scroll_host_suppresses_inner_positioned_for_growable_column(
         stack_placement=StackPlacement(top=221.0, width=375.0, height=591.0),
         children=[
             CleanDesignTreeNode(id="tab", name="Tab", type=NodeType.ROW, children=[]),
-            CleanDesignTreeNode(
-                id="form", name="Form", type=NodeType.COLUMN, children=[]
-            ),
+            CleanDesignTreeNode(id="form", name="Form", type=NodeType.COLUMN, children=[]),
         ],
     )
     home = CleanDesignTreeNode(
@@ -1523,9 +1478,7 @@ def test_pin_bottom_scroll_host_suppresses_inner_positioned_for_growable_column(
         sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
         children=[headline, content, home],
     )
-    body = render_node_body(
-        screen, is_layout_root=False, uses_svg=False, responsive_enabled=True
-    )
+    body = render_node_body(screen, is_layout_root=False, uses_svg=False, responsive_enabled=True)
     compact = body.replace("\n", "")
     assert "SingleChildScrollView(child: Positioned" not in compact
     assert compact.count("SingleChildScrollView") >= 1
@@ -1570,9 +1523,7 @@ def test_decomposed_absolute_stack_methods_are_not_scroll_wrapped() -> None:
         responsive_enabled=False,
     )
     compact = layout.replace("\n", "")
-    assert (
-        "Positioned.fill(child: SingleChildScrollView(child: _buildHero" not in compact
-    )
+    assert "Positioned.fill(child: SingleChildScrollView(child: _buildHero" not in compact
     assert "_buildHero(context), _buildFooter(context)" in compact
 
 
@@ -1592,9 +1543,7 @@ def test_wide_cta_centered_label_without_nested_positioned() -> None:
                 text="ADD TO CART",
                 sizing=Sizing(width=108.0, height=20.0),
                 style=NodeStyle(text_align="CENTER", text_color="0xFFFFFFFF"),
-                stack_placement=StackPlacement(
-                    left=109.0, top=21.0, width=108.0, height=20.0
-                ),
+                stack_placement=StackPlacement(left=109.0, top=21.0, width=108.0, height=20.0),
             ),
         ],
     )
@@ -1701,9 +1650,7 @@ def test_pill_cta_centered_label_without_nested_positioned() -> None:
                 type=NodeType.TEXT,
                 text="ADD TO CART",
                 sizing=Sizing(width=327.0, height=20.0),
-                stack_placement=StackPlacement(
-                    left=0.0, top=18.0, width=327.0, height=20.0
-                ),
+                stack_placement=StackPlacement(left=0.0, top=18.0, width=327.0, height=20.0),
             ),
         ],
     )
@@ -1766,9 +1713,7 @@ def test_stack_should_emit_mixed_inflow_column_overlay_for_flow_plus_absolute() 
         type=NodeType.STACK,
         spacing=24.0,
         sizing=Sizing(width=327.0, height=706.0),
-        stack_placement=StackPlacement(
-            left=24.0, top=68.0, right=24.0, width=327.0, height=706.0
-        ),
+        stack_placement=StackPlacement(left=24.0, top=68.0, right=24.0, width=327.0, height=706.0),
         children=[logo, headline, form, pattern],
     )
     assert stack_should_emit_mixed_inflow_column_overlay(host) is True
@@ -1849,9 +1794,7 @@ def test_mixed_inflow_absolute_stack_emits_column_plus_positioned_overlay() -> N
         type=NodeType.STACK,
         spacing=24.0,
         sizing=Sizing(width=327.0, height=706.0),
-        stack_placement=StackPlacement(
-            left=24.0, top=68.0, right=24.0, width=327.0, height=706.0
-        ),
+        stack_placement=StackPlacement(left=24.0, top=68.0, right=24.0, width=327.0, height=706.0),
         children=[logo, headline, tabs, form, pattern],
     )
     body = render_node_body(host, uses_svg=False)
@@ -1862,9 +1805,12 @@ def test_mixed_inflow_absolute_stack_emits_column_plus_positioned_overlay() -> N
     assert "top: -38.0" in compact
     assert "Get Started now" in compact
     assert "SizedBox(width: double.infinity, child: Positioned(" not in compact
-    assert compact.count(
-        "Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 24.0"
-    ) == 1
+    assert (
+        compact.count(
+            "Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 24.0"
+        )
+        == 1
+    )
 
 
 def test_interleaved_absolute_does_not_split_flow_column() -> None:
@@ -1912,9 +1858,12 @@ def test_interleaved_absolute_does_not_split_flow_column() -> None:
     )
     body = render_node_body(host, uses_svg=False)
     compact = body.replace("\n", "")
-    assert compact.count(
-        "Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12.0"
-    ) == 1
+    assert (
+        compact.count(
+            "Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12.0"
+        )
+        == 1
+    )
     assert "Header block" in compact
     assert "Footer block" in compact
     assert "Positioned(" in compact

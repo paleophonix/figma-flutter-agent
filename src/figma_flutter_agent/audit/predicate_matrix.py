@@ -49,14 +49,26 @@ class PredicateSpec:
 
 
 PREDICATE_SPECS: tuple[PredicateSpec, ...] = (
-    PredicateSpec("layout_fact_row_label_value_summary_row", layout_fact_row_label_value_summary_row),
-    PredicateSpec("layout_fact_row_space_between_text_metric_row", layout_fact_row_space_between_text_metric_row),
-    PredicateSpec("layout_fact_row_tight_horizontal_pill_label", layout_fact_row_tight_horizontal_pill_label),
-    PredicateSpec("layout_fact_row_tight_overflow_guard_label_row", layout_fact_row_tight_overflow_guard_label_row),
+    PredicateSpec(
+        "layout_fact_row_label_value_summary_row", layout_fact_row_label_value_summary_row
+    ),
+    PredicateSpec(
+        "layout_fact_row_space_between_text_metric_row",
+        layout_fact_row_space_between_text_metric_row,
+    ),
+    PredicateSpec(
+        "layout_fact_row_tight_horizontal_pill_label", layout_fact_row_tight_horizontal_pill_label
+    ),
+    PredicateSpec(
+        "layout_fact_row_tight_overflow_guard_label_row",
+        layout_fact_row_tight_overflow_guard_label_row,
+    ),
     PredicateSpec("layout_fact_row_status_pill_badge", layout_fact_row_status_pill_badge),
     PredicateSpec("layout_fact_row_numeric_counter_badge", layout_fact_row_numeric_counter_badge),
     PredicateSpec("row_hosts_checkbox_label_pair", row_hosts_checkbox_label_pair),
-    PredicateSpec("layout_fact_hosts_compact_checkbox_control", layout_fact_hosts_compact_checkbox_control),
+    PredicateSpec(
+        "layout_fact_hosts_compact_checkbox_control", layout_fact_hosts_compact_checkbox_control
+    ),
     PredicateSpec("layout_fact_checkbox_control", layout_fact_checkbox_control),
     PredicateSpec("layout_fact_textarea_field", layout_fact_textarea_field),
 )

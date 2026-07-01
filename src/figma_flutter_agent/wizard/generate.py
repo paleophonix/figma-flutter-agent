@@ -180,7 +180,9 @@ def _wizard_compare_generate(ctx: typer.Context, *, settings: Settings) -> None:
         )
     )
     print_pipeline_warnings(result.warnings)
-    console.print("[green]Compare complete — see ir_1.json, ir_2.json, ir_3.json under .debug/screen/[/green]")
+    console.print(
+        "[green]Compare complete — see ir_1.json, ir_2.json, ir_3.json under .debug/screen/[/green]"
+    )
 
 
 def _wizard_generate_menu(ctx: typer.Context) -> None:

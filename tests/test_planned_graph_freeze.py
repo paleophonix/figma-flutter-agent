@@ -18,8 +18,7 @@ from figma_flutter_agent.generator.planned.graph import (
 def test_validate_raises_on_stale_widget_import() -> None:
     planned = {
         "lib/features/login/login_screen.dart": (
-            "import 'package:demo_app/widgets/missing_widget.dart';\n"
-            "class LoginScreen {}\n"
+            "import 'package:demo_app/widgets/missing_widget.dart';\nclass LoginScreen {}\n"
         ),
     }
     graph = build_planned_dart_graph(planned)

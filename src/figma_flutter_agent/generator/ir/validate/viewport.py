@@ -54,9 +54,7 @@ def _viewport_clamp_preserves_outward_paint(
         return True
     if style.gradient is not None:
         return True
-    if node.render_boundary and bleed > margin * _OUTWARD_PAINT_BLEED_MARGIN_MULTIPLIER:
-        return True
-    return False
+    return bool(node.render_boundary and bleed > margin * _OUTWARD_PAINT_BLEED_MARGIN_MULTIPLIER)
 
 
 def _viewport_box_metrics(

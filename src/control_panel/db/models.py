@@ -77,7 +77,9 @@ class RepairJobRow(Base):
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     stage: Mapped[str | None] = mapped_column(String(32), nullable=True)
-    parent_generation_job_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    parent_generation_job_id: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, index=True
+    )
     gitlab_project_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     gitlab_issue_iid: Mapped[int | None] = mapped_column(Integer, nullable=True)
     project_slug: Mapped[str | None] = mapped_column(String(256), nullable=True)

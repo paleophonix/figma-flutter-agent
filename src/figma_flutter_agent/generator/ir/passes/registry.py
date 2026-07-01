@@ -44,9 +44,7 @@ _UNSTACK_MUTATES = frozenset(
 _UNSTACK_PRESERVES = frozenset({"node_multiset", "stack_paint_order", "graph_sync"})
 
 _UNPIN_MUTATES = frozenset({"sizing", "layout_slot", "layout_hints"})
-_UNPIN_PRESERVES = frozenset(
-    {"node_multiset", "stack_paint_order", "graph_sync", "kind"}
-)
+_UNPIN_PRESERVES = frozenset({"node_multiset", "stack_paint_order", "graph_sync", "kind"})
 
 _SCROLL_MUTATES = frozenset({"scroll_axis", "sizing", "kind", "layout_hints"})
 _SCROLL_PRESERVES = frozenset({"node_multiset", "stack_paint_order", "graph_sync"})

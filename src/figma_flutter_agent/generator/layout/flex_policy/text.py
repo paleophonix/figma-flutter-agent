@@ -75,11 +75,7 @@ def text_in_card_metadata_rail(
                 for item in parent_node.children
                 if item.type == NodeType.TEXT and (item.text or "").strip()
             ]
-            if (
-                surface is not None
-                and len(text_nodes) == 1
-                and node.id == text_nodes[0].id
-            ):
+            if surface is not None and len(text_nodes) == 1 and node.id == text_nodes[0].id:
                 height = parent_node.sizing.height
                 radius = surface.style.border_radius or parent_node.style.border_radius
                 if (text_nodes[0].style.text_align or "").upper() == "CENTER":

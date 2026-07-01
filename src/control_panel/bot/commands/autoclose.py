@@ -33,7 +33,9 @@ def register_autoclose_command(bot: commands.InteractionBot) -> None:
         default_repo = "default"
         keys = list_user_repo_keys(bot.settings, inter.author.id)
         if keys:
-            default_repo = await resolve_active_repo_key(bot.settings, bot.job_store, inter.author.id)
+            default_repo = await resolve_active_repo_key(
+                bot.settings, bot.job_store, inter.author.id
+            )
         await bot.job_store.set_autoclose_mode(
             inter.author.id,
             new_mode,

@@ -39,9 +39,7 @@ class OpenCodeClient:
         if self._directory:
             headers["x-opencode-directory"] = self._directory
         if self._password:
-            token = base64.b64encode(f"{self._username}:{self._password}".encode()).decode(
-                "ascii"
-            )
+            token = base64.b64encode(f"{self._username}:{self._password}".encode()).decode("ascii")
             headers["Authorization"] = f"Basic {token}"
         return headers
 

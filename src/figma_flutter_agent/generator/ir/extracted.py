@@ -367,9 +367,12 @@ def _preserve_extracted_widget_decoration_shell(
     style_source = subtree
     if not has_box_decoration(subtree.style):
         surface = primary_surface_node(subtree)
-        if surface is not None and layout_fact_icon_badge_stack(subtree):
-            style_source = surface
-        elif surface is not None and has_box_decoration(surface.style):
+        if (
+            surface is not None
+            and layout_fact_icon_badge_stack(subtree)
+            or surface is not None
+            and has_box_decoration(surface.style)
+        ):
             style_source = surface
         else:
             return body

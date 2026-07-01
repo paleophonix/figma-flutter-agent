@@ -155,8 +155,6 @@ def run_registered_reconcile_passes(
 
     working = tree
     for pass_name, pass_fn in passes:
-        if should_run_reconcile_pass(
-            pass_name, archetype_reconcile=archetype_reconcile
-        ):
+        if should_run_reconcile_pass(pass_name, archetype_reconcile=archetype_reconcile):
             working = pass_fn(working)
     return working

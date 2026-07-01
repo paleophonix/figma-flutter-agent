@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
-from figma_flutter_agent.generator.layout.style import dart_color_expr
+from figma_flutter_agent.generator.layout.style import box_decoration_expr, dart_color_expr
 from figma_flutter_agent.generator.variant.actions import button_on_pressed_expr
 from figma_flutter_agent.generator.variant.controls import (
     input_decoration_expr,
@@ -22,7 +22,6 @@ from figma_flutter_agent.generator.variant.state import (
     input_obscure_text_expr,
 )
 from figma_flutter_agent.parser.interaction import layout_fact_checkbox_control
-from figma_flutter_agent.generator.layout.style import box_decoration_expr
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 

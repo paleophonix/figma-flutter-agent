@@ -120,7 +120,10 @@ def test_trailing_chevron_glyph_uses_intrinsic_paint_bounds() -> None:
 def test_trailing_chevron_svg_is_centered_in_action_slot() -> None:
     host = _trailing_chevron_stack()
     emitted = _render_svg_picture(host, "assets/icons/vector_152_37.svg")
-    assert "Center(child: SizedBox(width: 5.5" in emitted or "Center(child: SizedBox(width: 4.0" in emitted
+    assert (
+        "Center(child: SizedBox(width: 5.5" in emitted
+        or "Center(child: SizedBox(width: 4.0" in emitted
+    )
     assert "SizedBox(width: 24.0, height: 24.0" in emitted
     assert "SvgPicture.asset('assets/icons/vector_152_37.svg'" in emitted
 

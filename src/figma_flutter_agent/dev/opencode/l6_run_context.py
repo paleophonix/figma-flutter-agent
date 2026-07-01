@@ -12,9 +12,7 @@ _L6_RUN_CONTEXT_OMIT_KEYS: frozenset[str] = frozenset({"_l6_bindings"})
 def run_context_for_l6_json(run_context: dict[str, Any]) -> dict[str, Any]:
     """Drop orchestrator-only keys before embedding run_context into L6."""
     return {
-        key: value
-        for key, value in run_context.items()
-        if key not in _L6_RUN_CONTEXT_OMIT_KEYS
+        key: value for key, value in run_context.items() if key not in _L6_RUN_CONTEXT_OMIT_KEYS
     }
 
 

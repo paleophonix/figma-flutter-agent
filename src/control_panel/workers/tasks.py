@@ -85,7 +85,9 @@ async def run_generation_job(ctx: dict[str, Any], job_id: str) -> None:
                     status=JobStatus.PIPELINE_RUNNING.value,
                     project_dir=project_dir.as_posix(),
                 )
-                logger.info("Starting generation pipeline job_id={} project={}", job_id, project_dir)
+                logger.info(
+                    "Starting generation pipeline job_id={} project={}", job_id, project_dir
+                )
                 outcome = await execute_generation_pipeline(
                     figma_url=job.figma_url,
                     project_dir=project_dir,
@@ -519,14 +521,10 @@ async def run_repair_job(ctx: dict[str, Any], repair_job_id: str) -> None:
                         repair_store,
                         repair_job_id,
                         status=RepairJobStatus.FAILED,
-                        error_message=str(outcome.stop_reason or "repair_pipeline_stopped")[
-                            :4000
-                        ],
+                        error_message=str(outcome.stop_reason or "repair_pipeline_stopped")[:4000],
                     )
                 elif (
-                    outcome.workspace is not None
-                    and outcome.task_completed
-                    and not outcome.stopped
+                    outcome.workspace is not None and outcome.task_completed and not outcome.stopped
                 ):
                     refreshed = await repair_store.get_job(repair_job_id)
                     if refreshed is not None:

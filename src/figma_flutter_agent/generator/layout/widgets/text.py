@@ -224,16 +224,15 @@ def _apply_stack_position(
         positioned_text_prefers_explicit_width_pins,
     )
 
-    width_hint, _ = figma_positioned_dimensions(node, placement) if placement is not None else (None, None)
-    prefer_fixed_width = (
-        placement is not None
-        and positioned_text_prefers_explicit_width_pins(
-            node,
-            placement,
-            parent_width=parent_width,
-            width=width_hint,
-            parent_node=parent_node,
-        )
+    width_hint, _ = (
+        figma_positioned_dimensions(node, placement) if placement is not None else (None, None)
+    )
+    prefer_fixed_width = placement is not None and positioned_text_prefers_explicit_width_pins(
+        node,
+        placement,
+        parent_width=parent_width,
+        width=width_hint,
+        parent_node=parent_node,
     )
 
     if (
@@ -281,9 +280,7 @@ def _apply_stack_position(
     )
     if nav_vertical is not None:
         fields[:] = [
-            field
-            for field in fields
-            if not field.startswith(("top:", "bottom:", "height:"))
+            field for field in fields if not field.startswith(("top:", "bottom:", "height:"))
         ]
         fields.extend(nav_vertical)
     if _should_omit_positioned_height(node, parent_node=parent_node):
@@ -321,11 +318,7 @@ def _apply_stack_position(
         and not prefer_fixed_width
         and not has_explicit_width_pin
         and (
-            (
-                placement_is_center_pinned_horizontal(placement)
-                if placement is not None
-                else False
-            )
+            (placement_is_center_pinned_horizontal(placement) if placement is not None else False)
             or top_navigation_bar_title_should_screen_center(node, parent_node)
         )
     ):
@@ -334,7 +327,8 @@ def _apply_stack_position(
     if (
         slot_height is not None
         and slot_height > 0
-        and node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER, NodeType.INPUT, NodeType.STACK}
+        and node.type
+        in {NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER, NodeType.INPUT, NodeType.STACK}
     ):
         child = _wrap_bounded_positioned_slot_child(
             child,
@@ -395,9 +389,7 @@ def _should_center_text_in_button_stack(
     if stack_interaction_kind(parent_node) == "button":
         if layout_fact_stack_vertical_icon_label_chip_tile(parent_node):
             return False
-        if layout_fact_stack_bottom_nav_active_tab_pill(parent_node):
-            return False
-        return True
+        return not layout_fact_stack_bottom_nav_active_tab_pill(parent_node)
     text_nodes = [
         item for item in _local_nodes(parent_node, 2) if item.type == NodeType.TEXT and item.text
     ]

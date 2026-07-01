@@ -148,9 +148,7 @@ def adjust_sizing_for_visible_children(
 
     if layout_mode == "VERTICAL" and sizing.height_mode == SizingMode.HUG:
         total = padding.top + padding.bottom
-        flow_children = [
-            child for child in children if not _figma_child_is_absolute_in_flow(child)
-        ]
+        flow_children = [child for child in children if not _figma_child_is_absolute_in_flow(child)]
         for index, child in enumerate(flow_children):
             bounds = child.get("absoluteBoundingBox") or {}
             height = bounds.get("height")
@@ -164,9 +162,7 @@ def adjust_sizing_for_visible_children(
 
     if layout_mode == "HORIZONTAL" and sizing.width_mode == SizingMode.HUG:
         total = padding.left + padding.right
-        flow_children = [
-            child for child in children if not _figma_child_is_absolute_in_flow(child)
-        ]
+        flow_children = [child for child in children if not _figma_child_is_absolute_in_flow(child)]
         for index, child in enumerate(flow_children):
             bounds = child.get("absoluteBoundingBox") or {}
             width = bounds.get("width")

@@ -131,12 +131,7 @@ def in_card_decorative_overlay_should_stay(
     if not parent.style.background_color or parent.style.border_radius is None:
         return False
     padding = parent.padding
-    if (
-        padding.top <= 0
-        and padding.bottom <= 0
-        and padding.left <= 0
-        and padding.right <= 0
-    ):
+    if padding.top <= 0 and padding.bottom <= 0 and padding.left <= 0 and padding.right <= 0:
         return False
     for sibling in parent.children:
         if sibling.id == child.id:
@@ -156,9 +151,7 @@ def is_bounded_interactive_surface_host(node: CleanDesignTreeNode) -> bool:
     if not (node.style.background_color or node.style.border_radius is not None):
         return False
     padding = node.padding
-    has_padding = (
-        padding.top > 0 or padding.bottom > 0 or padding.left > 0 or padding.right > 0
-    )
+    has_padding = padding.top > 0 or padding.bottom > 0 or padding.left > 0 or padding.right > 0
     if not has_padding:
         return False
     return _subtree_has_interactive_ui(node)

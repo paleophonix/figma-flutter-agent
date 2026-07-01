@@ -163,7 +163,9 @@ def test_is_dart_analyze_timeout_detail_detects_subprocess_timeout() -> None:
 def test_expand_minified_dart_source_wraps_long_physical_lines() -> None:
     from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
-    body = "return Column(children: [" + ", ".join(f"Text('{index}')" for index in range(800)) + "]);"
+    body = (
+        "return Column(children: [" + ", ".join(f"Text('{index}')" for index in range(800)) + "]);"
+    )
     expanded = expand_minified_dart_source(body)
     assert expanded != body
     assert max(len(line) for line in expanded.splitlines()) < len(body)

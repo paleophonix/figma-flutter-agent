@@ -294,9 +294,7 @@ def launch_project_screen_in_chrome(
     screen_rel = screen_file_path(feature_name, architecture=architecture)
     screen_path = project_dir / screen_rel
     if not screen_path.is_file():
-        raise FlutterProjectError(
-            f"Screen not found in lib/: {screen_rel}. Run generate first."
-        )
+        raise FlutterProjectError(f"Screen not found in lib/: {screen_rel}. Run generate first.")
 
     dump_path: Path | None = None
     try:

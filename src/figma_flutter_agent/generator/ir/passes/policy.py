@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.config.models import AgentYamlConfig
+from figma_flutter_agent.generator.ir.passes.protocol import Pass
 
 _PLACEMENT_MUTATING_PASS_NAMES = frozenset({"sectionize", "unstack", "unpin"})
 

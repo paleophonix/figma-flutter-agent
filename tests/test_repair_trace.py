@@ -154,7 +154,9 @@ def test_finish_emits_aggregated_posthog(tmp_path: Path, monkeypatch: pytest.Mon
     assert len(kwargs["extra_properties"]["repair_steps"]) == 2
 
 
-def test_record_step_does_not_emit_posthog_per_step(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_record_step_does_not_emit_posthog_per_step(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.trace.agent_repo_root",
         lambda: tmp_path,

@@ -664,7 +664,10 @@ def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
                 continue
             if not descendant.style.background_color:
                 continue
-            if descendant.style.border_radius is not None and float(descendant.style.border_radius) > 0:
+            if (
+                descendant.style.border_radius is not None
+                and float(descendant.style.border_radius) > 0
+            ):
                 pill_radius = float(descendant.style.border_radius)
                 break
     for index, tab in enumerate(items):

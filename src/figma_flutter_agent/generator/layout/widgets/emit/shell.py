@@ -30,7 +30,6 @@ from ..playback import (
     _render_concentric_circle_thumb,
     _render_playback_seek_slider,
 )
-from .context import LayoutRenderContext
 from .containers import (
     render_card,
     render_grid,
@@ -38,6 +37,7 @@ from .containers import (
     render_simple_controls,
     render_tabs_carousel_bottomnav_wrap,
 )
+from .context import LayoutRenderContext
 from .controls import render_button_node, render_input_node
 from .flex import render_column, render_row
 from .media import render_image_or_vector
@@ -328,13 +328,14 @@ def assemble_layout_emit(
         is_layout_root=is_layout_root,
         parent_node=parent_node,
     )
-    from .containers import card_should_emit_as_overlay_stack
-    from figma_flutter_agent.generator.layout.widgets.positioned import (
-        _stack_has_bottom_anchored_child,
-    )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll,
     )
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
+    )
+
+    from .containers import card_should_emit_as_overlay_stack
 
     pin_bottom_chrome = node.type == NodeType.STACK and _stack_has_bottom_anchored_child(node)
 

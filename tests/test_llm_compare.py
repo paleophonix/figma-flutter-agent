@@ -43,7 +43,9 @@ def test_resolved_llm_compare_models_raises_when_slot_missing() -> None:
 def test_write_compare_ir_artifact(tmp_path: Path) -> None:
     response = FlutterGenerationResponse(
         screenIr=ScreenIr(root=WidgetIrNode(figmaId="1:2")),
-        extractedWidgets=[ExtractedWidget(widgetName="DemoWidget", widgetIr=WidgetIrNode(figmaId="1:3"))],
+        extractedWidgets=[
+            ExtractedWidget(widgetName="DemoWidget", widgetIr=WidgetIrNode(figmaId="1:3"))
+        ],
     )
     path = write_compare_ir_artifact(
         project_dir=tmp_path,

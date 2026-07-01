@@ -555,10 +555,9 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             layout_fact_stack_product_purchase_footer_panel,
         )
 
-        if (
-            layout_fact_stack_product_purchase_footer_panel(node)
-            or layout_fact_checkout_sticky_footer_host(node)
-        ):
+        if layout_fact_stack_product_purchase_footer_panel(
+            node
+        ) or layout_fact_checkout_sticky_footer_host(node):
             interaction = None
     if interaction == "input":
         return _render_stack_input(
@@ -653,9 +652,8 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             node,
             growable_panels=growable_panels,
         )
-        uses_shared_scroll = (
-            pin_bottom_chrome
-            and stack_uses_shared_body_scroll_host(node, growable_panels=growable_panels)
+        uses_shared_scroll = pin_bottom_chrome and stack_uses_shared_body_scroll_host(
+            node, growable_panels=growable_panels
         )
         ordered_pairs = sorted(
             zip(sorted_children, stack_children, strict=True),
@@ -799,9 +797,10 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             spacing_field = ""
             if (node.spacing or 0.0) > 0.0 and len(inflow_children) >= 2:
                 spacing_field = f"spacing: {format_geometry_literal(node.spacing)}, "
-            inflow_body = ", ".join(
-                widget_by_child_id[child.id] for child in inflow_children
-            ) or "const SizedBox.shrink()"
+            inflow_body = (
+                ", ".join(widget_by_child_id[child.id] for child in inflow_children)
+                or "const SizedBox.shrink()"
+            )
             inflow_column = (
                 "Column("
                 "mainAxisSize: MainAxisSize.min, "
@@ -972,9 +971,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         clip_radius = hero_card_clip_radius(node)
         if clip_radius is not None and clip_radius > 0:
             radius_lit = format_geometry_literal(clip_radius)
-            stack_widget = (
-                f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), child: {stack_widget})"
-            )
+            stack_widget = f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), child: {stack_widget})"
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_should_emit_surface_decoration,
     )

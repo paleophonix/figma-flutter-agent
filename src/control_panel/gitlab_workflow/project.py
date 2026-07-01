@@ -40,7 +40,9 @@ async def resolve_issue_project(
     if not http_url:
         base = settings.yaml.gitlab.base_url.rstrip("/")
         http_url = f"{base}/{path}.git"
-    default_branch = str(project.get("default_branch") or settings.yaml.gitlab.target_branch or "main")
+    default_branch = str(
+        project.get("default_branch") or settings.yaml.gitlab.target_branch or "main"
+    )
     return IssueProjectContext(
         project_id=str(project.get("id") or project_id),
         path_with_namespace=path,

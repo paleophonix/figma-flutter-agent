@@ -46,7 +46,8 @@ def resolve_main_axis_alignment(
     ):
         return "MainAxisAlignment.center"
     if node.type == NodeType.ROW and (
-        layout_fact_row_icon_stepper_control_row(node) or layout_fact_row_product_card_price_footer_row(node)
+        layout_fact_row_icon_stepper_control_row(node)
+        or layout_fact_row_product_card_price_footer_row(node)
     ):
         return "MainAxisAlignment.spaceBetween"
     main = node.alignment.main or "start"
@@ -173,7 +174,9 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
             _stack_has_bottom_anchored_child,
         )
 
-        if _stack_has_bottom_anchored_child(node) or layout_fact_stack_positioned_subtitle_line(node):
+        if _stack_has_bottom_anchored_child(node) or layout_fact_stack_positioned_subtitle_line(
+            node
+        ):
             return False
     if node.type == NodeType.COLUMN and _column_is_text_primary(node):
         return False

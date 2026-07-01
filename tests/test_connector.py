@@ -166,7 +166,9 @@ async def test_fetch_image_urls_retries_batch_on_rate_limit(
         side_effect=[
             Response(
                 200,
-                json={"images": {node_id: f"https://cdn/{node_id}.png" for node_id in node_ids[:20]}},
+                json={
+                    "images": {node_id: f"https://cdn/{node_id}.png" for node_id in node_ids[:20]}
+                },
             ),
             Response(
                 429,
@@ -175,7 +177,9 @@ async def test_fetch_image_urls_retries_batch_on_rate_limit(
             ),
             Response(
                 200,
-                json={"images": {node_id: f"https://cdn/{node_id}.png" for node_id in second_batch}},
+                json={
+                    "images": {node_id: f"https://cdn/{node_id}.png" for node_id in second_batch}
+                },
             ),
         ]
     )

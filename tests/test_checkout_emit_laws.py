@@ -342,7 +342,9 @@ def test_step_indicator_stack_is_not_skip_control() -> None:
         name="Step",
         type=NodeType.STACK,
         sizing=Sizing(width=24.0, height=24.0),
-        variant=ComponentVariant(component_id="s1", variant_properties={"State": "Done"}, state="Done"),
+        variant=ComponentVariant(
+            component_id="s1", variant_properties={"State": "Done"}, state="Done"
+        ),
         children=[
             CleanDesignTreeNode(
                 id="bg",
@@ -386,7 +388,9 @@ def test_completed_step_numeral_suppressed_in_emit() -> None:
         name="Step",
         type=NodeType.STACK,
         sizing=Sizing(width=24.0, height=24.0),
-        variant=ComponentVariant(component_id="s1", variant_properties={"State": "Done"}, state="Done"),
+        variant=ComponentVariant(
+            component_id="s1", variant_properties={"State": "Done"}, state="Done"
+        ),
         children=[
             CleanDesignTreeNode(
                 id="bg",
@@ -396,7 +400,9 @@ def test_completed_step_numeral_suppressed_in_emit() -> None:
                 sizing=Sizing(width=24.0, height=24.0),
             ),
             numeral,
-            CleanDesignTreeNode(id="ok", name="Success", type=NodeType.STACK, sizing=Sizing(width=24.0, height=24.0)),
+            CleanDesignTreeNode(
+                id="ok", name="Success", type=NodeType.STACK, sizing=Sizing(width=24.0, height=24.0)
+            ),
         ],
     )
     emitted = render_node_body(numeral, uses_svg=True, parent_type=NodeType.STACK, parent_node=step)
@@ -459,17 +465,16 @@ def test_align_extracted_widgets_with_screen_ir_creates_missing_roots() -> None:
         disambiguate_extracted_widget_name_collisions(aligned)
     )
     remapped = remap_screen_ir_extracted_refs(screen_ir, figma_id_to_widget_name=figma_map)
-    step_refs = [
-        child.ref.widget_name
-        for child in remapped.root.children
-        if child.ref is not None
-    ]
+    step_refs = [child.ref.widget_name for child in remapped.root.children if child.ref is not None]
     assert set(figma_map.values()) == {"Step1Widget", "Step2Widget"}
     assert set(step_refs) == {"Step1Widget", "Step2Widget"}
-    assert emit_extracted_ref(
-        remapped.root.children[1],
-        figma_id_to_widget_name=figma_map,
-    ) == "Step2Widget()"
+    assert (
+        emit_extracted_ref(
+            remapped.root.children[1],
+            figma_id_to_widget_name=figma_map,
+        )
+        == "Step2Widget()"
+    )
 
 
 def test_step_indicator_title_column_uses_single_line_centered_label() -> None:

@@ -39,7 +39,9 @@ async def ready(
         if redis is not None:
             await redis.ping()
     except Exception:
-        return Response(content='{"status":"unavailable"}', status_code=503, media_type="application/json")
+        return Response(
+            content='{"status":"unavailable"}', status_code=503, media_type="application/json"
+        )
     return Response(content='{"status":"ready"}', media_type="application/json")
 
 
@@ -73,7 +75,9 @@ async def metrics(
                 func.count(),
             ).group_by(GenerationJobRow.status, GenerationJobRow.origin)
         )
-        job_counts = {(str(status), str(origin)): int(count) for status, origin, count in result.all()}
+        job_counts = {
+            (str(status), str(origin)): int(count) for status, origin, count in result.all()
+        }
     refresh_jobs_snapshot(job_counts)
 
     repair_counts = await repair_store.count_by_status()

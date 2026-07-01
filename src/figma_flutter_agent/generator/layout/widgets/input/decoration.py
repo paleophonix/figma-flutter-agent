@@ -243,7 +243,11 @@ def _stack_input_decoration(
                 placement_ref,
                 field_height=effective_field_height,
             )
-            if padding is None and placement_ref is not None and placement_ref.stack_placement is not None:
+            if (
+                padding is None
+                and placement_ref is not None
+                and placement_ref.stack_placement is not None
+            ):
                 padding = _input_content_padding(
                     surface,
                     placement_ref,
@@ -277,9 +281,7 @@ def _stack_input_decoration(
             padding = _input_content_padding(surface, hint_node, effective_field_height)
         if padding is None and host_node is not None and not vertical_center:
             padding_host = (
-                surface
-                if surface is not None and surface.padding is not None
-                else host_node
+                surface if surface is not None and surface.padding is not None else host_node
             )
             padding = _flex_input_content_padding(
                 padding_host,

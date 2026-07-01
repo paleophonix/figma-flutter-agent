@@ -25,6 +25,7 @@ from figma_flutter_agent.generator.layout.widgets.emit.shell import (
     render_layout_shell,
     render_leaf_body,
 )
+from figma_flutter_agent.parser.interaction.chip_variant import is_tag_component_chip_row
 from figma_flutter_agent.schemas import (
     SEMANTIC_MVP_IR_KINDS,
     STUB_IR_KINDS,
@@ -35,7 +36,6 @@ from figma_flutter_agent.schemas import (
     WidgetIrKind,
     WidgetIrNode,
 )
-from figma_flutter_agent.parser.interaction.chip_variant import is_tag_component_chip_row
 
 _STRUCTURAL_NODE_TYPES = frozenset(
     {
@@ -94,9 +94,7 @@ def emit_widget_expression(
 ) -> str:
     """Emit a Dart widget expression for one IR node."""
     if ir.kind == WidgetIrKind.EXTRACTED:
-        figma_map = (
-            walk.figma_id_to_widget_name if walk is not None else None
-        )
+        figma_map = walk.figma_id_to_widget_name if walk is not None else None
         return emit_extracted_ref(
             ir,
             extracted_class_by_widget_name=extracted_class_by_widget_name,

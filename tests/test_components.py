@@ -230,4 +230,7 @@ def test_named_slider_component_without_track_anatomy_not_slider() -> None:
     }
     assert match_semantic_type_from_name("Content row slider") == NodeType.SLIDER
     assert match_semantic_type_from_name_fallback(node, "Content row slider") is None
-    assert resolve_semantic_node_type(node, {"comp-slider-row": {"name": "Content row slider"}}) is None
+    assert (
+        resolve_semantic_node_type(node, {"comp-slider-row": {"name": "Content row slider"}})
+        is None
+    )

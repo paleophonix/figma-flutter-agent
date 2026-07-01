@@ -102,9 +102,7 @@ def test_check_missing_capture_json_is_artifact_missing_not_runtime(tmp_path: Pa
     mirror.mkdir()
     state_dir.mkdir()
     (mirror / "last.log").write_text(
-        "pre_write_analyze passed\n"
-        "--- dart analyze (generated) ---\n"
-        "exit_code=0\n",
+        "pre_write_analyze passed\n--- dart analyze (generated) ---\nexit_code=0\n",
         encoding="utf-8",
     )
     result = run_check_gate(

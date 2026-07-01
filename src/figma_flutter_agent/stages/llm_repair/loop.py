@@ -254,8 +254,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         if _errors_suggest_widget_constructor_signature_mismatch(analyze_outcome.errors):
             if _apply_widget_constructor_signature_reconcile(result):
                 log.info(
-                    "Applied deterministic widget constructor signature reconcile "
-                    "(attempt {}/{})",
+                    "Applied deterministic widget constructor signature reconcile (attempt {}/{})",
                     attempt,
                     max_attempts,
                 )
@@ -389,9 +388,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                     "CPI pattern interrupt"
                 )
                 break
-            elif _errors_suggest_widget_constructor_signature_mismatch(
-                analyze_outcome.errors
-            ):
+            elif _errors_suggest_widget_constructor_signature_mismatch(analyze_outcome.errors):
                 log.warning(
                     "Analyze repair: widget constructor signature mismatch unchanged on "
                     "attempt {}/{}; stopping before further LLM repair",

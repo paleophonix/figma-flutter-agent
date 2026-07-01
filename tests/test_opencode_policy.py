@@ -130,9 +130,7 @@ def test_build_opencode_overlay_uses_per_step_models() -> None:
         },
     )
     overlay = build_opencode_overlay(config)
-    assert overlay["agent"][OPENCODE_REPAIR_AGENT]["model"] == (
-        "openrouter/xiaomi/mimo-v2.5-pro"
-    )
+    assert overlay["agent"][OPENCODE_REPAIR_AGENT]["model"] == ("openrouter/xiaomi/mimo-v2.5-pro")
     assert overlay["agent"][OPENCODE_FIX_AGENT]["model"] == "openrouter/xiaomi/mimo-v2.5-pro"
 
 

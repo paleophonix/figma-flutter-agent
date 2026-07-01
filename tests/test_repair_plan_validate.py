@@ -4,14 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from figma_flutter_agent.dev.opencode.plan_target_registry import enrich_plan_targets
 from figma_flutter_agent.dev.opencode.plan_validate import (
     collect_invalid_plan_targets,
-    validate_plan,
 )
-from figma_flutter_agent.errors import FigmaFlutterError
 
 
 def test_registry_appends_row_companion_for_typed_law_id() -> None:
@@ -20,9 +16,7 @@ def test_registry_appends_row_companion_for_typed_law_id() -> None:
             {
                 "actionKind": "CODE_CHANGE",
                 "lawId": "FlexRowOverflowLaw",
-                "targetFiles": [
-                    "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
-                ],
+                "targetFiles": ["src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"],
                 "tests": ["tests/test_flex.py"],
             }
         ]

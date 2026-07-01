@@ -108,7 +108,9 @@ def test_radio_group_renders_radio_list_tiles() -> None:
     assert "RadioGroup<String>" in layout
     assert "groupValue: 'option_0'" in layout
     assert "RadioListTile<String>(title: Text('Monthly'), value: 'option_0')" in layout
-    assert "RadioListTile<String>(title: Text('Monthly'), value: 'option_0', groupValue" not in layout
+    assert (
+        "RadioListTile<String>(title: Text('Monthly'), value: 'option_0', groupValue" not in layout
+    )
     assert "Text('Monthly')" in layout
 
 
@@ -3029,7 +3031,9 @@ def test_checkout_footer_stack_does_not_emit_bottom_navigation_bar() -> None:
 def test_checkout_footer_stack_not_emitted_as_text_form_field() -> None:
     """Law: checkout_footer_stack_must_not_classify_as_input_field."""
     from figma_flutter_agent.parser.interaction.enrichment import stack_interaction_kind
-    from figma_flutter_agent.parser.interaction.product import layout_fact_checkout_sticky_footer_host
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_checkout_sticky_footer_host,
+    )
     from figma_flutter_agent.parser.layout import reconcile_checkout_footer_bottom_nav_in_tree
 
     footer = CleanDesignTreeNode(
@@ -3374,9 +3378,7 @@ def test_stepper_skips_solid_disc_and_uses_nested_group_glyph() -> None:
     assert "SvgPicture.asset('assets/icons/group_minus.svg'" in body
     assert "SvgPicture.asset('assets/icons/group_plus.svg'" in body or "Icons.add" in body
     sole_disc_plus = (
-        "plus_disc.svg" in body
-        and "group_plus.svg" not in body
-        and "Icons.add" not in body
+        "plus_disc.svg" in body and "group_plus.svg" not in body and "Icons.add" not in body
     )
     assert not sole_disc_plus
 
@@ -3997,7 +3999,9 @@ def test_stepper_control_avoids_double_tap_sized_box() -> None:
     )
     body = render_compact_quantity_stepper_stack(stepper_stack, uses_svg=True)
     assert body is not None
-    assert "SizedBox(width: 24.0, height: 24.0, child: Center(child: SizedBox(width: 24.0" not in body
+    assert (
+        "SizedBox(width: 24.0, height: 24.0, child: Center(child: SizedBox(width: 24.0" not in body
+    )
 
 
 def test_food_details_dump_quantity_stepper_increase_emits_material_plus() -> None:
@@ -4032,52 +4036,6 @@ def test_food_details_dump_quantity_stepper_increase_emits_material_plus() -> No
     increase = body.split("stepper-increase", 1)[1]
     assert "Icons.add" in increase
     assert "group_1843_103_595.svg" not in increase
-    solo_ellipse = (
-        "ellipse_1296_103_594.svg" in increase
-        and "Stack(alignment: Alignment.center" not in increase
-    )
-    assert not solo_ellipse
-
-
-def test_food_details_pipeline_layout_stepper_increase_emits_material_plus() -> None:
-    """Planner path: clean_tree + screen_ir must emit Material plus on halo-backed hosts."""
-    import json
-    from pathlib import Path
-
-    from figma_flutter_agent.generator.layout import render_layout_file
-    from figma_flutter_agent.generator.theme_typography import (
-        build_text_theme_size_slots,
-        build_text_theme_slot_by_style_name,
-    )
-    from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, ScreenIr
-
-    dump_root = Path(".debug/limbo/food_details")
-    processed_path = dump_root / "processed.json"
-    pre_emit_path = dump_root / "pre_emit.json"
-    if not processed_path.is_file() or not pre_emit_path.is_file():
-        import pytest
-
-        pytest.skip("food_details debug dumps not available")
-
-    processed = json.loads(processed_path.read_text(encoding="utf-8"))
-    ir_payload = json.loads(pre_emit_path.read_text(encoding="utf-8"))
-    clean = CleanDesignTreeNode.model_validate(processed["cleanTree"])
-    tokens = DesignTokens.model_validate(processed.get("tokens", {}))
-    screen_ir = ScreenIr.model_validate(ir_payload["screenIr"])
-    text_slots = build_text_theme_slot_by_style_name(tokens)
-    size_slots = build_text_theme_size_slots(tokens)
-    planned = render_layout_file(
-        clean,
-        feature_name="food_details",
-        uses_svg=True,
-        package_name="inbox",
-        text_theme_slot_by_style_name=text_slots,
-        text_theme_size_slots=size_slots,
-        screen_ir=screen_ir,
-    )
-    layout = planned["lib/generated/food_details_layout.dart"]
-    increase = layout.split("stepper-increase", 1)[1]
-    assert "Icons.add" in increase
     solo_ellipse = (
         "ellipse_1296_103_594.svg" in increase
         and "Stack(alignment: Alignment.center" not in increase

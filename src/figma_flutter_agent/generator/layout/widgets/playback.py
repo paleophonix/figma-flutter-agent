@@ -67,11 +67,7 @@ def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
     else:
         shape = ""
     size_prefix = f"{', '.join(size_parts)}, " if size_parts else ""
-    inner = (
-        f"Container({size_prefix}"
-        f"decoration: BoxDecoration({shape}"
-        f"color: {color_expr}))"
-    )
+    inner = f"Container({size_prefix}decoration: BoxDecoration({shape}color: {color_expr}))"
     widget = (
         f"ImageFiltered("
         f"imageFilter: ImageFilter.blur(sigmaX: {sigma}, sigmaY: {sigma}), "

@@ -37,7 +37,9 @@ def _child_is_full_bleed_backdrop(child: CleanDesignTreeNode, stack: CleanDesign
     if child_width is None or float(child_width) <= 0:
         return False
     left = placement.left if placement is not None and placement.left is not None else 0.0
-    return float(child_width) >= float(stack_width) * 0.85 and float(left) <= float(stack_width) * 0.05
+    return (
+        float(child_width) >= float(stack_width) * 0.85 and float(left) <= float(stack_width) * 0.05
+    )
 
 
 def _child_flow_ordinal(child: CleanDesignTreeNode) -> tuple[float, float]:
@@ -117,12 +119,7 @@ def _emit_chrome_band_row(
         else:
             row_parts.append(widget)
     row_body = ", ".join(row_parts)
-    return (
-        "Row("
-        "crossAxisAlignment: CrossAxisAlignment.center, "
-        f"children: [{row_body}]"
-        ")"
-    )
+    return f"Row(crossAxisAlignment: CrossAxisAlignment.center, children: [{row_body}])"
 
 
 def emit_purchase_footer_flow_layout(
@@ -156,9 +153,7 @@ def emit_purchase_footer_flow_layout(
     inner_width = max(0.0, stack_width - pad_left - pad_right)
 
     bands = _group_chrome_pairs_by_y_band(chrome_pairs)
-    band_rows = [
-        _emit_chrome_band_row(band, inner_width=inner_width) for band in bands if band
-    ]
+    band_rows = [_emit_chrome_band_row(band, inner_width=inner_width) for band in bands if band]
     if len(band_rows) == 1:
         chrome_body = band_rows[0]
     else:

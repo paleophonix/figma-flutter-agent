@@ -441,8 +441,10 @@ def _composite_glyph_slot_count(parent_node: CleanDesignTreeNode) -> int:
     for child in parent_node.children:
         if child.stack_placement is None:
             continue
-        if child.type == NodeType.VECTOR or child.type == NodeType.STACK and any(
-            item.type == NodeType.VECTOR for item in child.children
+        if (
+            child.type == NodeType.VECTOR
+            or child.type == NodeType.STACK
+            and any(item.type == NodeType.VECTOR for item in child.children)
         ):
             count += 1
     return count

@@ -1,5 +1,6 @@
 """Application configuration loaded from YAML and environment variables."""
 
+from figma_flutter_agent.config.debug_pipeline import DebugPipelineConfig
 from figma_flutter_agent.config.models import (
     AccessibilityConfig,
     AgentYamlConfig,
@@ -31,7 +32,6 @@ from figma_flutter_agent.config.models import (
     UxConfig,
     ValidationConfig,
 )
-from figma_flutter_agent.config.debug_pipeline import DebugPipelineConfig
 from figma_flutter_agent.config.paths import agent_repo_root, resolve_agent_config_path
 from figma_flutter_agent.config.profiles import (
     apply_interactive_preview_profile,

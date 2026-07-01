@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import MagicMock
 
 from pydantic import SecretStr
 
@@ -12,8 +13,6 @@ from control_panel.config.models import (
     GitLabConfig,
     GitLabWorkflowConfig,
 )
-from unittest.mock import MagicMock
-
 from control_panel.db.store import GenerationJob
 from control_panel.gitlab_workflow.branch import (
     issue_branch_name,
@@ -22,7 +21,9 @@ from control_panel.gitlab_workflow.branch import (
 )
 
 
-def _settings(*, gitlab_template: str = "", workflow_template: str = "figma/issue-{issue_iid}") -> DiscordBotSettings:
+def _settings(
+    *, gitlab_template: str = "", workflow_template: str = "figma/issue-{issue_iid}"
+) -> DiscordBotSettings:
     return DiscordBotSettings(
         yaml=DiscordBotYamlConfig(
             gitlab=GitLabConfig(issue_branch_template=gitlab_template),
@@ -41,13 +42,19 @@ def _settings(*, gitlab_template: str = "", workflow_template: str = "figma/issu
 
 def test_issue_branch_name_uses_workflow_template() -> None:
     settings = _settings()
-    assert issue_branch_name(settings, issue_iid=4, feature_slug="login_version_1", job_id="abc") == "figma/issue-4"
+    assert (
+        issue_branch_name(settings, issue_iid=4, feature_slug="login_version_1", job_id="abc")
+        == "figma/issue-4"
+    )
 
 
 def test_gitlab_section_overrides_workflow_template() -> None:
     settings = _settings(gitlab_template="feature/{feature_slug}")
     assert resolve_issue_branch_template(settings) == "feature/{feature_slug}"
-    assert issue_branch_name(settings, issue_iid=1, feature_slug="login_version_1", job_id="abc") == "feature/login_version_1"
+    assert (
+        issue_branch_name(settings, issue_iid=1, feature_slug="login_version_1", job_id="abc")
+        == "feature/login_version_1"
+    )
 
 
 def test_resolve_issue_branch_name_from_job() -> None:

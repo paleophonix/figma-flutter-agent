@@ -7,8 +7,8 @@ from pathlib import Path
 
 from loguru import logger
 
-from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
 from figma_flutter_agent.errors import SnapshotConflictError
+from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
 from figma_flutter_agent.sync import (
     GenerationSnapshot,
     hash_file_contents,

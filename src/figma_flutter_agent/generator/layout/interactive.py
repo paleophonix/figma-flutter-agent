@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.choice_chip_row import (
+    circular_option_chip_row_stateful_helpers,
+    layout_fact_circular_option_chip_row_host,
+)
 from figma_flutter_agent.generator.layout.interactive_time import (
     extract_wheel_picker_columns,
     render_time_wheel_picker_stack,
@@ -14,10 +18,6 @@ from figma_flutter_agent.generator.layout.interactive_toggle import (
 from figma_flutter_agent.generator.layout.interactive_weekday import (
     render_weekday_chip_row,
     weekday_chip_row_stateful_helpers,
-)
-from figma_flutter_agent.generator.layout.choice_chip_row import (
-    circular_option_chip_row_stateful_helpers,
-    layout_fact_circular_option_chip_row_host,
 )
 from figma_flutter_agent.parser.interaction import (
     layout_fact_checkbox_control,
@@ -70,9 +70,7 @@ def _is_deepest_wheel_host(node: CleanDesignTreeNode) -> bool:
     """Return True when this node is the innermost wheel-picker host in its branch."""
     if not layout_fact_wheel_time_picker_stack(node):
         return False
-    return not any(
-        layout_fact_wheel_time_picker_stack(child) for child in node.children
-    )
+    return not any(layout_fact_wheel_time_picker_stack(child) for child in node.children)
 
 
 def _delegated_extracted_subtree_ids(tree: CleanDesignTreeNode) -> frozenset[str]:
@@ -101,10 +99,7 @@ def _interactive_helper_omitted_ids(
     skip_helper_node_ids: frozenset[str] | None = None,
 ) -> frozenset[str]:
     """Return node ids that must not drive layout helper class emission."""
-    return (
-        (skip_helper_node_ids or frozenset())
-        | _delegated_extracted_subtree_ids(tree)
-    )
+    return (skip_helper_node_ids or frozenset()) | _delegated_extracted_subtree_ids(tree)
 
 
 def layout_interactive_helpers_needed(
@@ -121,9 +116,7 @@ def layout_interactive_helpers_needed(
                 return True
             if layout_fact_circular_option_chip_row_host(node):
                 return True
-            if _is_deepest_wheel_host(node) and not _wheel_layout_helpers_suppressed_for_node(
-                node
-            ):
+            if _is_deepest_wheel_host(node) and not _wheel_layout_helpers_suppressed_for_node(node):
                 return True
             if layout_fact_checkbox_control(node):
                 return True

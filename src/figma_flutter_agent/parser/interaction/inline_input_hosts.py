@@ -34,9 +34,7 @@ def _hosts_external_field_label(node: CleanDesignTreeNode) -> bool:
     if font_size is not None and float(font_size) > 14.0:
         return False
     height = node.sizing.height
-    if height is not None and float(height) > _FIELD_LABEL_MAX_HEIGHT:
-        return False
-    return True
+    return height is None or float(height) <= _FIELD_LABEL_MAX_HEIGHT
 
 
 def layout_fact_flex_painted_input_surface(node: CleanDesignTreeNode) -> bool:
@@ -57,9 +55,7 @@ def layout_fact_flex_painted_input_surface(node: CleanDesignTreeNode) -> bool:
     )
     if not has_chrome:
         return False
-    if input_flex_value_text(node) is None:
-        return False
-    return True
+    return input_flex_value_text(node) is not None
 
 
 def layout_fact_single_surface_input_field_column(node: CleanDesignTreeNode) -> bool:
@@ -112,12 +108,16 @@ def phone_composite_prefix_node(surface: CleanDesignTreeNode) -> CleanDesignTree
     for child in surface.children:
         if child.name and "country" in child.name.lower():
             return child
-        if child.variant is not None and "countries" in (child.variant.component_name or "").lower():
+        if (
+            child.variant is not None
+            and "countries" in (child.variant.component_name or "").lower()
+        ):
             return child
         for descendant in child.children:
-            if descendant.variant is not None and "countries" in (
-                descendant.variant.component_name or ""
-            ).lower():
+            if (
+                descendant.variant is not None
+                and "countries" in (descendant.variant.component_name or "").lower()
+            ):
                 return child
     return None
 
@@ -193,16 +193,19 @@ def layout_fact_phone_prefix_chrome_row(node: CleanDesignTreeNode) -> bool:
             return True
         for descendant in child.children:
             descendant_variant = descendant.variant
-            if descendant_variant is not None and "countries" in (
-                descendant_variant.component_name or ""
-            ).lower():
+            if (
+                descendant_variant is not None
+                and "countries" in (descendant_variant.component_name or "").lower()
+            ):
                 return True
     return False
 
 
 def coerce_inline_input_field_host(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
     """Shape a labeled input column as an ``INPUT`` host for the shared field emitter."""
-    surface = next(child for child in node.children if layout_fact_flex_painted_input_surface(child))
+    surface = next(
+        child for child in node.children if layout_fact_flex_painted_input_surface(child)
+    )
     label = next(
         child
         for child in node.children

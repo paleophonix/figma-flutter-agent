@@ -12,7 +12,12 @@ from control_panel.workers import tasks
 class WorkerSettings:
     """ARQ worker settings."""
 
-    functions = [tasks.run_generation_job, tasks.publish_job, tasks.feedback_issue_job, tasks.run_repair_job]
+    functions = [
+        tasks.run_generation_job,
+        tasks.publish_job,
+        tasks.feedback_issue_job,
+        tasks.run_repair_job,
+    ]
     on_startup = tasks.on_startup
     on_shutdown = tasks.on_shutdown
     redis_settings = RedisSettings.from_dsn(

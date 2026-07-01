@@ -59,11 +59,7 @@ def test_sign_up_version_5_interleaved_absolute_emits_single_flow_column() -> No
 def test_sign_up_version_5_pattern_is_decorative_background_overlay() -> None:
     """Law: render_boundary_flattened_pattern_is_decorative_background_overlay."""
     root = _load_root()
-    pattern = next(
-        child
-        for child in root.children[0].children
-        if child.name == "Pattern"
-    )
+    pattern = next(child for child in root.children[0].children if child.name == "Pattern")
     assert is_decorative_absolute_background_overlay(pattern)
 
 
@@ -235,11 +231,7 @@ def test_sign_up_version_5_pattern_svg_uses_contain_not_fill() -> None:
     """Law: decorative_render_boundary_svg_must_not_stretch_with_boxfit_fill."""
     from figma_flutter_agent.generator.layout.widgets.svg import _svg_fit_mode
 
-    pattern = next(
-        child
-        for child in _load_root().children[0].children
-        if child.name == "Pattern"
-    )
+    pattern = next(child for child in _load_root().children[0].children if child.name == "Pattern")
     assert pattern.render_boundary is True
     assert pattern.flatten_figma_node_ids
     width = float(pattern.sizing.width or 0.0)

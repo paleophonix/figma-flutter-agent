@@ -15,10 +15,8 @@ from figma_flutter_agent.fonts.local import (
     find_local_font_file,
     find_local_original_font_file,
 )
-from figma_flutter_agent.fonts.paths import is_valid_font_bytes, MIN_FONT_BUNDLE_BYTES
+from figma_flutter_agent.fonts.paths import MIN_FONT_BUNDLE_BYTES, is_valid_font_bytes
 from figma_flutter_agent.schemas import FontFaceRequirement
-
-
 from tests.font_bytes import minimal_ttf_payload as _minimal_ttf_payload
 
 

@@ -221,7 +221,9 @@ def run_doctor(
         DoctorCheck(
             name="openrouter_api_key",
             ok=openrouter_ok,
-            detail="set" if openrouter_ok else "missing OPENROUTER_API_KEY (wizard debug read steps)",
+            detail="set"
+            if openrouter_ok
+            else "missing OPENROUTER_API_KEY (wizard debug read steps)",
         )
     )
     rows.extend(_fidelity_engine_checks(resolved))

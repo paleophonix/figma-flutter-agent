@@ -253,7 +253,11 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             len(prompt),
             len(system_prompt),
             len(figma_reference_png) if figma_reference_png is not None else 0,
-            (len(prompt) + len(system_prompt) + (len(figma_reference_png) * 4 // 3 if figma_reference_png else 0))
+            (
+                len(prompt)
+                + len(system_prompt)
+                + (len(figma_reference_png) * 4 // 3 if figma_reference_png else 0)
+            )
             // 4,
         )
         return prompt, system_prompt

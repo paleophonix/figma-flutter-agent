@@ -220,8 +220,7 @@ def test_post_layout_pass_replan_assigns_slots_to_band_wrappers() -> None:
         require_layout_slots=True,
     )
     assert any(
-        violation.code == "missing_layout_slot"
-        and violation.node_id.startswith("band-")
+        violation.code == "missing_layout_slot" and violation.node_id.startswith("band-")
         for violation in pre_replan_violations
     )
 
@@ -233,9 +232,7 @@ def test_post_layout_pass_replan_assigns_slots_to_band_wrappers() -> None:
         replanned,
         require_layout_slots=True,
     )
-    assert not any(
-        violation.code == "missing_layout_slot" for violation in post_replan_violations
-    )
+    assert not any(violation.code == "missing_layout_slot" for violation in post_replan_violations)
 
 
 def test_sectionize_preserves_stack_paint_order_for_overlapping_peer_stacks() -> None:
@@ -260,11 +257,7 @@ def test_sectionize_peer_metric_band_uses_visual_island_wrapper() -> None:
         inject_root_scroll_host=True,
         validate_cp2=True,
     )
-    band_nodes = [
-        node
-        for node in after.children
-        if node.id.startswith("band-")
-    ]
+    band_nodes = [node for node in after.children if node.id.startswith("band-")]
     assert band_nodes
     metric_a = _find_node(after, "metric-a")
     assert metric_a is not None

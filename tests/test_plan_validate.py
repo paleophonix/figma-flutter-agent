@@ -166,9 +166,7 @@ def test_validate_plan_normalizes_hallucinated_test_prefix(tmp_path: Path) -> No
                 "lawId": "row-overflow-law",
                 "actionKind": "CODE_CHANGE",
                 "targetFiles": [rel],
-                "tests": [
-                    "src/figma_flutter_agent/tests/generator/layout/test_flex_emitter.py"
-                ],
+                "tests": ["src/figma_flutter_agent/tests/generator/layout/test_flex_emitter.py"],
             },
         ],
     }
@@ -178,7 +176,9 @@ def test_validate_plan_normalizes_hallucinated_test_prefix(tmp_path: Path) -> No
 
 def test_enrich_plan_row_overflow_targets_adds_flex_policy_row(tmp_path: Path) -> None:
     worktree = tmp_path / "wt"
-    emit_dir = worktree / "src" / "figma_flutter_agent" / "generator" / "layout" / "widgets" / "emit"
+    emit_dir = (
+        worktree / "src" / "figma_flutter_agent" / "generator" / "layout" / "widgets" / "emit"
+    )
     row_dir = worktree / "src" / "figma_flutter_agent" / "generator" / "layout" / "flex_policy"
     emit_dir.mkdir(parents=True)
     row_dir.mkdir(parents=True)

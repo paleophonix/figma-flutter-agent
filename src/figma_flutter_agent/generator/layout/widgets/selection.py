@@ -11,7 +11,6 @@ from figma_flutter_agent.generator.layout.style import (
 from figma_flutter_agent.generator.layout.style.colors import is_greenish_fill
 from figma_flutter_agent.generator.layout.style.decoration import _border_color_expr
 from figma_flutter_agent.generator.layout.style.facts import selected_from_variant_or_luminance
-from figma_flutter_agent.generator.variant.state import variant_is_checked
 from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -118,7 +117,9 @@ def _hosts_indicator_column(child: CleanDesignTreeNode) -> bool:
 
     if layout_fact_hosts_payment_selection_indicator(child):
         return True
-    return any(layout_fact_hosts_payment_selection_indicator(grandchild) for grandchild in child.children)
+    return any(
+        layout_fact_hosts_payment_selection_indicator(grandchild) for grandchild in child.children
+    )
 
 
 def _find_payment_option_row(button: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
@@ -178,7 +179,9 @@ def try_render_payment_option_card_body(
     indicator_leaf = indicator_host
     if not layout_fact_hosts_payment_selection_indicator(indicator_host):
         indicator_leaf = next(
-            child for child in indicator_host.children if layout_fact_hosts_payment_selection_indicator(child)
+            child
+            for child in indicator_host.children
+            if layout_fact_hosts_payment_selection_indicator(child)
         )
     primary_host = next(child for child in row.children if child.id != indicator_host.id)
     text_lines = _payment_option_text_lines(primary_host)

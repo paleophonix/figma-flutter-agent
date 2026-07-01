@@ -307,7 +307,9 @@ async def _handle_bug_note(
         logger.warning("Repair queue unavailable for /bug on issue {}:{}", project_id, issue_iid)
         return
     if not settings.yaml.repair.enabled:
-        logger.warning("Repair disabled; /bug recorded but not enqueued for issue {}:{}", project_id, issue_iid)
+        logger.warning(
+            "Repair disabled; /bug recorded but not enqueued for issue {}:{}", project_id, issue_iid
+        )
         return
 
     try:

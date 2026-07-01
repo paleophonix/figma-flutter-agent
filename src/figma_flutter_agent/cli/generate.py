@@ -247,7 +247,6 @@ def generate(
 
     configure_logging(verbose=verbose)
 
-
     if no_docker:
         os.environ["FIGMA_GOLDEN_RUNTIME"] = "host"
     elif golden_runtime is not None:

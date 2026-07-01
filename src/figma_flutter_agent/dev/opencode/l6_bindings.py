@@ -96,9 +96,7 @@ def build_task_completed_gate_snapshot(
     """Snapshot for summarize task-completed gate."""
     decision = review_decision.upper()
     task_completed = (
-        decision == "CONTINUE"
-        and check_passed
-        and (not capture_closure_required or capture_passed)
+        decision == "CONTINUE" and check_passed and (not capture_closure_required or capture_passed)
     )
     return {
         "reviewDecision": decision,

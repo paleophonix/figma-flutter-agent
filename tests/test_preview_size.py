@@ -16,6 +16,7 @@ from pydantic import ValidationError
 
 from figma_flutter_agent.config.models import ResponsiveConfig
 from figma_flutter_agent.config.settings import Settings
+from figma_flutter_agent.dev.flutter_launch import wait_for_tcp_listen
 from figma_flutter_agent.dev.preview_size import (
     ARTBOARD_PREVIEW_HEIGHT_DEFINE,
     ARTBOARD_PREVIEW_WIDTH_DEFINE,
@@ -33,7 +34,6 @@ from figma_flutter_agent.dev.preview_size import (
     prepare_artboard_chrome_launch,
     responsive_config_preview_size,
 )
-from figma_flutter_agent.dev.flutter_launch import wait_for_tcp_listen
 from figma_flutter_agent.dev.run import launch_flutter_app
 
 
@@ -97,9 +97,7 @@ def test_responsive_config_preview_size_none_when_unset() -> None:
 
 
 def test_responsive_config_preview_size_requires_both_dimensions() -> None:
-    with pytest.raises(
-        ValidationError, match="preview_width and responsive.preview_height"
-    ):
+    with pytest.raises(ValidationError, match="preview_width and responsive.preview_height"):
         ResponsiveConfig(preview_width=390)
 
 
@@ -535,7 +533,4 @@ def test_wait_for_tcp_listen_aborts_when_process_exits() -> None:
         stderr=subprocess.DEVNULL,
     )
     proc.wait(timeout=5)
-    assert (
-        wait_for_tcp_listen(CHROME_PREVIEW_WEB_HOST, 9, timeout_sec=1.0, proc=proc)
-        is False
-    )
+    assert wait_for_tcp_listen(CHROME_PREVIEW_WEB_HOST, 9, timeout_sec=1.0, proc=proc) is False

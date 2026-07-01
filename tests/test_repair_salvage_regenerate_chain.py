@@ -37,7 +37,9 @@ async def test_resume_blocked_plan_routes_to_check_after_salvage(
     worktree = tmp_path / "wt"
     worktree.mkdir()
     _init_git_repo(worktree)
-    row = worktree / "src" / "figma_flutter_agent" / "generator" / "layout" / "flex_policy" / "row.py"
+    row = (
+        worktree / "src" / "figma_flutter_agent" / "generator" / "layout" / "flex_policy" / "row.py"
+    )
     row.parent.mkdir(parents=True)
     row.write_text("# edit\n", encoding="utf-8")
 
@@ -138,15 +140,19 @@ async def test_resume_blocked_plan_routes_to_check_after_salvage(
     phase, _ = resolve_resume_phase_entry(state_dir)
     assert phase in {"plan", "check", "repair"}
 
-    with patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.evaluate_run_gate",
-        return_value=gate,
-    ), patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_step_gate",
-        return_value=None,
-    ), patch(
-        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_round_gate",
-        return_value=None,
+    with (
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.evaluate_run_gate",
+            return_value=gate,
+        ),
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_step_gate",
+            return_value=None,
+        ),
+        patch(
+            "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_round_gate",
+            return_value=None,
+        ),
     ):
         outcome = await run_repair_pipeline(
             settings=load_settings(),

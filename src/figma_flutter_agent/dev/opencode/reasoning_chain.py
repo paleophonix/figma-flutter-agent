@@ -50,9 +50,7 @@ class ReasoningChain:
                 if (key.startswith("fix_") or key.startswith("check_")) and isinstance(
                     payload, dict
                 ):
-                    failed_attempts.append(
-                        {"step": key, "summary": _compact_step_summary(payload)}
-                    )
+                    failed_attempts.append({"step": key, "summary": _compact_step_summary(payload)})
             if failed_attempts and step in {"plan", "repair"}:
                 compact["failed_attempts"] = failed_attempts[-4:]
         return compact

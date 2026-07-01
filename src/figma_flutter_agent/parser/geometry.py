@@ -126,13 +126,9 @@ def social_auth_icon_button_confidence(node: CleanDesignTreeNode) -> float:
     width, height = _child_extent(node)
     if width is None or height is None:
         return 0.0
-    if not (
-        _SOCIAL_ICON_BUTTON_MIN_HEIGHT <= float(height) <= _SOCIAL_ICON_BUTTON_MAX_HEIGHT
-    ):
+    if not (_SOCIAL_ICON_BUTTON_MIN_HEIGHT <= float(height) <= _SOCIAL_ICON_BUTTON_MAX_HEIGHT):
         return 0.0
-    if not (
-        _SOCIAL_ICON_BUTTON_MIN_WIDTH <= float(width) <= _SOCIAL_ICON_BUTTON_MAX_WIDTH
-    ):
+    if not (_SOCIAL_ICON_BUTTON_MIN_WIDTH <= float(width) <= _SOCIAL_ICON_BUTTON_MAX_WIDTH):
         return 0.0
     icons = 0
     labels = 0
@@ -148,9 +144,7 @@ def social_auth_icon_button_confidence(node: CleanDesignTreeNode) -> float:
         elif _compact_icon_stack(child):
             icons += 1
         elif child.type == NodeType.STACK:
-            vector_children = [
-                item for item in child.children if item.type == NodeType.VECTOR
-            ]
+            vector_children = [item for item in child.children if item.type == NodeType.VECTOR]
             if vector_children and not any(item.type == NodeType.TEXT for item in child.children):
                 icons += 1
     if icons < 1 or labels > 0:

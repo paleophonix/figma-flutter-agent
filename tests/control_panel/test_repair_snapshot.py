@@ -18,7 +18,9 @@ def test_repair_debug_dest_layout(tmp_path: Path) -> None:
     assert dest == tmp_path / ".repair" / "debug" / "demo_app" / "login"
 
 
-def test_copy_processed_snapshot_selects_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_copy_processed_snapshot_selects_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     flutter = tmp_path / "demo_app"
     feature = "feedback"
     source = tmp_path / "agent_debug" / "demo_app" / feature

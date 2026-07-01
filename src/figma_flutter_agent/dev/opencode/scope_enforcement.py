@@ -272,9 +272,7 @@ def collect_repair_gate_paths(
             paths.add(normalized)
     pruned: set[str] = set()
     plan_pytest = sorted(
-        path
-        for path in collect_plan_target_files(plan_payload)
-        if path.startswith("tests/")
+        path for path in collect_plan_target_files(plan_payload) if path.startswith("tests/")
     )
     for path in paths:
         if path.startswith("tests/") and path not in plan_pytest:
@@ -287,9 +285,7 @@ def collect_repair_gate_paths(
     if not pruned:
         return collect_plan_gate_paths(plan_payload)
     ruff_paths = [p for p in pruned if p.startswith("src/figma_flutter_agent/")]
-    pytest_paths = [
-        p for p in pruned if p.startswith("tests/") and (worktree / p).is_file()
-    ]
+    pytest_paths = [p for p in pruned if p.startswith("tests/") and (worktree / p).is_file()]
     if not ruff_paths:
         ruff_paths = ["src/figma_flutter_agent/dev/opencode"]
     if not pytest_paths:
@@ -470,7 +466,9 @@ def _path_allowed(touched: str, allowed: frozenset[str]) -> bool:
     return False
 
 
-def revert_scope_violation_paths(worktree: Path, violations: list[str] | tuple[str, ...]) -> list[str]:
+def revert_scope_violation_paths(
+    worktree: Path, violations: list[str] | tuple[str, ...]
+) -> list[str]:
     """Restore out-of-scope paths to HEAD in a repair worktree.
 
     Args:

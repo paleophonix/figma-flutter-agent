@@ -66,12 +66,7 @@ def run_capture_gate(
                 captured_run_id
                 and captured_run_id == served_run_id
                 and captured_run_id == committed_run_id
-            ):
-                kind = "verified"
-                failure_class = None
-                if score is not None and (score <= threshold or not require_pixel_diff) or score is None and not require_pixel_diff:
-                    passed = True
-            elif (
+            ) or (
                 refreshed_from_regenerate
                 and served_proof_kind != "served_probe"
                 and captured_run_id
@@ -80,7 +75,12 @@ def run_capture_gate(
             ):
                 kind = "verified"
                 failure_class = None
-                if score is not None and (score <= threshold or not require_pixel_diff) or score is None and not require_pixel_diff:
+                if (
+                    score is not None
+                    and (score <= threshold or not require_pixel_diff)
+                    or score is None
+                    and not require_pixel_diff
+                ):
                     passed = True
             elif flutter_capture_trusted(data) and not require_pixel_diff:
                 kind = "verified"

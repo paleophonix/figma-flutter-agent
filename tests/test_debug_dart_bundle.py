@@ -62,11 +62,7 @@ class SignInScreen extends StatelessWidget {
 
 def test_build_dart_debug_bundle_expands_minified_layout_lines() -> None:
     """Debug bundles must not preserve 50k+ char layout lines (triage readability law)."""
-    minified_return = (
-        "return Stack(children: ["
-        + "Positioned(child: Text('a')), " * 400
-        + "]);"
-    )
+    minified_return = "return Stack(children: [" + "Positioned(child: Text('a')), " * 400 + "]);"
     planned = {
         "lib/generated/checkout_layout.dart": f"""
 import 'package:flutter/material.dart';

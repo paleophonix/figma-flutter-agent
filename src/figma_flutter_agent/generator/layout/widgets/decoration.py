@@ -282,7 +282,9 @@ def _decorate_widget_with_box_decoration(
     )
 
     widget = wrap_flex_auto_layout_padding(node, widget, parent_node=parent_node)
-    omit_nav_fill = layout_fact_column_compact_nav_tab(node) and not compact_nav_tab_should_paint_background(
+    omit_nav_fill = layout_fact_column_compact_nav_tab(
+        node
+    ) and not compact_nav_tab_should_paint_background(
         node,
         parent_row=parent_node,
     )

@@ -39,10 +39,7 @@ def emit_tab_switcher_stack_children(
         f"children: [{', '.join(tab_cells) or 'const SizedBox.shrink()'}]"
         ")"
     )
-    row_widget = (
-        "Positioned(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0, "
-        f"child: {row_widget})"
-    )
+    row_widget = f"Positioned(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0, child: {row_widget})"
     decor_widgets: list[str] = []
     for child, widget in decor_pairs:
         placement = child.stack_placement

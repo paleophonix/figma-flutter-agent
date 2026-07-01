@@ -55,9 +55,9 @@ def extract_wheel_picker_columns(node: CleanDesignTreeNode) -> list[WheelPickerC
         for index, center in enumerate(cluster_centers):
             if abs(left - center) <= _WHEEL_COLUMN_MERGE_GAP_PX:
                 clusters[index].append(text_node)
-                cluster_centers[index] = sum(_wheel_text_left(item) for item in clusters[index]) / len(
-                    clusters[index]
-                )
+                cluster_centers[index] = sum(
+                    _wheel_text_left(item) for item in clusters[index]
+                ) / len(clusters[index])
                 placed = True
                 break
         if not placed:

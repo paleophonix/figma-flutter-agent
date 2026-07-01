@@ -16,6 +16,7 @@ from figma_flutter_agent.schemas import (
     NodeType,
     Sizing,
 )
+from tests.font_bytes import minimal_ttf_payload as _minimal_ttf_payload
 
 
 def _helvetica_tree() -> CleanDesignTreeNode:
@@ -47,9 +48,6 @@ def _inter_tree() -> CleanDesignTreeNode:
         ),
         sizing=Sizing(width=200.0, height=30.0),
     )
-
-
-from tests.font_bytes import minimal_ttf_payload as _minimal_ttf_payload
 
 
 def _google_metadata(family: str, slug: str, *, weight: str, ttf: str) -> dict:

@@ -780,7 +780,9 @@ def test_hero_cta_pill_label_centers_without_metadata_rail() -> None:
 
 def test_composite_nav_icon_preserves_absolute_slots() -> None:
     """Layered nav icons must keep absolute glyph slots instead of Positioned.fill."""
-    emitted = render_node_body(_nav_tab_glyph_stack(label="Music"), uses_svg=True, parent_type=NodeType.STACK)
+    emitted = render_node_body(
+        _nav_tab_glyph_stack(label="Music"), uses_svg=True, parent_type=NodeType.STACK
+    )
     assert "Positioned.fill" not in emitted
     assert "left: 10.0" in emitted
 

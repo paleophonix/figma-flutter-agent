@@ -77,8 +77,7 @@ def normalize_clean_tree(
         reconciled = reconcile_layout_tree(
             source,
             allow_placement_clamp=not preserve_placement,
-            archetype_reconcile=archetype_reconcile
-            and not suppress_archetype_compensation,
+            archetype_reconcile=archetype_reconcile and not suppress_archetype_compensation,
         )
         if preserve_placement:
             return reconciled
@@ -184,9 +183,7 @@ def clear_extracted_refs_for_inline_hosts(
 
     def walk(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
         updated_children = [walk(child) for child in node.children]
-        clear_ref = bool(
-            node.extracted_widget_ref
-        ) and must_inline_extracted_widget_host(node)
+        clear_ref = bool(node.extracted_widget_ref) and must_inline_extracted_widget_host(node)
         if not clear_ref and updated_children == node.children:
             return node
         updates: dict[str, object] = {}

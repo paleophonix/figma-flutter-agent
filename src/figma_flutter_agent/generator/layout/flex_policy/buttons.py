@@ -16,7 +16,9 @@ def button_hosts_status_pill(node: CleanDesignTreeNode) -> bool:
     if node.type != NodeType.BUTTON or not node.children:
         return False
     host = node.children[0]
-    return layout_fact_row_status_pill_badge(host) or layout_fact_row_tight_horizontal_pill_label(host)
+    return layout_fact_row_status_pill_badge(host) or layout_fact_row_tight_horizontal_pill_label(
+        host
+    )
 
 
 def horizontal_chip_button_should_hug_width(node: CleanDesignTreeNode) -> bool:
@@ -97,7 +99,9 @@ def button_is_pill_with_centered_label(node: CleanDesignTreeNode) -> bool:
     if surface is None:
         return False
     non_text = [child for child in node.children if child.type != NodeType.TEXT]
-    return len(non_text) == 1 and surface_covers_node(node, surface) and non_text[0].id == surface.id
+    return (
+        len(non_text) == 1 and surface_covers_node(node, surface) and non_text[0].id == surface.id
+    )
 
 
 def button_should_center_sole_text_label(node: CleanDesignTreeNode) -> bool:
@@ -115,7 +119,9 @@ def button_should_center_sole_text_label(node: CleanDesignTreeNode) -> bool:
     if button_is_left_aligned_text_label(node):
         return False
     text_children = [
-        child for child in node.children if child.type == NodeType.TEXT and (child.text or "").strip()
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
     ]
     if len(text_children) != 1:
         return False

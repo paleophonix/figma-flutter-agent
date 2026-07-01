@@ -47,5 +47,8 @@ def test_spaced_column_in_bounded_row_uses_loose_overflow_shell() -> None:
         parent_node=row,
     )
     compact = body.replace("\n", "")
-    assert "OverflowBox(" in compact or "ConstrainedBox(constraints: BoxConstraints(minHeight:" in compact
+    assert (
+        "OverflowBox(" in compact
+        or "ConstrainedBox(constraints: BoxConstraints(minHeight:" in compact
+    )
     assert "SizedBox(height: 72.0, child: Column(" not in compact

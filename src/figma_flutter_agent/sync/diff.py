@@ -93,17 +93,13 @@ def _select_by_regions(
     tree_hash: str,
 ) -> dict[str, str]:
     """Select files using layout-region and cluster hashes (spec §16 widget granularity)."""
-    cluster_delta = changed_cluster_ids(
-        snapshot.cluster_hashes, region_state.cluster_hashes
-    )
+    cluster_delta = changed_cluster_ids(snapshot.cluster_hashes, region_state.cluster_hashes)
     layout_changed = snapshot.layout_region_hash != region_state.layout_region_hash
 
     selected: dict[str, str] = {}
     for path, content in planned_files.items():
         if path.startswith(bindings.theme_prefix):
-            if tokens_changed or snapshot.file_hashes.get(path) != hash_file_contents(
-                content
-            ):
+            if tokens_changed or snapshot.file_hashes.get(path) != hash_file_contents(content):
                 selected[path] = content
             continue
 
@@ -116,8 +112,7 @@ def _select_by_regions(
         if bindings.layout_path is not None and path == bindings.layout_path:
             new_hash = hash_file_contents(content)
             emitter_only_layout_drift = (
-                snapshot.tree_hash == tree_hash
-                and snapshot.file_hashes.get(path) != new_hash
+                snapshot.tree_hash == tree_hash and snapshot.file_hashes.get(path) != new_hash
             )
             emitter_version_drift = snapshot.emitter_version != EMITTER_VERSION
             if layout_changed or emitter_only_layout_drift or emitter_version_drift:
@@ -231,7 +226,5 @@ def select_files_for_sync(
             if path in planned_files:
                 selected[path] = planned_files[path]
 
-    selected = _apply_disk_planned_drift(
-        selected, planned_files, project_dir, snapshot=snapshot
-    )
+    selected = _apply_disk_planned_drift(selected, planned_files, project_dir, snapshot=snapshot)
     return expand_theme_bundle_writes(selected, planned_files)

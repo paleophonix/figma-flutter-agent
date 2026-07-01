@@ -35,8 +35,7 @@ def test_filled_button_label_uses_white_on_button_frame_fill() -> None:
     )
     label = button.children[0]
     assert (
-        filled_button_label_text_color(label, button)
-        == "Theme.of(context).colorScheme.onPrimary"
+        filled_button_label_text_color(label, button) == "Theme.of(context).colorScheme.onPrimary"
     )
 
 

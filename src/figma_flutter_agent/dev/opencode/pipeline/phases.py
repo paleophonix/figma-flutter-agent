@@ -12,6 +12,7 @@ from loguru import logger
 
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineStep
 from figma_flutter_agent.dev.opencode.checkpoint import append_checkpoint
+from figma_flutter_agent.dev.opencode.failure_class import FailureClass
 from figma_flutter_agent.dev.opencode.gates import (
     run_repair_gates,
     skipped_repair_gate_result,
@@ -45,7 +46,6 @@ from figma_flutter_agent.dev.opencode.step_gate import StepGate
 from figma_flutter_agent.dev.opencode.step_runner import StepRunner, write_step_state
 from figma_flutter_agent.dev.opencode.trace import RepairTraceRecorder
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
-from figma_flutter_agent.dev.opencode.failure_class import FailureClass
 from figma_flutter_agent.errors import FigmaFlutterError, LlmError
 
 

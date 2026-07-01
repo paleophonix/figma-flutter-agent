@@ -138,8 +138,6 @@ def test_destination_trees_receive_archetype_reconcile_from_config() -> None:
         / "plan.py"
     )
     text = source.read_text(encoding="utf-8")
-    dest_idx = text.index(
-        "context.destination_trees[route_name] = normalize_clean_tree"
-    )
+    dest_idx = text.index("context.destination_trees[route_name] = normalize_clean_tree")
     dest_block = text[dest_idx : dest_idx + 700]
     assert "archetype_reconcile=generation_cfg.archetype_reconcile" in dest_block

@@ -68,7 +68,8 @@ def build_vision_bundle(
                     {
                         str(item.get("kind") or item.get("classification"))
                         for item in (loaded.get("nodes") or loaded.get("entries") or [])
-                        if isinstance(item, dict) and (item.get("kind") or item.get("classification"))
+                        if isinstance(item, dict)
+                        and (item.get("kind") or item.get("classification"))
                     }
                 )[:20],
             }

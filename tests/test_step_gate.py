@@ -103,7 +103,9 @@ def _outcome(tmp_path) -> PipelineOutcome:
 
 
 @pytest.mark.asyncio
-async def test_pipeline_stops_when_step_gate_denies(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_pipeline_stops_when_step_gate_denies(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     project = tmp_path / "demo_app"
     feature = "login"
     root = screen_root(project, feature)

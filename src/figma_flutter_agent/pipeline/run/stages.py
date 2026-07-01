@@ -63,10 +63,7 @@ async def run_dump_fetch_parse_phase(
             patches on ``pipeline.run.core.parse_figma_frame`` take effect).
         dump_prefetch: Optional wizard preflight snapshot for this dump path.
     """
-    reuse_prefetch = (
-        dump_prefetch is not None
-        and dump_prefetch.matches_dump(from_dump)
-    )
+    reuse_prefetch = dump_prefetch is not None and dump_prefetch.matches_dump(from_dump)
     with log_stage(log, "fetch"):
         if reuse_prefetch:
             fetch_result = dump_prefetch.fetch_result

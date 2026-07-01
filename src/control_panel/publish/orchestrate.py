@@ -69,7 +69,13 @@ async def _resolve_publish_target(
     repo_key = job.repo_key or await resolve_active_repo_key(settings, store, job.discord_user_id)
     repo = resolve_repo_config(settings, repo_key)
     project_id = repo.gitlab_project_id or settings.yaml.gitlab.app_project_id
-    return repo_key, repo.provider, _remote_clone_url(settings, repo_key), project_id, repo.target_branch
+    return (
+        repo_key,
+        repo.provider,
+        _remote_clone_url(settings, repo_key),
+        project_id,
+        repo.target_branch,
+    )
 
 
 async def run_publish_for_job(
@@ -169,7 +175,11 @@ async def run_publish_for_job(
                 files=files,
             )
             _record_agent_commit(branch=target_branch)
-            return PublishResult(branch=target_branch, pr_url=f"https://github.com/{repo.remote}/tree/{target_branch}", pr_number=None)
+            return PublishResult(
+                branch=target_branch,
+                pr_url=f"https://github.com/{repo.remote}/tree/{target_branch}",
+                pr_number=None,
+            )
         await github.commit_files(
             branch=branch,
             commit_message=commit_message,
@@ -226,9 +236,7 @@ async def run_publish_for_job(
 
         initiator = resolve_gitlab_username(settings.yaml, job.discord_user_id)
         reviewers = [
-            name
-            for name in (initiator, settings.yaml.publish.boss_reviewer_username)
-            if name
+            name for name in (initiator, settings.yaml.publish.boss_reviewer_username) if name
         ]
         open_mr = await gitlab.create_merge_request(
             project_id=project_id,

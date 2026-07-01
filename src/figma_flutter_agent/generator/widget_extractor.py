@@ -148,9 +148,9 @@ def collect_cluster_widget_specs(
                 for child in node.children:
                     walk(child)
                 return
-            if not layout_fact_hosts_compact_checkbox_control(node) and not layout_fact_hosts_payment_selection_indicator(
+            if not layout_fact_hosts_compact_checkbox_control(
                 node
-            ):
+            ) and not layout_fact_hosts_payment_selection_indicator(node):
                 candidates.setdefault(cluster_id, []).append(node)
         for child in node.children:
             walk(child)
@@ -508,7 +508,9 @@ def materialize_missing_cluster_delegate_files(
     }
     if not referenced_classes:
         return planned_files
-    class_to_cluster = {class_name: cluster_id for cluster_id, class_name in cluster_classes.items()}
+    class_to_cluster = {
+        class_name: cluster_id for cluster_id, class_name in cluster_classes.items()
+    }
     missing_specs: list[ClusterWidgetSpec] = []
     for class_name in sorted(referenced_classes):
         cluster_id = class_to_cluster.get(class_name)

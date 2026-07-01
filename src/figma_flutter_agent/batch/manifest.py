@@ -41,7 +41,11 @@ def load_batch_manifest(path: Path) -> BatchManifest:
             dump_raw = Path(str(item["dump"]))
             if dump_raw.is_absolute():
                 dump_path = dump_raw
-            elif len(dump_raw.parts) >= 2 and dump_raw.parts[0] == ".debug" and dump_raw.parts[1] == "screen":
+            elif (
+                len(dump_raw.parts) >= 2
+                and dump_raw.parts[0] == ".debug"
+                and dump_raw.parts[1] == "screen"
+            ):
                 dump_path = agent_debug_root().parent / dump_raw
             else:
                 dump_path = project_dir / dump_raw

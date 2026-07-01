@@ -19,7 +19,6 @@ def test_undefined_named_parameter_blocks_llm_repair() -> None:
 
 def test_missing_import_is_deterministic() -> None:
     errors = (
-        "lib/widgets/header_widget.dart:2:8 - "
-        "Target of URI doesn't exist - uri_does_not_exist",
+        "lib/widgets/header_widget.dart:2:8 - Target of URI doesn't exist - uri_does_not_exist",
     )
     assert errors_are_deterministic_analyzer_failures(errors, "dart analyze")

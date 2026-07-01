@@ -14,4 +14,6 @@ def test_archetype_reconcile_passes_off_by_default() -> None:
 
 
 def test_core_reconcile_passes_always_on() -> None:
-    assert should_run_reconcile_pass("reconcile_stack_placements_in_tree", archetype_reconcile=False)
+    assert should_run_reconcile_pass(
+        "reconcile_stack_placements_in_tree", archetype_reconcile=False
+    )

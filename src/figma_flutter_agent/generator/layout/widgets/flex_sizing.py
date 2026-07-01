@@ -223,9 +223,7 @@ def _button_social_auth_icon_label_row_body(
     )
 
 
-def _button_icon_label_inline_row_body(
-    node: CleanDesignTreeNode, child_widgets: list[str]
-) -> str:
+def _button_icon_label_inline_row_body(node: CleanDesignTreeNode, child_widgets: list[str]) -> str:
     """Compose a start-aligned icon + label ``Row`` for compact link affordances."""
     body = _button_social_auth_icon_label_row_body(node, child_widgets)
     return body.replace(

@@ -217,9 +217,8 @@ def compose_decomposed_root_widget(
                 tree,
                 growable_panels=growable_panels,
             )
-            uses_shared_scroll = (
-                pin_bottom_chrome
-                and stack_uses_shared_body_scroll_host(tree, growable_panels=growable_panels)
+            uses_shared_scroll = pin_bottom_chrome and stack_uses_shared_body_scroll_host(
+                tree, growable_panels=growable_panels
             )
             ordered = sorted(
                 zip(tree.children, methods, strict=True),
@@ -263,9 +262,7 @@ def compose_decomposed_root_widget(
                         and responsive_enabled
                         and not is_viewport_chrome_band(child)
                         and not is_bottom_docked_stack_child(child)
-                        and stack_child_should_use_pin_bottom_scroll_host(
-                            child, parent_stack=tree
-                        )
+                        and stack_child_should_use_pin_bottom_scroll_host(child, parent_stack=tree)
                     ):
                         widget = pin_bottom_flow_column_scroll_wrap(
                             widget,
@@ -336,10 +333,7 @@ def compose_decomposed_root_widget(
                 apply_pin_bottom_chrome_to_stack_layers,
             )
 
-            if (
-                pin_bottom_chrome
-                and stack_uses_shared_body_scroll_host(tree)
-            ):
+            if pin_bottom_chrome and stack_uses_shared_body_scroll_host(tree):
                 child_nodes = [method.node for method in methods]
                 child_widgets = [f"{method.name}(context)" for method in methods]
                 child_calls = ", ".join(

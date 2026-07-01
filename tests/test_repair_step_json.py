@@ -75,10 +75,7 @@ def test_single_model_parse_retry_on_prose(monkeypatch: pytest.MonkeyPatch) -> N
     settings = load_settings()
     single = build_single_invocation(model="deepseek/deepseek-v4-pro")
     responses = [
-        (
-            "I'll read capture.json first."
-            "<|DSML|tool_calls>\n<|DSML|invoke"
-        ),
+        ("I'll read capture.json first.<|DSML|tool_calls>\n<|DSML|invoke"),
         '{"step": "diagnose", "laws": [{"id": "law_a"}]}',
     ]
 

@@ -219,6 +219,7 @@ class GistAddExpenses945Layout extends StatelessWidget {{
     assert "HitTestBehavior.opaque" in fixed
     assert "width: 22," not in fixed
 
+
 def test_sanitize_planned_widget_syntax_injects_layout_chrome_nav_helpers() -> None:
     broken = """import 'package:flutter/material.dart';
 import 'package:ataev/theme/app_colors.dart';

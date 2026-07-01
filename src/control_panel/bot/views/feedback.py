@@ -10,7 +10,9 @@ from control_panel.db import Quality
 class FeedbackButton(disnake.ui.Button):
     """Quality rating button with a stable custom_id."""
 
-    def __init__(self, *, job_id: str, quality: Quality, label: str, style: disnake.ButtonStyle) -> None:
+    def __init__(
+        self, *, job_id: str, quality: Quality, label: str, style: disnake.ButtonStyle
+    ) -> None:
         self.job_id = job_id
         self.quality = quality
         super().__init__(

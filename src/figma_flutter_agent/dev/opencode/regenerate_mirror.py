@@ -15,7 +15,6 @@ from loguru import logger
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import (
-    CAPTURE_MANIFEST_JSON,
     FIGMA_DEBUG_DIR,
     RAW_JSON,
     RUN_META_JSON,
@@ -166,10 +165,7 @@ def resolve_regenerate_debug_screen_root(
             if candidate.is_dir():
                 return candidate
         tried = ", ".join(path.as_posix() for path in worktree_candidates)
-        msg = (
-            "regenerate worktree screen root missing after subprocess; "
-            f"tried: {tried}"
-        )
+        msg = f"regenerate worktree screen root missing after subprocess; tried: {tried}"
         raise FigmaFlutterError(msg)
     candidates = [
         *worktree_candidates,
@@ -195,9 +191,7 @@ def _validate_mirror_run_id(mirror_dir: Path, regen_run_id: str) -> None:
         raise FigmaFlutterError(f"RUN_ID_MISMATCH: invalid {RUN_META_JSON}") from exc
     if not isinstance(data, dict):
         raise FigmaFlutterError(f"RUN_ID_MISMATCH: invalid {RUN_META_JSON}")
-    committed = str(
-        data.get("committed_build_run_id") or data.get("pipeline_run_id") or ""
-    ).strip()
+    committed = str(data.get("committed_build_run_id") or data.get("pipeline_run_id") or "").strip()
     if committed != regen_run_id:
         msg = f"RUN_ID_MISMATCH: expected {regen_run_id!r}, got {committed!r}"
         raise FigmaFlutterError(msg)
@@ -310,7 +304,9 @@ async def _run_pipeline_in_worktree(
     ensure_worktree_poetry_env(worktree)
     request_path = state_dir / "regenerate_pipeline_request.json"
     result_path = state_dir / "regenerate_pipeline_result.json"
-    request_path.write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    request_path.write_text(
+        json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     child_script = resolve_regenerate_pipeline_child_script()
     compiler = resolve_orchestrator_ast_compiler_path(orchestrator_root)
     if compiler is not None:
@@ -367,7 +363,9 @@ async def _run_pipeline_in_worktree(
     if not result_path.is_file():
         return {"passed": False, "error": "regenerate subprocess did not write result.json"}
     loaded = json.loads(result_path.read_text(encoding="utf-8"))
-    return loaded if isinstance(loaded, dict) else {"passed": False, "error": "invalid result payload"}
+    return (
+        loaded if isinstance(loaded, dict) else {"passed": False, "error": "invalid result payload"}
+    )
 
 
 _RAW_REPLAY_MARKERS = (

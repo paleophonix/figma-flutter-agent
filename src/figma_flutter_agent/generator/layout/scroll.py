@@ -158,12 +158,7 @@ def _row_main_axis_intrinsic_min_extent(node: CleanDesignTreeNode) -> float:
 def _padding_needs_host_fit(node: CleanDesignTreeNode) -> bool:
     """Return True when raw Figma padding would clip fixed-size ROW chrome."""
     padding = node.padding
-    if (
-        padding.top == 0
-        and padding.bottom == 0
-        and padding.left == 0
-        and padding.right == 0
-    ):
+    if padding.top == 0 and padding.bottom == 0 and padding.left == 0 and padding.right == 0:
         return False
     stroke = _host_stroke_inset(node)
     height = node.sizing.height
@@ -180,9 +175,11 @@ def _padding_needs_host_fit(node: CleanDesignTreeNode) -> bool:
         if float(padding.left) + float(padding.right) > host_width:
             return True
         content_width = _row_main_axis_intrinsic_min_extent(node)
-        if content_width > 0 and content_width + 2.0 * stroke + float(padding.left) + float(
-            padding.right
-        ) > host_width:
+        if (
+            content_width > 0
+            and content_width + 2.0 * stroke + float(padding.left) + float(padding.right)
+            > host_width
+        ):
             return True
     return False
 
@@ -424,12 +421,8 @@ def _scroll_item_root_pins_finite_main_extent(widget: str) -> bool:
             return _head_has_finite_height_literal(_scroll_item_head_before_child(trimmed))
         if trimmed.startswith("ConstrainedBox("):
             head = _scroll_item_head_before_child(trimmed)
-            return (
-                "maxHeight:" in head
-                and "maxHeight: double.infinity" not in head
-            ) or (
-                "minHeight:" in head
-                and "minHeight: double.infinity" not in head
+            return ("maxHeight:" in head and "maxHeight: double.infinity" not in head) or (
+                "minHeight:" in head and "minHeight: double.infinity" not in head
             )
         if trimmed.startswith("Container("):
             return _head_has_finite_height_literal(_scroll_item_head_before_child(trimmed))

@@ -27,7 +27,9 @@ class _LoopOnceRunner:
         self.review_calls = 0
         self.diagnose_calls = 0
 
-    def run_read_step(self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs):
+    def run_read_step(
+        self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs
+    ):
         if step == "recognise":
             return {"step": "recognise", "symptoms": [{"id": "s1"}]}
         if step == "inspect":
@@ -162,13 +164,17 @@ def test_resolve_review_loop_route() -> None:
 
 
 @pytest.mark.asyncio
-async def test_repair_gates_failure_stops_before_summarize(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_repair_gates_failure_stops_before_summarize(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     project, feature = _prepare_screen(tmp_path)
     settings = load_settings()
     settings.agent.debug_pipeline.loops.max_repair_retries_per_plan = 0
 
     class _Runner:
-        def run_read_step(self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs):
+        def run_read_step(
+            self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs
+        ):
             payloads = {
                 "recognise": {"step": "recognise", "symptoms": [{"id": "s1"}]},
                 "inspect": {"step": "inspect", "entities": [{"id": "e1"}]},
@@ -251,7 +257,9 @@ async def test_review_override_persisted(tmp_path, monkeypatch: pytest.MonkeyPat
     settings = load_settings()
 
     class _Runner:
-        def run_read_step(self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs):
+        def run_read_step(
+            self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs
+        ):
             payloads = {
                 "recognise": {"step": "recognise", "symptoms": [{"id": "s1"}]},
                 "inspect": {"step": "inspect", "entities": [{"id": "e1"}]},
@@ -272,7 +280,11 @@ async def test_review_override_persisted(tmp_path, monkeypatch: pytest.MonkeyPat
                     "decision": "CONTINUE",
                     "reason_code": "REVIEW_OK",
                 },
-                "summarize": {"step": "summarize", "dev_summary": "dev", "ticket_summary": "ticket"},
+                "summarize": {
+                    "step": "summarize",
+                    "dev_summary": "dev",
+                    "ticket_summary": "ticket",
+                },
             }
             return payloads[step]
 
@@ -315,7 +327,9 @@ async def test_review_override_persisted(tmp_path, monkeypatch: pytest.MonkeyPat
 
 
 @pytest.mark.asyncio
-async def test_fix_exhausted_routes_diagnose_refine(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_fix_exhausted_routes_diagnose_refine(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     project, feature = _prepare_screen(tmp_path)
     settings = load_settings()
     loops = settings.agent.debug_pipeline.loops.model_copy(update={"max_fix_attempts": 1})
@@ -324,7 +338,9 @@ async def test_fix_exhausted_routes_diagnose_refine(tmp_path, monkeypatch: pytes
     class _Runner:
         diagnose_calls = 0
 
-        def run_read_step(self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs):
+        def run_read_step(
+            self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs
+        ):
             if step == "diagnose":
                 self.diagnose_calls += 1
             payloads = {
@@ -368,6 +384,7 @@ async def test_fix_exhausted_routes_diagnose_refine(tmp_path, monkeypatch: pytes
             },
         ),
     )
+
     async def _mock_fix_write(**_kwargs):
         return ("noop fix", None)
 
@@ -620,7 +637,9 @@ async def test_empty_diagnose_laws_stops_without_plan_llm(
     class _Runner:
         plan_calls = 0
 
-        def run_read_step(self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs):
+        def run_read_step(
+            self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs
+        ):
             if step == "recognise":
                 return {"step": "recognise", "symptoms": [{"id": "s1"}], "blocked": True}
             if step == "inspect":

@@ -206,9 +206,7 @@ def responsive_config_preview_size(
     return int(responsive.preview_width), int(responsive.preview_height)
 
 
-def resolve_default_chrome_device_id(
-    *, flutter_sdk: str | Path | None = None
-) -> str | None:
+def resolve_default_chrome_device_id(*, flutter_sdk: str | Path | None = None) -> str | None:
     """Return Chrome ``device_id`` when Flutter lists a web-javascript target.
 
     Args:

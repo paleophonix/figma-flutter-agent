@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.cluster_variants import (
     primary_vector_asset,
     resolve_cluster_delegate_class,
 )
+from figma_flutter_agent.generator.planned.reconcile import _is_shrink_only_widget_source
 from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
     render_cluster_widgets,
@@ -22,7 +23,6 @@ from figma_flutter_agent.schemas import (
     Sizing,
     StackPlacement,
 )
-from figma_flutter_agent.generator.planned.reconcile import _is_shrink_only_widget_source
 
 
 def _skip_cluster(*, forward: bool) -> CleanDesignTreeNode:
@@ -256,9 +256,7 @@ def test_resolve_cluster_delegate_class_skips_component_family_alias_during_mate
 def test_render_cluster_widgets_inlines_component_family_body_not_shrink() -> None:
     """Law: cluster_widget_materialization_must_not_delegate_to_self."""
     cluster_id = "component_348_22_190374ce"
-    cards = [
-        _component_image_card(f"card-{index}", cluster_id=cluster_id) for index in range(2)
-    ]
+    cards = [_component_image_card(f"card-{index}", cluster_id=cluster_id) for index in range(2)]
     screen = CleanDesignTreeNode(
         id="screen",
         name="Screen",

@@ -234,9 +234,7 @@ def compact_chain_for_step(
     inspect = steps.get("inspect")
     diagnose = steps.get("diagnose")
 
-    if step in {"inspect", "diagnose", "plan", "repair", "review"} and isinstance(
-        recognise, dict
-    ):
+    if step in {"inspect", "diagnose", "plan", "repair", "review"} and isinstance(recognise, dict):
         compact["recognise"] = compact_recognise(recognise)
     if step in {"diagnose", "plan", "repair", "review"} and isinstance(inspect, dict):
         compact["inspect"] = compact_inspect(inspect)

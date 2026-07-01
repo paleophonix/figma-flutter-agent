@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.widgets import render_node_body
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+)
 
 
 def _consent_row_node() -> CleanDesignTreeNode:

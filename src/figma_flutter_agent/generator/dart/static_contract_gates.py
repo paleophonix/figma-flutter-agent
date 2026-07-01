@@ -219,8 +219,7 @@ def find_loose_flex_infinite_width_violations(planned: Mapping[str, str]) -> lis
             if trimmed.startswith("Flexible(") and "width: double.infinity" in expr:
                 if "fit: FlexFit.tight" not in expr:
                     errors.append(
-                        "row_flex_child_must_not_force_infinite_width: "
-                        f"{rel} near offset {start}"
+                        f"row_flex_child_must_not_force_infinite_width: {rel} near offset {start}"
                     )
             pos = end + 1
     return errors

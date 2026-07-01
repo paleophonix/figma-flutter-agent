@@ -45,7 +45,9 @@ def test_pixel_fidelity_profile_enables_promotion_flag() -> None:
 def test_pixel_fidelity_profile_oracle_contract() -> None:
     settings = apply_pixel_fidelity_profile(Settings())
     manifest = load_screens_manifest()
-    blocking = [screen for screen in manifest.screens if screen.corpus_tier == "strict_pixel_blocking"]
+    blocking = [
+        screen for screen in manifest.screens if screen.corpus_tier == "strict_pixel_blocking"
+    ]
     assert blocking
     for entry in blocking:
         assert entry.thresholds.non_text_pixel_max > 0

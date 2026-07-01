@@ -35,7 +35,9 @@ def test_build_asset_node_index_maps_layer_suffix_and_render_boundary(tmp_path: 
 
     index = build_asset_node_index(tmp_path)
     assert lookup_asset_path_for_node(index, "1:2") == "assets/icons/logo_1_2.svg"
-    assert lookup_asset_path_for_node(index, "3:4") == "assets/illustrations/render_boundary_3_4.svg"
+    assert (
+        lookup_asset_path_for_node(index, "3:4") == "assets/illustrations/render_boundary_3_4.svg"
+    )
 
 
 def test_stale_cleanup_runs_once_per_process(monkeypatch: pytest.MonkeyPatch) -> None:

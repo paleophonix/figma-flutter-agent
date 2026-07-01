@@ -15,12 +15,8 @@ console = Console()
 
 def report_plan_failure_stale_preview() -> None:
     """Warn that Chrome preview still reflects the previous successful writeback."""
-    console.print(
-        "[bold red]Codegen failed before writeback — Chrome preview is stale.[/bold red]"
-    )
-    console.print(
-        "[dim]plan: failed | writeback: skipped | served_preview: previous build[/dim]"
-    )
+    console.print("[bold red]Codegen failed before writeback — Chrome preview is stale.[/bold red]")
+    console.print("[dim]plan: failed | writeback: skipped | served_preview: previous build[/dim]")
 
 
 def report_launch_preflight_failure() -> None:

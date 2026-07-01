@@ -66,9 +66,7 @@ def test_build_l6_bindings_repair_omits_chain_and_repo_map(tmp_path: Path) -> No
                 "order": 1,
                 "actionKind": "CODE_CHANGE",
                 "lawId": "law-flex",
-                "targetFiles": [
-                    "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
-                ],
+                "targetFiles": ["src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"],
                 "tests": [{"path": "tests/test_flex.py"}],
             }
         ]
@@ -116,9 +114,7 @@ def test_repair_write_prompt_file_first_and_bounded(tmp_path: Path) -> None:
                 "order": 1,
                 "actionKind": "CODE_CHANGE",
                 "lawId": "law-flex",
-                "targetFiles": [
-                    "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
-                ],
+                "targetFiles": ["src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"],
                 "tests": [{"path": "tests/test_flex.py"}],
             }
         ]

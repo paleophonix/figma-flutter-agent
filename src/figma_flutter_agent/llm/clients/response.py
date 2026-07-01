@@ -81,7 +81,12 @@ class ResponseMixin:
                 project_dir=project_dir,
                 tokens=tokens,
             )
-            if persist_ir_snapshots and project_dir is not None and feature_name and response.screen_ir is not None:
+            if (
+                persist_ir_snapshots
+                and project_dir is not None
+                and feature_name
+                and response.screen_ir is not None
+            ):
                 write_screen_ir_snapshot(
                     stage="llm_validated",
                     feature_name=feature_name,

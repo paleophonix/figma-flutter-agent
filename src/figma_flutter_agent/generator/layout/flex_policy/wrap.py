@@ -103,7 +103,9 @@ def resolve_flex_wrap(
         )
 
         if parent_node is not None and layout_fact_row_product_card_price_footer_row(parent_node):
-            if column_hosts_product_card_stepper(node) or layout_fact_stack_compact_quantity_stepper(node):
+            if column_hosts_product_card_stepper(
+                node
+            ) or layout_fact_stack_compact_quantity_stepper(node):
                 return FlexWrapKind.NONE
             if node.type == NodeType.COLUMN and _subtree_has_currency_price(node):
                 return FlexWrapKind.EXPANDED
@@ -180,7 +182,9 @@ def resolve_flex_wrap(
                 or layout_fact_row_status_pill_badge(parent_node)
             ):
                 return FlexWrapKind.NONE
-            if parent_node is not None and layout_fact_row_tight_overflow_guard_label_row(parent_node):
+            if parent_node is not None and layout_fact_row_tight_overflow_guard_label_row(
+                parent_node
+            ):
                 return FlexWrapKind.EXPANDED
             if parent_node is not None and len(parent_node.children) > 1:
                 parent_span = _row_usable_main_span(parent_node)

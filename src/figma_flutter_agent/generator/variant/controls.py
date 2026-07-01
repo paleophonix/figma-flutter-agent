@@ -118,14 +118,10 @@ def render_radio_group_widget(
         value = f"'option_{index}'"
         if theme_variant == "cupertino":
             tiles.append(
-                f"Row(children: ["
-                f"CupertinoRadio<String>(value: {value}), "
-                f"Text('{label}')])"
+                f"Row(children: [CupertinoRadio<String>(value: {value}), Text('{label}')])"
             )
         else:
-            tiles.append(
-                f"RadioListTile<String>(title: Text('{label}'), value: {value})"
-            )
+            tiles.append(f"RadioListTile<String>(title: Text('{label}'), value: {value})")
     body = ", ".join(tiles) if tiles else "const SizedBox.shrink()"
     return (
         f"RadioGroup<String>(groupValue: {group_value}, onChanged: {on_changed}, "
@@ -144,19 +140,12 @@ def render_radio_widget(
     on_changed = toggle_on_changed_expr(node)
     group_value = "'selected'" if variant_is_checked(node) else "'unselected'"
     if theme_variant == "cupertino":
-        inner = (
-            f"Row(children: ["
-            f"CupertinoRadio<String>(value: 'selected'), "
-            f"Text('{label}')])"
-        )
+        inner = f"Row(children: [CupertinoRadio<String>(value: 'selected'), Text('{label}')])"
     elif compact_glyph:
         inner = "Radio<String>(value: 'selected')"
     else:
         inner = f"RadioListTile<String>(title: Text('{label}'), value: 'selected')"
-    return (
-        f"RadioGroup<String>(groupValue: {group_value}, onChanged: {on_changed}, "
-        f"child: {inner})"
-    )
+    return f"RadioGroup<String>(groupValue: {group_value}, onChanged: {on_changed}, child: {inner})"
 
 
 def render_dropdown_widget(*, node: CleanDesignTreeNode, theme_variant: str = "material_3") -> str:

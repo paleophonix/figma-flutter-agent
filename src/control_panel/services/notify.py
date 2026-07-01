@@ -68,9 +68,7 @@ async def send_issue_created_notice(
         return
     await channel.send(
         content=(
-            f"<@{job.discord_user_id}> **Feedback issue created**\n\n"
-            f"Job: `{job.id}`\n"
-            f"{issue_url}"
+            f"<@{job.discord_user_id}> **Feedback issue created**\n\nJob: `{job.id}`\n{issue_url}"
         ),
         view=close_view,
     )
@@ -87,11 +85,7 @@ async def send_mr_ready_notice(
     if channel is None:
         return
     await channel.send(
-        content=(
-            f"<@{job.discord_user_id}> **Merge request ready**\n\n"
-            f"Job: `{job.id}`\n"
-            f"{mr_url}"
-        )
+        content=(f"<@{job.discord_user_id}> **Merge request ready**\n\nJob: `{job.id}`\n{mr_url}")
     )
 
 
@@ -119,9 +113,7 @@ async def send_issue_closed_notice(
         )
     else:
         content = (
-            f"<@{job.discord_user_id}> **Feedback issue closed**\n\n"
-            f"Job: `{job.id}`\n"
-            f"{issue_url}"
+            f"<@{job.discord_user_id}> **Feedback issue closed**\n\nJob: `{job.id}`\n{issue_url}"
         )
 
     message_id = job.feedback_comment_message_id
@@ -168,11 +160,7 @@ async def send_changelog_notice(
         return
 
     feature = job.feature_slug or "screen"
-    content = (
-        f"**feat: {feature}**\n"
-        f"{issue_url}\n\n"
-        f"{last_comment.strip()[:1800]}"
-    )
+    content = f"**feat: {feature}**\n{issue_url}\n\n{last_comment.strip()[:1800]}"
     await channel.send(content=content)
 
 
@@ -188,8 +176,6 @@ async def send_publish_ready_notice(
         return
     await channel.send(
         content=(
-            f"<@{job.discord_user_id}> **Pull request published**\n\n"
-            f"Job: `{job.id}`\n"
-            f"{pr_url}"
+            f"<@{job.discord_user_id}> **Pull request published**\n\nJob: `{job.id}`\n{pr_url}"
         )
     )

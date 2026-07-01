@@ -159,7 +159,13 @@ def positioned_slot_height_cap(node: CleanDesignTreeNode) -> float | None:
 
 def column_in_bounded_positioned_host(node: CleanDesignTreeNode) -> bool:
     """True when a node is pinned inside a fixed-height ``Stack`` slot."""
-    if node.type not in {NodeType.COLUMN, NodeType.BUTTON, NodeType.CARD, NodeType.INPUT, NodeType.STACK}:
+    if node.type not in {
+        NodeType.COLUMN,
+        NodeType.BUTTON,
+        NodeType.CARD,
+        NodeType.INPUT,
+        NodeType.STACK,
+    }:
         return False
     height: float | None = None
     if node.stack_placement is not None:
@@ -260,7 +266,9 @@ def layout_fact_column_product_tile_metadata(
     if main != "spacebetween":
         return False
     width = node.sizing.width
-    if not width_within_band(width, min_width=PRODUCT_TILE_WIDTH_MIN, max_width=PRODUCT_TILE_WIDTH_MAX):
+    if not width_within_band(
+        width, min_width=PRODUCT_TILE_WIDTH_MIN, max_width=PRODUCT_TILE_WIDTH_MAX
+    ):
         return False
     from figma_flutter_agent.parser.interaction import _subtree_has_currency_price
 
@@ -297,7 +305,9 @@ def column_hosts_product_card_stepper(
         return False
     if layout_fact_stack_compact_quantity_stepper(node):
         return True
-    return any(layout_fact_stack_compact_quantity_stepper(item) for item in _descendant_nodes(node, 3))
+    return any(
+        layout_fact_stack_compact_quantity_stepper(item) for item in _descendant_nodes(node, 3)
+    )
 
 
 def layout_fact_column_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
@@ -310,7 +320,6 @@ def layout_fact_column_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
         return False
     if layout_fact_column_nav_tab_label_host(node):
         return False
-    width = node.sizing.width
     if not bounded_width_at_most(node.sizing, CARD_METADATA_MAX_WIDTH):
         return False
     cross = (node.alignment.cross or "").lower()
@@ -365,7 +374,12 @@ def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.TEXT:
         glyph = (node.text or "").strip()
         width = node.sizing.width
-        if glyph.isdigit() and len(glyph) <= 3 and width is not None and 0 < float(width) <= NUMERIC_GLYPH_OVERLAY_MAX_WIDTH:
+        if (
+            glyph.isdigit()
+            and len(glyph) <= 3
+            and width is not None
+            and 0 < float(width) <= NUMERIC_GLYPH_OVERLAY_MAX_WIDTH
+        ):
             return False
     return bool(node.type == NodeType.TEXT and _text_has_multiple_lines(node))
 

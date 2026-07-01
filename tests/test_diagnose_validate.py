@@ -21,9 +21,7 @@ def _chain_with_compiler_inspect() -> ReasoningChain:
             "entities": [
                 {
                     "id": "e1",
-                    "repoPaths": [
-                        "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
-                    ],
+                    "repoPaths": ["src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"],
                 }
             ]
         },

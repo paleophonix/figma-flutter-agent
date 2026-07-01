@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from control_panel.config import DiscordBotSettings
-from control_panel.gitlab_workflow.branch import resolve_issue_branch_name
 from control_panel.db.store import GenerationJob
+from control_panel.gitlab_workflow.branch import resolve_issue_branch_name
 from control_panel.services.gitlab import GitLabClient
 
 

@@ -299,12 +299,8 @@ def _scroll_contract_fields(
     preview_capture_scrollable = False
     preview_interactive_scrollable = bool(tree_scrollable or tall_content)
     uses_artboard_preview = _emit_uses_artboard_preview_branch(clean_tree)
-    active_branch_interactive_dev = (
-        "preview_interactive" if uses_artboard_preview else "fallback"
-    )
-    active_branch_golden_capture = (
-        "preview_capture" if uses_artboard_preview else "fallback"
-    )
+    active_branch_interactive_dev = "preview_interactive" if uses_artboard_preview else "fallback"
+    active_branch_golden_capture = "preview_capture" if uses_artboard_preview else "fallback"
     effective_scrollable = (
         preview_interactive_scrollable
         if active_branch_interactive_dev == "preview_interactive"
@@ -377,9 +373,7 @@ def build_responsiveness_report(
             bottom_panel_mode = "pinned_section"
     verdict = "pass" if tier == "reflowed" else "fail"
     law: str | None = (
-        None
-        if verdict == "pass"
-        else "runtime_screen_must_not_be_full_artboard_absolute_stack"
+        None if verdict == "pass" else "runtime_screen_must_not_be_full_artboard_absolute_stack"
     )
     return {
         "root_layout": clean_tree.type.value.lower(),

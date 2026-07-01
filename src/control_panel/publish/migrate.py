@@ -46,9 +46,9 @@ def migrate_screen_debug_to_repo(
             continue
         if path.name.endswith(".lock"):
             continue
-        rel = str(
-            Path(REPO_DEBUG_DIRNAME) / safe_feature / path.relative_to(source)
-        ).replace("\\", "/")
+        rel = str(Path(REPO_DEBUG_DIRNAME) / safe_feature / path.relative_to(source)).replace(
+            "\\", "/"
+        )
         dest = repo_dir / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(path, dest)

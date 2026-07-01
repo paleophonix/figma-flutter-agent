@@ -20,9 +20,7 @@ _EMITTER_SURFACES = (
     "generator/layout/common.py",
     "generator/ir/validate.py",
 )
-_ROW_OVERFLOW_SURFACES = (
-    "generator/layout/flex_policy/row.py",
-)
+_ROW_OVERFLOW_SURFACES = ("generator/layout/flex_policy/row.py",)
 _OVERFLOW_KEYWORDS = (
     "overflow",
     "renderflex",

@@ -17,9 +17,7 @@ from figma_flutter_agent.validation.golden_capture import (
 )
 
 
-def test_warm_capture_sandbox_dir_under_agent_debug(
-    debug_agent_root: Path, tmp_path: Path
-) -> None:
+def test_warm_capture_sandbox_dir_under_agent_debug(debug_agent_root: Path, tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     sandbox = warm_capture_sandbox_dir(project)

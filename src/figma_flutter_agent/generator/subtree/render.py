@@ -284,12 +284,9 @@ def _render_subtree_widget_body(
         )
 
     root = _prepare_subtree_render_root(representative)
-    force_inline_cluster = (
-        layout_fact_step_indicator_glyph_stack(representative)
-        or (
-            (representative.name or "").strip().lower() == "success"
-            and len(representative.children) > 1
-        )
+    force_inline_cluster = layout_fact_step_indicator_glyph_stack(representative) or (
+        (representative.name or "").strip().lower() == "success"
+        and len(representative.children) > 1
     )
     if project_dir is not None and project_dir.is_dir():
         from figma_flutter_agent.parser.boundaries.assets import resolve_missing_image_asset_keys

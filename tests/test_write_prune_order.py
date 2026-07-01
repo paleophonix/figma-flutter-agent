@@ -39,8 +39,7 @@ class KeepWidget extends StatelessWidget {
             return WriteBatch(
                 backup_dir=tmp_path / "backup",
                 written=[
-                    WriteRecord(target=project_dir / path, existed_before=False)
-                    for path in payload
+                    WriteRecord(target=project_dir / path, existed_before=False) for path in payload
                 ],
             )
 

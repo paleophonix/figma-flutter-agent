@@ -45,10 +45,7 @@ def _hero_raster_layer(*, asset: str) -> str:
 
 def _detail_hero_background_child(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return the primary full-bleed background leaf inside a detail hero host."""
-    overlays = {
-        candidate.id
-        for candidate in _hero_overlay_nodes(node)
-    }
+    overlays = {candidate.id for candidate in _hero_overlay_nodes(node)}
     candidates: list[tuple[float, CleanDesignTreeNode]] = []
     for child in node.children:
         if child.id in overlays:
@@ -84,8 +81,12 @@ def _detail_hero_background_layer(
     if uses_svg and background.vector_asset_key:
         from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
-        width_lit = format_geometry_literal(float(background.sizing.width or node.sizing.width or 0.0))
-        height_lit = format_geometry_literal(float(background.sizing.height or node.sizing.height or 0.0))
+        width_lit = format_geometry_literal(
+            float(background.sizing.width or node.sizing.width or 0.0)
+        )
+        height_lit = format_geometry_literal(
+            float(background.sizing.height or node.sizing.height or 0.0)
+        )
         picture = _render_svg_picture(
             background,
             escape_dart_string(background.vector_asset_key),
@@ -330,8 +331,7 @@ def _render_favorite_overlay_stack(
         (
             item
             for item in local_nodes
-            if item.style.background_color
-            and item.type in {NodeType.CONTAINER, NodeType.STACK}
+            if item.style.background_color and item.type in {NodeType.CONTAINER, NodeType.STACK}
         ),
         child,
     )
@@ -679,9 +679,7 @@ def try_render_compact_icon_label_metric_stack(
     icon_height = icon.sizing.height
     icon_w_lit = format_geometry_literal(float(icon_width or 0.0))
     icon_h_lit = format_geometry_literal(float(icon_height or height or 0.0))
-    icon_slot = (
-        f"SizedBox(width: {icon_w_lit}, height: {icon_h_lit}, child: {icon_widget})"
-    )
+    icon_slot = f"SizedBox(width: {icon_w_lit}, height: {icon_h_lit}, child: {icon_widget})"
     text_slot = (
         "Expanded("
         "child: FittedBox("
@@ -745,9 +743,7 @@ def try_render_metric_icon_label_band_row(
             prev_left = stack_child_ordinal_left(previous)
             gap = stack_child_ordinal_left(child) - prev_left - prev_width
             if gap > 0.5:
-                row_children.append(
-                    f"SizedBox(width: {format_geometry_literal(gap)}), "
-                )
+                row_children.append(f"SizedBox(width: {format_geometry_literal(gap)}), ")
         row_children.append(metric_widget)
     width = node.sizing.width
     height = node.sizing.height

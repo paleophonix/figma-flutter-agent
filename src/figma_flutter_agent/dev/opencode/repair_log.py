@@ -55,11 +55,7 @@ def bind_repair_observability(
     """
     root_span_id = bind_pipeline_observability(run_id=run_id, settings=settings)
     trace_cfg = settings.agent.debug_pipeline.trace
-    if (
-        emit_root_trace
-        and trace_cfg.posthog
-        and settings.posthog_api_key.get_secret_value()
-    ):
+    if emit_root_trace and trace_cfg.posthog and settings.posthog_api_key.get_secret_value():
         capture_ai_trace(
             settings=settings,
             trace_id=run_id,

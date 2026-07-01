@@ -402,9 +402,7 @@ class Settings(BaseSettings):
                 missing.append(env_name)
         if missing:
             joined = ", ".join(missing)
-            raise LlmError(
-                f"Wizard compare requires all three generate models; missing: {joined}"
-            )
+            raise LlmError(f"Wizard compare requires all three generate models; missing: {joined}")
         return models
 
     def resolved_llm_repair_model(self) -> str:

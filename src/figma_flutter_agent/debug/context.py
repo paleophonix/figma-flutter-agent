@@ -82,8 +82,7 @@ def collect_screen_debug_context(project_dir: Path, feature: str) -> DebugContex
     if not any(name in present for name in REQUIRED_ANY_OF):
         display = debug_path_display(root, project_dir)
         raise FigmaFlutterError(
-            f"Debug bundle at {display} has no processed.json or last.log. "
-            "Run generate first."
+            f"Debug bundle at {display} has no processed.json or last.log. Run generate first."
         )
 
     log_tail = _read_log_tail(root / "last.log")

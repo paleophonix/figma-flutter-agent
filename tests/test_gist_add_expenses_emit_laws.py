@@ -34,7 +34,9 @@ from figma_flutter_agent.schemas import (
 )
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-_GIST_PROCESSED = _REPO_ROOT / ".debug" / "screen" / "limbo" / "gist_add_expenses_945" / "processed.json"
+_GIST_PROCESSED = (
+    _REPO_ROOT / ".debug" / "screen" / "limbo" / "gist_add_expenses_945" / "processed.json"
+)
 
 
 def _load_gist_tree() -> CleanDesignTreeNode | None:

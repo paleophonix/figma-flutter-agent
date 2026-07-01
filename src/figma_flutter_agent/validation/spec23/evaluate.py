@@ -11,6 +11,9 @@ from figma_flutter_agent.generator.checks.validate import validate_generated_dar
 from figma_flutter_agent.generator.dart.project_validation import validate_planned_dart_files
 from figma_flutter_agent.schemas import FlutterGenerationResponse
 from figma_flutter_agent.validation.spec23.assets import _criterion_asset_export
+from figma_flutter_agent.validation.spec23.emit_contracts import (
+    _criterion_emit_fidelity_contracts,
+)
 from figma_flutter_agent.validation.spec23.figma import _criterion_figma_connectivity
 from figma_flutter_agent.validation.spec23.models import Spec23CriterionResult, Spec23Report
 from figma_flutter_agent.validation.spec23.planning import (
@@ -20,9 +23,6 @@ from figma_flutter_agent.validation.spec23.planning import (
 )
 from figma_flutter_agent.validation.spec23.preservation import (
     _criterion_developer_changes_preserved,
-)
-from figma_flutter_agent.validation.spec23.emit_contracts import (
-    _criterion_emit_fidelity_contracts,
 )
 from figma_flutter_agent.validation.spec23.styles import _criterion_rest_css_synthesis
 
@@ -65,8 +65,10 @@ def evaluate_spec23(
         )
         screen_routes_into_layout = bool(screen_key) and (
             "GeneratedScreenShell" in screen_source
-            or "return const " in screen_source and "Layout();" in screen_source
-            or "return " in screen_source and "Layout(" in screen_source
+            or "return const " in screen_source
+            and "Layout();" in screen_source
+            or "return " in screen_source
+            and "Layout(" in screen_source
         )
         responsive_passed = screen_routes_into_layout
         responsive_passed = responsive_passed and responsive_layout_contract

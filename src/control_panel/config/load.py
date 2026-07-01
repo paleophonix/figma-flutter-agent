@@ -162,7 +162,9 @@ def load_discord_bot_yaml(config_path: Path) -> DiscordBotYamlConfig:
     return DiscordBotYamlConfig.model_validate(raw)
 
 
-def _merge_repair_env(yaml_config: DiscordBotYamlConfig, env: _DiscordBotEnv) -> DiscordBotYamlConfig:
+def _merge_repair_env(
+    yaml_config: DiscordBotYamlConfig, env: _DiscordBotEnv
+) -> DiscordBotYamlConfig:
     """Apply repair-related environment overrides."""
     repair = yaml_config.repair
     models = repair.models.model_copy(
@@ -200,7 +202,9 @@ def _parse_discord_guild_ids(raw: str) -> tuple[int, ...]:
     return tuple(ids)
 
 
-def _merge_discord_env(yaml_config: DiscordBotYamlConfig, env: _DiscordBotEnv) -> DiscordBotYamlConfig:
+def _merge_discord_env(
+    yaml_config: DiscordBotYamlConfig, env: _DiscordBotEnv
+) -> DiscordBotYamlConfig:
     """Apply Discord-related environment overrides."""
     guild_ids = list(yaml_config.discord.guild_ids)
     env_guild_ids = _parse_discord_guild_ids(env.figma_cp_discord_guild_ids)

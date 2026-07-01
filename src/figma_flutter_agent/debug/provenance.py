@@ -13,7 +13,6 @@ from loguru import logger
 
 from figma_flutter_agent.debug.paths import provenance_dump_path
 
-
 _visual_pixel_mutation_enforce: ContextVar[bool] = ContextVar(
     "visual_pixel_mutation_enforce",
     default=False,

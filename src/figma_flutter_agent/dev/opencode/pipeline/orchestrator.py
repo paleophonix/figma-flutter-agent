@@ -296,11 +296,7 @@ async def run_repair_pipeline(
             )
             run_context["loop_budget"] = loop_state.snapshot()
             run_context["pivot"] = None
-            if (
-                resume
-                and isinstance(repair_payload, dict)
-                and repair_payload.get("salvaged")
-            ):
+            if resume and isinstance(repair_payload, dict) and repair_payload.get("salvaged"):
                 run_context["_salvage_repair_payload"] = repair_payload
             if resume:
                 resumed_ctx = load_resume_context(workspace.state_dir)
@@ -487,9 +483,7 @@ async def run_repair_pipeline(
                                 "step": "recognise",
                                 "degraded": True,
                                 "degraded_to": "FORENSIC",
-                                "blocked_reason": run_context["vision_bundle"].get(
-                                    "blockedReason"
-                                ),
+                                "blocked_reason": run_context["vision_bundle"].get("blockedReason"),
                             }
                             write_step_state(
                                 workspace.state_dir,
@@ -921,8 +915,7 @@ async def run_repair_pipeline(
                     ):
                         outcome.stopped = True
                         outcome.stop_reason = str(
-                            capture_verify.payload.get("reason_code")
-                            or "capture_verify_blocked"
+                            capture_verify.payload.get("reason_code") or "capture_verify_blocked"
                         )
                         save_loop_budget(workspace.state_dir, loop_state)
                         chain.save(chain_path)
@@ -956,10 +949,7 @@ async def run_repair_pipeline(
                 fix_attempts = 0
                 max_fix = loops_config.max_fix_attempts
                 route_decision = resolve_from_check(check.payload)
-                if (
-                    not pipeline_policy.fix_enabled
-                    and route_decision == RouteDecision.FIX_ATTEMPT
-                ):
+                if not pipeline_policy.fix_enabled and route_decision == RouteDecision.FIX_ATTEMPT:
                     outcome.stopped = True
                     outcome.stop_reason = "fix_disabled"
                     chain.save(chain_path)
@@ -1145,17 +1135,14 @@ async def run_repair_pipeline(
                     served_run_id=effective_served_run_id,
                     committed_run_id=effective_committed_run_id,
                     require_pixel_diff=effective_case_mode == "SCREEN",
-                    refreshed_from_regenerate=bool(
-                        regen_payload and regen_payload.get("passed")
-                    ),
+                    refreshed_from_regenerate=bool(regen_payload and regen_payload.get("passed")),
                     served_proof_kind=effective_proof_kind,
                 )
                 chain.append("capture", capture.payload)
                 append_checkpoint(workspace.state_dir, step="capture", loop_round=loop_round)
                 capture_passed = capture.passed
                 capture_closure_required = (
-                    effective_case_mode == "SCREEN"
-                    or gate.verdict == FailureClass.CAPTURE_FAILED
+                    effective_case_mode == "SCREEN" or gate.verdict == FailureClass.CAPTURE_FAILED
                 )
                 run_context["capture_closure_required"] = capture_closure_required
                 improved = check_passed and (not capture_closure_required or capture_passed)

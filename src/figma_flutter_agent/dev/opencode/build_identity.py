@@ -23,7 +23,6 @@ from figma_flutter_agent.dev.opencode.run_gate import (
     probe_served_run_id_for_screen_dir,
 )
 
-
 ProofKind = Literal["served_probe", "committed_run_meta", "missing"]
 
 

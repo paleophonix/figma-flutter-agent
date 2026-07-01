@@ -361,7 +361,11 @@ def layout_fact_tall_multiline_input_shell(
     field_height: float | None,
 ) -> bool:
     """True when an input host is a tall multiline comment shell, not a single-line field."""
-    if host_node is None or field_height is None or float(field_height) < _TALL_MULTILINE_INPUT_MIN_HEIGHT:
+    if (
+        host_node is None
+        or field_height is None
+        or float(field_height) < _TALL_MULTILINE_INPUT_MIN_HEIGHT
+    ):
         return False
     min_height = host_node.sizing.min_height
     if min_height is not None and float(min_height) >= _TALL_MULTILINE_INPUT_MIN_HEIGHT:
@@ -620,7 +624,13 @@ def interaction_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode |
     surface = primary_surface_node(node)
     if surface is not None:
         return surface
-    if node.type not in {NodeType.BUTTON, NodeType.INPUT, NodeType.STACK, NodeType.ROW, NodeType.COLUMN}:
+    if node.type not in {
+        NodeType.BUTTON,
+        NodeType.INPUT,
+        NodeType.STACK,
+        NodeType.ROW,
+        NodeType.COLUMN,
+    }:
         return None
     if node.style.gradient is not None and node.sizing.width and node.sizing.height:
         return node
