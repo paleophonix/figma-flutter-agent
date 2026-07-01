@@ -72,6 +72,7 @@ from .forms import (
     layout_fact_tall_multiline_input_shell,
     row_bounded_inner_height,
     row_hosts_checkbox_label_pair,
+    stack_hosts_checkbox_label_pair,
     layout_fact_row_bounded_inline_control_row,
 )
 from .icons import (
@@ -284,6 +285,7 @@ __all__ = [
     "surface_covers_node",
     "row_bounded_inner_height",
     "row_hosts_checkbox_label_pair",
+    "stack_hosts_checkbox_label_pair",
     "layout_fact_row_bounded_inline_control_row",
     "layout_fact_row_product_card_price_footer_row",
     "layout_fact_row_leading_glyph_value_row",

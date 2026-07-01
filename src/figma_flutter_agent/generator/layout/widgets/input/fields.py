@@ -127,7 +127,7 @@ def _prefilled_input_field_expr(
 ) -> str:
     """Emit a stateless prefilled input without per-build ``TextEditingController``."""
     keyboard = f"keyboardType: {keyboard_type}, " if keyboard_type else ""
-    align = "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
+    align = "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
     return (
         f"TextFormField("
         f"{align}"
@@ -159,7 +159,7 @@ def _render_stack_input(
     width, height = _input_surface_layout_size(surface, node)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
-    align_field = "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
+    align_field = "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
     trailing = list(trailing_nodes or input_trailing_chrome_nodes(node))
     if not trailing:
         for child in node.children:
@@ -410,7 +410,7 @@ def _render_flex_input_with_trailing_chrome(
     hint = input_hint_text(node)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
-    align_field = "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
+    align_field = "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
     decoration = _stack_input_decoration(
         surface,
         hint_node,

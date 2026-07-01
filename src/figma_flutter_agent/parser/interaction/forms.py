@@ -234,6 +234,34 @@ def checkbox_label_text_host(node: CleanDesignTreeNode) -> CleanDesignTreeNode |
     return None
 
 
+def stack_hosts_checkbox_label_pair(stack: CleanDesignTreeNode) -> bool:
+    """True when a ``Stack`` pairs a compact checkbox host with label copy."""
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    checkbox_child: CleanDesignTreeNode | None = None
+    label_leaf: CleanDesignTreeNode | None = None
+    for child in stack.children:
+        if layout_fact_hosts_compact_checkbox_control(child):
+            if checkbox_child is not None:
+                return False
+            checkbox_child = child
+            continue
+        label_host = checkbox_label_text_host(child)
+        if label_host is not None:
+            if label_leaf is not None:
+                return False
+            label_leaf = label_host
+            continue
+        if child.type == NodeType.VECTOR:
+            continue
+        return False
+    if checkbox_child is None or label_leaf is None:
+        return False
+    if is_link_text(label_leaf.text):
+        return False
+    return True
+
+
 def row_hosts_checkbox_label_pair(row: CleanDesignTreeNode) -> bool:
     """True when a ``Row`` pairs a compact checkbox host with label copy."""
     if row.type != NodeType.ROW or len(row.children) != 2:

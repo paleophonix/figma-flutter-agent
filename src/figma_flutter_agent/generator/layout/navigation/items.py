@@ -557,6 +557,12 @@ def layout_fact_stack_bottom_nav_tab_glyph_column(node: CleanDesignTreeNode) -> 
         return False
     if not (34.0 <= float(width) <= 80.0 and 40.0 <= float(height) <= 70.0):
         return False
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_is_absolute_overlay,
+    )
+
+    if any(stack_child_is_absolute_overlay(child) for child in node.children):
+        return False
     return _node_has_nav_label(node)
 
 

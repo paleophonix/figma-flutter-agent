@@ -350,7 +350,11 @@ def _decorate_widget_with_box_decoration(
             width_mode=node.sizing.width_mode,
         )
 
-    foreground = box_foreground_decoration_expr(node.style)
+    foreground = box_foreground_decoration_expr(
+        node.style,
+        width=node.sizing.width,
+        height=node.sizing.height,
+    )
     height_lit = (
         format_geometry_literal(float(height)) if height is not None and height > 0 else None
     )

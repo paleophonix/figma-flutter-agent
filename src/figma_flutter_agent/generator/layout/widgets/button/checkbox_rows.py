@@ -161,9 +161,10 @@ def _try_render_checkbox_label_row(
         checkbox_label_text_host,
         compact_checkbox_leaf,
         row_hosts_checkbox_label_pair,
+        stack_hosts_checkbox_label_pair,
     )
 
-    if not row_hosts_checkbox_label_pair(node):
+    if not (row_hosts_checkbox_label_pair(node) or stack_hosts_checkbox_label_pair(node)):
         return None
     checkbox_host = next(
         child for child in node.children if compact_checkbox_leaf(child) is not None

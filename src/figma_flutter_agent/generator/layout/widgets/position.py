@@ -488,6 +488,10 @@ def _ensure_positioned_stack_bounds(
 
 def _render_leaf_surface(node: CleanDesignTreeNode) -> str | None:
     """Render a leaf ``CONTAINER`` (e.g. Figma RECTANGLE) with fills/effects."""
+    from figma_flutter_agent.generator.layout.style.decoration import (
+        box_foreground_decoration_expr,
+    )
+
     if node.type != NodeType.CONTAINER or not has_box_decoration(node.style):
         return None
     decoration = box_decoration_expr(
@@ -495,20 +499,30 @@ def _render_leaf_surface(node: CleanDesignTreeNode) -> str | None:
         width=node.sizing.width,
         height=node.sizing.height,
     )
-    if decoration is None:
+    foreground = box_foreground_decoration_expr(
+        node.style,
+        width=node.sizing.width,
+        height=node.sizing.height,
+    )
+    if decoration is None and foreground is None:
         return None
     from figma_flutter_agent.generator.layout.responsive import responsive_emit_width
 
     width = responsive_emit_width(node.sizing.width)
     height = node.sizing.height
+    deco_field = f"decoration: {decoration}, " if decoration is not None else ""
+    foreground_field = (
+        f"foregroundDecoration: {foreground}, " if foreground is not None else ""
+    )
     if width is not None and width > 0 and height is not None and height > 0:
-        leaf = f"Container(width: {width}, height: {height}, decoration: {decoration})"
+        leaf = f"Container(width: {width}, height: {height}, {deco_field}{foreground_field})"
     elif width is not None and width > 0:
-        leaf = f"Container(width: {width}, decoration: {decoration})"
+        leaf = f"Container(width: {width}, {deco_field}{foreground_field})"
     elif height is not None and height > 0:
-        leaf = f"Container(height: {height}, decoration: {decoration})"
+        leaf = f"Container(height: {height}, {deco_field}{foreground_field})"
     else:
-        leaf = f"Container(decoration: {decoration})"
+        leaf = f"Container({deco_field}{foreground_field})"
+    leaf = leaf.replace(", )", ")")
     if node.style.layer_blur is not None and node.style.layer_blur > 0:
         return _wrap_frosted_layer_blur(node, leaf)
     return leaf

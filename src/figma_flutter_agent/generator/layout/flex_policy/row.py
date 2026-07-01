@@ -312,13 +312,24 @@ def row_exceeds_parent_content_width(
     parent_node: CleanDesignTreeNode | None,
 ) -> bool:
     """True when a fixed-width row is wider than its bounded column parent."""
-    row_width = row.sizing.width
-    if row_width is None or float(row_width) <= 0 or parent_node is None:
+    node_width = row.sizing.width
+    if node_width is None or float(node_width) <= 0 or parent_node is None:
         return False
     parent_width = parent_node.sizing.width
     if parent_width is None or float(parent_width) <= 0:
         return False
-    return float(row_width) > float(parent_width) + 0.5
+    return float(node_width) > float(parent_width) + 0.5
+
+
+def layout_fact_stack_overflowing_horizontal_content_strip(
+    stack: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """True when a multi-slot stack is wider than its parent content band."""
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    return row_exceeds_parent_content_width(stack, parent_node)
 
 
 def layout_fact_row_overflowing_painted_chip_strip(
@@ -936,6 +947,16 @@ def layout_fact_row_segmented_tab_option_host(row: CleanDesignTreeNode) -> bool:
     return bool((text_children[0].text or "").strip())
 
 
+def _stack_tab_switcher_decor_child(child: CleanDesignTreeNode) -> bool:
+    """Return True when a non-text sibling is a tab baseline or indicator layer."""
+    if child.type == NodeType.VECTOR:
+        return True
+    if child.type == NodeType.CONTAINER and not child.children:
+        height = child.sizing.height
+        return height is not None and float(height) <= 4.0
+    return False
+
+
 def layout_fact_stack_tab_switcher_host(stack: CleanDesignTreeNode) -> bool:
     """Return True when an absolute stack hosts two sibling tab labels."""
     if stack.type != NodeType.STACK:
@@ -950,7 +971,14 @@ def layout_fact_stack_tab_switcher_host(stack: CleanDesignTreeNode) -> bool:
     text_children = [child for child in stack.children if child.type == NodeType.TEXT]
     if len(text_children) != 2:
         return False
-    return all((child.text or "").strip() for child in text_children)
+    if not all((child.text or "").strip() for child in text_children):
+        return False
+    for child in stack.children:
+        if child.type == NodeType.TEXT:
+            continue
+        if not _stack_tab_switcher_decor_child(child):
+            return False
+    return True
 
 
 def layout_fact_row_segmented_tab_switcher_host(row: CleanDesignTreeNode) -> bool:

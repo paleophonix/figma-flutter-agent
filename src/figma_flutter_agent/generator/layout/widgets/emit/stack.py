@@ -561,6 +561,26 @@ def render_stack(
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
+    from figma_flutter_agent.generator.layout.widgets.button.checkbox_rows import (
+        _try_render_checkbox_label_row,
+    )
+
+    checkbox_row = _try_render_checkbox_label_row(
+        node,
+        theme_variant=theme_variant,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+    if checkbox_row is not None:
+        return _finalize_widget(
+            node,
+            checkbox_row,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
     interaction = None if is_layout_root else stack_interaction_kind(node)
     if interaction == "input":
         from figma_flutter_agent.parser.interaction.product import (
@@ -1015,6 +1035,21 @@ def render_stack(
         responsive_enabled=responsive_enabled,
         theme_variant=theme_variant,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_stack_overflowing_horizontal_content_strip,
+    )
+    from figma_flutter_agent.generator.layout.scroll import (
+        wrap_horizontal_intrinsic_content_scroll,
+    )
+
+    if layout_fact_stack_overflowing_horizontal_content_strip(
+        node,
+        parent_node=parent_node,
+    ):
+        stack_widget = wrap_horizontal_intrinsic_content_scroll(
+            stack_widget,
+            height=node.sizing.height,
+        )
     return _finalize_widget(
         node,
         stack_widget,

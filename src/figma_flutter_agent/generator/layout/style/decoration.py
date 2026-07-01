@@ -327,7 +327,12 @@ def box_decoration_expr(
     return f"BoxDecoration({', '.join(fields)})"
 
 
-def box_foreground_decoration_expr(style: NodeStyle) -> str | None:
+def box_foreground_decoration_expr(
+    style: NodeStyle,
+    *,
+    width: float | None = None,
+    height: float | None = None,
+) -> str | None:
     """Build ``foregroundDecoration`` for OUTSIDE strokes (FID-47)."""
     if (style.stroke_align or "").upper() != "OUTSIDE":
         return None
@@ -342,20 +347,39 @@ def box_foreground_decoration_expr(style: NodeStyle) -> str | None:
                 border_width = None
     if border_color is None or border_width is None or border_width <= 0:
         return None
-    radius = _resolved_border_radius(style)
+    radius = _resolved_border_radius(
+        style,
+        frame_width=width,
+        frame_height=height,
+    )
+    is_circle = (
+        radius is not None
+        and width is not None
+        and height is not None
+        and width > 0
+        and height > 0
+        and radius >= min(width, height) / 2.0 - 1.0
+        and abs(width - height) <= 2.0
+    )
     resolved_width = _resolved_border_width(
         border_width,
         stroke_align=style.stroke_align,
     )
     fields = [f"border: Border.all(color: {border_color}, width: {resolved_width})"]
-    if radius is not None or style.border_radius_corners is not None:
-        fields.append(f"borderRadius: {border_radius_expr(style)}")
+    if is_circle:
+        fields.append("shape: BoxShape.circle")
+    elif radius is not None or style.border_radius_corners is not None:
+        fields.append(
+            f"borderRadius: {border_radius_expr(style, frame_width=width, frame_height=height)}"
+        )
     return f"BoxDecoration({', '.join(fields)})"
 
 
 def has_box_decoration(style: NodeStyle) -> bool:
     """Return True when the node style warrants a Container decoration."""
     if box_decoration_expr(style) is not None:
+        return True
+    if box_foreground_decoration_expr(style) is not None:
         return True
     border_color = _border_color_expr(style)
     border_width = style.border_width

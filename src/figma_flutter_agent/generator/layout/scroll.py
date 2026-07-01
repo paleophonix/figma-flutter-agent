@@ -685,6 +685,23 @@ def render_both_axis_scroll(
     return scroll
 
 
+def wrap_horizontal_intrinsic_content_scroll(
+    content_widget: str,
+    *,
+    height: float | None = None,
+) -> str:
+    """Wrap intrinsic-width horizontal content in a horizontal scroll host."""
+    scroll = (
+        "SingleChildScrollView("
+        "scrollDirection: Axis.horizontal, "
+        f"child: {content_widget.strip()})"
+    )
+    if height is not None and float(height) > 0:
+        height_lit = format_geometry_literal(float(height))
+        return f"SizedBox(height: {height_lit}, child: {scroll})"
+    return scroll
+
+
 def wrap_horizontal_intrinsic_row_scroll(
     row_widget: str,
     *,
