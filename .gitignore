@@ -33,3 +33,4 @@ apps/
 .traces/
 .worktrees/
 .repair/
+.vscode/

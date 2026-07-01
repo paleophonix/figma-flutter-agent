@@ -18,7 +18,6 @@ from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
     count_tag_option_chips,
     is_static_segmented_number_row,
     is_tag_option_chip_group,
-    layout_fact_compact_chip_stack,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
 
