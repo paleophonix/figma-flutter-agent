@@ -1,0 +1,25 @@
+{
+  "feature": "food_menu_2",
+  "pipeline_run_id": "23ae05a59fde",
+  "candidate_build_run_id": "23ae05a59fde",
+  "committed_build_run_id": "23ae05a59fde",
+  "writeback": "committed",
+  "written_files": [
+    "lib/features/food_menu_2/food_menu_2_screen.dart",
+    "lib/generated/food_menu_2_layout.dart",
+    "lib/main.dart",
+    "lib/theme/app_colors.dart",
+    "lib/theme/app_elevation.dart",
+    "lib/theme/app_layout.dart",
+    "lib/theme/app_radius.dart",
+    "lib/theme/app_spacing.dart",
+    "lib/theme/app_theme.dart",
+    "lib/theme/app_typography.dart",
+    "lib/widgets/group3362_widget.dart",
+    "lib/widgets/group8264_widget.dart",
+    "test/golden/food_menu_2_screen_test.dart",
+    "test/harness/element_coordinate_mapper.dart"
+  ],
+  "analyze_passed": null,
+  "captured_at": "2026-07-02T17:16:23.267972+00:00"
+}

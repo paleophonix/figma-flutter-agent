@@ -1,0 +1,97 @@
+{
+  "cacheKey": "6d7175795ab5d39f80b22299abc7da1f5345fd40e4aa6437edc21c28d2b83ff5",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "602:766",
+        "widgetName": "ProfileMenuItem",
+        "reason": "This row pattern repeats across multiple menu options with a leading circular icon button, a text label, and a trailing chevron.",
+        "confidence": 0.95,
+        "suggestedParams": [
+          "title",
+          "leadingIcon",
+          "onTap"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "602:777",
+            "602:790",
+            "602:808",
+            "602:825"
+          ],
+          "shapeSimilarity": 0.93,
+          "semanticRole": "navigable menu row"
+        }
+      },
+      {
+        "nodeId": "602:764",
+        "widgetName": "ProfileMenuCard",
+        "reason": "This card groups two repeated ProfileMenuItem rows under a shared rounded background, suggesting a reusable section card.",
+        "confidence": 0.89,
+        "suggestedParams": [
+          "firstTitle",
+          "firstLeadingIcon",
+          "secondTitle",
+          "secondLeadingIcon"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "602:823"
+          ],
+          "shapeSimilarity": 0.79,
+          "semanticRole": "grouped menu/stat card"
+        }
+      },
+      {
+        "nodeId": "602:823",
+        "widgetName": "StatsAndActionCard",
+        "reason": "This larger card combines a stats row and an action row using the same repeated row family inside one shared background.",
+        "confidence": 0.83,
+        "suggestedParams": [
+          "metricValue",
+          "metricTitle",
+          "metricIcon",
+          "actionTitle",
+          "actionIcon",
+          "onActionTap"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "602:764"
+          ],
+          "shapeSimilarity": 0.76,
+          "semanticRole": "grouped info and action card"
+        }
+      },
+      {
+        "nodeId": "602:753",
+        "widgetName": "PrimaryPillButton",
+        "reason": "Compact rounded call-to-action with background container and centered label is a common reusable button pattern.",
+        "confidence": 0.73,
+        "suggestedParams": [
+          "label",
+          "onTap"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "primary action button"
+        }
+      },
+      {
+        "nodeId": "602:759",
+        "widgetName": "CircularBackButton",
+        "reason": "Self-contained circular back control with ellipse background and arrow vector is a reusable navigation button.",
+        "confidence": 0.71,
+        "suggestedParams": [
+          "onTap"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "navigation back button"
+        }
+      }
+    ]
+  }
+}
