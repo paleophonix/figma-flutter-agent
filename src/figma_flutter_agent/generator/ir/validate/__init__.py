@@ -507,6 +507,7 @@ def validate_extracted_widget_ir(
     *,
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
+    strip_llm_fidelity_authority: bool = False,
 ) -> None:
     """Raise when an extracted widget IR subtree is invalid against ``root``."""
     if widget.widget_ir is None:
@@ -526,6 +527,7 @@ def validate_extracted_widget_ir(
         extracted_widget_names=frozenset({widget.widget_name}),
         project_dir=project_dir,
         tokens=tokens,
+        strip_llm_fidelity_authority=strip_llm_fidelity_authority,
     )
 
 
@@ -535,6 +537,13 @@ def validate_extracted_widgets(
     *,
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
+    strip_llm_fidelity_authority: bool = False,
 ) -> None:
     for widget in widgets:
-        validate_extracted_widget_ir(widget, root, project_dir=project_dir, tokens=tokens)
+        validate_extracted_widget_ir(
+            widget,
+            root,
+            project_dir=project_dir,
+            tokens=tokens,
+            strip_llm_fidelity_authority=strip_llm_fidelity_authority,
+        )

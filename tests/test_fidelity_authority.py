@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.expression import emit_widget_expression
+from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_code_from_ir
 from figma_flutter_agent.generator.ir.fidelity_manifest import load_fidelity_manifest
 from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
 from figma_flutter_agent.generator.ir.passes.fidelity import stamp_fidelity_tiers
@@ -11,14 +13,20 @@ from figma_flutter_agent.generator.ir.presence.sanitize import (
     sanitize_screen_ir_llm_drift,
 )
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
-from figma_flutter_agent.generator.ir.validate import validate_screen_ir
+from figma_flutter_agent.generator.ir.validate import (
+    validate_extracted_widgets,
+    validate_screen_ir,
+)
 from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
 from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    ExtractedWidget,
     FidelityTier,
     FlutterGenerationResponse,
     FlutterRepairIrPatch,
     FlutterRepairPatchResponse,
+    NodeType,
     TierSource,
     WidgetIrKind,
     WidgetIrNode,
@@ -198,3 +206,56 @@ def test_materialize_manifest_button_emits_native_with_validate() -> None:
     )
     assert result.screen_code is not None
     assert "FilledButton" in result.screen_code
+
+
+def test_llm_extracted_widget_ir_fidelity_not_authoritative() -> None:
+    """Extracted widgetIr LLM tiers are stripped at ingress and cannot open native emit alone."""
+    clean = filled_button()
+    root = CleanDesignTreeNode(
+        id="root",
+        name="root",
+        type=NodeType.COLUMN,
+        children=[clean],
+    )
+    widget = ExtractedWidget(
+        widget_name="PrimaryButton",
+        widget_ir=WidgetIrNode(
+            figma_id=clean.id,
+            kind=WidgetIrKind.BUTTON_FILLED,
+            fidelity_tier=FidelityTier.NATIVE_VERIFIED,
+            tier_source=TierSource.MANUAL_OVERRIDE,
+        ),
+    )
+    validate_extracted_widgets([widget], root, strip_llm_fidelity_authority=True)
+    assert widget.widget_ir is not None
+    assert widget.widget_ir.fidelity_tier is None
+    assert widget.widget_ir.tier_source is None
+
+    ctx = IrEmitContext(semantic_report_only=False, uses_svg=False, responsive_enabled=False)
+    dart = emit_widget_expression(
+        widget.widget_ir,
+        clean=clean,
+        parent_type=NodeType.COLUMN,
+        ctx=ctx,
+    )
+    assert "FilledButton" not in dart
+    assert "ElevatedButton" not in dart
+
+
+def test_manifest_approved_extracted_widget_native_after_compiler_stamp() -> None:
+    """Compiler classify+stamp on extracted emit restores manifest-approved native widgets."""
+    clean = filled_button()
+    root = CleanDesignTreeNode(
+        id="root",
+        name="root",
+        type=NodeType.COLUMN,
+        children=[clean],
+    )
+    ctx = IrEmitContext(semantic_report_only=False, uses_svg=False, responsive_enabled=False)
+    code = emit_extracted_widget_code_from_ir(
+        WidgetIrNode(figma_id=clean.id, kind=WidgetIrKind.AUTO),
+        clean_tree=root,
+        widget_name="primary_button",
+        ctx=ctx,
+    )
+    assert "FilledButton" in code or "ElevatedButton" in code

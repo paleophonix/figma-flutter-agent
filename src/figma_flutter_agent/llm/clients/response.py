@@ -89,6 +89,7 @@ class ResponseMixin:
                 clean_tree,
                 project_dir=project_dir,
                 tokens=tokens,
+                strip_llm_fidelity_authority=True,
             )
             if (
                 persist_ir_snapshots

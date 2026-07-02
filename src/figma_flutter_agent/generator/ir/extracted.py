@@ -249,6 +249,38 @@ def _render_extracted_widget_body(
     )
 
 
+def _prepare_extracted_widget_ir_for_emit(
+    widget_ir: WidgetIrNode,
+    *,
+    clean_tree: CleanDesignTreeNode,
+    ctx: IrEmitContext,
+) -> WidgetIrNode:
+    """Classify and stamp compiler-owned fidelity before extracted widget emit."""
+    from figma_flutter_agent.generator.ir.fidelity.manifest import feature_profile_from_theme
+    from figma_flutter_agent.generator.ir.passes.fidelity import stamp_fidelity_tiers
+    from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
+
+    semantics = ctx.semantics
+    screen_ir = ScreenIr(root=widget_ir.model_copy(deep=True))
+    classified, _ = classify_screen_ir(
+        screen_ir,
+        clean_tree,
+        confidence_threshold=semantics.confidence_threshold,
+        grey_zone_min=semantics.grey_zone_min,
+        authoritative_classifier=semantics.authoritative_classifier,
+        llm_gray_zone_enabled=semantics.llm_gray_zone_annotations,
+    )
+    stamped = stamp_fidelity_tiers(
+        classified,
+        feature_profile=feature_profile_from_theme(ctx.theme_variant),
+        clean_tree=clean_tree,
+        strict_fidelity=ctx.strict_fidelity,
+        strict_l10n=ctx.strict_l10n,
+        strict_a11y=ctx.strict_a11y,
+    )
+    return stamped.root
+
+
 def emit_extracted_widget_code_from_ir(
     widget_ir: WidgetIrNode,
     *,
@@ -259,6 +291,11 @@ def emit_extracted_widget_code_from_ir(
     tokens: DesignTokens | None = None,
 ) -> str:
     """Compile one extracted widget IR subtree into a widget Dart file."""
+    widget_ir = _prepare_extracted_widget_ir_for_emit(
+        widget_ir,
+        clean_tree=clean_tree,
+        ctx=ctx,
+    )
     tree_by_id = index_clean_tree(clean_tree)
     subtree = tree_by_id.get(widget_ir.figma_id)
     if subtree is None:

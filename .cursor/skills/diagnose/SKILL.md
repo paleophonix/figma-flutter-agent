@@ -79,7 +79,7 @@ Plus when present: llm_*, semantic_*, contract_emit_diff.*, provenance.json, dar
 Read before classifying:
 
 ```text
-.cursor/rules/project-bible-lite.mdc
+.cursor/rules/project-bible.mdc
 .cursor/rules/pipeline-contracts.mdc
 corpus/families.yaml
 AGENTS.md

@@ -306,6 +306,19 @@ def sanitize_screen_ir_fidelity_authority(screen_ir: ScreenIr) -> tuple[int, int
     return tiers_stripped, sources_stripped
 
 
+def sanitize_widget_ir_fidelity_authority(widget_ir: WidgetIrNode) -> tuple[int, int]:
+    """Strip LLM-authored fidelity authority from one extracted widget IR subtree.
+
+    ponytail: reuses screen-level walker; ``widget_ir`` is mutated in place.
+
+    Returns:
+        Tuple of (fidelity_tiers_stripped, tier_sources_stripped) counts.
+    """
+    from figma_flutter_agent.schemas import ScreenIr
+
+    return sanitize_screen_ir_fidelity_authority(ScreenIr(root=widget_ir))
+
+
 def sanitize_screen_ir_llm_drift(
     screen_ir: ScreenIr,
     clean_tree: CleanDesignTreeNode,

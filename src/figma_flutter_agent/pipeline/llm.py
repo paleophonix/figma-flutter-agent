@@ -155,6 +155,7 @@ def _normalize_cached_ir_generation(
             clean_tree,
             project_dir=project_dir,
             tokens=tokens,
+            strip_llm_fidelity_authority=True,
         )
     return generation
 
