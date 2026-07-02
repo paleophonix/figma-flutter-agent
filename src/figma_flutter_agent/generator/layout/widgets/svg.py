@@ -337,6 +337,11 @@ def _wrap_paint_overflow_export(
     raw_width, raw_height = _node_layout_size(node, node.stack_placement)
     if raw_width is None or raw_height is None or raw_width <= 0 or raw_height <= 0:
         return asset_expr
+    _ZERO_BBOX_EPSILON = 0.25
+    width_collapsed = raw_width <= _ZERO_BBOX_EPSILON
+    height_collapsed = raw_height <= _ZERO_BBOX_EPSILON
+    if not width_collapsed and not height_collapsed:
+        return asset_expr
     expanded_width, expanded_height = expanded_layout_dimensions(
         node,
         raw_width,

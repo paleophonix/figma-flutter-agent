@@ -191,6 +191,23 @@ def _cluster_delegate_lookup_keys(node: CleanDesignTreeNode) -> list[str]:
         base = component_cluster_id(component_id)
         if fingerprinted == base and base not in keys:
             keys.append(base)
+
+    def append_nested_keys(current: CleanDesignTreeNode, depth: int) -> None:
+        if depth > 3:
+            return
+        for child in current.children:
+            if child.cluster_id and child.cluster_id not in keys:
+                keys.append(child.cluster_id)
+            nested_component_id = component_id_for_node(child)
+            if nested_component_id:
+                from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
+
+                nested_base = component_cluster_id(nested_component_id)
+                if nested_base not in keys:
+                    keys.append(nested_base)
+            append_nested_keys(child, depth + 1)
+
+    append_nested_keys(node, 0)
     return keys
 
 

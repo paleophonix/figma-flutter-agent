@@ -317,7 +317,7 @@ class _LayoutIconNavState extends State<_LayoutIconNav> {{
         }},
         child: SizedBox(
           width: tab.slotWidth,
-          height: tab.rowBandHeight,
+          height: tab.slotHeight,
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,

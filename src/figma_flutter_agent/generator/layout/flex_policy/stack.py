@@ -140,6 +140,32 @@ def stack_child_is_growable_panel(child: CleanDesignTreeNode) -> bool:
     return height is not None and float(height) >= STACK_PANEL_MIN_HEIGHT
 
 
+def stack_child_overlaps_sibling_dashboard_card_region(
+    child: CleanDesignTreeNode,
+    parent_stack: CleanDesignTreeNode,
+) -> bool:
+    """Return True when a growable panel intersects a pinned dashboard card sibling."""
+    from figma_flutter_agent.parser.interaction.absolute_fields import (
+        layout_fact_painted_dashboard_card_shell,
+        painted_dashboard_card_vertical_span,
+    )
+
+    if not stack_child_is_growable_panel(child):
+        return False
+    child_top = stack_child_ordinal_top(child)
+    child_bottom = stack_child_ordinal_bottom(child)
+    for sibling in parent_stack.children:
+        if sibling.id == child.id or not layout_fact_painted_dashboard_card_shell(sibling):
+            continue
+        card_span = painted_dashboard_card_vertical_span(sibling)
+        if card_span is None:
+            continue
+        card_top, card_bottom = card_span
+        if child_top < card_bottom - 1.0 and child_bottom > card_top + 1.0:
+            return True
+    return False
+
+
 def _stack_flow_body_children(stack: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
     """Return stack siblings that participate in shared body scroll (exclude docked chrome)."""
     from figma_flutter_agent.generator.layout.stack_chrome import (
@@ -194,6 +220,8 @@ def stack_flow_child_is_shared_scroll_body(
 
     if is_bottom_docked_stack_child(child) or is_viewport_chrome_band(child):
         return False
+    if stack_child_overlaps_sibling_dashboard_card_region(child, parent_stack):
+        return False
     return stack_child_is_growable_panel(child)
 
 
@@ -214,6 +242,10 @@ def stack_child_should_use_pin_bottom_scroll_host(
 ) -> bool:
     """True when pin-bottom-chrome flow should wrap this slot in a scroll host."""
     if not stack_child_is_growable_panel(child):
+        return False
+    if parent_stack is not None and stack_child_overlaps_sibling_dashboard_card_region(
+        child, parent_stack
+    ):
         return False
     if parent_stack is not None and stack_uses_shared_body_scroll_host(parent_stack):
         return False

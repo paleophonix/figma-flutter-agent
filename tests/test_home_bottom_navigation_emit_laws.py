@@ -139,3 +139,92 @@ def test_capture_pending_is_not_visual_success() -> None:
     passport = manifest.get("capture_passport") or {}
     assert flutter_capture_trusted(passport) is False
     assert passport.get("capture_verified") is False
+
+
+def test_arrow_badge_not_checkbox() -> None:
+    """Law: SemanticCheckboxEvidenceLaw — direction badges are not checkbox controls."""
+    from figma_flutter_agent.parser.interaction.forms import layout_fact_checkbox_control
+
+    root = _load_home_root()
+    income = _find_node(root, "7342:2867")
+    expense = _find_node(root, "7342:2866")
+    assert income is not None
+    assert expense is not None
+    assert not layout_fact_checkbox_control(income)
+    assert not layout_fact_checkbox_control(expense)
+
+
+def test_icon_glyph_not_checkbox() -> None:
+    """Law: SemanticCheckboxEvidenceLaw — pictogram vectors are not checkbox controls."""
+    from figma_flutter_agent.parser.interaction.forms import layout_fact_checkbox_control
+
+    root = _load_home_root()
+    salary = _find_node(root, "7342:2861")
+    assert salary is not None
+    assert not layout_fact_checkbox_control(salary)
+
+
+def test_real_checkbox_still_detected() -> None:
+    """Law: SemanticCheckboxEvidenceLaw — genuine check glyphs remain interactive."""
+    from figma_flutter_agent.parser.interaction.forms import layout_fact_checkbox_control
+
+    root = _load_home_root()
+    checkbox = _find_node(root, "7342:2878")
+    assert checkbox is not None
+    assert layout_fact_checkbox_control(checkbox)
+
+
+def test_painted_dashboard_card_not_multiline_field() -> None:
+    """Law: PaintedCardNotFieldLaw — dashboard cards do not emit as TextField shells."""
+    from figma_flutter_agent.parser.interaction.absolute_fields import (
+        layout_fact_painted_dashboard_card_shell,
+        layout_fact_painted_multiline_field_shell,
+    )
+
+    root = _load_home_root()
+    card = _find_node(root, "7342:2820")
+    assert card is not None
+    assert layout_fact_painted_dashboard_card_shell(card)
+    assert not layout_fact_painted_multiline_field_shell(card)
+
+
+def test_hairline_divider_skips_double_stroke_wrap() -> None:
+    """Law: ZeroDimensionStrokeLaw — 1px dividers do not get expanded Positioned width."""
+    from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+    root = _load_home_root()
+    line = _find_node(root, "7342:2834")
+    assert line is not None
+    body = render_node_body(line, uses_svg=True)
+    assert "Positioned(width: 2.0" not in body
+
+
+def test_nav_active_substrate_uses_slot_height() -> None:
+    """Law: NavActiveSubstrateGeometryLaw — tab shell height matches active pill slot."""
+    from figma_flutter_agent.generator.layout.navigation.helpers import icon_nav_stateful_helpers
+
+    helpers = icon_nav_stateful_helpers(node_id="test")
+    assert "height: tab.slotHeight," in helpers
+    assert "height: tab.rowBandHeight," not in helpers.split("_buildTab")[1]
+
+
+def test_home_replay_rejects_checkbox_and_field_regressions() -> None:
+    """Law: orchestration replay — no checkbox badges or Food Last Week TextField."""
+    from figma_flutter_agent.generator.layout import render_layout_file
+
+    root = _load_home_root()
+    screen_ir = _load_home_screen_ir()
+    files = render_layout_file(
+        root,
+        feature_name="9_a_home_bottom_navigation_laws",
+        uses_svg=True,
+        screen_ir=screen_ir,
+        responsive_enabled=True,
+    )
+    compact = "".join(files.values())
+    salary_idx = compact.find("figma-7342_2861")
+    if salary_idx >= 0:
+        salary_window = compact[salary_idx : salary_idx + 600]
+        assert "_GeneratedToggleCheckbox" not in salary_window
+        assert "semanticsLabel: 'Salary'" not in salary_window
+    assert "hintText: 'Food Last Week'" not in compact

@@ -152,9 +152,70 @@ def _stroked_vector_is_checkbox_outline(vector: CleanDesignTreeNode) -> bool:
     return bool(vector.style.has_stroke) and not vector.style.background_color
 
 
+def _stack_hosts_direction_badge_glyph(node: CleanDesignTreeNode) -> bool:
+    """Return True for a bordered plate hosting an inset arrow or chevron vector."""
+    if node.type not in {NodeType.STACK, NodeType.CONTAINER}:
+        return False
+    containers = [
+        child
+        for child in node.children
+        if child.type == NodeType.CONTAINER
+        and child.style.has_stroke
+        and (child.style.border_width or 0.0) > 0.0
+    ]
+    vectors = [
+        child
+        for child in node.children
+        if child.type == NodeType.VECTOR and child.style.has_stroke
+    ]
+    if len(containers) == 1 and vectors:
+        plate = containers[0]
+        plate_width = float(plate.sizing.width or 0.0)
+        plate_height = float(plate.sizing.height or 0.0)
+        if plate_width > 0.0 and plate_height > 0.0:
+            for vector in vectors:
+                vector_width = float(vector.sizing.width or 0.0)
+                vector_height = float(vector.sizing.height or 0.0)
+                if vector_width <= plate_width * 0.9 and vector_height <= plate_height * 0.9:
+                    if vector_width < plate_width - 1.0 or vector_height < plate_height - 1.0:
+                        return True
+    if len(node.children) == 1:
+        return _stack_hosts_direction_badge_glyph(node.children[0])
+    return False
+
+
+def _stroked_vector_fills_host_as_icon_glyph(
+    host: CleanDesignTreeNode,
+    vector: CleanDesignTreeNode,
+) -> bool:
+    """Return True when a stroked vector fills its host like a pictogram, not a checkbox frame."""
+    host_width = float(host.sizing.width or 0.0)
+    host_height = float(host.sizing.height or 0.0)
+    vector_width = float(vector.sizing.width or 0.0)
+    vector_height = float(vector.sizing.height or 0.0)
+    if host_width <= 0.0 or host_height <= 0.0:
+        return False
+    if vector_width < host_width * 0.9 or vector_height < host_height * 0.9:
+        return False
+    return abs(host_width - host_height) > 2.0
+
+
+def _vector_reads_as_checkbox_mark(
+    vector: CleanDesignTreeNode,
+    host: CleanDesignTreeNode,
+) -> bool:
+    """Return True when vector export metadata indicates a checkmark, not a pictogram."""
+    path_count = vector.vector_svg_path_count
+    if path_count is None:
+        path_count = host.vector_svg_path_count
+    return path_count is not None and path_count >= 2
+
+
 def _stack_hosts_stroked_outline_checkbox_glyph(node: CleanDesignTreeNode) -> bool:
     """Square component icon with stroked hollow vectors (checkbox outline + optional mark)."""
     if node.type not in {NodeType.STACK, NodeType.CONTAINER}:
+        return False
+    if _stack_hosts_direction_badge_glyph(node):
         return False
     width = node.sizing.width
     height = node.sizing.height
@@ -168,7 +229,12 @@ def _stack_hosts_stroked_outline_checkbox_glyph(node: CleanDesignTreeNode) -> bo
         return False
     vectors = [child for child in node.children if child.type == NodeType.VECTOR]
     if len(vectors) == 1:
-        return _stroked_vector_is_checkbox_outline(vectors[0])
+        vector = vectors[0]
+        if not _stroked_vector_is_checkbox_outline(vector):
+            return False
+        if _stroked_vector_fills_host_as_icon_glyph(node, vector):
+            return _vector_reads_as_checkbox_mark(vector, node)
+        return True
     if len(vectors) == 2:
         outer, inner = sorted(
             vectors,
@@ -184,6 +250,8 @@ def _stack_hosts_stroked_outline_checkbox_glyph(node: CleanDesignTreeNode) -> bo
 def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Small square used as a consent, bonus, or list-tile checkbox control."""
     if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:
+        return False
+    if _stack_hosts_direction_badge_glyph(node):
         return False
     width = node.sizing.width
     height = node.sizing.height
@@ -205,7 +273,11 @@ def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
             return False
         return True
     if not node.style.border_color or not node.style.border_width:
-        return _stack_hosts_stroked_outline_checkbox_glyph(node)
+        if _stack_hosts_stroked_outline_checkbox_glyph(node):
+            return True
+        if _hosts_decorative_icon_glyph(node):
+            return False
+        return False
     return True
 
 

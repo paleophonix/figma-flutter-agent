@@ -11,6 +11,32 @@ _SINGLE_LINE_FIELD_MAX_HEIGHT = 56.0
 _MULTILINE_FIELD_MIN_HEIGHT = 80.0
 _MULTILINE_FIELD_MAX_HEIGHT = 280.0
 _FIELD_VALUE_HORIZONTAL_INSET = 8.0
+_CARD_SHELL_MIN_BORDER_RADIUS = 20.0
+
+
+def layout_fact_painted_dashboard_card_shell(node: CleanDesignTreeNode) -> bool:
+    """Return True for large-radius painted dashboard cards that are not form fields."""
+    if node.type != NodeType.CONTAINER:
+        return False
+    if not node.style.background_color:
+        return False
+    radius = node.style.border_radius
+    if radius is None or float(radius) < _CARD_SHELL_MIN_BORDER_RADIUS:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) < _SINGLE_LINE_FIELD_MIN_WIDTH:
+        return False
+    return float(height) >= _MULTILINE_FIELD_MIN_HEIGHT
+
+
+def painted_dashboard_card_vertical_span(
+    node: CleanDesignTreeNode,
+) -> tuple[float, float] | None:
+    """Return inclusive top/bottom span for a painted dashboard card shell."""
+    return field_shell_vertical_span(node)
 
 
 def _field_shell_layout_rect(node: CleanDesignTreeNode) -> GeomRect | None:
@@ -26,6 +52,8 @@ def _field_shell_layout_rect(node: CleanDesignTreeNode) -> GeomRect | None:
 
 def layout_fact_painted_multiline_field_shell(node: CleanDesignTreeNode) -> bool:
     """Return True for tall painted containers that host multiline entry."""
+    if layout_fact_painted_dashboard_card_shell(node):
+        return False
     if node.type != NodeType.CONTAINER:
         return False
     if not node.style.background_color:
