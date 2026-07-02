@@ -82,11 +82,29 @@ def _record_override_mutation(
     old: object,
     new: object,
 ) -> None:
-    from figma_flutter_agent.debug.provenance import get_provenance_recorder
+    from figma_flutter_agent.debug.provenance import (
+        DeviationReason,
+        DeviationSeverity,
+        get_provenance_recorder,
+    )
 
     recorder = get_provenance_recorder()
     if recorder is None:
         return
+    recorder.record_deviation(
+        node_id=node_id,
+        field=field,
+        before=old,
+        after=new,
+        reason=DeviationReason.IR_OVERRIDE,
+        source="generator/ir/tree.py::_apply_ir_overrides",
+        severity=DeviationSeverity.RECOVERABLE,
+        provenance={
+            "law_id": "LAW-A1-OVERRIDE-PROV",
+            "checkpoint": _CHECKPOINT_A1_MERGE,
+            "policy": "llm_proposal_commit",
+        },
+    )
     recorder.record_mutation(
         checkpoint=_CHECKPOINT_A1_MERGE,
         transform=_TRANSFORM_IR_OVERRIDE,

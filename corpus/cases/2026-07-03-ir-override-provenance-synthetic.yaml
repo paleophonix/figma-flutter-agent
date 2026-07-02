@@ -37,13 +37,13 @@ occurrences:
         summary: _apply_ir_overrides merged facts without recorder calls.
       - kind: test
         path: tests/test_ir_merge_override_provenance.py
-        summary: Regression asserts per-field mutation records.
+        summary: Regression asserts per-field DeviationRecord entries.
     repair:
       changed_files:
         - src/figma_flutter_agent/generator/ir/tree.py
       regression_tests:
-        - tests/test_ir_merge_override_provenance.py::test_text_override_records_mutation
-        - tests/test_ir_merge_override_provenance.py::test_multiple_overrides_create_separate_records
-        - tests/test_ir_merge_override_provenance.py::test_noop_override_creates_no_record
+        - tests/test_ir_merge_override_provenance.py::test_text_override_records_deviation
+        - tests/test_ir_merge_override_provenance.py::test_multiple_overrides_create_separate_deviations
+        - tests/test_ir_merge_override_provenance.py::test_noop_override_creates_no_deviation
       verification:
         - poetry run pytest -q tests/test_ir_merge_override_provenance.py tests/test_ir_merge_preserve.py

@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from pydantic import ValidationError as PydanticValidationError
 from ruamel.yaml import YAML
+from ruamel.yaml.error import YAMLError
 
 from figma_flutter_agent.defects.models import CaseDocument, FamiliesDocument, LoadedCorpus
 from figma_flutter_agent.defects.paths import cases_dir, families_path
@@ -20,10 +22,36 @@ def load_families(path: Path | None = None) -> FamiliesDocument:
 
     Returns:
         Parsed families document.
+
+    Raises:
+        FileNotFoundError: When the families file is missing.
+        PermissionError: When the families file cannot be read.
+        ValueError: When YAML or schema validation fails.
     """
     resolved = path or families_path()
-    payload = _yaml.load(resolved.read_text(encoding="utf-8"))
-    return FamiliesDocument.model_validate(payload)
+    file_path = resolved.as_posix()
+    if not resolved.is_file():
+        raise FileNotFoundError(f"families file not found: {file_path}")
+    try:
+        raw = resolved.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise PermissionError(f"cannot read families file {file_path}: {exc}") from exc
+    try:
+        payload = _yaml.load(raw)
+    except YAMLError as exc:
+        raise ValueError(f"YAML parse error in {file_path}: {exc}") from exc
+    if payload is None:
+        raise ValueError(f"YAML parse error in {file_path}: empty document")
+    try:
+        return FamiliesDocument.model_validate(payload)
+    except PydanticValidationError as exc:
+        raise ValueError(
+            "; ".join(
+                f"{'.'.join(str(part) for part in item.get('loc', ()))}: {item.get('msg', 'validation error')}"
+                for item in exc.errors()
+            )
+            or str(exc),
+        ) from exc
 
 
 def load_case(path: Path) -> CaseDocument:
@@ -34,9 +62,35 @@ def load_case(path: Path) -> CaseDocument:
 
     Returns:
         Parsed case document.
+
+    Raises:
+        FileNotFoundError: When the case file is missing.
+        PermissionError: When the case file cannot be read.
+        ValueError: When YAML or schema validation fails.
     """
-    payload = _yaml.load(path.read_text(encoding="utf-8"))
-    return CaseDocument.model_validate(payload)
+    file_path = path.as_posix()
+    if not path.is_file():
+        raise FileNotFoundError(f"case file not found: {file_path}")
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise PermissionError(f"cannot read case file {file_path}: {exc}") from exc
+    try:
+        payload = _yaml.load(raw)
+    except YAMLError as exc:
+        raise ValueError(f"YAML parse error in {file_path}: {exc}") from exc
+    if payload is None:
+        raise ValueError(f"YAML parse error in {file_path}: empty document")
+    try:
+        return CaseDocument.model_validate(payload)
+    except PydanticValidationError as exc:
+        raise ValueError(
+            "; ".join(
+                f"{'.'.join(str(part) for part in item.get('loc', ()))}: {item.get('msg', 'validation error')}"
+                for item in exc.errors()
+            )
+            or str(exc),
+        ) from exc
 
 
 def load_corpus(
@@ -52,6 +106,11 @@ def load_corpus(
 
     Returns:
         Combined corpus payload.
+
+    Raises:
+        FileNotFoundError: When required corpus files are missing.
+        PermissionError: When corpus files cannot be read.
+        ValueError: When YAML or schema validation fails.
     """
     families = load_families(families_file)
     case_root = cases_directory or cases_dir()

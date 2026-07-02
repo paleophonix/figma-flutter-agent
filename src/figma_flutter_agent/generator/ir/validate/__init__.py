@@ -334,6 +334,7 @@ def validate_screen_ir(
     strict_invariants: bool = False,
     semantics: SemanticsSettings | None = None,
     strict_contrast: bool = False,
+    strip_llm_fidelity_authority: bool = False,
 ) -> CleanDesignTreeNode:
     """Validate IR; optionally normalize tree via guards.
 
@@ -356,8 +357,18 @@ def validate_screen_ir(
     )
     from figma_flutter_agent.generator.ir.presence import (
         expand_extracted_widget_names_for_validate,
+        sanitize_screen_ir_fidelity_authority,
         sanitize_screen_ir_llm_drift,
     )
+
+    if strip_llm_fidelity_authority:
+        tiers_stripped, sources_stripped = sanitize_screen_ir_fidelity_authority(screen_ir)
+        if tiers_stripped or sources_stripped:
+            logger.info(
+                "Stripped LLM fidelity authority at ingress: {} tier(s), {} tierSource(s)",
+                tiers_stripped,
+                sources_stripped,
+            )
 
     canonical_extracted = expand_extracted_widget_names_for_validate(
         declared_extracted,

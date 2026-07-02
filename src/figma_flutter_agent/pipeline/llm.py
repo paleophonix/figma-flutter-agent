@@ -147,6 +147,7 @@ def _normalize_cached_ir_generation(
         semantics=semantics or SemanticsSettings(),
         strict_contrast=strict_contrast,
         skip_presence_normalize=True,
+        strip_llm_fidelity_authority=True,
     )
     if generation.extracted_widgets:
         validate_extracted_widgets(

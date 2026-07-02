@@ -49,6 +49,7 @@ occurrences:
       regression_tests:
         - tests/test_fidelity_authority.py::test_llm_native_verified_on_unknown_kind_not_authoritative
         - tests/test_fidelity_authority.py::test_llm_manual_override_not_trusted
-        - tests/test_fidelity_authority.py::test_repair_replace_subtree_strips_fidelity_authority
+        - tests/test_fidelity_authority.py::test_apply_repair_patches_strips_fidelity_authority
+        - tests/test_fidelity_authority.py::test_materialize_manifest_button_emits_native_with_validate
       verification:
         - poetry run pytest -q tests/test_fidelity_authority.py tests/test_fidelity_stamp.py

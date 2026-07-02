@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
-from figma_flutter_agent.defects.loader import load_corpus
-from figma_flutter_agent.defects.models import LoadedCorpus, OccurrenceEntry
-from figma_flutter_agent.defects.paths import families_path
+from figma_flutter_agent.defects.loader import load_case, load_families
+from figma_flutter_agent.defects.models import (
+    CaseDocument,
+    FamilyEntry,
+    LoadedCorpus,
+    OccurrenceEntry,
+)
+from figma_flutter_agent.defects.paths import cases_dir, families_path
 
 _FAMILY_ID_RE = re.compile(r"^[a-z][a-z0-9_]+$")
-_FORBIDDEN_PATH_PREFIXES = ("C:", "c:", "/", "\\\\")
 _SECRET_MARKERS = ("FIGMA_ACCESS_TOKEN", "Bearer ", "sk-", "phc_")
 
 
@@ -28,6 +32,44 @@ class ValidationError:
         return f"{self.file_path}:{self.field_path}: {self.message}"
 
 
+def _load_corpus_errors(
+    *,
+    families_file: Path | None = None,
+    cases_directory: Path | None = None,
+) -> tuple[LoadedCorpus | None, list[ValidationError]]:
+    errors: list[ValidationError] = []
+    families_path_resolved = families_file or families_path()
+    families_file_posix = families_path_resolved.as_posix()
+
+    try:
+        families = load_families(families_file)
+    except FileNotFoundError as exc:
+        errors.append(ValidationError(families_file_posix, "", str(exc)))
+        return None, errors
+    except PermissionError as exc:
+        errors.append(ValidationError(families_file_posix, "", str(exc)))
+        return None, errors
+    except ValueError as exc:
+        for line in str(exc).split("; "):
+            if line.strip():
+                errors.append(ValidationError(families_file_posix, "", line.strip()))
+        return None, errors
+
+    case_root = cases_directory or cases_dir()
+    cases: list[tuple[str, CaseDocument]] = []
+    if case_root.is_dir():
+        for case_path in sorted(case_root.glob("*.yaml")):
+            case_file = case_path.as_posix()
+            try:
+                cases.append((case_file, load_case(case_path)))
+            except (FileNotFoundError, PermissionError, ValueError) as exc:
+                errors.append(ValidationError(case_file, "", str(exc)))
+
+    if errors:
+        return None, errors
+    return LoadedCorpus(families=families, cases=cases), []
+
+
 def validate_corpus(corpus: LoadedCorpus | None = None) -> list[ValidationError]:
     """Validate families and all case documents.
 
@@ -37,19 +79,29 @@ def validate_corpus(corpus: LoadedCorpus | None = None) -> list[ValidationError]
     Returns:
         Sorted list of validation errors (empty when valid).
     """
-    loaded = corpus or load_corpus()
+    if corpus is None:
+        loaded, load_errors = _load_corpus_errors()
+        if load_errors:
+            return sorted(load_errors, key=lambda item: (item.file_path, item.field_path, item.message))
+        assert loaded is not None
+        loaded_corpus = loaded
+    else:
+        loaded_corpus = corpus
+
     errors: list[ValidationError] = []
     families_file = families_path().as_posix()
     family_ids: set[str] = set()
+    family_by_id: dict[str, FamilyEntry] = {}
     case_ids: set[str] = set()
 
-    for index, family in enumerate(loaded.families.families):
+    for index, family in enumerate(loaded_corpus.families.families):
         prefix = f"families[{index}]"
         if family.id in family_ids:
             errors.append(
                 ValidationError(families_file, f"{prefix}.id", f"duplicate family id {family.id!r}"),
             )
         family_ids.add(family.id)
+        family_by_id[family.id] = family
         if not _FAMILY_ID_RE.match(family.id):
             errors.append(
                 ValidationError(
@@ -63,7 +115,7 @@ def validate_corpus(corpus: LoadedCorpus | None = None) -> list[ValidationError]
                 ValidationError(families_file, f"{prefix}.law_ids", "law_ids must be non-empty"),
             )
 
-    for file_path, case_doc in loaded.cases:
+    for file_path, case_doc in loaded_corpus.cases:
         case = case_doc.case
         case_prefix = "case"
         if case.id in case_ids:
@@ -75,7 +127,9 @@ def validate_corpus(corpus: LoadedCorpus | None = None) -> list[ValidationError]
         occurrence_ids: set[str] = set()
         for occ_index, occurrence in enumerate(case_doc.occurrences):
             occ_prefix = f"case.occurrences[{occ_index}]"
-            errors.extend(_validate_occurrence(file_path, occ_prefix, occurrence, family_ids))
+            errors.extend(
+                _validate_occurrence(file_path, occ_prefix, occurrence, family_by_id),
+            )
 
             if occurrence.id in occurrence_ids:
                 errors.append(
@@ -94,10 +148,11 @@ def _validate_occurrence(
     file_path: str,
     prefix: str,
     occurrence: OccurrenceEntry,
-    family_ids: set[str],
+    family_by_id: dict[str, FamilyEntry],
 ) -> list[ValidationError]:
     errors: list[ValidationError] = []
-    if occurrence.family_id not in family_ids:
+    family = family_by_id.get(occurrence.family_id)
+    if family is None:
         errors.append(
             ValidationError(
                 file_path,
@@ -105,6 +160,54 @@ def _validate_occurrence(
                 f"unknown family {occurrence.family_id!r}",
             ),
         )
+    else:
+        arrow = occurrence.pipeline_arrow.value
+        if arrow not in {item.value for item in family.pipeline_arrows}:
+            errors.append(
+                ValidationError(
+                    file_path,
+                    f"{prefix}.pipeline_arrow",
+                    f"pipeline_arrow {arrow!r} not in family {family.id!r} arrows",
+                ),
+            )
+        if occurrence.law_id not in family.law_ids:
+            errors.append(
+                ValidationError(
+                    file_path,
+                    f"{prefix}.law_id",
+                    f"law_id {occurrence.law_id!r} not in family {family.id!r} law_ids",
+                ),
+            )
+        if occurrence.origin not in family.allowed_origins:
+            errors.append(
+                ValidationError(
+                    file_path,
+                    f"{prefix}.origin",
+                    f"origin {occurrence.origin.value!r} not allowed for family {family.id!r}",
+                ),
+            )
+        if occurrence.stage != family.owning_stage:
+            errors.append(
+                ValidationError(
+                    file_path,
+                    f"{prefix}.stage",
+                    (
+                        f"stage {occurrence.stage!r} does not match family owning_stage "
+                        f"{family.owning_stage!r}"
+                    ),
+                ),
+            )
+        family_owners = {(owner.module, owner.symbol) for owner in family.owners}
+        owner_key = (occurrence.owner.module, occurrence.owner.symbol)
+        if owner_key not in family_owners:
+            errors.append(
+                ValidationError(
+                    file_path,
+                    f"{prefix}.owner",
+                    f"owner {owner_key!r} not registered on family {family.id!r}",
+                ),
+            )
+
     if occurrence.family_id == "UNCLASSIFIED":
         errors.append(
             ValidationError(
@@ -206,6 +309,14 @@ def _validate_origin_requirements(
     return errors
 
 
+def _is_forbidden_absolute_path(value: str) -> bool:
+    if PurePosixPath(value).is_absolute():
+        return True
+    if PureWindowsPath(value).is_absolute():
+        return True
+    return bool(re.match(r"^[A-Za-z]:", value))
+
+
 def _validate_paths(
     file_path: str,
     prefix: str,
@@ -225,7 +336,7 @@ def _validate_paths(
         if not value.strip():
             errors.append(ValidationError(file_path, field_path, "path must be non-empty"))
             continue
-        if any(value.startswith(prefix) for prefix in _FORBIDDEN_PATH_PREFIXES):
+        if _is_forbidden_absolute_path(value):
             errors.append(ValidationError(file_path, field_path, "absolute paths are forbidden"))
         if "\\" in value:
             errors.append(ValidationError(file_path, field_path, "use repository-relative posix paths"))

@@ -176,9 +176,10 @@ what diagnosis is blocked by its absence
 Read before classifying compiler/IR failures:
 
 ```text
-refactor/AGENT_SYSTEM_PROMPT.md
-refactor/PROJECT_MAP.md
+.claude/prompts/project-bible-lite.md
+.claude/prompts/pipeline-contracts.md
 corpus/families.yaml
+AGENTS.md
 ```
 
 @.claude/prompts/pipeline-contracts.md

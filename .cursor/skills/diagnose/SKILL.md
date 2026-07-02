@@ -79,9 +79,10 @@ Plus when present: llm_*, semantic_*, contract_emit_diff.*, provenance.json, dar
 Read before classifying:
 
 ```text
-refactor/AGENT_SYSTEM_PROMPT.md
-refactor/PROJECT_MAP.md
+.cursor/rules/project-bible-lite.mdc
+.cursor/rules/pipeline-contracts.mdc
 corpus/families.yaml
+AGENTS.md
 ```
 
 Compiler arrow/law contract: `.cursor/rules/pipeline-contracts.mdc` (self-contained; do not chase `refactor/contracts/` links).

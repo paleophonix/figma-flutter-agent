@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.debug.provenance import ProvenanceRecorder
+from figma_flutter_agent.debug.provenance import DeviationReason, ProvenanceRecorder
 from figma_flutter_agent.generator.ir.tree import _apply_ir_overrides, merge_ir_node
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -33,6 +33,21 @@ def _text_node(node_id: str = "text-1", *, text: str = "Hello") -> CleanDesignTr
     )
 
 
+def test_text_override_records_deviation(monkeypatch) -> None:
+    recorder = _activate_recorder(monkeypatch)
+    node = _text_node()
+    result = _apply_ir_overrides(node, WidgetIrOverrides(text="Changed"))
+    assert result.text == "Changed"
+    assert len(recorder.deviations) == 1
+    deviation = recorder.deviations[0]
+    assert deviation.field == "text"
+    assert deviation.before == "Hello"
+    assert deviation.after == "Changed"
+    assert deviation.reason == DeviationReason.IR_OVERRIDE
+    assert deviation.provenance["law_id"] == "LAW-A1-OVERRIDE-PROV"
+    assert len(recorder.mutations) == 1
+
+
 def test_text_override_records_mutation(monkeypatch) -> None:
     recorder = _activate_recorder(monkeypatch)
     node = _text_node()
@@ -56,6 +71,27 @@ def test_font_size_override_records_mutation(monkeypatch) -> None:
     assert recorder.mutations[0].field == "style.font_size"
 
 
+def test_multiple_overrides_create_separate_deviations(monkeypatch) -> None:
+    recorder = _activate_recorder(monkeypatch)
+    node = _text_node()
+    _apply_ir_overrides(
+        node,
+        WidgetIrOverrides(text="New", text_color="#FF0000", font_size=18.0),
+    )
+    fields = {deviation.field for deviation in recorder.deviations}
+    assert fields == {"text", "style.text_color", "style.font_size"}
+    assert len(recorder.deviations) == 3
+
+
+def test_noop_override_creates_no_deviation(monkeypatch) -> None:
+    recorder = _activate_recorder(monkeypatch)
+    node = _text_node(text="Same")
+    result = _apply_ir_overrides(node, WidgetIrOverrides(text="Same"))
+    assert result.text == "Same"
+    assert recorder.deviations == []
+    assert recorder.mutations == []
+
+
 def test_multiple_overrides_create_separate_records(monkeypatch) -> None:
     recorder = _activate_recorder(monkeypatch)
     node = _text_node()
@@ -74,6 +110,7 @@ def test_noop_override_creates_no_record(monkeypatch) -> None:
     result = _apply_ir_overrides(node, WidgetIrOverrides(text="Same"))
     assert result.text == "Same"
     assert recorder.mutations == []
+    assert recorder.deviations == []
 
 
 def test_absent_overrides_create_no_record(monkeypatch) -> None:
@@ -107,4 +144,5 @@ def test_merge_ir_node_records_override_provenance(monkeypatch) -> None:
     )
     merged = merge_ir_node(clean, ir, omit_ids=frozenset())
     assert merged.text == "Merged"
+    assert any(deviation.field == "text" for deviation in recorder.deviations)
     assert any(mutation.field == "text" for mutation in recorder.mutations)

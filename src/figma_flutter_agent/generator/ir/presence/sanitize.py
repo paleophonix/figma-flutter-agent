@@ -359,16 +359,6 @@ def sanitize_screen_ir_llm_drift(
         elif not resolved_semantics.llm_gray_zone_annotations:
             strip_screen_ir_classification_hints(screen_ir)
 
-    fidelity_tiers_stripped, tier_sources_stripped = sanitize_screen_ir_fidelity_authority(
-        screen_ir,
-    )
-    if fidelity_tiers_stripped or tier_sources_stripped:
-        logger.info(
-            "Sanitized screenIr fidelity authority: stripped {} tier(s), {} tierSource(s)",
-            fidelity_tiers_stripped,
-            tier_sources_stripped,
-        )
-
     return SanitizeSummary(
         omit_ids_removed=omit_before - len(screen_ir.omit_figma_ids),
         state_keys_pruned=state_pruned,
@@ -378,6 +368,4 @@ def sanitize_screen_ir_llm_drift(
         phantom_nodes_pruned=phantom_pruned,
         duplicate_nodes_dropped=duplicate_dropped,
         orphan_refs_removed=orphan_refs_removed,
-        fidelity_tiers_stripped=fidelity_tiers_stripped,
-        tier_sources_stripped=tier_sources_stripped,
     )

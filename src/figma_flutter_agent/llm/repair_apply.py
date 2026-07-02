@@ -203,6 +203,7 @@ def apply_repair_patches(
             project_dir=project_dir,
             tokens=tokens,
             skip_presence_normalize=True,
+            strip_llm_fidelity_authority=True,
         )
 
     for patch in patch_response.patches:

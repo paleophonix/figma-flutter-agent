@@ -82,6 +82,7 @@ class ResponseMixin:
                 project_dir=project_dir,
                 tokens=tokens,
                 skip_presence_normalize=True,
+                strip_llm_fidelity_authority=True,
             )
             validate_extracted_widgets(
                 response.extracted_widgets,

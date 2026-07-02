@@ -41,6 +41,7 @@ class DeviationReason(StrEnum):
     STRUCTURAL_GROUPING_RECONCILE = "structural_grouping_reconcile"
     ASSET_RECOVERY = "asset_recovery"
     FIDELITY_DOWNGRADE = "fidelity_downgrade"
+    IR_OVERRIDE = "ir_override"
 
 
 class DeviationSeverity(StrEnum):

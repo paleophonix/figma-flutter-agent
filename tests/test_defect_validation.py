@@ -131,3 +131,86 @@ def test_fixed_requires_regression_proof() -> None:
 def test_validation_error_format() -> None:
     error = ValidationError("corpus/cases/foo.yaml", "case.id", "duplicate")
     assert error.format() == "corpus/cases/foo.yaml:case.id: duplicate"
+
+
+def test_occurrence_law_must_belong_to_family() -> None:
+    case = CaseDocument(
+        version=1,
+        case=CaseMeta(
+            id="case-law",
+            title="t",
+            project="synthetic",
+            feature="f",
+            observed_at=date(2026, 7, 3),
+            summary="s",
+        ),
+        occurrences=[
+            OccurrenceEntry(
+                id="occ-1",
+                family_id="llm_fidelity_authority_bypass",
+                pipeline_arrow=PipelineArrow.A1,
+                law_id="LAW-WRONG",
+                stage="ir_validation",
+                origin=DefectOrigin.COMPILER,
+                blast_radius=BlastRadius.B2_SILENT_WRONG_BEHAVIOR,
+                confidence=Confidence.HIGH,
+                status=DefectStatus.OPEN,
+                owner=OwnerRef(module="src/foo.py", symbol="bar"),
+                contract=ContractRef(
+                    field="fidelityTier",
+                    field_class=FieldClass.COMPILER_OWNED,
+                    category=ContractCategory.ILLEGAL,
+                    expected="e",
+                    actual="a",
+                ),
+                authority_boundary="fidelity_manifest",
+            ),
+        ],
+    )
+    errors = validate_corpus(
+        LoadedCorpus(families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]),
+    )
+    assert any("law_id" in error.field_path for error in errors)
+
+
+def test_windows_drive_path_rejected() -> None:
+    case = CaseDocument(
+        version=1,
+        case=CaseMeta(
+            id="case-path",
+            title="t",
+            project="synthetic",
+            feature="f",
+            observed_at=date(2026, 7, 3),
+            summary="s",
+        ),
+        occurrences=[
+            OccurrenceEntry(
+                id="occ-1",
+                family_id="llm_fidelity_authority_bypass",
+                pipeline_arrow=PipelineArrow.A1,
+                law_id="LAW-A1-FIDELITY-AUTHORITY",
+                stage="ir_validation",
+                origin=DefectOrigin.COMPILER,
+                blast_radius=BlastRadius.B2_SILENT_WRONG_BEHAVIOR,
+                confidence=Confidence.HIGH,
+                status=DefectStatus.OPEN,
+                owner=OwnerRef(module="src/foo.py", symbol="bar"),
+                contract=ContractRef(
+                    field="fidelityTier",
+                    field_class=FieldClass.COMPILER_OWNED,
+                    category=ContractCategory.ILLEGAL,
+                    expected="e",
+                    actual="a",
+                ),
+                authority_boundary="fidelity_manifest",
+                evidence=[
+                    EvidenceItem(kind="source_code", path="D:/workspace/file.py", summary="bad"),
+                ],
+            ),
+        ],
+    )
+    errors = validate_corpus(
+        LoadedCorpus(families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]),
+    )
+    assert any("absolute paths are forbidden" in error.message for error in errors)

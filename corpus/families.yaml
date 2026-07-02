@@ -60,8 +60,8 @@ families:
       - CP2
     owning_stage: ir_pass
     owners:
-      - module: src/figma_flutter_agent/generator/ir/passes/sync.py
-        symbol: apply_graph_sync_pass
+      - module: src/figma_flutter_agent/generator/geometry/invariants/conservation.py
+        symbol: check_graph_sync
     law_ids:
       - LAW-CP2-GRAPH-SYNC
     default_blast_radius: B3_BLOCKING
@@ -111,7 +111,7 @@ families:
       - A1
     owning_stage: ir_validation
     owners:
-      - module: src/figma_flutter_agent/generator/ir/extracted.py
+      - module: src/figma_flutter_agent/generator/ir/validate/__init__.py
         symbol: validate_extracted_widgets
     law_ids:
       - LAW-WIDGETIR-CONSERVE
