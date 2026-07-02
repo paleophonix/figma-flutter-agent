@@ -171,6 +171,7 @@ def gate_planned_dart_syntax(
             planned,
             bootstrap_files=bootstrap_files,
             force=True,
+            feature_name=bootstrap_context.feature_name,
         )
         planned.clear()
         planned.update(refreshed)

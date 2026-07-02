@@ -1,0 +1,136 @@
+{
+  "cacheKey": "58fbfe13c36ef566a2de689aee274460c2f8ff626231b902cf86325df74aa87e",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "152:27",
+        "widgetName": "MenuOptionRow",
+        "reason": "This 40px-tall menu row pattern repeats across the settings cards and logout area with the same core structure: leading circular icon, title text, and trailing chevron/right affordance.",
+        "confidence": 0.96,
+        "suggestedParams": [
+          "title",
+          "leadingIcon",
+          "onTap",
+          "showTrailingChevron",
+          "trailingWidget"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "152:38",
+            "152:140",
+            "152:149",
+            "152:166",
+            "152:176",
+            "228:60",
+            "152:195",
+            "152:196",
+            "152:51"
+          ],
+          "shapeSimilarity": 0.94,
+          "semanticRole": "navigable menu option row"
+        }
+      },
+      {
+        "nodeId": "152:136",
+        "widgetName": "CircularMenuIcon",
+        "reason": "A 40x40 circular icon badge is reused as the leading visual in most menu option rows, with only the inner glyph differing.",
+        "confidence": 0.92,
+        "suggestedParams": [
+          "icon",
+          "backgroundColor"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "152:137",
+            "152:142",
+            "152:151",
+            "152:168",
+            "152:178",
+            "228:62",
+            "152:216"
+          ],
+          "shapeSimilarity": 0.95,
+          "semanticRole": "leading circular icon badge"
+        }
+      },
+      {
+        "nodeId": "152:25",
+        "widgetName": "MenuSectionCard",
+        "reason": "Rounded card sections containing vertically stacked menu rows appear multiple times with the same container treatment but different item counts and content.",
+        "confidence": 0.89,
+        "suggestedParams": [
+          "items",
+          "height"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "152:138",
+            "152:121"
+          ],
+          "shapeSimilarity": 0.84,
+          "semanticRole": "grouped settings/menu card"
+        }
+      },
+      {
+        "nodeId": "152:52",
+        "widgetName": "TrailingChevronIcon",
+        "reason": "The 24x24 right-chevron affordance is repeated extensively as the trailing indicator for navigable rows.",
+        "confidence": 0.98,
+        "suggestedParams": [
+          "iconColor"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "152:183",
+            "152:171",
+            "152:156",
+            "152:147",
+            "152:47",
+            "152:36",
+            "228:67",
+            "152:188",
+            "152:122"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "trailing navigation chevron"
+        }
+      },
+      {
+        "nodeId": "152:49",
+        "widgetName": "LogoutActionCard",
+        "reason": "The logout entry is a distinct card-level action sharing the menu row language but with its own standalone container and semantic purpose.",
+        "confidence": 0.75,
+        "suggestedParams": [
+          "title",
+          "leadingIcon",
+          "onTap"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "152:25",
+            "152:138",
+            "152:121"
+          ],
+          "shapeSimilarity": 0.68,
+          "semanticRole": "standalone destructive/action card"
+        }
+      },
+      {
+        "nodeId": "137:201",
+        "widgetName": "ProfileHeaderCard",
+        "reason": "The profile block combines avatar, user name, and subtitle into a cohesive reusable header component likely useful across account-related screens.",
+        "confidence": 0.7,
+        "suggestedParams": [
+          "avatar",
+          "name",
+          "subtitle"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "profile summary header"
+        }
+      }
+    ]
+  }
+}

@@ -164,7 +164,7 @@
                     },
                     {
                       "figmaId": "602:1188",
-                      "kind": "input_rating",
+                      "kind": "stack",
                       "children": [
                         {
                           "figmaId": "602:1189",
@@ -196,12 +196,7 @@
                           "fidelityTier": "native_unverified",
                           "tierSource": "manifest"
                         }
-                      ],
-                      "payload": {
-                        "payloadKind": "input_rating"
-                      },
-                      "fidelityTier": "native_unverified",
-                      "tierSource": "policy_fallback"
+                      ]
                     }
                   ]
                 },
@@ -417,7 +412,7 @@
                       "children": [
                         {
                           "figmaId": "602:1042",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1043",
@@ -459,12 +454,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -490,7 +480,7 @@
                       "children": [
                         {
                           "figmaId": "602:1055",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1056",
@@ -537,12 +527,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -568,7 +553,7 @@
                       "children": [
                         {
                           "figmaId": "602:1069",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1070",
@@ -640,12 +625,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -671,7 +651,7 @@
                       "children": [
                         {
                           "figmaId": "602:1088",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1089",
@@ -718,12 +698,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -749,7 +724,7 @@
                       "children": [
                         {
                           "figmaId": "602:1102",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1103",
@@ -781,12 +756,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -812,7 +782,7 @@
                       "children": [
                         {
                           "figmaId": "602:1113",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1114",
@@ -869,12 +839,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -937,7 +902,7 @@
                       "children": [
                         {
                           "figmaId": "602:1130",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1131",
@@ -954,12 +919,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -985,7 +945,7 @@
                       "children": [
                         {
                           "figmaId": "602:1138",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1139",
@@ -1002,12 +962,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -1033,7 +988,7 @@
                       "children": [
                         {
                           "figmaId": "602:1146",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1147",
@@ -1065,12 +1020,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -1135,7 +1085,7 @@
                       "children": [
                         {
                           "figmaId": "602:1164",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1165",
@@ -1157,12 +1107,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }
@@ -1188,7 +1133,7 @@
                       "children": [
                         {
                           "figmaId": "602:1173",
-                          "kind": "input_rating",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "602:1174",
@@ -1210,12 +1155,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "payload": {
-                            "payloadKind": "input_rating"
-                          },
-                          "fidelityTier": "native_unverified",
-                          "tierSource": "policy_fallback"
+                          ]
                         }
                       ]
                     }

@@ -15,6 +15,7 @@ from figma_flutter_agent.generator.layout.navigation.items import (
     layout_fact_stack_bottom_nav_tab_glyph_column,
 )
 from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_node_body
+from figma_flutter_agent.generator.layout.widgets.emit.shell import prepare_layout_children
 from figma_flutter_agent.generator.layout.widgets.position import _render_leaf_surface
 from figma_flutter_agent.generator.layout.widgets.svg import (
     stack_should_emit_flattened_vector_group,
@@ -313,6 +314,26 @@ def test_food_replay_ingredient_chips_not_text_fields() -> None:
         compact = emitted.replace("\n", "")
         assert "TextField(" not in compact, node_id
         assert "keyboard_arrow_down" not in compact, node_id
+
+
+def test_stack_emit_zip_survives_omitted_children() -> None:
+    """Law: StackEmitChildWidgetZipAlignmentLaw — zip only emitted (child, widget) pairs."""
+    root = _load_food_root()
+    tile = _find_node(root, "602:1184")
+    assert tile is not None
+    (
+        sorted_children,
+        _metadata_column_host,
+        paired_circle_ids,
+        omit_child_ids,
+        playback_seek_ids,
+        playback_decor_omit_ids,
+        _merged_thumb_widgets,
+    ) = prepare_layout_children(tile, is_layout_root=False, parent_node=None)
+    skip_ids = paired_circle_ids | omit_child_ids | playback_seek_ids | playback_decor_omit_ids
+    emitted_count = sum(1 for child in sorted_children if child.id not in skip_ids)
+    assert len(sorted_children) > emitted_count
+    render_node_body(tile, uses_svg=True, parent_type=NodeType.STACK)
 
 
 def test_food_replay_upload_tile_not_text_field() -> None:

@@ -895,7 +895,6 @@ def test_refresh_cluster_widget_rerenders_stale_icon_badge_glyph() -> None:
 
 def test_refresh_stale_icon_badge_alias_widget_rerenders_renamed_class() -> None:
     import json
-    import re
     from pathlib import Path
 
     import pytest
@@ -914,16 +913,20 @@ def test_refresh_stale_icon_badge_alias_widget_rerenders_renamed_class() -> None
         pytest.skip("transaction income debug bundle unavailable")
     proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
     pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
-    plan = (debug_root / "plan.dart").read_text(encoding="utf-8")
     root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
     screen_ir = ScreenIr.model_validate(pre["screenIr"])
     norm = normalize_clean_tree(root, screen_ir=screen_ir)
-    match = re.search(
-        r"class TransactionCategoryIconWidget.*?(?=class |\Z)",
-        plan,
-        re.S,
+    stale = (
+        "class TransactionCategoryIconWidget extends StatelessWidget {\n"
+        "  const TransactionCategoryIconWidget({super.key});\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return Container(width: 57.0, height: 53.0, "
+        "decoration: BoxDecoration(color: Color(0xFF6DB6FE), borderRadius: BorderRadius.circular(22.0)), "
+        "child: SvgPicture.asset('assets/icons/vector_I7110_1045;7102_1277.svg', "
+        "width: 57.0, height: 53.0, fit: BoxFit.contain));\n"
+        "  }\n"
+        "}\n"
     )
-    stale = match.group(0) if match else ""
     path = preferred_widget_path_for_class("TransactionCategoryIconWidget")
     updated = refresh_stale_icon_badge_planned_widget_files(
         {path: stale},
@@ -1059,3 +1062,95 @@ def test_icon_glyph_svg_gets_intrinsic_size_not_plate() -> None:
     emitted = _render_svg_picture(glyph, "assets/icons/vector_salary.svg")
     assert "width: 26.0" in emitted
     assert "width: 57.0" not in emitted
+
+
+def test_composite_root_asset_promotion_ban_skips_icon_badge_stack(tmp_path) -> None:
+    """CompositeRootAssetPromotionBanLaw: never hoist glyph SVG onto badge stack roots."""
+    from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
+    from figma_flutter_agent.parser.boundaries.assets import resolve_discovered_vector_asset_keys
+
+    salary = _salary_icon_stack()
+    asset_dir = tmp_path / "assets" / "icons"
+    asset_dir.mkdir(parents=True)
+    (asset_dir / "vector_I7110_1045;7102_1277.svg").write_text("<svg></svg>", encoding="utf-8")
+    copied = deep_copy_clean_tree(salary)
+    copied.vector_asset_key = None
+    resolve_discovered_vector_asset_keys(copied, tmp_path)
+    assert copied.vector_asset_key is None
+    glyph = copied.children[1]
+    assert glyph.vector_asset_key is not None
+
+
+def test_cluster_asset_discovery_emits_intrinsic_glyph_bounds(tmp_path) -> None:
+    """FinalPlanAssetGateLaw: cluster refresh with on-disk assets keeps glyph sizing."""
+    from figma_flutter_agent.generator.widget_extractor import render_cluster_widgets
+    from figma_flutter_agent.generator.widget_models import ClusterWidgetSpec
+
+    salary = _salary_icon_stack()
+    asset_dir = tmp_path / "assets" / "icons"
+    asset_dir.mkdir(parents=True)
+    (asset_dir / "vector_salary.svg").write_text("<svg></svg>", encoding="utf-8")
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=430.0, height=932.0),
+        children=[salary],
+    )
+    spec = ClusterWidgetSpec(
+        cluster_id="component_7102_2848",
+        class_name="IconSalaryWidget",
+        file_name="icon_salary_widget",
+        representative=salary,
+    )
+    result = render_cluster_widgets(
+        [spec],
+        uses_svg=True,
+        clean_trees=[screen],
+        project_dir=tmp_path,
+    )
+    body = next(iter(result.files.values()))
+    assert "width: 26.0" in body
+    assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in body
+    assert "BoxDecoration(" in body
+
+
+def test_nav_active_indicator_overflows_padded_row_band() -> None:
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.layout.navigation.bottom import (
+        render_icon_only_bottom_navigation,
+    )
+    from figma_flutter_agent.generator.layout.navigation.helpers import icon_nav_stateful_helpers
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+
+    debug_root = Path(".debug/screen/limbo/9_3_1_b_transaction_income")
+    if not (debug_root / "processed.json").is_file():
+        pytest.skip("transaction income debug bundle unavailable")
+    proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    norm = normalize_clean_tree(root, screen_ir=screen_ir)
+
+    def find(node: CleanDesignTreeNode, nid: str) -> CleanDesignTreeNode | None:
+        if node.id == nid:
+            return node
+        for child in node.children:
+            found = find(child, nid)
+            if found is not None:
+                return found
+        return None
+
+    nav = find(norm, "7420:7339")
+    assert nav is not None
+    nav_call = render_icon_only_bottom_navigation(nav, uses_svg=True)
+    helpers = icon_nav_stateful_helpers(node_id="7420:7339")
+    assert "rowBandHeight" in nav_call
+    assert "slotHeight: 53.0" in nav_call
+    assert "OverflowBox(" in helpers
+    assert "clipBehavior: Clip.none" in helpers

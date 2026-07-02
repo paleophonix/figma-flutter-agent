@@ -16,7 +16,10 @@ _WIDGET_CLASS_DECL_RE = re.compile(
 
 _ICON_NAV_HELPER_MARKERS = (
     "required this.slotWidth",
+    "required this.rowBandHeight",
     "required this.activePillRadius",
+    "clipBehavior: Clip.none",
+    "OverflowBox(",
     "width: tab.iconWidth",
     "HitTestBehavior.opaque",
 )

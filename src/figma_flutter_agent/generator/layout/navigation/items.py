@@ -733,6 +733,7 @@ def nav_icon_tab_spec_expr(child: CleanDesignTreeNode, *, uses_svg: bool) -> str
         f"iconAsset: '{asset_lit}', "
         f"slotWidth: {format_geometry_literal(slot_width)}, "
         f"slotHeight: {format_geometry_literal(slot_height)}, "
+        f"rowBandHeight: {format_geometry_literal(icon_height)}, "
         f"iconWidth: {format_geometry_literal(icon_width)}, "
         f"iconHeight: {format_geometry_literal(icon_height)}"
         ")"

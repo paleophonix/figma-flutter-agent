@@ -8,10 +8,14 @@ from loguru import logger
 
 from figma_flutter_agent.config import Settings, load_settings
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
-from figma_flutter_agent.dev.run import RunScreenPlan, launch_flutter_app
+from figma_flutter_agent.dev.run import (
+    RunScreenPlan,
+    detect_wired_screen_feature,
+    launch_flutter_app,
+)
 from figma_flutter_agent.dev.wizard.models import ScreenPreflight
 from figma_flutter_agent.dev.wizard.preflight import build_run_plan, collect_screen_preflight
-from figma_flutter_agent.errors import FlutterPreviewLaunchError
+from figma_flutter_agent.errors import FlutterPreviewLaunchError, FlutterProjectError
 from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 from figma_flutter_agent.pipeline.result import PipelineResult
 from figma_flutter_agent.pipeline.run import run_pipeline
@@ -149,6 +153,13 @@ async def sync_preview_workflow(
         use_cached_ir=use_cached_ir,
         dump_prefetch=preflight.dump_prefetch,
     )
+    wired = detect_wired_screen_feature(plan.project_dir)
+    if wired is not None and wired != plan.screen.feature:
+        raise FlutterProjectError(
+            "main.dart is wired to "
+            f"{wired!r} but preview targets {plan.screen.feature!r}. "
+            "Run generate for this screen to refresh bootstrap wiring."
+        )
     if skip_launch:
         return plan, None, pipeline_result
     try:

@@ -49,12 +49,16 @@ class ResponseMixin:
             )
 
             if persist_ir_snapshots and project_dir is not None and feature_name:
+                from figma_flutter_agent.debug.ir_cache import ir_cache_metadata_for_write
+
+                cache_meta = ir_cache_metadata_for_write(clean_tree)
                 write_screen_ir_snapshot(
                     stage="llm_parsed",
                     feature_name=feature_name,
                     screen_ir=response.screen_ir,
                     extracted_widgets=response.extracted_widgets or None,
                     project_dir=project_dir,
+                    extra=cache_meta,
                 )
 
             extracted = frozenset(widget.widget_name for widget in response.extracted_widgets)
@@ -91,12 +95,16 @@ class ResponseMixin:
                 and feature_name
                 and response.screen_ir is not None
             ):
+                from figma_flutter_agent.debug.ir_cache import ir_cache_metadata_for_write
+
+                cache_meta = ir_cache_metadata_for_write(clean_tree)
                 write_screen_ir_snapshot(
                     stage="llm_validated",
                     feature_name=feature_name,
                     screen_ir=response.screen_ir,
                     extracted_widgets=response.extracted_widgets or None,
                     project_dir=project_dir,
+                    extra=cache_meta,
                 )
             return response.model_copy(update={"screen_code": None})
         if response.resolved_screen_code():

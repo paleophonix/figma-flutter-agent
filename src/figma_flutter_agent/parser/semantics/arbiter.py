@@ -137,6 +137,14 @@ def _consult_llm_hint(
             bucket=None,
         )
     suggested = WidgetIrKind(hint.suggested_kind)
+    if _nav_bottom_bar_hint_vetoed(ctx, suggested):
+        return ArbitrationOutcome(
+            kind=None,
+            confidence=0.0,
+            evidence={"llmRejected": "nav_bottom_bar_screen_frame"},
+            payload=None,
+            bucket=None,
+        )
     if suggested in ctx.signals.hard_reject_kinds:
         return ArbitrationOutcome(
             kind=None,
@@ -183,6 +191,18 @@ def _consult_llm_hint(
     )
 
 
+def _nav_bottom_bar_hint_vetoed(ctx: DetectorContext, suggested: WidgetIrKind) -> bool:
+    """Return True when a nav hint must not apply to the current clean node."""
+    from figma_flutter_agent.generator.ir.validate.root_kind import (
+        nav_bottom_bar_kind_contradicts_clean_node,
+    )
+
+    return (
+        suggested == WidgetIrKind.NAV_BOTTOM_BAR
+        and nav_bottom_bar_kind_contradicts_clean_node(ctx.clean_node)
+    )
+
+
 def _maybe_llm_hint(
     ctx: DetectorContext,
     *,
@@ -201,6 +221,16 @@ def _maybe_llm_hint(
             runner_up_kind=runner_up_kind,
         )
     suggested = WidgetIrKind(hint.suggested_kind)
+    if _nav_bottom_bar_hint_vetoed(ctx, suggested):
+        return ArbitrationOutcome(
+            kind=None,
+            confidence=0.0,
+            evidence={"llmRejected": "nav_bottom_bar_screen_frame"},
+            payload=None,
+            bucket="rejectedBelowThreshold",
+            reject_reason="llm_hint_rejected",
+            runner_up_kind=runner_up_kind,
+        )
     if suggested in ctx.signals.hard_reject_kinds:
         return ArbitrationOutcome(
             kind=None,

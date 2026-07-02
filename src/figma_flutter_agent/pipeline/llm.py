@@ -66,6 +66,13 @@ def load_cached_ir_llm_outcome(
         explicit_path=from_ir_path,
     )
     generation = load_generation_from_ir_dump(ir_path)
+    from figma_flutter_agent.debug.ir_cache import assert_cached_screen_ir_compatible
+
+    assert_cached_screen_ir_compatible(
+        generation,
+        clean_tree,
+        dump_path=ir_path,
+    )
     extracted = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     generation = _normalize_cached_ir_generation(
         generation,

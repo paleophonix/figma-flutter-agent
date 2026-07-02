@@ -118,6 +118,16 @@ def classify_node(
 ) -> tuple[WidgetIrNode, ClassificationReportEntry]:
     """Classify one IR node against its clean-tree counterpart."""
     effective_hint = llm_hint if llm_gray_zone_enabled else None
+    if effective_hint is not None:
+        from figma_flutter_agent.generator.ir.validate.root_kind import (
+            nav_bottom_bar_kind_contradicts_clean_node,
+        )
+
+        if (
+            effective_hint.suggested_kind == WidgetIrKind.NAV_BOTTOM_BAR.value
+            and nav_bottom_bar_kind_contradicts_clean_node(clean_node)
+        ):
+            effective_hint = None
     ctx = merge_signals(
         DetectorContext(
             clean_node=clean_node,
@@ -218,12 +228,21 @@ def classify_screen_ir(
         working = ir_node
         hint = working.classification_hint
         if authoritative_classifier and working.kind in SEMANTIC_IR_KINDS:
-            hint = LlmClassificationHint(
-                suggested_kind=working.kind.value,
-                confidence=hint.confidence if hint is not None else grey_zone_min,
-                rationale=hint.rationale if hint is not None else None,
+            from figma_flutter_agent.generator.ir.validate.root_kind import (
+                downgrade_nav_bottom_bar_ir_node,
             )
-            working = working.model_copy(update={"kind": WidgetIrKind.AUTO})
+
+            downgraded = downgrade_nav_bottom_bar_ir_node(working, clean_node)
+            if downgraded.kind not in SEMANTIC_IR_KINDS:
+                working = downgraded
+                hint = None
+            else:
+                hint = LlmClassificationHint(
+                    suggested_kind=working.kind.value,
+                    confidence=hint.confidence if hint is not None else grey_zone_min,
+                    rationale=hint.rationale if hint is not None else None,
+                )
+                working = working.model_copy(update={"kind": WidgetIrKind.AUTO})
 
         classified, entry = classify_node(
             working,

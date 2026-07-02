@@ -29,6 +29,37 @@ def _bootstrap_context() -> PlannedBootstrapContext:
     )
 
 
+def test_bootstrap_main_needs_refresh_when_wired_feature_differs() -> None:
+    home_bootstrap = render_planned_bootstrap_files(_bootstrap_context())
+    transaction_context = PlannedBootstrapContext(
+        feature_name="transaction_income",
+        screen_class="TransactionIncomeScreen",
+        app_title="Transaction Income",
+        routing_type="go_router",
+        routing_enabled=False,
+        generate_dark_mode=False,
+        max_web_width=1200,
+        architecture="feature_first",
+        package_name="cases",
+        use_package_imports=True,
+        state_management_type="none",
+        theme_variant="material_3",
+    )
+    transaction_bootstrap = render_planned_bootstrap_files(transaction_context)
+    existing = home_bootstrap["lib/main.dart"]
+    assert not bootstrap_main_needs_refresh(existing, feature_name="task_management")
+    assert bootstrap_main_needs_refresh(
+        existing,
+        feature_name=transaction_context.feature_name,
+    )
+    refreshed = ensure_compiler_bootstrap_planned_files(
+        {"lib/main.dart": existing},
+        bootstrap_files=transaction_bootstrap,
+        feature_name=transaction_context.feature_name,
+    )
+    assert "TransactionIncomeScreen" in refreshed["lib/main.dart"]
+
+
 def test_bootstrap_main_needs_refresh_for_flutter_create_template() -> None:
     foreign_main = """
 import 'package:flutter/material.dart';

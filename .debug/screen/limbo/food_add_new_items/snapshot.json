@@ -2,12 +2,13 @@
   "file_key": "nJBqmuLJ1KXSA23yNouMOR",
   "node_id": "602:1027",
   "feature_name": "food_add_new_items",
-  "tree_hash": "27ce40abd1e82d7e06139305c927281b057e662ab075f216559371285e20ecfc",
+  "tree_hash": "66f8b44dbdfd2f86494d9e8c1b5fae96b1af775137370f40a202faa67a750f3c",
   "colors_hash": "e595c5659d230391e9ffa762a76dfbb0b8b0d91faa7305cdef0d7f6d7cb7150d",
   "typography_hash": "d97c05e72371a71cb0f5aa778aa1c22c5d8c310c6850c843377c1616a41a6105",
   "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
   "file_hashes": {
-    "lib/widgets/ingridents_widget.dart": "2544697af72dfdc8a1621ff33d657a53b04561b0c88cbebd7d4045fdd5fc49ad",
+    "lib/widgets/upload_photo_video_widget.dart": "3f538617f79e81a53a1e22d9737cd94790f9b97ef219760a06ffaed1d805d9eb",
+    "lib/widgets/ingridents_widget.dart": "31d31643c0659fefda8713488a7a6f4e723596bbfed161270ec9db7a5da2a9c1",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "f233a46b5a2102c41acde0d1dbec95c9fbf65328d8f8dae7f9365d86c443c33b",
     "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
@@ -15,20 +16,20 @@
     "lib/theme/app_radius.dart": "474d7e026c62009f7d895430bdbdc27422eb4ce236bb1b61ae87a203f6012cdb",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "36062c5562921a35851b6958f87f9f73ebd03ae52112dc8993ae54a12727460f",
-    "lib/generated/food_add_new_items_layout.dart": "efcc5329551e2b1d7b156f7396a14f0c42dee9d47a57bec94191580717167e68",
-    "lib/generated/food_add_new_items_chunk_2e8d5787.dart": "2a1e69c4d6e1e282bc9a72efd5251eeeff41f36957b92c5b6feb864b89608d73",
+    "lib/generated/food_add_new_items_layout.dart": "7964bed7abaec14a3d041a9e7e2fe9a341e20944ce998a1bdd035a229746da67",
+    "lib/generated/food_add_new_items_chunk_2e8d5787.dart": "a2b3e0f0e193e9c3590e21b1d84587a1293c2d5436ca9db228a2d7498db3b25e",
     "lib/features/food_add_new_items/food_add_new_items_screen.dart": "c7b2934ebc14e97e073f6a35cbb3c1f5c693d7168cb57860f996eddcaed55e84",
     "test/golden/food_add_new_items_screen_test.dart": "3976e51c9f9ae808c521d655e09932b8e03c66a609a9b83d99246b18839783b5",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
     "lib/main.dart": "7e4e3351b8cd77e30baa895735e3bbde198816456a5e32c1c934afcb303c59a8"
   },
-  "layout_region_hash": "82cd0fc0bf6b364cbb1833cb00613ed719f0fb14ca3c6b4256c94710e5b3893c",
+  "layout_region_hash": "ef898e43da127e83664706bf3f5ac90ee85edd7c98f437c998553dc43286e402",
   "cluster_hashes": {
     "cluster_0": "8eccad5b507cfbb3609f63dfbf0cb114e04a3d33245bedbd4bbff19bbb7d5db5",
     "cluster_1": "f8ece058b7c2e5f9ffcc262122b9e12d63860f4dc948b54cd0bd4cd7d22fb525"
   },
   "reference_image_hash": null,
-  "emitter_version": "2026.06.2",
-  "version": 2,
-  "updated_at": "2026-07-01T12:32:45.489642+00:00"
+  "emitter_version": "2026.07.1",
+  "version": 3,
+  "updated_at": "2026-07-02T12:51:36.921544+00:00"
 }

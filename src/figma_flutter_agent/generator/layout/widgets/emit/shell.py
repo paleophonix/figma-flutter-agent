@@ -184,6 +184,7 @@ def build_flow_context(
     *,
     child_widgets: list[str],
     sorted_children: list[CleanDesignTreeNode],
+    emitted_pairs: list[tuple[CleanDesignTreeNode, str]],
     parent_type: NodeType | None,
     parent_node: CleanDesignTreeNode | None,
     is_layout_root: bool,
@@ -215,6 +216,7 @@ def build_flow_context(
         "scroll_content_root": scroll_content_root,
         "child_widgets": child_widgets,
         "sorted_children": sorted_children,
+        "emitted_pairs": emitted_pairs,
         "metadata_column_host": metadata_column_host,
         "main_axis": main_axis,
         "cross_axis": cross_axis,
@@ -360,9 +362,12 @@ def assemble_layout_emit(
         else node.type
     )
     child_widgets: list[str] = []
+    emitted_pairs: list[tuple[CleanDesignTreeNode, str]] = []
     for child in sorted_children:
         if child.id in field_widgets_by_shell_id:
-            child_widgets.append(field_widgets_by_shell_id[child.id])
+            widget = field_widgets_by_shell_id[child.id]
+            child_widgets.append(widget)
+            emitted_pairs.append((child, widget))
             continue
         if (
             child.id in paired_circle_ids
@@ -375,26 +380,26 @@ def assemble_layout_emit(
             pin_bottom_chrome
             and stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll(child)
         )
-        child_widgets.append(
-            recurse(
-                child,
-                uses_svg=uses_svg,
-                parent_type=child_parent_type,
-                parent_node=node,
-                theme_variant=theme_variant,
-                cluster_classes=cluster_classes,
-                cluster_vector_variants=cluster_vector_variants,
-                cluster_vector_variant=cluster_vector_variant,
-                skip_cluster_id=skip_cluster_id,
-                responsive_enabled=responsive_enabled,
-                design_artboard_width=design_artboard_width,
-                bundled_font_families=bundled_font_families,
-                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-                text_theme_size_slots=text_theme_size_slots,
-                scroll_content_root=child_scroll_root,
-            )
+        widget = recurse(
+            child,
+            uses_svg=uses_svg,
+            parent_type=child_parent_type,
+            parent_node=node,
+            theme_variant=theme_variant,
+            cluster_classes=cluster_classes,
+            cluster_vector_variants=cluster_vector_variants,
+            cluster_vector_variant=cluster_vector_variant,
+            skip_cluster_id=skip_cluster_id,
+            responsive_enabled=responsive_enabled,
+            design_artboard_width=design_artboard_width,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+            scroll_content_root=child_scroll_root,
         )
+        child_widgets.append(widget)
+        emitted_pairs.append((child, widget))
     if merged_thumb_widgets:
         child_widgets.extend(merged_thumb_widgets)
     playback_seek_widget: str | None = None
@@ -404,6 +409,7 @@ def assemble_layout_emit(
         node,
         child_widgets=child_widgets,
         sorted_children=sorted_children,
+        emitted_pairs=emitted_pairs,
         parent_type=parent_type,
         parent_node=parent_node,
         is_layout_root=is_layout_root,

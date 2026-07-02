@@ -620,10 +620,10 @@
   "rejectedByInvariant": [
     {
       "figmaId": "38:38",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "STACK": 2,
@@ -635,10 +635,10 @@
     },
     {
       "figmaId": "152:38",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 1,
@@ -652,10 +652,10 @@
     },
     {
       "figmaId": "152:27",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 1,
@@ -669,10 +669,10 @@
     },
     {
       "figmaId": "152:176",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 1,
@@ -686,10 +686,10 @@
     },
     {
       "figmaId": "152:166",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 1,
@@ -703,10 +703,10 @@
     },
     {
       "figmaId": "152:149",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 1,
@@ -720,10 +720,10 @@
     },
     {
       "figmaId": "152:140",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 1,
@@ -737,10 +737,10 @@
     },
     {
       "figmaId": "228:60",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "TEXT": 1,
@@ -754,10 +754,10 @@
     },
     {
       "figmaId": "152:195",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "STACK": 2
@@ -768,10 +768,10 @@
     },
     {
       "figmaId": "152:196",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "STACK": 2
@@ -797,10 +797,10 @@
     },
     {
       "figmaId": "152:51",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "STACK": 2,

@@ -54,24 +54,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "602:1188",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1188",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "602:1189",
       "field": "fidelity_tier",
       "old": null,
@@ -162,114 +144,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "602:1042",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1042",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1055",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1055",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1069",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1069",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1088",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1088",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1102",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1102",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1113",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1113",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "602:1178",
       "field": "fidelity_tier",
       "old": null,
@@ -302,96 +176,6 @@
       "old": null,
       "new": "manifest",
       "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1130",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1130",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1138",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1138",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1146",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1146",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1164",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1164",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1173",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1173",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -423,18 +207,6 @@
           "STACK": 7
         },
         "child_count": 7
-      }
-    },
-    {
-      "nodeId": "602:1188",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 4
-        },
-        "child_count": 4
       }
     },
     {
@@ -498,78 +270,6 @@
       }
     },
     {
-      "nodeId": "602:1042",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 8
-        },
-        "child_count": 8
-      }
-    },
-    {
-      "nodeId": "602:1055",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 9
-        },
-        "child_count": 9
-      }
-    },
-    {
-      "nodeId": "602:1069",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 14
-        },
-        "child_count": 14
-      }
-    },
-    {
-      "nodeId": "602:1088",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 9
-        },
-        "child_count": 9
-      }
-    },
-    {
-      "nodeId": "602:1102",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 6
-        },
-        "child_count": 6
-      }
-    },
-    {
-      "nodeId": "602:1113",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 11
-        },
-        "child_count": 11
-      }
-    },
-    {
       "nodeId": "602:1178",
       "kind": "container_list_tile",
       "confidence": 0.84,
@@ -591,66 +291,6 @@
         "technical_divider": true,
         "child_type_counts": {},
         "child_count": 0
-      }
-    },
-    {
-      "nodeId": "602:1130",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 3
-        },
-        "child_count": 3
-      }
-    },
-    {
-      "nodeId": "602:1138",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 3
-        },
-        "child_count": 3
-      }
-    },
-    {
-      "nodeId": "602:1146",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 6
-        },
-        "child_count": 6
-      }
-    },
-    {
-      "nodeId": "602:1164",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 4
-        },
-        "child_count": 4
-      }
-    },
-    {
-      "nodeId": "602:1173",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "VECTOR": 4
-        },
-        "child_count": 4
       }
     },
     {

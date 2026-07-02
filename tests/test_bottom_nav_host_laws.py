@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir.validate import validate_screen_ir
 from figma_flutter_agent.generator.layout.navigation.items import collect_bottom_nav_items
 from figma_flutter_agent.parser.components import (
@@ -184,7 +183,7 @@ def test_oversized_bottom_nav_host_rejects_screen_text_children() -> None:
     assert collect_bottom_nav_items(host) == []
 
 
-def test_validate_screen_ir_rejects_nav_bottom_bar_on_screen_frame() -> None:
+def test_validate_screen_ir_downgrades_nav_bottom_bar_on_screen_frame() -> None:
     root = CleanDesignTreeNode(
         id="7342:2818",
         name="9 - A - Home - Bottom Navigation",
@@ -206,8 +205,29 @@ def test_validate_screen_ir_rejects_nav_bottom_bar_on_screen_frame() -> None:
             children=[],
         )
     )
-    with pytest.raises(GenerationError, match="nav_bottom_bar"):
-        validate_screen_ir(screen_ir, root, apply_guards=False)
+    validate_screen_ir(screen_ir, root, apply_guards=False)
+    assert screen_ir.root.kind == WidgetIrKind.STACK
+
+
+def test_validate_screen_ir_keeps_nav_bottom_bar_on_compact_dock() -> None:
+    root = CleanDesignTreeNode(
+        id="7342:2879",
+        name="Bottom Navigation - Light Mode",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=430.0, height=108.0),
+        children=[
+            CleanDesignTreeNode(id="home", name="Home", type=NodeType.TEXT, text="Home"),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="7342:2879",
+            kind=WidgetIrKind.NAV_BOTTOM_BAR,
+            children=[],
+        )
+    )
+    validate_screen_ir(screen_ir, root, apply_guards=False)
+    assert screen_ir.root.kind == WidgetIrKind.NAV_BOTTOM_BAR
 
 
 def test_compact_bottom_nav_still_collects_text_tabs() -> None:

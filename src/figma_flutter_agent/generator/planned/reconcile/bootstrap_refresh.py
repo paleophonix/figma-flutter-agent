@@ -36,7 +36,7 @@ def is_agent_generated_bootstrap(content: str) -> bool:
     return _AGENT_GENERATED_MARKER in content and f"class {_AGENT_BOOTSTRAP_CLASS}" in content
 
 
-def bootstrap_main_needs_refresh(content: str) -> bool:
+def bootstrap_main_needs_refresh(content: str, *, feature_name: str | None = None) -> bool:
     """True when planned ``lib/main.dart`` should be replaced before emit gates."""
     from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
@@ -44,7 +44,25 @@ def bootstrap_main_needs_refresh(content: str) -> bool:
         return True
     if validate_dart_delimiters(content) is not None:
         return True
+    if feature_name and is_agent_generated_bootstrap(content):
+        wired = wired_feature_from_bootstrap(content)
+        if wired is not None and wired != feature_name:
+            return True
     return not is_agent_generated_bootstrap(content)
+
+
+def wired_feature_from_bootstrap(content: str) -> str | None:
+    """Return the feature slug referenced by an agent-generated ``main.dart`` body."""
+    import re
+
+    for pattern in (
+        r"features/(?P<feature>[a-z0-9_]+)/(?P=feature)_screen\.dart",
+        r"presentation/screens/(?P<feature>[a-z0-9_]+)_screen\.dart",
+    ):
+        match = re.search(pattern, content)
+        if match is not None:
+            return match.group("feature")
+    return None
 
 
 def build_planned_bootstrap_context(
@@ -108,6 +126,7 @@ def ensure_compiler_bootstrap_planned_files(
     bootstrap_files: dict[str, str],
     merge_custom_code: bool = True,
     force: bool = False,
+    feature_name: str | None = None,
 ) -> dict[str, str]:
     """Overwrite stale or foreign ``lib/main.dart`` bodies with compiler bootstrap output.
 
@@ -127,7 +146,11 @@ def ensure_compiler_bootstrap_planned_files(
     updated = dict(planned)
     existing = _existing_bootstrap_content(updated)
     fresh = bootstrap_files[_COMPILER_BOOTSTRAP_PATH]
-    if not force and not bootstrap_main_needs_refresh(existing):
+    target_feature = feature_name or wired_feature_from_bootstrap(fresh)
+    if not force and not bootstrap_main_needs_refresh(
+        existing,
+        feature_name=target_feature,
+    ):
         drop_planned_path_aliases(updated, _COMPILER_BOOTSTRAP_PATH)
         if existing:
             updated[_COMPILER_BOOTSTRAP_PATH] = existing

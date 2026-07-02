@@ -239,18 +239,23 @@ def _emit_ir_layout_container(
             scroll_content_root=scroll_content_root,
         )
 
-    child_widgets = [
-        ir_recurse(
+    child_widgets: list[str] = []
+    emitted_pairs: list[tuple[CleanDesignTreeNode, str]] = []
+    for child in sorted_children:
+        if (
+            child.id in paired_circle_ids
+            or child.id in omit_child_ids
+            or child.id in playback_seek_ids
+            or child.id in playback_decor_omit_ids
+        ):
+            continue
+        widget = ir_recurse(
             child,
             parent_type=NodeType.COLUMN if metadata_column_host else clean.type,
             parent_node=clean,
         )
-        for child in sorted_children
-        if child.id not in paired_circle_ids
-        and child.id not in omit_child_ids
-        and child.id not in playback_seek_ids
-        and child.id not in playback_decor_omit_ids
-    ]
+        child_widgets.append(widget)
+        emitted_pairs.append((child, widget))
     if merged_thumb_widgets:
         child_widgets.extend(merged_thumb_widgets)
     playback_seek_widget = None
@@ -264,6 +269,7 @@ def _emit_ir_layout_container(
         clean,
         child_widgets=child_widgets,
         sorted_children=sorted_children,
+        emitted_pairs=emitted_pairs,
         parent_type=parent_type,
         parent_node=parent_node,
         is_layout_root=is_layout_root,

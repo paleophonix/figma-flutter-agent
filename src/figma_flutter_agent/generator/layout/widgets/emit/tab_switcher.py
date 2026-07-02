@@ -9,28 +9,20 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 def emit_tab_switcher_stack_children(
     node: CleanDesignTreeNode,
     *,
-    sorted_children: list[CleanDesignTreeNode],
-    stack_children: list[str],
+    emitted_pairs: list[tuple[CleanDesignTreeNode, str]],
 ) -> str:
     """Compose tab labels in a full-bleed row with decor pinned above the baseline.
 
     Args:
         node: Tab switcher stack host.
-        sorted_children: Paint-ordered stack children.
-        stack_children: Pre-rendered widget expressions aligned with ``sorted_children``.
+        emitted_pairs: Pre-rendered (child, widget) pairs for emitted stack children only.
 
     Returns:
         Dart ``Stack`` widget expression for the tab switcher chrome.
     """
-    tab_pairs = [
-        (child, widget)
-        for child, widget in zip(sorted_children, stack_children, strict=True)
-        if child.type == NodeType.TEXT
-    ]
+    tab_pairs = [(child, widget) for child, widget in emitted_pairs if child.type == NodeType.TEXT]
     decor_pairs = [
-        (child, widget)
-        for child, widget in zip(sorted_children, stack_children, strict=True)
-        if child.type != NodeType.TEXT
+        (child, widget) for child, widget in emitted_pairs if child.type != NodeType.TEXT
     ]
     tab_cells = [f"Expanded(child: {widget})" for _, widget in tab_pairs]
     row_widget = (

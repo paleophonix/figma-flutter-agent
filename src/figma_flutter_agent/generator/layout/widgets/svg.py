@@ -671,10 +671,21 @@ def _intrinsic_glyph_svg_dimensions(
     height: float | None,
 ) -> tuple[float | None, float | None]:
     """Prefer vector intrinsic bounds when the layout host is materially larger."""
+    from figma_flutter_agent.generator.ir.extracted_paint import (
+        icon_badge_stack_intrinsic_glyph_size,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
     from figma_flutter_agent.parser.interaction.icons import (
         layout_fact_trailing_chevron_action_slot,
         trailing_chevron_glyph_paint_span,
     )
+
+    if layout_fact_icon_badge_stack(node):
+        glyph = icon_badge_stack_intrinsic_glyph_size(node)
+        if glyph is not None:
+            return glyph
 
     if layout_fact_trailing_chevron_action_slot(node):
         glyph = trailing_chevron_glyph_paint_span(node)

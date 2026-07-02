@@ -14,6 +14,7 @@ _L5_SCREEN_IR_ARCHITECTURE = """7. SCREEN IR ARCHITECTURE (replaces Dart screenC
    - For each extracted widget, emit `extractedWidgets[]` with `widgetName` + `widgetIr` rooted at the subtree `figmaId` (see ### extractedWidgetBlueprints). No Dart in `code`.
    - The compiler emits Dart, flex wrappers, and Positioned pins — you supply structure only.
    - Leave `kind: "auto"` on nodes — the deterministic semantic classifier assigns widget kinds after layout passes.
+   - Never set `screenIr.root.kind` to `nav_bottom_bar` when ### cleanTree root is a full-screen frame (height above ~160px or many children). Reserve `nav_bottom_bar` for compact dock hosts (`BOTTOM_NAV` or short bottom bars), not screen titles containing "navigation".
    - Optional grey-zone hints only: `classificationHint` with `suggestedKind` + `confidence` (0.5–0.8); never authoritative.
    - `classificationHint.suggestedKind` MUST use WidgetIrKind slugs (e.g. `chip_choice`, `input_rating`, `input_text_field`) — NEVER contractKind values such as `choice_chip_group` or `rating_input`.
    - Use ### interactionSignals for structure (chip rows, inputs, nav) without assigning semantic kinds yourself.

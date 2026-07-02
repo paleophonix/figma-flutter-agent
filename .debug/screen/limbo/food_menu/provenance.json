@@ -1,6 +1,6 @@
 {
   "featureName": "food_menu",
-  "emitterVersion": "2026.06.2",
+  "emitterVersion": "2026.07.1",
   "checkpoints": [
     "CP0b_reprune",
     "CP1_normalize",

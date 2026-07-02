@@ -176,6 +176,7 @@ def render_stack(
     scroll_content_root = flow["scroll_content_root"]
     child_widgets = flow["child_widgets"]
     sorted_children = flow["sorted_children"]
+    emitted_pairs: list[tuple[CleanDesignTreeNode, str]] = flow["emitted_pairs"]
     metadata_column_host = flow["metadata_column_host"]
     paired_circle_ids = flow["paired_circle_ids"]
     omit_child_ids = flow["omit_child_ids"]
@@ -636,12 +637,11 @@ def render_stack(
 
         stack_widget = emit_tab_switcher_stack_children(
             node,
-            sorted_children=sorted_children,
-            stack_children=stack_children,
+            emitted_pairs=emitted_pairs,
         )
     elif stack_should_flow_as_centered_wrap(node) or stack_should_flow_as_tag_option_wrap(node):
         ordered_pairs = sorted(
-            zip(sorted_children, stack_children, strict=True),
+            emitted_pairs,
             key=lambda pair: (
                 stack_child_ordinal_top(pair[0]),
                 stack_child_ordinal_left(pair[0]),
@@ -691,7 +691,7 @@ def render_stack(
             node, growable_panels=growable_panels
         )
         ordered_pairs = sorted(
-            zip(sorted_children, stack_children, strict=True),
+            emitted_pairs,
             key=lambda pair: stack_flow_column_child_sort_key(pair[0]),
         )
         column_flow_parts: list[str] = []
@@ -803,7 +803,7 @@ def render_stack(
         )
 
         ordered_pairs = sorted(
-            zip(sorted_children, stack_children, strict=True),
+            emitted_pairs,
             key=lambda pair: stack_flow_column_child_sort_key(pair[0]),
         )
         widget_by_child_id: dict[str, str] = {}
@@ -919,14 +919,7 @@ def render_stack(
             partition_viewport_pinned_stack_layers,
         )
 
-        stack_emit_pairs = [
-            (child, widget)
-            for child, widget in zip(sorted_children, stack_children, strict=True)
-            if child.id not in paired_circle_ids
-            and child.id not in omit_child_ids
-            and child.id not in playback_seek_ids
-            and child.id not in playback_decor_omit_ids
-        ]
+        stack_emit_pairs = list(emitted_pairs)
         if stack_emit_pairs:
             stack_emit_children = [child for child, _ in stack_emit_pairs]
             stack_emit_widgets = [widget for _, widget in stack_emit_pairs]

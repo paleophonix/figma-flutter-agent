@@ -117,6 +117,17 @@ def _best_descendant_vector_asset(node: CleanDesignTreeNode) -> str | None:
     return min(keys, key=_vector_asset_discovery_rank)
 
 
+def _composite_root_blocks_descendant_vector_promotion(
+    node: CleanDesignTreeNode,
+) -> bool:
+    """Return True when hoisting a descendant SVG onto ``node`` would bypass composite emit."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
+
+    return layout_fact_icon_badge_stack(node)
+
+
 def _product_photo_stack_geometry(
     node: CleanDesignTreeNode,
 ) -> tuple[float, float, float, float] | None:
@@ -390,6 +401,8 @@ def resolve_discovered_vector_asset_keys(
         for child in node.children:
             walk(child)
         if node.vector_asset_key or not _node_eligible_for_vector_asset_discovery(node):
+            return
+        if _composite_root_blocks_descendant_vector_promotion(node):
             return
         candidates: list[str] = []
         for node_id in _vector_discovery_node_ids(node):

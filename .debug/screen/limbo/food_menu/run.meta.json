@@ -1,8 +1,8 @@
 {
   "feature": "food_menu",
-  "pipeline_run_id": "bc7354cdd6d9",
-  "candidate_build_run_id": "bc7354cdd6d9",
-  "committed_build_run_id": "bc7354cdd6d9",
+  "pipeline_run_id": "0fbc58ebea8c",
+  "candidate_build_run_id": "0fbc58ebea8c",
+  "committed_build_run_id": "0fbc58ebea8c",
   "writeback": "committed",
   "written_files": [
     "lib/features/food_menu/food_menu_screen.dart",
@@ -23,5 +23,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-30T01:25:01.855188+00:00"
+  "captured_at": "2026-07-02T12:45:44.036822+00:00"
 }

@@ -255,6 +255,7 @@ class _IconNavTabSpec {{
     required this.iconAsset,
     required this.slotWidth,
     required this.slotHeight,
+    required this.rowBandHeight,
     required this.iconWidth,
     required this.iconHeight,
   }});
@@ -262,6 +263,7 @@ class _IconNavTabSpec {{
   final String iconAsset;
   final double slotWidth;
   final double slotHeight;
+  final double rowBandHeight;
   final double iconWidth;
   final double iconHeight;
 }}
@@ -315,19 +317,24 @@ class _LayoutIconNavState extends State<_LayoutIconNav> {{
         }},
         child: SizedBox(
           width: tab.slotWidth,
-          height: tab.slotHeight,
-          child: Center(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: isActive ? widget.activeBackground : Colors.transparent,
-                borderRadius: BorderRadius.circular(widget.activePillRadius),
-              ),
-              child: SizedBox(
-                width: isActive ? tab.slotWidth : tab.iconWidth,
-                height: isActive ? tab.slotHeight : tab.iconHeight,
-                child: Center(child: icon),
-              ),
-            ),
+          height: tab.rowBandHeight,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              if (isActive)
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: widget.activeBackground,
+                    borderRadius: BorderRadius.circular(widget.activePillRadius),
+                  ),
+                  child: SizedBox(
+                    width: tab.slotWidth,
+                    height: tab.slotHeight,
+                  ),
+                ),
+              icon,
+            ],
           ),
         ),
       ),
@@ -336,13 +343,22 @@ class _LayoutIconNavState extends State<_LayoutIconNav> {{
 
   @override
   Widget build(BuildContext context) {{
+    final maxSlotHeight = widget.tabs.fold<double>(
+      0.0,
+      (current, tab) => tab.slotHeight > current ? tab.slotHeight : current,
+    );
     return RepaintBoundary(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          for (var index = 0; index < widget.tabs.length; index++)
-            _buildTab(index),
-        ],
+      child: OverflowBox(
+        alignment: Alignment.center,
+        maxHeight: maxSlotHeight,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            for (var index = 0; index < widget.tabs.length; index++)
+              _buildTab(index),
+          ],
+        ),
       ),
     );
   }}

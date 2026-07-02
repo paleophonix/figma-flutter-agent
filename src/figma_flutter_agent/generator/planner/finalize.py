@@ -112,6 +112,7 @@ def render_state_and_bootstrap_files(
         planned_files,
         bootstrap_files=bootstrap_files,
         force=True,
+        feature_name=context.resolved_feature,
     )
 
 
