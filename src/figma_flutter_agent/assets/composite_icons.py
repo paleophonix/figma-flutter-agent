@@ -210,6 +210,12 @@ def is_composite_icon_stack_shape(node: CleanDesignTreeNode) -> bool:
 
 def is_composite_icon_export_node(node: CleanDesignTreeNode) -> bool:
     """True when a clean-tree node should render as one exported SVG group."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
+
+    if layout_fact_icon_badge_stack(node):
+        return False
     if not node.vector_asset_key:
         return False
     if is_composite_icon_stack_shape(node):

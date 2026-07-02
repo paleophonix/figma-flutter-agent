@@ -8,7 +8,7 @@
       "children": [
         {
           "figmaId": "7064:2572",
-          "kind": "input_rating",
+          "kind": "wrap",
           "children": [
             {
               "figmaId": "7064:2573",
@@ -41,12 +41,7 @@
                 }
               ]
             }
-          ],
-          "payload": {
-            "payloadKind": "input_rating"
-          },
-          "fidelityTier": "native_unverified",
-          "tierSource": "policy_fallback"
+          ]
         },
         {
           "figmaId": "band-7253:3639",

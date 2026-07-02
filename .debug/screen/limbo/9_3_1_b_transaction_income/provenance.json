@@ -397,24 +397,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "7064:2572",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "7064:2572",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "band-7035:1265",
       "field": "fidelity_tier",
       "old": null,
@@ -572,20 +554,6 @@
           "BOTTOM_NAV": 1
         },
         "child_count": 15
-      }
-    },
-    {
-      "nodeId": "7064:2572",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "TEXT": 1,
-          "VECTOR": 2,
-          "STACK": 1
-        },
-        "child_count": 4
       }
     },
     {

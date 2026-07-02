@@ -682,6 +682,19 @@ def _intrinsic_glyph_svg_dimensions(
             glyph_width, glyph_height = glyph
             if glyph_width > 0 and glyph_height > 0:
                 return glyph_width, glyph_height
+    node_width = node.sizing.width
+    node_height = node.sizing.height
+    if (
+        width is not None
+        and height is not None
+        and node_width is not None
+        and node_height is not None
+        and float(node_width) > 0
+        and float(node_height) > 0
+        and float(node_width) < float(width) - 0.5
+        and float(node_height) < float(height) - 0.5
+    ):
+        return float(node_width), float(node_height)
     frame = node.geometry_frame
     if frame is None or width is None or height is None:
         return width, height

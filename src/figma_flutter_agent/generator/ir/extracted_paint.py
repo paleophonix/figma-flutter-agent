@@ -79,13 +79,25 @@ def extracted_icon_badge_glyph_emit_needs_rematerialization(
         return True
     plate_w_token = format_geometry_literal(float(plate_w))
     plate_h_token = format_geometry_literal(float(plate_h))
-    if (
+    plate_sized_glyph = (
         f"width: {plate_w_token}" in existing_code
         and f"height: {plate_h_token}" in existing_code
-        and "BoxFit.fill" in existing_code
+        and f"width: {glyph_w_token}" not in existing_code
+    )
+    if plate_sized_glyph and (
+        "BoxFit.fill" in existing_code or "BoxFit.contain" in existing_code
     ):
         return True
-    return f"width: {plate_w_token}" in existing_code and f"width: {glyph_w_token}" not in existing_code
+    return plate_sized_glyph
+
+
+def asset_path_family_key(path: str) -> str:
+    """Normalize instance-specific SVG exports to a shared glyph/component family key."""
+    name = path.rsplit("/", 1)[-1]
+    stem = name.rsplit(".", 1)[0]
+    if ";" in stem:
+        return stem.split(";", 1)[1]
+    return stem
 
 
 def collect_subtree_asset_paths(node: CleanDesignTreeNode) -> frozenset[str]:
@@ -100,9 +112,19 @@ def collect_subtree_asset_paths(node: CleanDesignTreeNode) -> frozenset[str]:
     return frozenset(paths)
 
 
+def collect_subtree_asset_family_keys(node: CleanDesignTreeNode) -> frozenset[str]:
+    """Collect normalized asset-family keys for a clean-tree subtree."""
+    return frozenset(asset_path_family_key(path) for path in collect_subtree_asset_paths(node))
+
+
 def extract_dart_asset_paths(code: str) -> frozenset[str]:
     """Extract bundled asset path literals from generated Dart source."""
     return frozenset(_ASSET_PATH_RE.findall(code))
+
+
+def extract_dart_asset_family_keys(code: str) -> frozenset[str]:
+    """Extract normalized asset-family keys from generated Dart source."""
+    return frozenset(asset_path_family_key(path) for path in extract_dart_asset_paths(code))
 
 
 def icon_badge_widget_identity_matches_subtree(
@@ -110,10 +132,10 @@ def icon_badge_widget_identity_matches_subtree(
     subtree: CleanDesignTreeNode,
 ) -> bool:
     """Return True when cached widget assets overlap the candidate badge subtree."""
-    existing_assets = extract_dart_asset_paths(existing_code)
+    existing_assets = extract_dart_asset_family_keys(existing_code)
     if not existing_assets:
         return False
-    subtree_assets = collect_subtree_asset_paths(subtree)
+    subtree_assets = collect_subtree_asset_family_keys(subtree)
     if not subtree_assets:
         return False
     return bool(existing_assets & subtree_assets)

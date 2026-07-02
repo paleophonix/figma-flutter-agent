@@ -933,3 +933,129 @@ def test_refresh_stale_icon_badge_alias_widget_rerenders_renamed_class() -> None
     body = updated[path]
     assert "width: 26.0" in body
     assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in body
+
+
+def test_asset_family_key_matches_instance_specific_exports() -> None:
+    from figma_flutter_agent.generator.ir.extracted_paint import (
+        asset_path_family_key,
+        icon_badge_widget_identity_matches_subtree,
+    )
+
+    assert asset_path_family_key("assets/icons/vector_I7110_1045;7102_1277.svg") == "7102_1277"
+    assert asset_path_family_key("assets/icons/vector_I7110_1051;7102_1277.svg") == "7102_1277"
+    salary_a = _salary_icon_stack().model_copy(
+        update={
+            "children": [
+                _salary_icon_stack().children[0],
+                _salary_icon_stack().children[1].model_copy(
+                    update={
+                        "vector_asset_key": "assets/icons/vector_I7110_1051;7102_1277.svg",
+                    }
+                ),
+            ],
+        }
+    )
+    stale = (
+        "SvgPicture.asset('assets/icons/vector_I7110_1051;7102_1277.svg', "
+        "width: 57.0, height: 53.0, fit: BoxFit.contain)"
+    )
+    assert icon_badge_widget_identity_matches_subtree(stale, salary_a)
+
+
+def test_pruned_component_family_instance_delegates_to_cluster_widget() -> None:
+    from figma_flutter_agent.generator.cluster_variants import resolve_cluster_delegate_class
+
+    pruned = _salary_icon_stack().model_copy(
+        update={
+            "id": "7110:1051",
+            "component_ref": "7102:2848",
+            "cluster_id": "component_7102_2848",
+            "children": [],
+            "flatten_figma_node_ids": ["I7110:1051;7102:2847", "I7110:1051;7102:1277"],
+            "vector_asset_key": "assets/icons/vector_I7110_1051;7102_1277.svg",
+        }
+    )
+    cluster_classes = {"component_7102_2848": "IconSalaryWidget"}
+    assert (
+        resolve_cluster_delegate_class(pruned, cluster_classes) == "IconSalaryWidget"
+    )
+
+
+def test_collapse_component_family_duplicate_widgets_merges_salary_aliases() -> None:
+    from figma_flutter_agent.generator.planned.reconcile.widget_prune import (
+        collapse_component_family_duplicate_widgets,
+    )
+
+    salary = _salary_icon_stack().model_copy(
+        update={
+            "cluster_id": "component_7102_2848",
+            "component_ref": "7102:2848",
+            "children": [
+                _salary_icon_stack().children[0],
+                _salary_icon_stack().children[1].model_copy(
+                    update={
+                        "vector_asset_key": "assets/icons/vector_I7110_1045;7102_1277.svg",
+                    }
+                ),
+            ],
+        }
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=430.0, height=932.0),
+        children=[salary],
+    )
+    planned = {
+        "lib/widgets/icon_salary_widget.dart": (
+            "class IconSalaryWidget extends StatelessWidget {\n"
+            "  const IconSalaryWidget({super.key});\n"
+            "  Widget build(BuildContext context) {\n"
+            "    return Container(decoration: BoxDecoration(color: Color(0xFF6DB6FE)), "
+            "child: SvgPicture.asset('assets/icons/vector_I7110_1045;7102_1277.svg', "
+            "width: 26.0, height: 23.5, fit: BoxFit.contain));\n"
+            "  }\n"
+            "}\n"
+        ),
+        "lib/widgets/transaction_category_icon_widget.dart": (
+            "class TransactionCategoryIconWidget extends StatelessWidget {\n"
+            "  const TransactionCategoryIconWidget({super.key});\n"
+            "  Widget build(BuildContext context) {\n"
+            "    return SizedBox(width: 57.0, height: 53.0, child: SvgPicture.asset("
+            "'assets/icons/vector_I7110_1045;7102_1277.svg', width: 57.0, height: 53.0, "
+            "fit: BoxFit.contain));\n"
+            "  }\n"
+            "}\n"
+        ),
+        "lib/generated/screen_layout.dart": (
+            "child: const TransactionCategoryIconWidget(),\n"
+            "child: const IconSalaryWidget(),\n"
+        ),
+    }
+    merged = collapse_component_family_duplicate_widgets(
+        planned,
+        cluster_classes={"component_7102_2848": "IconSalaryWidget"},
+        clean_tree=screen,
+    )
+    assert "transaction_category_icon_widget.dart" not in merged
+    layout = merged["lib/generated/screen_layout.dart"]
+    assert "TransactionCategoryIconWidget(" not in layout
+    assert layout.count("IconSalaryWidget(") == 2
+    assert "width: 26.0" in merged["lib/widgets/icon_salary_widget.dart"]
+
+
+def test_icon_glyph_svg_gets_intrinsic_size_not_plate() -> None:
+    glyph = CleanDesignTreeNode(
+        id="glyph",
+        name="Vector",
+        type=NodeType.VECTOR,
+        vector_asset_key="assets/icons/vector_salary.svg",
+        sizing=Sizing(width=26.0, height=23.5),
+        stack_placement=StackPlacement(left=16.0, top=15.0, width=26.0, height=23.5),
+    )
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+    emitted = _render_svg_picture(glyph, "assets/icons/vector_salary.svg")
+    assert "width: 26.0" in emitted
+    assert "width: 57.0" not in emitted

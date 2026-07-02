@@ -163,6 +163,7 @@ from .syntax_repair import (
     sanitize_screen_emit_syntax,
 )
 from .widget_prune import (
+    collapse_component_family_duplicate_widgets,
     collapse_numbered_widget_stem_aliases,
     drop_unparseable_planned_widget_files,
     prune_duplicate_widget_classes,
@@ -328,6 +329,18 @@ def reconcile_planned_dart_files(
         updated = repair_stale_widget_ctor_names_in_planned(updated)
     elif not incremental:
         logger.info("Planned reconcile: skipping hydrate/absorb (widgets already complete)")
+    cluster_classes: dict[str, str] | None = None
+    cluster_vector_variants: dict | None = None
+    if clean_tree is not None and cluster_summary and uses_svg is not None and widget_suffix:
+        from figma_flutter_agent.generator.subtree import build_cluster_render_context
+
+        cluster_classes, cluster_vector_variants = build_cluster_render_context(
+            clean_tree,
+            cluster_summary=cluster_summary,
+            widget_suffix=widget_suffix,
+            min_count=cluster_min_count,
+            destination_trees=destination_trees,
+        )
     if clean_tree is not None and cluster_summary and uses_svg is not None and widget_suffix:
         from figma_flutter_agent.generator.widget_extractor import (
             refresh_cluster_widget_planned_files,
@@ -349,6 +362,12 @@ def reconcile_planned_dart_files(
             refresh_stale_icon_badge_planned_widget_files,
         )
 
+        if cluster_classes:
+            updated = collapse_component_family_duplicate_widgets(
+                updated,
+                cluster_classes=cluster_classes,
+                clean_tree=clean_tree,
+            )
         updated = refresh_stale_icon_badge_planned_widget_files(
             updated,
             clean_tree=clean_tree,
@@ -357,11 +376,16 @@ def reconcile_planned_dart_files(
             use_package_imports=use_package_imports,
             project_dir=project_dir,
         )
+        if cluster_classes:
+            updated = collapse_component_family_duplicate_widgets(
+                updated,
+                cluster_classes=cluster_classes,
+                clean_tree=clean_tree,
+            )
         updated = consolidate_planned_widget_paths(updated)
         _log_reconcile_phase("refresh_cluster", end=True)
     if clean_tree is not None and widget_suffix:
         from figma_flutter_agent.generator.subtree import (
-            build_cluster_render_context,
             collect_subtree_widget_specs,
             refresh_subtree_widget_planned_files,
         )
@@ -372,9 +396,9 @@ def reconcile_planned_dart_files(
 
         specs = list(collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix))
         layout_names = sorted(_layout_widget_class_names(updated))
-        cluster_classes: dict[str, str] | None = None
-        cluster_vector_variants: dict | None = None
-        if cluster_summary and uses_svg is not None:
+        if cluster_summary and uses_svg is not None and cluster_classes is None:
+            from figma_flutter_agent.generator.subtree import build_cluster_render_context
+
             cluster_classes, cluster_vector_variants = build_cluster_render_context(
                 clean_tree,
                 cluster_summary=cluster_summary,

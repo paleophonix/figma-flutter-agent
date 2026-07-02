@@ -208,6 +208,7 @@ def resolve_cluster_delegate_class(
         and not node.children
         and bool(node.flatten_figma_node_ids)
         and bool(node.vector_asset_key)
+        and node.component_ref is None
     ):
         return None
     blocked_cluster_ids = _expand_skip_cluster_ids(skip_cluster_id, cluster_classes)

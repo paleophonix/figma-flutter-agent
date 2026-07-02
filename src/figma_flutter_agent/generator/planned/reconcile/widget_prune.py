@@ -8,6 +8,8 @@ from pathlib import Path
 
 from loguru import logger
 
+from figma_flutter_agent.schemas import CleanDesignTreeNode
+
 from .class_inspect import (
     _pick_canonical_widget_path,
     _planned_has_widget_consumers,
@@ -120,6 +122,116 @@ def strip_inline_widget_duplicates_from_screens(planned: dict[str, str]) -> dict
         patched = strip_inline_widget_duplicates_from_screen(content, planned)
         if patched != content:
             updated[path] = patched
+    return updated
+
+
+def collapse_component_family_duplicate_widgets(
+    planned: dict[str, str],
+    *,
+    cluster_classes: dict[str, str] | None,
+    clean_tree: CleanDesignTreeNode | None,
+) -> dict[str, str]:
+    """Collapse duplicate widget classes that serve the same published component family."""
+    if not cluster_classes or clean_tree is None:
+        return planned
+
+    from figma_flutter_agent.generator.cluster_variants import _cluster_delegate_lookup_keys
+    from figma_flutter_agent.generator.ir.extracted_paint import (
+        collect_subtree_asset_family_keys,
+        extract_dart_asset_family_keys,
+    )
+    from figma_flutter_agent.generator.ir.tree import index_clean_tree
+    from figma_flutter_agent.generator.subtree.merge import _rename_widget_class
+
+    canonical_by_cluster = {
+        cluster_id: class_name
+        for cluster_id, class_name in cluster_classes.items()
+        if cluster_id.startswith("component_")
+    }
+    if not canonical_by_cluster:
+        return planned
+
+    cluster_families: dict[str, frozenset[str]] = {}
+    for node in index_clean_tree(clean_tree).values():
+        if not node.children:
+            continue
+        for cluster_id in _cluster_delegate_lookup_keys(node):
+            if cluster_id in canonical_by_cluster and cluster_id not in cluster_families:
+                families = collect_subtree_asset_family_keys(node)
+                if families:
+                    cluster_families[cluster_id] = families
+
+    class_paths = _widget_class_paths(planned)
+    duplicate_to_cluster: dict[str, str] = {}
+    for class_name, path in class_paths.items():
+        families = extract_dart_asset_family_keys(planned[path])
+        if not families:
+            continue
+        for cluster_id, cluster_family in cluster_families.items():
+            canonical = canonical_by_cluster[cluster_id]
+            if class_name == canonical:
+                continue
+            if families & cluster_family:
+                duplicate_to_cluster[class_name] = cluster_id
+                break
+
+    if not duplicate_to_cluster:
+        return planned
+
+    def _component_family_widget_body_score(code: str) -> int:
+        score = 0
+        if "BoxDecoration(" in code:
+            score += 20
+        if re.search(r"width: (1[0-9]|2[0-6])\.", code):
+            score += 10
+        if "width: 57.0, height: 53.0" in code and "BoxFit.contain" in code:
+            score -= 15
+        if (
+            "SizedBox(width: 57.0, height: 53.0, child: RepaintBoundary(child: SvgPicture"
+            in code
+        ):
+            score -= 20
+        return score
+
+    updated = dict(planned)
+    drop_paths: set[str] = set()
+    for duplicate_class, cluster_id in duplicate_to_cluster.items():
+        canonical_class = canonical_by_cluster[cluster_id]
+        duplicate_path = class_paths.get(duplicate_class)
+        if duplicate_path is None:
+            continue
+        canonical_path = class_paths.get(canonical_class)
+        duplicate_body = updated.get(duplicate_path, "")
+        canonical_body = updated.get(canonical_path, "") if canonical_path else ""
+        if _component_family_widget_body_score(duplicate_body) > _component_family_widget_body_score(
+            canonical_body
+        ):
+            promoted = _rename_widget_class(duplicate_body, duplicate_class, canonical_class)
+            target_path = canonical_path or duplicate_path
+            updated[target_path] = promoted
+            if canonical_path and duplicate_path != canonical_path:
+                drop_paths.add(duplicate_path)
+        elif canonical_path is None:
+            updated[duplicate_path] = _rename_widget_class(
+                duplicate_body,
+                duplicate_class,
+                canonical_class,
+            )
+        else:
+            drop_paths.add(duplicate_path)
+
+        for path, content in list(updated.items()):
+            patched = content.replace(f"const {duplicate_class}(", f"const {canonical_class}(")
+            patched = patched.replace(f"{duplicate_class}(", f"{canonical_class}(")
+            if patched != content:
+                updated[path] = patched
+
+    for path in drop_paths:
+        updated.pop(path, None)
+        logger.info(
+            "Collapsed component-family duplicate widget: {}",
+            path.replace("\\", "/"),
+        )
     return updated
 
 

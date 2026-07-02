@@ -18,21 +18,6 @@
       "rejectReason": null
     },
     {
-      "figmaId": "7064:2572",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "TEXT": 1,
-          "VECTOR": 2,
-          "STACK": 1
-        },
-        "child_count": 4
-      },
-      "rejectReason": null
-    },
-    {
       "figmaId": "band-7035:1265",
       "kind": "container_list_tile",
       "confidence": 0.84,
@@ -397,6 +382,6 @@
     "I7110:3218;7110:3178"
   ],
   "llmAnnotationUsed": [],
-  "acceptedCount": 10,
-  "totalDecisions": 28
+  "acceptedCount": 9,
+  "totalDecisions": 27
 }

@@ -695,12 +695,17 @@ def _icon_badge_representative_for_stale_body(
         icon_badge_widget_identity_matches_subtree,
     )
 
+    candidates: list[CleanDesignTreeNode] = []
     for node in badge_nodes:
         if not icon_badge_planned_widget_needs_rematerialization(node, existing):
             continue
         if icon_badge_widget_identity_matches_subtree(existing, node):
-            return node
-    return None
+            candidates.append(node)
+    if not candidates:
+        return None
+    with_children = [node for node in candidates if node.children]
+    pool = with_children if with_children else candidates
+    return max(pool, key=_representative_score)
 
 
 def refresh_stale_icon_badge_planned_widget_files(
@@ -747,6 +752,11 @@ def refresh_stale_icon_badge_planned_widget_files(
             uses_svg=uses_svg,
             skip_cluster_id=representative.cluster_id,
         )
+        from figma_flutter_agent.generator.ir.extracted import (
+            _preserve_extracted_widget_decoration_shell,
+        )
+
+        body = _preserve_extracted_widget_decoration_shell(representative, body)
         body = _bound_cluster_widget_root(representative, body)
         merged[path] = render_widget_file(
             class_name=class_name,
