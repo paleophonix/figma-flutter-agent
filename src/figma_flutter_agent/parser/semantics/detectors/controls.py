@@ -14,6 +14,12 @@ def _is_checkbox(ctx: DetectorContext) -> bool:
 
 
 def _is_switch(ctx: DetectorContext) -> bool:
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_switch_hosts_segmented_options,
+    )
+
+    if layout_fact_switch_hosts_segmented_options(ctx.clean_node):
+        return False
     return ctx.clean_node.type == NodeType.SWITCH
 
 
@@ -23,6 +29,12 @@ def _is_radio(ctx: DetectorContext) -> bool:
 
 def _is_segmented(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_switch_hosts_segmented_options,
+    )
+
+    if layout_fact_switch_hosts_segmented_options(node):
+        return True
     axis = _variant_axis_value(node, "type", "control", "variant")
     if axis and "segment" in axis:
         return True

@@ -149,6 +149,7 @@ def merge_ir_node(
     *,
     omit_ids: frozenset[str],
     extracted_class_by_widget_name: dict[str, str] | None = None,
+    clean_index: dict[str, CleanDesignTreeNode] | None = None,
 ) -> CleanDesignTreeNode:
     """Apply IR child ordering/filtering onto a clean-tree node."""
     merged = _apply_ir_overrides(clean, ir.overrides)
@@ -182,6 +183,12 @@ def merge_ir_node(
     emitted_ids: set[str] = set()
     for ir_child in ir.children:
         clean_child = clean_child_by_id.get(ir_child.figma_id)
+        if clean_child is None and clean_index is not None:
+            from figma_flutter_agent.generator.ir.passes.sectionize import (
+                materialize_band_clean_node,
+            )
+
+            clean_child = materialize_band_clean_node(ir_child, clean_index)
         if clean_child is None or clean_child.id in omit_ids:
             continue
         emitted_ids.add(clean_child.id)
@@ -191,6 +198,7 @@ def merge_ir_node(
                 ir_child,
                 omit_ids=omit_ids,
                 extracted_class_by_widget_name=extracted_class_by_widget_name,
+                clean_index=clean_index,
             )
         )
     for clean_child in clean.children:
@@ -262,11 +270,13 @@ def merge_screen_ir(
 ) -> CleanDesignTreeNode:
     """Return a clean tree with ``screen_ir`` structure applied at ``root``."""
     omit_ids = frozenset(screen_ir.omit_figma_ids)
+    clean_index = index_clean_tree(root)
     merged = merge_ir_node(
         root,
         screen_ir.root,
         omit_ids=omit_ids,
         extracted_class_by_widget_name=extracted_class_by_widget_name,
+        clean_index=clean_index,
     )
     if screen_ir.stack_child_order and merged.type.value == "STACK":
         by_id = {child.id: child for child in merged.children}

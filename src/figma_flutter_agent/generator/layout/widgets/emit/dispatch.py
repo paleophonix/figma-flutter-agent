@@ -192,7 +192,10 @@ def render_node_body(
         from figma_flutter_agent.generator.layout.flex_policy.stack import (
             layout_fact_icon_badge_stack,
         )
-        from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
+        from figma_flutter_agent.parser.interaction import (
+            layout_fact_checkbox_control,
+            layout_fact_stack_category_component_tile,
+        )
 
         from ..svg import stack_should_emit_flattened_vector_group
 
@@ -203,6 +206,7 @@ def render_node_body(
             and stack_should_emit_flattened_vector_group(node)
             and not layout_fact_stack_category_component_tile(node)
             and not layout_fact_icon_badge_stack(node)
+            and not layout_fact_checkbox_control(node)
         ):
             exported = _render_exported_vector(node, uses_svg=uses_svg)
             if exported is not None:

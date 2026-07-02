@@ -293,7 +293,10 @@ def render_stack(
     from figma_flutter_agent.generator.layout.flex_policy import (
         stack_hosts_notification_badge_overlay,
     )
-    from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+    from figma_flutter_agent.parser.interaction import (
+        find_raster_photo_leaf,
+        layout_fact_checkbox_control,
+    )
 
     from ..svg import (
         _render_svg_picture,
@@ -302,6 +305,17 @@ def render_stack(
     )
 
     has_raster_photo_fill = find_raster_photo_leaf(node) is not None
+    if layout_fact_checkbox_control(node):
+        from figma_flutter_agent.generator.layout.form import render_checkbox
+
+        widget = render_checkbox(node, theme_variant=theme_variant)
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
     if has_raster_photo_fill:
         compact_photo = try_render_media_avatar_stack(node, uses_svg=uses_svg)
         if compact_photo is None:
@@ -600,14 +614,13 @@ def render_stack(
             layout_fact_labeled_absolute_field_stack,
             layout_fact_painted_field_shell_container,
         )
+
         from ..input.absolute_fields import render_decomposed_absolute_field
         from ..input.fields import _compose_external_label_input
 
         if layout_fact_labeled_absolute_field_stack(node):
             shell = next(
-                child
-                for child in node.children
-                if layout_fact_painted_field_shell_container(child)
+                child for child in node.children if layout_fact_painted_field_shell_container(child)
             )
             value_node = find_field_shell_value_text(shell, node.children)
             label_node = find_field_shell_external_label(shell, node.children)
@@ -973,7 +986,7 @@ def render_stack(
                 stack_emit_widgets,
                 allow_outward_paint=stack_needs_soft_clip(node),
             )
-            if is_layout_root and not responsive_enabled:
+            if is_layout_root:
                 partition = partition_viewport_pinned_stack_layers(
                     node,
                     stack_emit_children,

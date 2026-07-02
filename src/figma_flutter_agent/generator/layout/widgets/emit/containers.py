@@ -13,6 +13,7 @@ from figma_flutter_agent.generator.layout.form import (
     render_radio_group,
     render_slider,
     render_switch,
+    render_segmented_control_host,
 )
 from figma_flutter_agent.generator.layout.navigation.tabs import render_carousel, render_tabs
 from figma_flutter_agent.generator.layout.scroll import render_grid_view
@@ -68,7 +69,18 @@ def render_simple_controls(
         )
 
     if node.type == NodeType.SWITCH:
-        widget = render_switch(node, theme_variant=theme_variant)
+        from figma_flutter_agent.generator.layout.flex_policy.row import (
+            layout_fact_switch_hosts_segmented_options,
+        )
+
+        if layout_fact_switch_hosts_segmented_options(node):
+            widget = render_segmented_control_host(
+                node,
+                child_widgets,
+                theme_variant=theme_variant,
+            )
+        else:
+            widget = render_switch(node, theme_variant=theme_variant)
         return _finalize_widget(
             node,
             widget,

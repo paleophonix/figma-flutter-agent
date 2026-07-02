@@ -57,6 +57,44 @@ def render_switch(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     return f"Semantics(label: '{label}', child: {control})"
 
 
+def render_segmented_control_host(
+    node: CleanDesignTreeNode,
+    child_widgets: list[str],
+    *,
+    theme_variant: str,
+) -> str:
+    """Render a pill host with mutually exclusive segmented option children."""
+    from figma_flutter_agent.generator.layout.style import box_decoration_expr
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    label = escape_dart_string(node.accessibility_label or node.name)
+    body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+    row = (
+        f"Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [{body}])"
+        if node.spacing and node.spacing > 0
+        else f"Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [{body}])"
+    )
+    decoration = box_decoration_expr(
+        node.style,
+        width=node.sizing.width,
+        height=node.sizing.height,
+    )
+    if decoration is not None:
+        width = node.sizing.width
+        height = node.sizing.height
+        size_fields: list[str] = []
+        if width is not None and width > 0:
+            size_fields.append(f"width: {format_geometry_literal(float(width))}")
+        if height is not None and height > 0:
+            size_fields.append(f"height: {format_geometry_literal(float(height))}")
+        size_prefix = ", ".join(size_fields)
+        if size_prefix:
+            row = f"Container({size_prefix}, decoration: {decoration}, child: {row})"
+        else:
+            row = f"Container(decoration: {decoration}, child: {row})"
+    return f"Semantics(label: '{label}', child: {row})"
+
+
 def render_radio_group(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     label = escape_dart_string(node.accessibility_label or node.name)
     control = render_radio_group_widget(node=node, theme_variant=theme_variant)

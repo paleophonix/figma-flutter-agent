@@ -19,6 +19,7 @@ from .shared import (
 _PASSWORD_DOT_CHARS = frozenset("•·●∙*·.")
 _MAX_CHECKBOX_SIZE = 32.0
 _MIN_CHECKBOX_SIZE = 12.0
+_MIN_STROKED_GLYPH_CHECKBOX_SIZE = 10.0
 
 _LINK_HINTS = (
     "forgot password",
@@ -147,8 +148,12 @@ def _hosts_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def _stroked_vector_is_checkbox_outline(vector: CleanDesignTreeNode) -> bool:
+    return bool(vector.style.has_stroke) and not vector.style.background_color
+
+
 def _stack_hosts_stroked_outline_checkbox_glyph(node: CleanDesignTreeNode) -> bool:
-    """Square component icon with a single stroked hollow vector (checkbox outline)."""
+    """Square component icon with stroked hollow vectors (checkbox outline + optional mark)."""
     if node.type not in {NodeType.STACK, NodeType.CONTAINER}:
         return False
     width = node.sizing.width
@@ -156,20 +161,24 @@ def _stack_hosts_stroked_outline_checkbox_glyph(node: CleanDesignTreeNode) -> bo
     if width is None or height is None:
         return False
     if not (
-        _MIN_CHECKBOX_SIZE <= width <= _MAX_CHECKBOX_SIZE
-        and _MIN_CHECKBOX_SIZE <= height <= _MAX_CHECKBOX_SIZE
+        _MIN_STROKED_GLYPH_CHECKBOX_SIZE <= width <= _MAX_CHECKBOX_SIZE
+        and _MIN_STROKED_GLYPH_CHECKBOX_SIZE <= height <= _MAX_CHECKBOX_SIZE
         and abs(width - height) <= 4.0
     ):
         return False
     vectors = [child for child in node.children if child.type == NodeType.VECTOR]
-    if len(vectors) != 1:
-        return False
-    vector = vectors[0]
-    if not vector.style.has_stroke:
-        return False
-    if vector.style.background_color:
-        return False
-    return True
+    if len(vectors) == 1:
+        return _stroked_vector_is_checkbox_outline(vectors[0])
+    if len(vectors) == 2:
+        outer, inner = sorted(
+            vectors,
+            key=lambda item: float(item.sizing.width or 0.0) * float(item.sizing.height or 0.0),
+            reverse=True,
+        )
+        return _stroked_vector_is_checkbox_outline(outer) and _stroked_vector_is_checkbox_outline(
+            inner
+        )
+    return False
 
 
 def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
@@ -180,10 +189,9 @@ def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if width is None or height is None:
         return False
-    if not (
-        _MIN_CHECKBOX_SIZE <= width <= _MAX_CHECKBOX_SIZE
-        and _MIN_CHECKBOX_SIZE <= height <= _MAX_CHECKBOX_SIZE
-    ):
+    stroked_glyph = _stack_hosts_stroked_outline_checkbox_glyph(node)
+    min_size = _MIN_STROKED_GLYPH_CHECKBOX_SIZE if stroked_glyph else _MIN_CHECKBOX_SIZE
+    if not (min_size <= width <= _MAX_CHECKBOX_SIZE and min_size <= height <= _MAX_CHECKBOX_SIZE):
         return False
     if abs(width - height) > 4.0:
         return False
@@ -624,9 +632,7 @@ def _caption_label_below_icon_band(
         if child.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.VECTOR, NodeType.IMAGE}:
             continue
         child_placement = child.stack_placement
-        child_top = (
-            float(child_placement.top or 0.0) if child_placement is not None else 0.0
-        )
+        child_top = float(child_placement.top or 0.0) if child_placement is not None else 0.0
         if child_top <= float(height) * 0.45:
             return True
     return False

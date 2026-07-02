@@ -275,4 +275,8 @@ def layout_fact_compact_vector_icon_export_node(node: CleanDesignTreeNode) -> bo
 
     if subtree_has_text_descendant(node):
         return False
+    from figma_flutter_agent.parser.interaction import layout_fact_checkbox_control
+
+    if layout_fact_checkbox_control(node):
+        return False
     return layout_fact_compact_vector_icon_shape(node) and bool(node.vector_asset_key)

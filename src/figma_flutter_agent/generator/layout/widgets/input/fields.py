@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.layout.common import (
+    escape_dart_string,
+    escape_figma_text_literal,
+)
+from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+    neutralize_parent_data_for_flex_child,
+)
 from figma_flutter_agent.generator.layout.form import wrap_material_input_child
 from figma_flutter_agent.generator.layout.style import (
     box_decoration_expr,
@@ -96,7 +102,8 @@ def _compose_external_label_input(
     text_theme_size_slots: list[tuple[float, str]] | None,
 ) -> str:
     """Stack a field label above the control when Figma places it outside the surface."""
-    label_text = escape_dart_string((label_node.text or "").strip())
+    label_text = escape_figma_text_literal(label_node)
+    field_widget = neutralize_parent_data_for_flex_child(field_widget)
     style_expr = text_style_expr(
         label_node,
         bundled_font_families=bundled_font_families,

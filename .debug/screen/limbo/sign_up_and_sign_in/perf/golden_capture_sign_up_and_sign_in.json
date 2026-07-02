@@ -1,0 +1,10 @@
+{
+  "feature": "sign_up_and_sign_in",
+  "mode": "docker",
+  "fastCapture": true,
+  "workspace": "docker",
+  "timingsSec": {
+    "totalCapture": 12.0
+  },
+  "screenId": "sign_up_and_sign_in"
+}

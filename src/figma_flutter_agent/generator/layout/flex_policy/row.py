@@ -981,6 +981,33 @@ def layout_fact_stack_tab_switcher_host(stack: CleanDesignTreeNode) -> bool:
     return True
 
 
+def _segmented_option_label_text(node: CleanDesignTreeNode) -> str | None:
+    """Return the first non-empty label string inside a segmented option subtree."""
+    if node.type == NodeType.TEXT:
+        text = (node.text or "").strip()
+        return text or None
+    for child in node.children:
+        label = _segmented_option_label_text(child)
+        if label:
+            return label
+    return None
+
+
+def layout_fact_segmented_option_host(node: CleanDesignTreeNode) -> bool:
+    """Return True when a subtree is one labeled option inside a segmented control."""
+    if node.type not in {NodeType.ROW, NodeType.STACK, NodeType.CONTAINER, NodeType.BUTTON}:
+        return False
+    return _segmented_option_label_text(node) is not None
+
+
+def layout_fact_switch_hosts_segmented_options(node: CleanDesignTreeNode) -> bool:
+    """Return True when a Figma ``SWITCH`` component hosts mutually exclusive option chips."""
+    if node.type != NodeType.SWITCH or len(node.children) < 2:
+        return False
+    option_hosts = [child for child in node.children if layout_fact_segmented_option_host(child)]
+    return len(option_hosts) >= 2
+
+
 def layout_fact_row_segmented_tab_switcher_host(row: CleanDesignTreeNode) -> bool:
     """Return True when a ``Row`` hosts two side-by-side segmented tab options."""
     if row.type != NodeType.ROW or len(row.children) != 2:

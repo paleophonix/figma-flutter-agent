@@ -1,0 +1,10 @@
+{
+  "feature": "bounded_order_card",
+  "mode": "docker",
+  "fastCapture": true,
+  "workspace": "docker",
+  "timingsSec": {
+    "totalCapture": 11.296000000002095
+  },
+  "screenId": "bounded_order_card"
+}

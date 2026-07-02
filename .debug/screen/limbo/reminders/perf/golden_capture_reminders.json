@@ -1,0 +1,10 @@
+{
+  "feature": "reminders",
+  "mode": "docker",
+  "fastCapture": true,
+  "workspace": "docker",
+  "timingsSec": {
+    "totalCapture": 11.625
+  },
+  "screenId": "reminders"
+}

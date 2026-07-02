@@ -1,0 +1,10 @@
+{
+  "feature": "music_v2",
+  "mode": "docker",
+  "fastCapture": true,
+  "workspace": "docker",
+  "timingsSec": {
+    "totalCapture": 10.389999999999418
+  },
+  "screenId": "music_v2"
+}

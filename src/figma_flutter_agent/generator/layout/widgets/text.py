@@ -369,8 +369,13 @@ def _should_center_text_in_button_stack(
     from figma_flutter_agent.generator.layout.navigation.items import (
         layout_fact_stack_bottom_nav_active_tab_pill,
     )
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_upload_placeholder_tile,
+    )
 
     if layout_fact_stack_bottom_nav_active_tab_pill(parent_node):
+        return False
+    if layout_fact_upload_placeholder_tile(parent_node):
         return False
     if parent_node.type == NodeType.BUTTON:
         from figma_flutter_agent.parser.interaction import (

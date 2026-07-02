@@ -583,6 +583,19 @@ def strip_flex_parent_data_deep(widget: str) -> str:
     return widget
 
 
+def neutralize_parent_data_for_flex_child(widget: str) -> str:
+    """Strip stack/flex parent-data wrappers before composing into Column/Row/Flex.
+
+    Widgets finalized under a STACK parent may carry ``Positioned``; flex hosts require
+    plain children. Likewise remove top-level ``Expanded``/``Flexible`` wrappers.
+    """
+    from figma_flutter_agent.generator.layout.widget_roots import (
+        strip_stack_parent_data_wrappers,
+    )
+
+    return strip_flex_parent_data_for_scroll_item(strip_stack_parent_data_wrappers(widget))
+
+
 def _unwrap_flex_parent_data_wrapper(widget: str) -> tuple[str, str] | None:
     """Return ``(wrapper_prefix, inner)`` for a top-level Expanded/Flexible wrapper."""
     trimmed = widget.lstrip()

@@ -462,3 +462,22 @@ def test_sectionize_product_detail_fixture_without_fitted_box_scale_down() -> No
     plan = evaluate_root_sectionize(clean, responsive_reflow_enabled=True)
     assert plan.activated is True
     assert len(plan.scroll_sections) >= 1
+
+
+def test_sectionize_rejects_dense_absolute_overlay_artboard() -> None:
+    """Law: FixedArtboardStackPreservationLaw — dense overlay dashboards stay STACK."""
+    import json
+    from pathlib import Path
+
+    from figma_flutter_agent.parser.dedup.hydrate import hydrate_pruned_cluster_instances
+
+    payload = json.loads(
+        Path(".debug/screen/limbo/9_a_home_bottom_navigation/processed.json").read_text(
+            encoding="utf-8",
+        ),
+    )
+    root = CleanDesignTreeNode.model_validate(payload["cleanTree"])
+    hydrate_pruned_cluster_instances(root)
+    plan = evaluate_root_sectionize(root, responsive_reflow_enabled=True)
+    assert plan.activated is False
+    assert plan.reject_reason == "dense_absolute_overlay_artboard"

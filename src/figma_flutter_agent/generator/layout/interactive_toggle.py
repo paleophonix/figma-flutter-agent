@@ -58,13 +58,21 @@ def _checkbox_theme_wrapper(
         css_key="border-color",
         fallback="AppColors.primary",
     )
-    fill_fields = ""
+    unchecked_fill = dart_color_expr(
+        border.style,
+        css_key="background-color",
+        fallback="const Color(0xFFFFFFFF)",
+    )
     if checked:
         fill_fields = (
             f"fillColor: MaterialStateProperty.resolveWith((states) => "
-            f"states.contains(MaterialState.selected) ? {color_expr} : Colors.transparent), "
-            f"checkColor: MaterialStateProperty.all({color_expr}), "
+            f"states.contains(MaterialState.selected) ? {color_expr} : {unchecked_fill}), "
+            "checkColor: MaterialStateProperty.all(const Color(0xFFFFFFFF)), "
         )
+    elif border.style.background_color:
+        fill_fields = f"fillColor: MaterialStateProperty.all({unchecked_fill}), "
+    else:
+        fill_fields = ""
     return (
         "Theme("
         "data: Theme.of(context).copyWith("
@@ -161,8 +169,6 @@ def render_stateful_toggle_checkbox(
         f"onChangedBody: () {{ {comment} }})"
     )
     border = checkbox_option_border_container(stack_ref)
-    if border is not None and (
-        border.style.border_color or border.style.background_color
-    ):
+    if border is not None and (border.style.border_color or border.style.background_color):
         widget = _checkbox_theme_wrapper(widget, border, checked=checked)
     return widget

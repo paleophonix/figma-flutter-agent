@@ -143,6 +143,14 @@ def plausible_kinds(node: CleanDesignTreeNode) -> frozenset[WidgetIrKind]:
     if typed:
         candidates.update(typed)
 
+    if signal_type == NodeType.SWITCH:
+        from figma_flutter_agent.generator.layout.flex_policy.row import (
+            layout_fact_switch_hosts_segmented_options,
+        )
+
+        if layout_fact_switch_hosts_segmented_options(node):
+            candidates.add(WidgetIrKind.CONTROL_SEGMENTED)
+
     if node.scroll_axis == "vertical" and signal_type in {NodeType.COLUMN, NodeType.STACK}:
         candidates.add(WidgetIrKind.NAV_SCROLL_HOST)
 

@@ -59,6 +59,39 @@ def test_absolute_overlay_density_preservation_law_blocks_home_column_flow() -> 
     assert stack_should_flow_as_column(root) is False
 
 
+def test_sectionize_rejects_dense_home_artboard() -> None:
+    """Law: FixedArtboardStackPreservationLaw — dense overlay roots skip sectionize."""
+    from figma_flutter_agent.generator.ir.passes.sectionize import evaluate_root_sectionize
+
+    root = _load_home_root()
+    plan = evaluate_root_sectionize(root, responsive_reflow_enabled=True)
+    assert plan.activated is False
+    assert plan.reject_reason == "dense_absolute_overlay_artboard"
+
+
+def test_switch_hosts_segmented_options_emit_children_not_material_switch() -> None:
+    """Law: SegmentedSwitchHostLaw — multi-option SWITCH hosts render option row."""
+    from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+    root = _load_home_root()
+    switch = _find_node(root, "7342:2856")
+    assert switch is not None
+    body = render_node_body(switch, uses_svg=True)
+    assert "Switch(value:" not in body
+
+
+def test_stroked_glyph_checkbox_emits_interactive_control() -> None:
+    """Law: CompactCheckboxGlyphLaw — stroked square stacks emit Checkbox, not SVG."""
+    from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+    root = _load_home_root()
+    checkbox = _find_node(root, "7342:2878")
+    assert checkbox is not None
+    body = render_node_body(checkbox, uses_svg=True)
+    assert "Checkbox(" in body or "_GeneratedToggleCheckbox" in body
+    assert "check_7342_2878.svg" not in body
+
+
 def test_extracted_widget_fixed_bounds_law_wraps_notification_icon() -> None:
     """Law: ExtractedWidgetFixedBoundsLaw — icon badge widgets get finite bounds."""
     root = _load_home_root()

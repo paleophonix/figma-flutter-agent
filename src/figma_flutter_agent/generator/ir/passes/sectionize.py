@@ -18,7 +18,10 @@ from figma_flutter_agent.generator.ir.passes.sync import (
     index_ir_nodes,
     ir_kind_for_node_type,
 )
-from figma_flutter_agent.generator.layout.flex_policy.stack import is_viewport_chrome_band
+from figma_flutter_agent.generator.layout.flex_policy.stack import (
+    is_viewport_chrome_band,
+    stack_dense_absolute_overlays_preserve_stack,
+)
 from figma_flutter_agent.generator.layout.widgets.positioned import _should_pin_bottom
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -216,6 +219,51 @@ def _section_gaps_from_bands(bands: list[list[CleanDesignTreeNode]]) -> list[flo
     return gaps
 
 
+def materialize_band_clean_node(
+    ir_band: WidgetIrNode,
+    clean_index: dict[str, CleanDesignTreeNode],
+) -> CleanDesignTreeNode | None:
+    """Synthesize a ``band-*`` clean wrapper from IR descendants when merge lacks bands.
+
+    Args:
+        ir_band: IR node whose ``figma_id`` uses the sectionize band prefix.
+        clean_index: Flat index of the pre-merge clean design tree.
+
+    Returns:
+        Bounded band stack node, or ``None`` when descendants cannot be resolved.
+    """
+    if not is_sectionize_band_wrapper_id(ir_band.figma_id):
+        return None
+    resolved: list[CleanDesignTreeNode] = []
+    for ir_child in ir_band.children:
+        clean_child = clean_index.get(ir_child.figma_id)
+        if clean_child is not None:
+            resolved.append(clean_child)
+    if not resolved:
+        return None
+    if len(resolved) == 1:
+        band_node = CleanDesignTreeNode(
+            id=ir_band.figma_id,
+            name=f"{resolved[0].name}-section",
+            type=NodeType.STACK,
+            children=[_clear_flex_placement(resolved[0])],
+        )
+    else:
+        band_node = _band_to_section_node(resolved)
+    if band_node is None:
+        return None
+    if len(resolved) > 1 and not band_node.children:
+        band_node = CleanDesignTreeNode(
+            id=ir_band.figma_id,
+            name=f"{resolved[0].name}-section",
+            type=NodeType.STACK,
+            children=resolved,
+        )
+    if band_node.id == ir_band.figma_id:
+        return band_node
+    return band_node.model_copy(update={"id": ir_band.figma_id})
+
+
 def evaluate_root_sectionize(
     root: CleanDesignTreeNode,
     *,
@@ -226,6 +274,11 @@ def evaluate_root_sectionize(
         return SectionizePlan(activated=False, reject_reason="responsive_disabled")
     if root.type != NodeType.STACK or len(root.children) < 2:
         return SectionizePlan(activated=False, reject_reason="not_stack_or_too_few_children")
+    if stack_dense_absolute_overlays_preserve_stack(root):
+        return SectionizePlan(
+            activated=False,
+            reject_reason="dense_absolute_overlay_artboard",
+        )
     parent_height = _parent_artboard_height(root)
     if parent_height is None:
         return SectionizePlan(activated=False, reject_reason="unknown_artboard_height")

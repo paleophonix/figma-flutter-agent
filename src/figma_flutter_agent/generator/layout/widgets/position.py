@@ -567,22 +567,31 @@ def _wrap_root_stack_viewport(
         )
         from figma_flutter_agent.generator.layout.common import (
             bottom_chrome_pinned_live_viewport,
+            bottom_chrome_viewport_partition_live,
         )
 
         if responsive_enabled and is_mobile_artboard_width(width):
-            fallback = (
-                "LayoutBuilder("
-                "builder: (context, constraints) {"
-                f"final viewportHeight = constraints.maxHeight.isFinite && "
-                f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
-                "return SizedBox("
-                "width: constraints.maxWidth, "
-                f"height: viewportHeight, "
-                f"child: {stack_widget}"
-                ");"
-                "},"
-                ")"
-            )
+            if viewport_pinned_layers:
+                fallback = bottom_chrome_viewport_partition_live(
+                    scrollable_stack=stack_widget,
+                    pinned_layers=viewport_pinned_layers,
+                    width_token=width_token,
+                    height_token=height_token,
+                )
+            else:
+                fallback = (
+                    "LayoutBuilder("
+                    "builder: (context, constraints) {"
+                    f"final viewportHeight = constraints.maxHeight.isFinite && "
+                    f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
+                    "return SizedBox("
+                    "width: constraints.maxWidth, "
+                    f"height: viewportHeight, "
+                    f"child: {stack_widget}"
+                    ");"
+                    "},"
+                    ")"
+                )
         elif responsive_enabled:
             fitted = (
                 "Align("

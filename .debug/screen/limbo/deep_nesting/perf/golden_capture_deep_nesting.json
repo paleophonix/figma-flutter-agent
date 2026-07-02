@@ -1,0 +1,10 @@
+{
+  "feature": "deep_nesting",
+  "mode": "docker",
+  "fastCapture": true,
+  "workspace": "docker",
+  "timingsSec": {
+    "totalCapture": 11.547000000005937
+  },
+  "screenId": "deep_nesting"
+}

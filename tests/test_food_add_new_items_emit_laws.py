@@ -599,6 +599,7 @@ def test_labeled_absolute_field_stack_emits_external_label() -> None:
                 type=NodeType.TEXT,
                 text="item name",
                 sizing=Sizing(width=80.0, height=16.0),
+                style=NodeStyle(text_case="UPPER"),
                 stack_placement=StackPlacement(left=24.0, top=0.0, width=80.0, height=16.0),
                 geometry_frame={
                     "layoutRect": {"x": 24.0, "y": 0.0, "width": 80.0, "height": 16.0},
@@ -635,13 +636,47 @@ def test_labeled_absolute_field_stack_emits_external_label() -> None:
     assert layout_fact_labeled_absolute_field_stack(field_stack)
     emitted = render_node_body(field_stack, uses_svg=True, parent_type=NodeType.COLUMN)
     compact = emitted.replace("\n", "")
-    assert "Text('item name'" in compact
-    assert compact.index("item name") < compact.index("Mazalichiken Halim")
+    assert "Text('ITEM NAME'" in compact
+    assert compact.index("ITEM NAME") < compact.index("Mazalichiken Halim")
     assert "Column(" in compact
+    col_children = compact.split("Column(", 1)[1].split("children: [", 1)[1]
+    depth = 1
+    end = 0
+    for index, char in enumerate(col_children):
+        if char == "[":
+            depth += 1
+        elif char == "]":
+            depth -= 1
+            if depth == 0:
+                end = index
+                break
+    assert "Positioned(" not in col_children[:end]
 
 
-def test_checkbox_theme_uses_border_color_not_surface_fill() -> None:
-    """Law: CheckboxVisualContractLaw — checkbox chrome follows stroke color."""
+def test_food_replay_item_name_field_no_positioned_in_column() -> None:
+    """Law: ParentDataNeutralCompositionLaw — labeled field Column has no Positioned children."""
+    root = _load_food_root()
+    field = _find_node(root, "602:1218")
+    assert field is not None
+    emitted = render_node_body(field, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "Text('ITEM NAME'" in compact
+    col_children = compact.split("Column(", 1)[1].split("children: [", 1)[1]
+    depth = 1
+    end = 0
+    for index, char in enumerate(col_children):
+        if char == "[":
+            depth += 1
+        elif char == "]":
+            depth -= 1
+            if depth == 0:
+                end = index
+                break
+    assert "Positioned(" not in col_children[:end]
+
+
+def test_checkbox_theme_uses_border_color_and_white_fill() -> None:
+    """Law: CheckboxLayerPreservationLaw — unchecked shell keeps white fill and grey stroke."""
     stack = CleanDesignTreeNode(
         id="1:option",
         name="Delivery",
@@ -672,8 +707,94 @@ def test_checkbox_theme_uses_border_color_not_surface_fill() -> None:
     )
     emitted = render_node_body(stack, uses_svg=True, parent_type=NodeType.COLUMN)
     compact = emitted.replace("\n", "")
-    assert "side: BorderSide(color: Color(0xFFE8EAED)" in compact
-    assert "Color(0xFFFDFDFD)" not in compact.split("checkboxTheme")[1].split("child:")[0]
+    theme = compact.split("checkboxTheme:")[1].split("child:")[0]
+    assert "side: BorderSide(color: Color(0xFFE8EAED)" in theme
+    assert "fillColor: MaterialStateProperty.all(Color(0xFFFDFDFD))" in theme
+
+
+def test_checked_checkbox_uses_contrasting_tick_color() -> None:
+    """Law: CheckboxLayerPreservationLaw — checked tick must contrast with fill."""
+    stack = CleanDesignTreeNode(
+        id="1:option",
+        name="Pick up",
+        type=NodeType.STACK,
+        sizing=Sizing(width=75.0, height=19.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:box",
+                name="Rectangle",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=18.0, height=18.0),
+                style=NodeStyle(
+                    border_color="0xFFFB6D3A",
+                    border_width=1.0,
+                    border_radius=3.0,
+                    has_stroke=True,
+                ),
+                stack_placement=StackPlacement(top=1.0, right=57.0, width=18.0, height=18.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Pick up",
+                type=NodeType.TEXT,
+                text="Pick up",
+                sizing=Sizing(width=47.0, height=16.0),
+                stack_placement=StackPlacement(left=28.0, bottom=3.0, width=47.0, height=16.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:mark",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=8.0, height=6.0),
+                style=NodeStyle(border_color="0xFFFB6D3A", border_width=1.5, has_stroke=True),
+                stack_placement=StackPlacement(left=5.0, top=7.0, width=8.0, height=6.0),
+            ),
+        ],
+    )
+    assert checkbox_option_stack_is_checked(stack)
+    emitted = render_node_body(stack, uses_svg=True, parent_type=NodeType.COLUMN)
+    compact = emitted.replace("\n", "")
+    assert "checkboxTheme: CheckboxThemeData" in compact
+    theme = compact.split("checkboxTheme:")[1].split("child:")[0]
+    assert "checkColor: MaterialStateProperty.all(const Color(0xFFFFFFFF))" in theme
+    assert "checkColor: MaterialStateProperty.all(Color(0xFFFB6D3A))" not in theme
+
+
+def test_upload_placeholder_label_uses_local_stack_placement() -> None:
+    """Law: UploadTileCompositePreservationLaw — Add label keeps Figma stack pins."""
+    root = _load_food_root()
+    tile = _find_node(root, "602:1184")
+    assert tile is not None
+    emitted = render_node_body(tile, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "top: 64.1" in compact or "top: 64.0" in compact
+    assert "left: 37.0" in compact
+    assert "width: 111.0, top: 0.0, height: 101.0" not in compact
+
+
+def test_extracted_upload_section_preserves_glyph_assets() -> None:
+    """Law: UploadTileCompositePreservationLaw — extracted upload host keeps glyph SVG."""
+    from figma_flutter_agent.generator.cluster_variants import (
+        cluster_classes_for_inline_widget_render,
+    )
+    from figma_flutter_agent.generator.subtree.render import _prepare_subtree_render_root
+
+    root = _load_food_root()
+    section = _find_node(root, "602:1183")
+    assert section is not None
+    prepared = _prepare_subtree_render_root(section)
+    emitted = render_node_body(
+        prepared,
+        uses_svg=True,
+        is_layout_root=False,
+        cluster_classes=cluster_classes_for_inline_widget_render(
+            "UploadPhotoVideoWidget",
+            {"cluster_0": "Group8228Widget"},
+        ),
+    )
+    compact = emitted.replace("\n", "")
+    assert "group_8227" in compact
+    assert "ellipse_51" in compact
 
 
 def test_food_replay_pruned_upload_tile_rehydrates_glyph() -> None:
@@ -698,7 +819,7 @@ def test_food_replay_layout_file_orchestration_contracts() -> None:
         uses_svg=True,
     )
     compact = "".join(files.values()).replace("\n", "")
-    assert "item name" in compact
+    assert "ITEM NAME" in compact
     assert "See All" in compact
     assert compact.index("See All") < compact.rindex(".svg")
     assert "Save Changes" in compact
