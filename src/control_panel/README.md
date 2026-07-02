@@ -4,7 +4,7 @@ Control panel: FastAPI host, optional disnake bot, ARQ workers, PostgreSQL jobs,
 # Usage Example
 ```bash
 poetry install --with dev,control_panel
-docker compose -f docker-compose.control-panel.yml --profile bundled-db up --build
+docker compose -f docker-compose.local.yml --profile bundled-db up --build
 poetry run alembic upgrade head
 poetry run figma-flutter-control-panel
 poetry run figma-flutter-worker

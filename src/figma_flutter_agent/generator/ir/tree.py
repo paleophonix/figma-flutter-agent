@@ -71,6 +71,33 @@ def default_screen_ir(root: CleanDesignTreeNode) -> ScreenIr:
     return ScreenIr(root=walk(root))
 
 
+_CHECKPOINT_A1_MERGE = "A1_merge"
+_TRANSFORM_IR_OVERRIDE = "ir_override"
+
+
+def _record_override_mutation(
+    *,
+    node_id: str,
+    field: str,
+    old: object,
+    new: object,
+) -> None:
+    from figma_flutter_agent.debug.provenance import get_provenance_recorder
+
+    recorder = get_provenance_recorder()
+    if recorder is None:
+        return
+    recorder.record_mutation(
+        checkpoint=_CHECKPOINT_A1_MERGE,
+        transform=_TRANSFORM_IR_OVERRIDE,
+        node_id=node_id,
+        field=field,
+        old=old,
+        new=new,
+        policy="llm_proposal_commit",
+    )
+
+
 def _apply_ir_overrides(
     node: CleanDesignTreeNode,
     overrides: WidgetIrOverrides | None,
@@ -80,14 +107,49 @@ def _apply_ir_overrides(
     updates: dict[str, object] = {}
     style_updates: dict[str, object] = {}
     if overrides.text is not None:
+        if overrides.text != node.text:
+            _record_override_mutation(
+                node_id=node.id,
+                field="text",
+                old=node.text,
+                new=overrides.text,
+            )
         updates["text"] = overrides.text
     if overrides.accessibility_label is not None:
+        if overrides.accessibility_label != node.accessibility_label:
+            _record_override_mutation(
+                node_id=node.id,
+                field="accessibility_label",
+                old=node.accessibility_label,
+                new=overrides.accessibility_label,
+            )
         updates["accessibility_label"] = overrides.accessibility_label
     if overrides.text_color is not None:
+        if overrides.text_color != node.style.text_color:
+            _record_override_mutation(
+                node_id=node.id,
+                field="style.text_color",
+                old=node.style.text_color,
+                new=overrides.text_color,
+            )
         style_updates["text_color"] = overrides.text_color
     if overrides.background_color is not None:
+        if overrides.background_color != node.style.background_color:
+            _record_override_mutation(
+                node_id=node.id,
+                field="style.background_color",
+                old=node.style.background_color,
+                new=overrides.background_color,
+            )
         style_updates["background_color"] = overrides.background_color
     if overrides.font_size is not None:
+        if overrides.font_size != node.style.font_size:
+            _record_override_mutation(
+                node_id=node.id,
+                field="style.font_size",
+                old=node.style.font_size,
+                new=overrides.font_size,
+            )
         style_updates["font_size"] = overrides.font_size
     if style_updates:
         updates["style"] = node.style.model_copy(update=style_updates)

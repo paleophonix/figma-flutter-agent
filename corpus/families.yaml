@@ -1,0 +1,123 @@
+version: 1
+
+families:
+  - id: llm_fidelity_authority_bypass
+    title: LLM fidelity authority bypass
+    pipeline_arrows:
+      - A1
+    owning_stage: ir_validation
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/fidelity/stamp.py
+        symbol: _stamp_node
+    law_ids:
+      - LAW-A1-FIDELITY-AUTHORITY
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+      - AMBIGUOUS
+    description: >
+      LLM-authored fidelity fields are accepted as compiler authority
+      and can alter the semantic emit route.
+    status: active
+
+  - id: ir_override_without_provenance
+    title: IR override without provenance
+    pipeline_arrows:
+      - A1
+    owning_stage: ir_pass
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/tree.py
+        symbol: _apply_ir_overrides
+    law_ids:
+      - LAW-A1-OVERRIDE-PROV
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      IR overrides mutate clean-tree facts without a DeviationRecord.
+    status: active
+
+  - id: ir_merge_visible_child_drop
+    title: IR merge visible child drop
+    pipeline_arrows:
+      - A1
+    owning_stage: ir_pass
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/tree.py
+        symbol: merge_ir_node
+    law_ids:
+      - LAW-A1-DROP-VISIBLE
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Clean children disappear during merge without a named deviation or policy.
+    status: active
+
+  - id: graph_sync_violation
+    title: Graph sync violation
+    pipeline_arrows:
+      - CP2
+    owning_stage: ir_pass
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/passes/sync.py
+        symbol: apply_graph_sync_pass
+    law_ids:
+      - LAW-CP2-GRAPH-SYNC
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      IR figmaId multiset diverges from the clean tree after a pass.
+    status: active
+
+  - id: node_multiset_loss
+    title: Node multiset loss
+    pipeline_arrows:
+      - A1
+    owning_stage: conservation
+    owners:
+      - module: src/figma_flutter_agent/generator/geometry/invariants/conservation.py
+        symbol: check_node_multiset_preserved
+    law_ids:
+      - LAW-CONSERVE-MULTISET
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Node identity multiset is not preserved across a pipeline arrow.
+    status: active
+
+  - id: pass_over_mutation
+    title: Pass over-mutation
+    pipeline_arrows:
+      - CP2
+    owning_stage: ir_pass
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/passes/contract.py
+        symbol: validate_pass_mutates
+    law_ids:
+      - LAW-PASS-CONTRACT
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      A registered IR pass mutates fields outside its declared contract.
+    status: active
+
+  - id: extracted_widget_subtree_conservation_gap
+    title: Extracted widget subtree conservation gap
+    pipeline_arrows:
+      - A1
+    owning_stage: ir_validation
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/extracted.py
+        symbol: validate_extracted_widgets
+    law_ids:
+      - LAW-WIDGETIR-CONSERVE
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Extracted widget IR validation is skipped or silent without a named outcome.
+    status: active

@@ -5,17 +5,17 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-COMPOSE_FILE="deploy/docker-compose.vps.yml"
+COMPOSE_FILE="docker-compose.deploy.yml"
 PROFILES=(bundled-db)
 
 usage() {
     cat <<'EOF'
 Usage: ./scripts/deploy-vps.sh [--repair] [--observability] [--pull] [--down]
 
-First run copies deploy/env.production.example → .env and deploy/Caddyfile.example → deploy/Caddyfile
+First run copies env.production.example → .env and Caddyfile.example → Caddyfile
 when missing. Edit .env, .control-panel.yml, and .ai-figma-flutter.yml before production traffic.
 
-Default: docker compose -f deploy/docker-compose.vps.yml --profile bundled-db up -d --build
+Default: docker compose -f docker-compose.deploy.yml --profile bundled-db up -d --build
 EOF
 }
 
@@ -32,13 +32,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ! -f .env ]]; then
-    cp deploy/env.production.example .env
-    echo "Created .env from deploy/env.production.example — edit secrets before going live."
+    cp env.production.example .env
+    echo "Created .env from env.production.example — edit secrets before going live."
 fi
 
-if [[ ! -f deploy/Caddyfile ]]; then
-    cp deploy/Caddyfile.example deploy/Caddyfile
-    echo "Created deploy/Caddyfile from example."
+if [[ ! -f Caddyfile ]]; then
+    cp Caddyfile.example Caddyfile
+    echo "Created Caddyfile from example."
 fi
 
 if [[ ! -f .control-panel.yml ]]; then

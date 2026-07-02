@@ -584,7 +584,7 @@ Headless jobs for teams: design opens a ticket, agent generates code, stakeholde
 ```bash
 poetry install --with dev,control_panel
 copy .control-panel.yml.example .control-panel.yml
-docker compose -f docker-compose.control-panel.yml --profile bundled-db up
+docker compose -f docker-compose.local.yml --profile bundled-db up
 poetry run alembic upgrade head
 poetry run figma-flutter-control-panel
 poetry run figma-flutter-worker

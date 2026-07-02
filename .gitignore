@@ -10,7 +10,7 @@ build/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
-.cursor/
+# .cursor/
 .VSCodeCounter/
 docs/
 logs/
@@ -21,7 +21,7 @@ logs/
 tools/bin/ast_compiler*
 tests/_fmt_*.txt
 CLAUDE.md
-.claude/
+# .claude/
 apps/
 .gemini/
 .temp/
@@ -29,6 +29,7 @@ apps/
 .sandbox/
 .data/
 .control-panel/
+Caddyfile
 .discord-bot/
 .traces/
 .worktrees/

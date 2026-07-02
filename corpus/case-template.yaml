@@ -1,0 +1,40 @@
+version: 1
+
+case:
+  id: YYYY-MM-DD-example-case
+  title: Short mechanism title
+  case_kind: regression
+  project: synthetic
+  feature: example_mechanism
+  observed_at: 2026-07-03
+  summary: >
+    One paragraph describing the mechanism, not the visual symptom.
+
+occurrences:
+  - id: example-occurrence
+    family_id: llm_fidelity_authority_bypass
+    pipeline_arrow: A1
+    law_id: LAW-A1-FIDELITY-AUTHORITY
+    stage: ir_validation
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: OPEN
+    owner:
+      module: src/figma_flutter_agent/generator/ir/fidelity/stamp.py
+      symbol: _stamp_node
+    contract:
+      field: fidelityTier
+      field_class: compiler_owned
+      category: illegal
+      expected: Manifest or compiler policy assigns fidelity authority.
+      actual: LLM-authored tier is accepted as authoritative.
+    authority_boundary: fidelity_manifest
+    evidence:
+      - kind: source_code
+        path: src/figma_flutter_agent/schemas/ir.py
+        summary: Schema exposes compiler-owned fidelity fields to LLM.
+    repair:
+      changed_files: []
+      regression_tests: []
+      verification: []

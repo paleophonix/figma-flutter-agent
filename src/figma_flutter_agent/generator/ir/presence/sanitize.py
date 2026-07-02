@@ -25,6 +25,8 @@ class SanitizeSummary:
     phantom_nodes_pruned: int = 0
     duplicate_nodes_dropped: int = 0
     orphan_refs_removed: int = 0
+    fidelity_tiers_stripped: int = 0
+    tier_sources_stripped: int = 0
 
 
 def sanitize_screen_ir_omit_figma_ids(
@@ -277,6 +279,33 @@ def sanitize_screen_ir_duplicate_figma_ids(screen_ir: ScreenIr) -> int:
     return dropped
 
 
+def sanitize_screen_ir_fidelity_authority(screen_ir: ScreenIr) -> tuple[int, int]:
+    """Strip LLM-authored fidelity authority fields from every IR node.
+
+    ponytail: migration step toward P1-1 proposal DTO; compiler-owned tiers are
+    assigned only by ``stamp_fidelity_tiers`` after this boundary strip.
+
+    Returns:
+        Tuple of (fidelity_tiers_stripped, tier_sources_stripped) counts.
+    """
+    tiers_stripped = 0
+    sources_stripped = 0
+
+    def walk(node: WidgetIrNode) -> None:
+        nonlocal tiers_stripped, sources_stripped
+        if node.fidelity_tier is not None:
+            node.fidelity_tier = None
+            tiers_stripped += 1
+        if node.tier_source is not None:
+            node.tier_source = None
+            sources_stripped += 1
+        for child in node.children:
+            walk(child)
+
+    walk(screen_ir.root)
+    return tiers_stripped, sources_stripped
+
+
 def sanitize_screen_ir_llm_drift(
     screen_ir: ScreenIr,
     clean_tree: CleanDesignTreeNode,
@@ -330,6 +359,16 @@ def sanitize_screen_ir_llm_drift(
         elif not resolved_semantics.llm_gray_zone_annotations:
             strip_screen_ir_classification_hints(screen_ir)
 
+    fidelity_tiers_stripped, tier_sources_stripped = sanitize_screen_ir_fidelity_authority(
+        screen_ir,
+    )
+    if fidelity_tiers_stripped or tier_sources_stripped:
+        logger.info(
+            "Sanitized screenIr fidelity authority: stripped {} tier(s), {} tierSource(s)",
+            fidelity_tiers_stripped,
+            tier_sources_stripped,
+        )
+
     return SanitizeSummary(
         omit_ids_removed=omit_before - len(screen_ir.omit_figma_ids),
         state_keys_pruned=state_pruned,
@@ -339,4 +378,6 @@ def sanitize_screen_ir_llm_drift(
         phantom_nodes_pruned=phantom_pruned,
         duplicate_nodes_dropped=duplicate_dropped,
         orphan_refs_removed=orphan_refs_removed,
+        fidelity_tiers_stripped=fidelity_tiers_stripped,
+        tier_sources_stripped=tier_sources_stripped,
     )

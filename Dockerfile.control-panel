@@ -21,7 +21,7 @@ COPY tools/render-capture ./tools/render-capture
 COPY scripts/capture.sh ./scripts/capture.sh
 COPY tests/fixtures/flutter_skeleton ./tests/fixtures/flutter_skeleton
 COPY .ai-figma-flutter.yml.example ./.ai-figma-flutter.yml.example
-COPY deploy/entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh /scripts/capture.sh \
     && pip install --upgrade pip \

@@ -1,0 +1,163 @@
+# Control panel: FastAPI + ARQ worker + Redis.
+#
+# PostgreSQL — two modes (see database.mode in .control-panel.yml):
+#
+#   bundled  — Postgres in Docker (data on host under FIGMA_CP_PGDATA):
+#     docker compose -f docker-compose.local.yml --profile bundled-db up --build
+#     Set FIGMA_CP_PG_PASSWORD in .env; leave FIGMA_CP_DATABASE_URL empty.
+#
+#   external — managed / VPS Postgres (no bundled-db profile):
+#     docker compose -f docker-compose.local.yml up --build
+#     Set database.mode: external and database.url in .control-panel.yml
+#     OR FIGMA_CP_DATABASE_MODE=external + FIGMA_CP_DATABASE_URL in .env
+
+services:
+  postgres:
+    profiles: ["bundled-db"]
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: figma_cp
+      POSTGRES_PASSWORD: ${FIGMA_CP_PG_PASSWORD:-figma_cp_dev}
+      POSTGRES_DB: figma_control_plane
+    volumes:
+      - ${FIGMA_CP_PGDATA:-./.data/postgres}:/var/lib/postgresql/data
+    ports:
+      - "${FIGMA_CP_PG_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U figma_cp -d figma_control_plane"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ${FIGMA_CP_REDISDATA:-./.data/redis}:/data
+    ports:
+      - "${FIGMA_CP_REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  control-panel:
+    build:
+      context: .
+      dockerfile: Dockerfile.control-panel
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      FIGMA_CP_DATABASE_MODE: ${FIGMA_CP_DATABASE_MODE:-bundled}
+      FIGMA_CP_PG_PASSWORD: ${FIGMA_CP_PG_PASSWORD:-figma_cp_dev}
+      FIGMA_CP_DATABASE_URL: ${FIGMA_CP_DATABASE_URL:-}
+      FIGMA_CP_REDIS_URL: redis://redis:6379/0
+      FIGMA_CP_INTERNAL_URL: http://control-panel:8787
+      FIGMA_CP_RUN_MIGRATIONS: "1"
+      FIGMA_CP_PG_HOST: postgres
+      REPAIR_OPENCODE_URL: ${REPAIR_OPENCODE_URL:-http://opencode:4096}
+    volumes:
+      - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
+      - ./.control-panel.yml:/app/.control-panel.yml:ro
+    ports:
+      - "${FIGMA_CP_HTTP_PORT:-8787}:8787"
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+        required: false
+    command:
+      [
+        "uvicorn",
+        "control_panel.api.app:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8787",
+      ]
+
+  arq-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.control-panel
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      FIGMA_CP_DATABASE_MODE: ${FIGMA_CP_DATABASE_MODE:-bundled}
+      FIGMA_CP_PG_PASSWORD: ${FIGMA_CP_PG_PASSWORD:-figma_cp_dev}
+      FIGMA_CP_DATABASE_URL: ${FIGMA_CP_DATABASE_URL:-}
+      FIGMA_CP_REDIS_URL: redis://redis:6379/0
+      FIGMA_CP_INTERNAL_URL: http://control-panel:8787
+      FIGMA_CP_RUN_MIGRATIONS: "0"
+      REPAIR_OPENCODE_URL: ${REPAIR_OPENCODE_URL:-http://opencode:4096}
+      FIGMA_CP_METRICS_PORT: "9090"
+      FIGMA_GOLDEN_RUNTIME: ${FIGMA_GOLDEN_RUNTIME:-docker}
+    volumes:
+      - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
+      - ./.control-panel.yml:/app/.control-panel.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "${FIGMA_CP_WORKER_METRICS_PORT:-9090}:9090"
+    depends_on:
+      redis:
+        condition: service_healthy
+      control-panel:
+        condition: service_started
+    command: ["arq", "control_panel.workers.settings.WorkerSettings"]
+
+  opencode:
+    profiles: ["repair"]
+    image: node:22-bookworm-slim
+    restart: unless-stopped
+    working_dir: /worktrees
+    environment:
+      OPENCODE_SERVER_PASSWORD: ${OPENCODE_SERVER_PASSWORD:-}
+      OPENCODE_SERVER_USERNAME: opencode
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+    volumes:
+      - ${FIGMA_CP_AGENT_REPO:-.}:/agent:ro
+      - ${FIGMA_CP_REPAIR_WORKTREES:-./.data/repair-worktrees}:/worktrees
+    ports:
+      - "${OPENCODE_PORT:-4096}:4096"
+    command:
+      [
+        "sh",
+        "-c",
+        "npm install -g opencode-ai@${OPENCODE_VERSION:-1.0.0} && opencode serve --hostname 0.0.0.0 --port 4096",
+      ]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- --user=$$OPENCODE_SERVER_USERNAME --password=$$OPENCODE_SERVER_PASSWORD http://127.0.0.1:4096/global/health || exit 1",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    profiles: ["observability"]
+    image: prom/prometheus:v2.55.1
+    restart: unless-stopped
+    volumes:
+      - ./docs/projects/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "${PROMETHEUS_PORT:-9091}:9090"
+    depends_on:
+      - control-panel
+      - arq-worker
+
+  grafana:
+    profiles: ["observability"]
+    image: grafana/grafana:11.4.0
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    depends_on:
+      - prometheus

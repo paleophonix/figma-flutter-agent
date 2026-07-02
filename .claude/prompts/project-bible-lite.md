@@ -1,0 +1,161 @@
+# Project Bible — Thesis Prompt
+
+General-purpose **Figma → Flutter compiler**, not a demo generator. Every module must handle unknown future designs — not one golden, screen, `figmaId`, or demo frame.
+
+**North Star:** deterministic compiler, measurable pixel fidelity, reusable semantic upgrades, corpus-proven robustness.
+
+---
+
+## Core Laws
+
+- **Pixel fidelity wins.** Semantic `kind` is annotation until gated. Native emit only when: `report_only=false` AND fidelity tier allows AND manifest allows AND corpus/oracle green.
+- **No clever guesses.** Optimize: verified transforms, named invariants, explicit policies, corpus evidence, deterministic recovery. Not: screen tricks, golden offsets, one-off regex, text-value guesses.
+- **Fail loud > hide.** Downgrade fidelity or geometric fallback is OK. Local patch pretending to be a fix is not.
+- **Ask the code.** Docs/memory/prior conclusions are hypotheses. Grep/read live source before claiming behavior.
+
+---
+
+## Anti-Patching (non-negotiable)
+
+Never branch on: screen/feature name, `figmaId`, marketing text, customer path, golden file, asset filename, one-screen coordinates, regex fixing one Dart shape.
+
+Fix flow: failure → family → generic fixture → correct layer → invariants → corpus proof. Must work on current + similar + dirty + random Figma trees.
+
+Local patch → compiler veto, reconcile failure, output rejected, halt.
+
+---
+
+## Knowledge (4 categories)
+
+1. **Facts** — Figma/IR/assets/Dart graph. Read, normalize, preserve. Name-derived leaf types (`BUTTON`, `INPUT`…) are classifier signals (`derived_from_name`), not tier-1 truth.
+2. **Invariants** — hard laws (multiset, paint order, graph sync, import resolve, report_only, blocking corpus). Some machine-enforced, some self-enforced until contract enforcer lands — verify by hand if no gate yet.
+3. **Classifiers** — candidate + confidence + evidence + provenance only. Cannot mutate geometry, children, clean-tree type, or production Dart alone.
+4. **Policies** — named, visible, testable (`report_only`, `strict_fidelity`, advisory vs blocking).
+
+**Heuristic rule:** no hidden heuristic may affect emitted code unless explicit, typed, logged, tested, gated, reversible.
+
+---
+
+## Master Invariant
+
+Every stage must: **preserve a Figma fact**, **create named deviation with provenance**, or **downgrade fidelity tier**.
+
+Silent mutation/deletion/fallback/semantic upgrade/golden drift = bug. Stages must be **idempotent** (re-run on own output = no-op).
+
+---
+
+## Pipeline
+
+```
+Figma JSON → fetch → parse → clean tree + tokens
+→ fonts/assets → LLM Screen IR (optional) → normalize/reconcile
+→ materialize → layout passes → classification → fidelity stamp
+→ emit → planned Dart reconcile → graph invariants → analyze
+→ optional repair/refine → write
+```
+
+- Legacy path must not silently fork; divergence needs explicit flag + fixtures + ownership.
+- Offline dumps under `<project_dir>/.debug/` (not agent repo). `screens.yaml` maps feature → dump.
+- **Settings at pipeline boundary only** — no `load_settings()` inside `generator/` or `parser/`. Pass via context (`IrEmitContext`, `PassContext`).
+
+---
+
+## Dual Graph
+
+| Graph | Role |
+|-------|------|
+| `CleanDesignTreeNode` | Geometry/style/type/paint-order truth |
+| `ScreenIr` / `WidgetIrNode` | Layout intent, semantic kind, fidelity tier |
+
+Clean tree = geometry truth. IR cannot invent geometry facts. Graph sync must be deterministic + provenance-recorded. Unreconcilable graphs → typed error early.
+
+---
+
+## Deterministic Failures
+
+Catch before: `dart analyze`, Flutter runtime, LLM repair, visual refine, write.
+
+- **Planned Dart graph:** every `package:<app>/widgets/foo.dart` import must resolve to planned `lib/widgets/foo.dart` → `PlannedDartGraphError`, not LLM repair.
+- **Prune law:** pruned planned file → reconcile all consumer imports immediately.
+
+---
+
+## LLM Boundary
+
+LLM proposes intent (`screenIr`, `widgetIr`, candidates, repair suggestions). Compiler decides legality.
+
+LLM cannot mutate: node ids, bounds, paint order, style/type/asset truth, fidelity manifest, goldens, corpus tiers.
+
+Conflict → deterministic facts win (sanitize/downgrade/reject).
+
+Repair loop: identical repeated analyzer errors → stop repair, capture capsule, classify family. Missing planned file / stale import / broken pubspec / graph invariant = compiler bug, not prompt magic.
+
+---
+
+## Semantic & Fidelity
+
+Classification ≠ emit permission. Tiers: `native_verified` | `native_unverified` | `styled_primitive` | `svg_baked` | `png_baked` | `unsupported`.
+
+`report_only=true` → report only, production Dart unchanged. Outer `report_only` gate AND inner fidelity router — do not collapse.
+
+---
+
+## Corpus
+
+`inbox → corpus → fixtures → blocking`. Include clean + dirty + stress + regressions + semantic-only + text-heavy + bad names + nested groups.
+
+Manifest per screen (purpose, quality_profile, tier, checks). Promote to blocking only when purpose clear, baseline stable, oracle useful — not because convenient.
+
+---
+
+## Fix Routing
+
+| Symptom | Layer |
+|---------|-------|
+| Missing Figma fact | parser |
+| Lost node / child mismatch | conservation / graph sync |
+| Bad layout intent | IR pass |
+| Wrong semantic candidate | classifier / semantic corpus |
+| Wrong native output | fidelity manifest / template |
+| Broken Dart graph | planned reconcile / graph invariant |
+| Syntax mutation | AST sidecar |
+| Golden mismatch | oracle diagnosis |
+| Repair loop | infrastructure conflict |
+| Name-derived type trusted | `type_trust` / provenance |
+
+Classify failure family first (input detection, stack constraints, text metrics, asset sync, paint order, overflow…). Family issue → fix family, not screen.
+
+---
+
+## Forbidden
+
+- Screen/`figmaId`/text/path-specific codegen; one-off pixel offsets; anonymous hardcoded colors.
+- Python regex Dart surgery; non-UTF-8 Dart I/O; line erasure in writer.
+- Fuzzy name/text as truth; `looks_like_*` outside classifier; native emit from `native_unverified`; semantic mutation under `report_only`.
+- CI: auto-mutate manifest, auto-promote advisory→blocking, auto-update PNGs, weaken thresholds. Burn-down = stable fingerprints, not raw counts.
+
+---
+
+## Acceptable Fix
+
+1. Reproduce (fixture/corpus) → 2. Classify family → 3. Name layer → 4. Add invariant/gate if missing → 5. Generic fix → 6. Regression test → 7. Signoff/corpus → 8. Document fidelity change.
+
+---
+
+## Style & Posture
+
+≤300 lines new modules; typed helpers; explicit dataclasses; `loguru` English no emojis in runtime logs; secrets via env; context-passed config.
+
+**Status:** E1–E8 foundation accepted; production-complete HOLD. Harden oracle, expand corpus, burn legacy heuristics, enforce pass contracts, graph invariants — then widen semantic emit.
+
+**Signoff:** ruff, mypy, pytest `-m "not live_figma"`, IR/fidelity validation, corpus oracle, semantic gate, burndown gate.
+
+---
+
+## Oath
+
+Compiler engineer, not layout fixer. Preserve facts. Name deviations. Gate semantic upgrades. Reject poisoned shortcuts.
+
+```
+ASK THE CODE · PRESERVE FACTS · NAME DEVIATIONS · GATE SEMANTICS · NEVER PATCH THE SCREEN · FIX THE SYSTEM
+```

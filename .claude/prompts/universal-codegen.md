@@ -1,0 +1,60 @@
+# Universal codegen and AST guardrails
+
+General-purpose Figma → Flutter compiler — any customer layout tree, not one debug frame.
+
+Anti-patching and compiler-wide forbidden rules: `project-bible-lite.md`.
+
+## Pipeline (Screen IR path)
+
+```
+Figma JSON → fetch → parse (clean tree + tokens)
+→ fonts/assets → [optional] LLM Screen IR
+→ normalize / reconcile / validate (generator/ir/)
+→ layout passes → fidelity stamp → emit (generator/ir/emitter.py)
+→ AST sidecar (tools/dart_ast_sidecar) — NO regex Dart surgery
+→ planned Dart reconcile → graph invariants → flutter analyze
+→ [optional] repair / refine → write (generator/writer.py)
+```
+
+| Layer | Role | Rule |
+|-------|------|------|
+| `parser/tree.py` | Figma → `CleanDesignTreeNode` | Structural signals (bounds, layoutMode, children) — not fuzzy string matching as truth. |
+| `parser/tokens.py` | Design tokens | No fallback color/typography hallucinations. |
+| `generator/ir/emitter.py` | IR → Dart | Deterministic emit; classification ≠ emit permission. |
+| `tools/ast_sidecar` | AST mutations | All programmatic Dart edits; no regex code-tearing. |
+| `generator/writer.py` | Transactional write | Merge `// <custom-code>` with indentation rebase. |
+
+## AST and emit (zero-tolerance here)
+
+- **No regex Dart post-processing** in `dart_postprocess.py` or `visual_refine.py` — delegate to `ast_sidecar`.
+- **No inline `fontFamily` hardcoding** — inherit from `Theme.of(context).textTheme`.
+- **UTF-8 only** for Dart read/write.
+- **No orphan line erasure** with braces/comments/whitespace in `find_orphan_line_numbers`.
+- **Idempotency:** post-processors and sidecar passes are no-op on unchanged input.
+- **Structural matching:** map widgets via assets, bounds, semantic types — never label text like `"LOG IN"`.
+
+## Build prerequisites
+
+| Artifact | When | How |
+|----------|------|-----|
+| `tools/bin/ast_compiler*` | `runtime.use_ast_sidecar: true` | `.\tools\build_sidecars.ps1` |
+| `figma-flutter-golden-capture:local` | `runtime.golden_capture: docker` | Auto-build or `.\scripts\update-golden-docker.ps1` |
+
+Verify: `poetry run figma-flutter doctor`
+
+## Bug fix protocol
+
+1. Reproduce in `tests/fixtures/` — not ad-hoc on one customer screen.
+2. Identical analyzer errors across repair attempts = infrastructure conflict, not more prompts.
+3. After `tools/dart_ast_sidecar/` edits: rebuild sidecar, then `poetry run pytest -q -m "not live_figma"`.
+4. Refresh goldens only via `scripts/generate_fixture_goldens.py` — never hand-edit PNG baselines.
+
+## Systemic LLM bug registry
+
+Pipeline-wide LLM defect with (or needing) a deterministic sanitizer:
+
+1. Add a short NEVER/MUST rule to `SYSTEMIC_BUG_RULES` in `src/figma_flutter_agent/llm/prompts.py`.
+2. Keep the repair in `dart_syntax_repairs.py`, `dart_postprocess.py`, or `tools/ast_sidecar`.
+3. Add or extend a unit test on a mock fixture.
+
+Do not leave recurring bugs only in sanitizer comments.

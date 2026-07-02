@@ -41,7 +41,7 @@ function Clear-StalePipelineLocks {
 }
 
 Write-Host "Ensuring Redis is up..."
-docker compose -f docker-compose.control-panel.yml up -d redis | Out-Null
+docker compose -f docker-compose.local.yml up -d redis | Out-Null
 
 Stop-OrphanFigmaWorkers
 Clear-StalePipelineLocks

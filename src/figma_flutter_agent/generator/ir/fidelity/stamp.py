@@ -58,17 +58,6 @@ def _stamp_node(
 ) -> WidgetIrNode:
     if node.kind not in SEMANTIC_IR_KINDS:
         stamped = node
-    elif node.fidelity_tier is not None:
-        stamped = node
-        if node.tier_source is None:
-            stamped = node.model_copy(update={"tier_source": TierSource.MANUAL_OVERRIDE})
-            _record_stamp_mutation(
-                node_id=node.figma_id,
-                field="tier_source",
-                old=None,
-                new=TierSource.MANUAL_OVERRIDE.value,
-                policy="manual_override",
-            )
     else:
         resolved = manifest.resolve(node.kind, feature_profile=feature_profile)
         clean_node = clean_by_id.get(node.figma_id) if clean_by_id is not None else None
@@ -80,6 +69,8 @@ def _stamp_node(
             strict_a11y=strict_a11y,
         )
         tier_source = override_source or resolved.tier_source
+        old_tier = node.fidelity_tier.value if node.fidelity_tier is not None else None
+        old_source = node.tier_source.value if node.tier_source is not None else None
         stamped = node.model_copy(
             update={
                 "fidelity_tier": tier,
@@ -89,14 +80,14 @@ def _stamp_node(
         _record_stamp_mutation(
             node_id=node.figma_id,
             field="fidelity_tier",
-            old=None,
+            old=old_tier,
             new=tier.value,
             policy=tier_source.value,
         )
         _record_stamp_mutation(
             node_id=node.figma_id,
             field="tier_source",
-            old=None,
+            old=old_source,
             new=tier_source.value,
             policy=tier_source.value,
         )
@@ -131,7 +122,7 @@ def stamp_fidelity_tiers(
     strict_l10n: bool = False,
     strict_a11y: bool = False,
 ) -> ScreenIr:
-    """Apply manifest tiers to semantic IR nodes missing ``fidelity_tier``."""
+    """Apply manifest tiers to every semantic IR node (manifest/policy authority only)."""
     effective = manifest or default_fidelity_manifest()
     clean_by_id = index_clean_tree(clean_tree) if clean_tree is not None else None
     return screen_ir.model_copy(
