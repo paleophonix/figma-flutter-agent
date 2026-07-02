@@ -692,10 +692,13 @@ def _icon_badge_representative_for_stale_body(
     """Pick the badge stack that matches a stale stretched-glyph widget body."""
     from figma_flutter_agent.generator.ir.extracted_paint import (
         icon_badge_planned_widget_needs_rematerialization,
+        icon_badge_widget_identity_matches_subtree,
     )
 
     for node in badge_nodes:
-        if icon_badge_planned_widget_needs_rematerialization(node, existing):
+        if not icon_badge_planned_widget_needs_rematerialization(node, existing):
+            continue
+        if icon_badge_widget_identity_matches_subtree(existing, node):
             return node
     return None
 

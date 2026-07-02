@@ -227,14 +227,23 @@ def _render_extracted_widget_body(
     ctx: IrEmitContext,
 ) -> str:
     """Render an extracted widget subtree without self-referential cluster delegation."""
+    from figma_flutter_agent.generator.cluster_variants import (
+        cluster_classes_for_inline_widget_render,
+    )
     from figma_flutter_agent.generator.layout.widgets import render_node_body
+    from figma_flutter_agent.generator.subtree.render import _prepare_subtree_render_root
 
+    class_name = _canonical_widget_class_name(widget_name)
+    prepared = _prepare_subtree_render_root(node)
     return render_node_body(
-        node,
+        prepared,
         uses_svg=ctx.uses_svg,
         is_layout_root=False,
         responsive_enabled=ctx.responsive_enabled,
-        cluster_classes=ctx.cluster_classes,
+        cluster_classes=cluster_classes_for_inline_widget_render(
+            class_name,
+            ctx.cluster_classes,
+        ),
         cluster_vector_variants=ctx.cluster_vector_variants,
         skip_cluster_id=_extracted_widget_skip_cluster_id(node, widget_name, ctx),
     )

@@ -11,10 +11,9 @@
           "STACK": 5,
           "ROW": 1,
           "TEXT": 3,
-          "VECTOR": 1,
           "BOTTOM_NAV": 1
         },
-        "child_count": 16
+        "child_count": 15
       },
       "rejectReason": null
     },
@@ -30,6 +29,21 @@
           "STACK": 1
         },
         "child_count": 4
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "band-7035:1265",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
+      "evidence": {
+        "container_list_tile": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "STACK": 1,
+          "TEXT": 1
+        },
+        "child_count": 3
       },
       "rejectReason": null
     },
@@ -372,21 +386,6 @@
         "child_count": 3
       },
       "rejectReason": "overlay_without_t1_signal"
-    },
-    {
-      "figmaId": "band-7043:3387",
-      "kind": "overlay_banner",
-      "confidence": 0.82,
-      "evidence": {
-        "overlay_banner": true,
-        "overlayVeto": true,
-        "child_type_counts": {
-          "STACK": 1,
-          "TEXT": 1
-        },
-        "child_count": 2
-      },
-      "rejectReason": "overlay_without_t1_signal"
     }
   ],
   "legacySemanticTypeDetected": [],
@@ -398,6 +397,6 @@
     "I7110:3218;7110:3178"
   ],
   "llmAnnotationUsed": [],
-  "acceptedCount": 9,
+  "acceptedCount": 10,
   "totalDecisions": 28
 }

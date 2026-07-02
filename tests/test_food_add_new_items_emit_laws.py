@@ -417,3 +417,70 @@ def test_catalog_chip_label_uses_scale_down_not_ellipsis() -> None:
     emitted = render_node_body(chip, uses_svg=True, parent_type=NodeType.STACK)
     assert "FittedBox(fit: BoxFit.scaleDown" in emitted.replace("\n", "")
     assert "TextOverflow.ellipsis" not in emitted
+
+
+def test_multi_vector_glyph_group_not_input_rating() -> None:
+    """Law: MultiVectorIsNotRatingLaw — upload glyph groups are not star ratings."""
+    from figma_flutter_agent.parser.semantics.detectors.inputs import (
+        _count_rating_star_units,
+        _is_rating_star_unit,
+    )
+
+    root = _load_food_root()
+    glyph_group = _find_node(root, "602:1188")
+    assert glyph_group is not None
+    assert not _is_rating_star_unit(glyph_group)
+    assert _count_rating_star_units(glyph_group) < 3
+
+
+def test_inline_widget_render_blocks_sibling_cluster_delegate() -> None:
+    """Law: ClusterReferenceClosureBeforePruneLaw — inline hosts do not call cluster widgets."""
+    from figma_flutter_agent.generator.cluster_variants import (
+        cluster_classes_for_inline_widget_render,
+    )
+    from figma_flutter_agent.generator.subtree.render import _prepare_subtree_render_root
+
+    root = _load_food_root()
+    badge = _find_node(root, "602:1186")
+    assert badge is not None
+    prepared = _prepare_subtree_render_root(badge)
+    emitted = render_node_body(
+        prepared,
+        uses_svg=True,
+        cluster_classes=cluster_classes_for_inline_widget_render(
+            "UploadPhotoVideoWidget",
+            {"cluster_0": "Group8228Widget"},
+        ),
+    )
+    compact = emitted.replace("\n", "")
+    assert "Group8228Widget" not in compact
+    assert "SvgPicture" in compact
+    assert "SizedBox.shrink" not in compact
+
+
+def test_repair_stale_ctor_does_not_shrink_substantive_upload_glyph() -> None:
+    """Law: PlannedWidgetGraphClosureLaw — missing ctor must not be masked as shrink."""
+    from figma_flutter_agent.generator.planned.reconcile.delegate_repair import (
+        repair_stale_widget_ctor_names_in_planned,
+    )
+
+    planned = {
+        "lib/widgets/upload_photo_video_widget.dart": """
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+class UploadPhotoVideoWidget extends StatelessWidget {
+  const UploadPhotoVideoWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      Positioned(child: Group8228Widget()),
+      Positioned(child: SvgPicture.asset('assets/icons/foo.svg')),
+    ]);
+  }
+}
+""",
+    }
+    updated = repair_stale_widget_ctor_names_in_planned(planned)
+    body = updated["lib/widgets/upload_photo_video_widget.dart"]
+    assert "Group8228Widget()" in body
+    assert "SizedBox.shrink" not in body

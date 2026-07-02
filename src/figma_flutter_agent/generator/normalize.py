@@ -138,6 +138,11 @@ def normalize_clean_tree(
         archetype_reconcile=archetype_reconcile and not suppress_archetype_compensation,
     ):
         working = reconcile_product_hero_photo_viewport_in_tree(working)
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        canonicalize_root_bottom_nav_terminal_overlay,
+    )
+
+    working = canonicalize_root_bottom_nav_terminal_overlay(working)
     return working
 
 

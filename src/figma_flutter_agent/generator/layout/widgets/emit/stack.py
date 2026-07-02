@@ -919,19 +919,21 @@ def render_stack(
             partition_viewport_pinned_stack_layers,
         )
 
-        stack_emit_children = [
-            child
-            for child in sorted_children
+        stack_emit_pairs = [
+            (child, widget)
+            for child, widget in zip(sorted_children, stack_children, strict=True)
             if child.id not in paired_circle_ids
             and child.id not in omit_child_ids
             and child.id not in playback_seek_ids
             and child.id not in playback_decor_omit_ids
         ]
-        if len(stack_emit_children) == len(stack_children):
+        if stack_emit_pairs:
+            stack_emit_children = [child for child, _ in stack_emit_pairs]
+            stack_emit_widgets = [widget for _, widget in stack_emit_pairs]
             stack_children = apply_pin_bottom_chrome_to_stack_layers(
                 node,
                 stack_emit_children,
-                stack_children,
+                stack_emit_widgets,
                 allow_outward_paint=stack_needs_soft_clip(node),
             )
             if is_layout_root and not responsive_enabled:
@@ -947,6 +949,8 @@ def render_stack(
                     body = ", ".join(stack_children) or "const SizedBox.shrink()"
             else:
                 body = ", ".join(stack_children) or "const SizedBox.shrink()"
+        else:
+            body = ", ".join(stack_children) or "const SizedBox.shrink()"
         stack_clip = (
             "Clip.none" if not is_layout_root or stack_needs_soft_clip(node) else "Clip.hardEdge"
         )

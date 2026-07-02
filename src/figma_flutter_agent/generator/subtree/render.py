@@ -207,16 +207,27 @@ def refresh_subtree_widget_planned_files(
 
 
 def _subtree_render_root(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
-    """Strip placement stubs so subtree widget files render full bodies."""
-    if not node.extracted_widget_ref:
-        return node
-    return node.model_copy(update={"extracted_widget_ref": None})
+    """Strip extraction stubs so subtree widget files render full inline bodies."""
+
+    def walk(current: CleanDesignTreeNode) -> CleanDesignTreeNode:
+        updated_children = [walk(child) for child in current.children]
+        if not current.extracted_widget_ref and updated_children == current.children:
+            return current
+        updates: dict[str, object] = {}
+        if current.extracted_widget_ref:
+            updates["extracted_widget_ref"] = None
+        if updated_children != current.children:
+            updates["children"] = updated_children
+        return current.model_copy(update=updates)
+
+    return walk(node)
 
 
 def _prepare_subtree_render_root(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
     """Clone a subtree representative and apply the same cluster pruning as layout codegen."""
     from copy import deepcopy
 
+    from figma_flutter_agent.parser.dedup.hydrate import hydrate_pruned_cluster_instances
     from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
     from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
@@ -224,7 +235,19 @@ def _prepare_subtree_render_root(node: CleanDesignTreeNode) -> CleanDesignTreeNo
     if find_raster_photo_leaf(root) is not None:
         return root
     prune_duplicated_cluster_subtrees(root)
+    hydrate_pruned_cluster_instances(root)
     return root
+
+
+def _subtree_cluster_classes_for_inline_render(
+    class_name: str,
+    cluster_classes: dict[str, str] | None,
+) -> dict[str, str] | None:
+    from figma_flutter_agent.generator.cluster_variants import (
+        cluster_classes_for_inline_widget_render,
+    )
+
+    return cluster_classes_for_inline_widget_render(class_name, cluster_classes)
 
 
 def _subtree_skip_cluster_id_for_root(
@@ -280,13 +303,17 @@ def _render_subtree_widget_body(
             selected=variant_is_checked(representative),
         )
 
+    inline_cluster_classes = _subtree_cluster_classes_for_inline_render(
+        class_name,
+        cluster_classes,
+    )
     if layout_fact_success_check_glyph_host(representative):
         root = _prepare_subtree_render_root(representative)
         skip_cluster_id = representative.cluster_id if representative.cluster_id else None
         return render_node_body(
             root,
             uses_svg=uses_svg,
-            cluster_classes=cluster_classes,
+            cluster_classes=inline_cluster_classes,
             cluster_vector_variants=cluster_vector_variants,
             skip_cluster_id=skip_cluster_id,
         )
@@ -322,7 +349,7 @@ def _render_subtree_widget_body(
     body = render_node_body(
         root,
         uses_svg=uses_svg,
-        cluster_classes=cluster_classes,
+        cluster_classes=inline_cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
         skip_cluster_id=skip_cluster_id,
     )

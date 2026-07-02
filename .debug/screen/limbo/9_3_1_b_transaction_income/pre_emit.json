@@ -230,9 +230,14 @@
           }
         },
         {
-          "figmaId": "band-7043:3387",
-          "kind": "stack",
+          "figmaId": "band-7035:1265",
+          "kind": "container_list_tile",
           "children": [
+            {
+              "figmaId": "7035:1265",
+              "kind": "auto",
+              "children": []
+            },
             {
               "figmaId": "7043:3387",
               "kind": "stack",
@@ -259,7 +264,12 @@
               "kind": "auto",
               "children": []
             }
-          ]
+          ],
+          "payload": {
+            "payloadKind": "container_list_tile"
+          },
+          "fidelityTier": "native_unverified",
+          "tierSource": "manifest"
         },
         {
           "figmaId": "band-7110:1045",
@@ -647,11 +657,6 @@
           },
           "fidelityTier": "native_unverified",
           "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7035:1265",
-          "kind": "auto",
-          "children": []
         },
         {
           "figmaId": "7035:1284",

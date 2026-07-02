@@ -28,6 +28,44 @@ from figma_flutter_agent.schemas import (
 )
 
 
+def _balanced_constructor_span(source: str, marker: str, start: int = 0) -> tuple[int, int] | None:
+    """Return [open, close) indices for the first balanced ``marker(`` call at/after *start*."""
+    open_idx = source.find(f"{marker}(", start)
+    if open_idx < 0:
+        return None
+    depth = 0
+    cursor = open_idx + len(marker)
+    while cursor < len(source):
+        char = source[cursor]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                return open_idx, cursor + 1
+        cursor += 1
+    return None
+
+
+def _value_key_outside_constructor(
+    source: str,
+    *,
+    figma_key: str,
+    constructor: str,
+) -> bool:
+    """Return True when *figma_key* is not nested inside any *constructor* call."""
+    needle = f"key: ValueKey('figma-{figma_key}')"
+    cursor = 0
+    while True:
+        span = _balanced_constructor_span(source, constructor, cursor)
+        if span is None:
+            return True
+        open_idx, close_idx = span
+        if needle in source[open_idx:close_idx]:
+            return False
+        cursor = close_idx
+
+
 def _calendar_badge_stack() -> CleanDesignTreeNode:
     return CleanDesignTreeNode(
         id="7043:3387",
@@ -514,11 +552,13 @@ def test_bottom_chrome_viewport_partition_pins_nav_outside_scroll() -> None:
     from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     assert validate_dart_delimiters(layout) is None
-    scroll_host = layout.index("Positioned.fill(")
-    nav_host = layout.index("figma-7420_7339")
-    assert scroll_host >= 0
-    assert nav_host > scroll_host
+    assert _value_key_outside_constructor(
+        layout,
+        figma_key="7420_7339",
+        constructor="SingleChildScrollView",
+    )
     assert "figma-7035_1265" in layout
+    assert "top: 334.0" in layout
 
 
 def test_bottom_nav_is_terminal_paint_layer() -> None:
@@ -541,6 +581,7 @@ def test_bottom_nav_is_terminal_paint_layer() -> None:
     root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
     screen_ir = ScreenIr.model_validate(pre["screenIr"])
     norm = normalize_clean_tree(root, screen_ir=screen_ir)
+    assert norm.children[-1].id == "7420:7339"
     layout = render_layout_file(
         norm,
         feature_name="9_3_1_b_transaction_income",
@@ -553,6 +594,41 @@ def test_bottom_nav_is_terminal_paint_layer() -> None:
     assert "7420_7339" in keys
     nav_index = max(index for index, key in enumerate(keys) if key == "7420_7339")
     assert all(key != "7420_7339" for key in keys[nav_index + 1 :])
+
+
+def test_rematerialize_requires_matching_widget_identity() -> None:
+    """Stale refresh must not cross-rematerialize unrelated icon-badge subtrees."""
+    from figma_flutter_agent.generator.planned.reconcile import preferred_widget_path_for_class
+    from figma_flutter_agent.generator.widget_extractor import (
+        refresh_stale_icon_badge_planned_widget_files,
+    )
+
+    salary = _salary_icon_stack()
+    calendar_stale = (
+        "class TransactionCategoryIconWidget extends StatelessWidget {\n"
+        "  const TransactionCategoryIconWidget({super.key});\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return SvgPicture.asset('assets/icons/vector_calendar.svg', "
+        "width: 32.3, height: 30.0, fit: BoxFit.fill);\n"
+        "  }\n"
+        "}\n"
+    )
+    path = preferred_widget_path_for_class("TransactionCategoryIconWidget")
+    screen = CleanDesignTreeNode(
+        id="root",
+        name="root",
+        type=NodeType.STACK,
+        sizing=Sizing(width=430.0, height=932.0),
+        children=[salary],
+    )
+    updated = refresh_stale_icon_badge_planned_widget_files(
+        {path: calendar_stale},
+        clean_tree=screen,
+        uses_svg=True,
+    )
+    assert "vector_calendar.svg" in updated[path]
+    assert "vector_salary.svg" not in updated[path]
+    assert "width: 26.0" not in updated[path]
 
 
 def test_icon_glyph_uses_intrinsic_bounds_not_plate() -> None:

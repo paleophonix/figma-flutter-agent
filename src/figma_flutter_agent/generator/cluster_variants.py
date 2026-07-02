@@ -157,6 +157,21 @@ def _expand_skip_cluster_ids(
     return blocked
 
 
+def cluster_classes_for_inline_widget_render(
+    class_name: str,
+    cluster_classes: dict[str, str] | None,
+) -> dict[str, str] | None:
+    """Keep only cluster delegates owned by the widget file being materialized inline."""
+    if not cluster_classes:
+        return None
+    filtered = {
+        cluster_id: mapped
+        for cluster_id, mapped in cluster_classes.items()
+        if mapped == class_name
+    }
+    return filtered or None
+
+
 def _cluster_delegate_lookup_keys(node: CleanDesignTreeNode) -> list[str]:
     """Return cluster map keys in preferred lookup order for delegate resolution."""
     keys: list[str] = []

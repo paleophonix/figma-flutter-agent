@@ -66,18 +66,19 @@ def _is_input_file_uploader(ctx: DetectorContext) -> bool:
 
 
 def _is_rating_star_unit(node: CleanDesignTreeNode) -> bool:
-    if node.type not in {NodeType.STACK, NodeType.CONTAINER, NodeType.VECTOR}:
+    """True for a compact single-star glyph unit, not arbitrary multi-vector icons."""
+    if node.type not in {NodeType.STACK, NodeType.CONTAINER}:
         return False
-    if node.type == NodeType.VECTOR:
-        return True
     extent = node.sizing.width, node.sizing.height
     if extent[0] is None or extent[1] is None:
         return False
     if max(float(extent[0]), float(extent[1])) > 48.0:
         return False
-    return NodeType.VECTOR in _child_types(node) or any(
-        child.type == NodeType.VECTOR for child in node.children
-    )
+    vector_children = [child for child in node.children if child.type == NodeType.VECTOR]
+    if not vector_children or len(vector_children) > 2:
+        return False
+    # ponytail: upload/cloud glyphs pack 3+ vectors; rating stars are 1-2 paths per unit
+    return all(child.type == NodeType.VECTOR for child in node.children)
 
 
 def _count_rating_star_units(node: CleanDesignTreeNode) -> int:

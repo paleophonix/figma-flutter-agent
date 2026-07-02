@@ -160,6 +160,26 @@ def _shared_body_scroll_inner_column(
     )
 
 
+def canonicalize_root_bottom_nav_terminal_overlay(
+    root: CleanDesignTreeNode,
+) -> CleanDesignTreeNode:
+    """Move docked bottom navigation to the terminal paint slot on root stacks."""
+    if root.type != NodeType.STACK or not root.children:
+        return root
+    nav_indices = [
+        index for index, child in enumerate(root.children) if is_bottom_docked_stack_child(child)
+    ]
+    if not nav_indices:
+        return root
+    nav_index = nav_indices[-1]
+    if nav_index == len(root.children) - 1:
+        return root
+    children = list(root.children)
+    nav = children.pop(nav_index)
+    children.append(nav)
+    return root.model_copy(update={"children": children})
+
+
 def apply_pin_bottom_chrome_to_stack_layers(
     stack_node: CleanDesignTreeNode,
     child_nodes: list[CleanDesignTreeNode],

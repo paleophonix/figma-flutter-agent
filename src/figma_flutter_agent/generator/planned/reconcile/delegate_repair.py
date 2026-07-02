@@ -21,6 +21,7 @@ from .class_inspect import (
     _is_shrink_only_widget_source,
     _pick_canonical_widget_path,
     _strip_nested_self_widget_ctors,
+    _strip_would_collapse_substantive_widget,
     _widget_build_snippet,
     _widget_class_names_by_path,
     _widget_class_paths,
@@ -251,6 +252,13 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
             if name in class_paths or _widget_stem_alias_ctor(name, class_name, normalized):
                 replacement = class_name
             else:
+                candidate = re.sub(
+                    rf"\b{re.escape(name)}\s*\(",
+                    "SizedBox.shrink(",
+                    patched_build,
+                )
+                if _strip_would_collapse_substantive_widget(patched_build, candidate):
+                    continue
                 replacement = "SizedBox.shrink"
             patched_build = re.sub(
                 rf"\b{re.escape(name)}\s*\(",

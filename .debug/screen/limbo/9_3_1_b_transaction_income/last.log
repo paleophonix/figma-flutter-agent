@@ -1,33 +1,27 @@
 
---- dart format @ 2026-07-02T10:31:07.055723+00:00 ---
+--- dart format @ 2026-07-02T11:30:41.966853+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\features\9_3_1_b_transaction_income\9_3_1_b_transaction_income_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\widgets\calendar_filter_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\widgets\frame3_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\widgets\icon_notification_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\widgets\icon_salary_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\lib\widgets\transaction_category_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\test\golden\9_3_1_b_transaction_income_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fdeh4_bp\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\features\9_3_1_b_transaction_income\9_3_1_b_transaction_income_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\widgets\calendar_filter_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\widgets\frame3_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\widgets\icon_notification_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\widgets\icon_salary_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\lib\widgets\transaction_category_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\test\golden\9_3_1_b_transaction_income_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ib3fdqwi\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 17 files (17 changed) in 0.03 seconds.
 
---- pub get --offline @ 2026-07-02T10:31:12.654897+00:00 ---
+--- pub get --offline @ 2026-07-02T11:30:44.979481+00:00 ---
 exit_code=0
-
-┌─────────────────────────────────────────────────────────┐
-│ A new version of Flutter is available!                  │
-│                                                         │
-│ To update to the latest version, run "flutter upgrade". │
-└─────────────────────────────────────────────────────────┘
 Resolving dependencies...
 Downloading packages...
   flutter_lints 4.0.0 (6.0.0 available)
@@ -39,12 +33,12 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-07-02T10:31:15.266168+00:00 ---
+--- dart analyze (generated) @ 2026-07-02T11:30:49.212622+00:00 ---
 exit_code=0
 Analyzing calendar_filter_widget.dart, frame3_widget.dart, icon_notification_widget.dart, icon_salary_widget.dart, icon_salary_widget2.dart, transaction_category_icon_widget.dart...
 No issues found!
 
---- dart analyze (generated) (1/4) @ 2026-07-02T10:31:18.678458+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-02T11:30:52.772014+00:00 ---
 exit_code=0
 Analyzing 9_3_1_b_transaction_income_screen.dart, 9_3_1_b_transaction_income_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -66,18 +60,18 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
    info - lib\generated\9_3_1_b_transaction_income_layout.dart:12:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\9_3_1_b_transaction_income_layout.dart:13:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\9_3_1_b_transaction_income_layout.dart:184:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:26766 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:58537 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:90520 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:27385 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:59671 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:91656 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 21 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-02T10:31:21.946553+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-02T11:30:56.227871+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, calendar_filter_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/4) @ 2026-07-02T10:31:24.711418+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-02T11:30:59.165268+00:00 ---
 exit_code=0
 Analyzing frame3_widget.dart, icon_notification_widget.dart, icon_salary_widget.dart, icon_salary_widget2.dart, transaction_category_icon_widget.dart, 9_3_1_b_transaction_income_screen_test.dart...
 
@@ -85,7 +79,7 @@ Analyzing frame3_widget.dart, icon_notification_widget.dart, icon_salary_widget.
 
 1 issue found.
 
---- dart analyze (generated) (4/4) @ 2026-07-02T10:31:27.189527+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-02T11:31:01.754168+00:00 ---
 exit_code=0
 Analyzing element_coordinate_mapper.dart...
 
@@ -93,70 +87,69 @@ Analyzing element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-07-02T10:31:29.354296+00:00 ---
+--- dart format @ 2026-07-02T11:31:04.223084+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\features\9_3_1_b_transaction_income\9_3_1_b_transaction_income_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\widgets\calendar_filter_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\widgets\frame3_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\widgets\icon_notification_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\widgets\icon_salary_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\lib\widgets\transaction_category_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\test\golden\9_3_1_b_transaction_income_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5e8ylso\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\features\9_3_1_b_transaction_income\9_3_1_b_transaction_income_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\widgets\calendar_filter_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\widgets\frame3_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\widgets\icon_salary_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\lib\widgets\transaction_category_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\test\golden\9_3_1_b_transaction_income_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_hgllv50\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 16 files (16 changed) in 0.03 seconds.
+
+--- dart format @ 2026-07-02T11:31:06.554516+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\features\9_3_1_b_transaction_income\9_3_1_b_transaction_income_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\widgets\calendar_filter_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\widgets\frame3_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\widgets\icon_notification_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\widgets\icon_salary_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\lib\widgets\transaction_category_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\test\golden\9_3_1_b_transaction_income_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-igbjoeym\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 17 files (17 changed) in 0.03 seconds.
 
---- dart format @ 2026-07-02T10:31:31.087318+00:00 ---
+--- dart format @ 2026-07-02T11:31:10.884209+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\features\9_3_1_b_transaction_income\9_3_1_b_transaction_income_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\widgets\calendar_filter_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\widgets\frame3_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\widgets\icon_notification_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\widgets\icon_salary_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\lib\widgets\transaction_category_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\test\golden\9_3_1_b_transaction_income_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-k5a1jnsf\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\features\9_3_1_b_transaction_income\9_3_1_b_transaction_income_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\widgets\calendar_filter_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\widgets\frame3_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\widgets\icon_notification_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\widgets\icon_salary_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\lib\widgets\transaction_category_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\test\golden\9_3_1_b_transaction_income_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mh_iz3kn\analyze_check\test\harness\element_coordinate_mapper.dart
 Formatted 17 files (17 changed) in 0.03 seconds.
 
---- dart format @ 2026-07-02T10:31:33.782397+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\features\9_3_1_b_transaction_income\9_3_1_b_transaction_income_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\widgets\calendar_filter_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\widgets\frame3_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\widgets\icon_notification_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\widgets\icon_salary_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\lib\widgets\transaction_category_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\test\golden\9_3_1_b_transaction_income_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-km0og54_\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 17 files (17 changed) in 0.03 seconds.
-
---- pub get --offline @ 2026-07-02T10:31:36.421219+00:00 ---
+--- pub get --offline @ 2026-07-02T11:31:13.553450+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -169,7 +162,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-07-02T10:31:39.764717+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-07-02T11:31:18.807742+00:00 ---
 exit_code=0
 Analyzing 9_3_1_b_transaction_income_screen.dart, 9_3_1_b_transaction_income_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -191,18 +184,18 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
    info - lib\generated\9_3_1_b_transaction_income_layout.dart:12:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\9_3_1_b_transaction_income_layout.dart:13:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\9_3_1_b_transaction_income_layout.dart:184:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:26766 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:58537 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:90520 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:27385 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:59671 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\9_3_1_b_transaction_income_layout.dart:192:91656 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 21 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-07-02T10:31:42.161136+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-07-02T11:31:21.825118+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, calendar_filter_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-07-02T10:31:44.893210+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-07-02T11:31:25.042675+00:00 ---
 exit_code=0
 Analyzing frame3_widget.dart, icon_notification_widget.dart, icon_salary_widget.dart, transaction_category_icon_widget.dart, 9_3_1_b_transaction_income_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -211,7 +204,7 @@ Analyzing frame3_widget.dart, icon_notification_widget.dart, icon_salary_widget.
 
 2 issues found.
 
---- flutter pub get @ 2026-07-02T10:31:48.568182+00:00 ---
+--- flutter pub get @ 2026-07-02T11:31:30.616668+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -224,4 +217,4 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-02T10:31:48.570182+00:00 ---
+--- flutter render errors @ 2026-07-02T11:31:30.618668+00:00 ---

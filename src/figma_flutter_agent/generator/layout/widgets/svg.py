@@ -248,6 +248,12 @@ def _svg_fit_mode(
         and width / height >= _METRIC_STRIP_MIN_ASPECT
     ):
         return "BoxFit.contain"
+    if (
+        width
+        and height
+        and max(float(width), float(height)) <= 72.0
+    ):
+        return "BoxFit.contain"
     return "BoxFit.fill" if width and height else "BoxFit.contain"
 
 

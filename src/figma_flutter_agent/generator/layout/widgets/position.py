@@ -628,15 +628,24 @@ def _wrap_root_stack_viewport(
                 theme_variant=theme_variant,
                 anchor_top=True,
             )
+        partitioned_preview = None
+        if viewport_pinned_layers:
+            partitioned_preview = bottom_chrome_viewport_partition_live(
+                scrollable_stack=stack_widget,
+                pinned_layers=viewport_pinned_layers,
+                width_token="_artboardPreviewWidth",
+                height_token="_artboardPreviewHeight",
+            )
         preview_child = artboard_preview_sized_box(
-            child=preview_stack_widget or stack_widget,
+            child=partitioned_preview or preview_stack_widget or stack_widget,
             alignment="Alignment.topLeft",
             bounded_child=True,
         )
         return wrap_artboard_preview_layout_builder(
             preview_child=preview_child,
             fallback=fallback,
-            viewport_pin_bottom_chrome=True,
+            scroll_child=partitioned_preview,
+            viewport_pin_bottom_chrome=bool(viewport_pinned_layers),
         )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         _stack_is_phone_shell_layout,

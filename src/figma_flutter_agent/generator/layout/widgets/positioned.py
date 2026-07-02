@@ -58,6 +58,8 @@ def _should_pin_bottom(
     """Return True when a positioned child should use ``bottom:`` not ``top:``."""
     if prefer_top_pin and placement.vertical == "TOP":
         return False
+    if placement.vertical == "TOP":
+        return False
     if placement.vertical == "BOTTOM":
         return True
     if (

@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import re
+
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrNode
+
+_ASSET_PATH_RE = re.compile(r"['\"](assets/[^'\"]+)['\"]")
 
 
 def subtree_has_visible_paint(node: CleanDesignTreeNode, *, max_depth: int = 6) -> bool:
@@ -82,6 +86,37 @@ def extracted_icon_badge_glyph_emit_needs_rematerialization(
     ):
         return True
     return f"width: {plate_w_token}" in existing_code and f"width: {glyph_w_token}" not in existing_code
+
+
+def collect_subtree_asset_paths(node: CleanDesignTreeNode) -> frozenset[str]:
+    """Collect bundled asset paths referenced by a clean-tree subtree."""
+    paths: set[str] = set()
+    if node.vector_asset_key:
+        paths.add(node.vector_asset_key)
+    if node.image_asset_key:
+        paths.add(node.image_asset_key)
+    for child in node.children:
+        paths |= set(collect_subtree_asset_paths(child))
+    return frozenset(paths)
+
+
+def extract_dart_asset_paths(code: str) -> frozenset[str]:
+    """Extract bundled asset path literals from generated Dart source."""
+    return frozenset(_ASSET_PATH_RE.findall(code))
+
+
+def icon_badge_widget_identity_matches_subtree(
+    existing_code: str,
+    subtree: CleanDesignTreeNode,
+) -> bool:
+    """Return True when cached widget assets overlap the candidate badge subtree."""
+    existing_assets = extract_dart_asset_paths(existing_code)
+    if not existing_assets:
+        return False
+    subtree_assets = collect_subtree_asset_paths(subtree)
+    if not subtree_assets:
+        return False
+    return bool(existing_assets & subtree_assets)
 
 
 def icon_badge_planned_widget_needs_rematerialization(
