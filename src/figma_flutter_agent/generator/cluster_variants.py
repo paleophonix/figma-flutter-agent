@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
 def _sizing_like_skip_control(node: CleanDesignTreeNode) -> bool:
@@ -227,14 +227,34 @@ def resolve_cluster_delegate_class(
 
 
 def primary_vector_asset(node: CleanDesignTreeNode) -> str | None:
-    """Return the first exported vector asset key inside ``node``."""
-    if node.vector_asset_key:
-        return node.vector_asset_key
-    for child in node.children:
-        asset = primary_vector_asset(child)
-        if asset is not None:
-            return asset
-    return None
+    """Return the best exported vector asset key inside ``node``."""
+    candidates: list[tuple[int, str]] = []
+
+    def score_asset(asset: str, owner: CleanDesignTreeNode) -> int:
+        lowered = asset.lower()
+        score = 0
+        if "ellipse" in lowered or "circle" in lowered:
+            score -= 20
+        if lowered.startswith("assets/icons/group_"):
+            score += 12
+        path_count = owner.vector_svg_path_count
+        if path_count is not None and path_count > 1:
+            score += min(int(path_count), 8)
+        if owner.type == NodeType.STACK and owner.vector_asset_key == asset:
+            score += 4
+        return score
+
+    def walk(current: CleanDesignTreeNode) -> None:
+        if current.vector_asset_key:
+            candidates.append((score_asset(current.vector_asset_key, current), current.vector_asset_key))
+        for child in current.children:
+            walk(child)
+
+    walk(node)
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return candidates[0][1]
 
 
 def _collect_cluster_assets(

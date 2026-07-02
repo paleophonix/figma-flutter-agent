@@ -4,406 +4,15 @@
   "screenIr": {
     "root": {
       "figmaId": "7342:2818",
-      "kind": "nav_bottom_bar",
+      "kind": "nav_scroll_host",
       "children": [
         {
-          "figmaId": "7342:2819",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Rectangle 148",
-            "backgroundColor": "0xFFF1FFF3"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2820",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "backgroundColor": "0xFF00D09E"
-          },
-          "fidelityTier": "styled_primitive",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2821",
-          "kind": "column",
-          "children": [
-            {
-              "figmaId": "7342:2822",
-              "kind": "text",
-              "children": [],
-              "overrides": {
-                "text": "Hi, Welcome Back",
-                "accessibilityLabel": "Hi, Welcome Back",
-                "textColor": "0xFF052224",
-                "fontSize": 20.0
-              },
-              "layoutHints": {
-                "heightFit": "min"
-              },
-              "maxLines": 1,
-              "fidelityTier": "native_verified",
-              "tierSource": "policy_fallback"
-            },
-            {
-              "figmaId": "7342:2823",
-              "kind": "text",
-              "children": [],
-              "overrides": {
-                "text": "Good Morning",
-                "accessibilityLabel": "Good Morning",
-                "textColor": "0xFF052224",
-                "fontSize": 14.0
-              },
-              "layoutHints": {
-                "heightFit": "min"
-              },
-              "maxLines": 1,
-              "fidelityTier": "native_verified",
-              "tierSource": "policy_fallback"
-            }
-          ],
-          "layoutHints": {
-            "minHeight": 35.0,
-            "heightFit": "min"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2824",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 5"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2825",
-          "kind": "technical_divider",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 6"
-          },
-          "payload": {
-            "payloadKind": "technical_divider"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2826",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Food Last Week",
-            "accessibilityLabel": "Food Last Week",
-            "textColor": "0xFF052224",
-            "fontSize": 12.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2827",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Revenue Last Week",
-            "accessibilityLabel": "Revenue Last Week",
-            "textColor": "0xFF052224",
-            "fontSize": 12.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2828",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "$4.000.00",
-            "accessibilityLabel": "$4.000.00",
-            "textColor": "0xFF052224",
-            "fontSize": 15.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2829",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "-$100.00",
-            "accessibilityLabel": "-$100.00",
-            "fontSize": 15.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2830",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Salary",
-            "accessibilityLabel": "Salary",
-            "textColor": "0xFF052224",
-            "fontSize": 15.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2831",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "$4.000,00",
-            "accessibilityLabel": "$4.000,00",
-            "textColor": "0xFF052224",
-            "fontSize": 15.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2832",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Monthly",
-            "accessibilityLabel": "Monthly",
-            "textColor": "0xFF052224",
-            "fontSize": 13.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2833",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "18:27 - April 30",
-            "accessibilityLabel": "18:27 - April 30",
-            "fontSize": 12.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2834",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 11"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2835",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 12"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2836",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Groceries",
-            "accessibilityLabel": "Groceries",
-            "textColor": "0xFF052224",
-            "fontSize": 15.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2837",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "-$100,00",
-            "accessibilityLabel": "-$100,00",
-            "fontSize": 15.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2838",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Pantry",
-            "accessibilityLabel": "Pantry",
-            "textColor": "0xFF052224",
-            "fontSize": 13.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2839",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "17:00 - April 24",
-            "accessibilityLabel": "17:00 - April 24",
-            "fontSize": 12.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2840",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 13"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2841",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 14"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2842",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Rent",
-            "accessibilityLabel": "Rent",
-            "textColor": "0xFF052224",
-            "fontSize": 15.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2843",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "-$674,40",
-            "accessibilityLabel": "-$674,40",
-            "fontSize": 15.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2844",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Rent",
-            "accessibilityLabel": "Rent",
-            "textColor": "0xFF052224",
-            "fontSize": 13.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2845",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "8:30 - April 15",
-            "accessibilityLabel": "8:30 - April 15",
-            "fontSize": 12.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2846",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 15"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2847",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 16"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2848",
-          "kind": "extracted",
-          "children": [
-            {
-              "figmaId": "I7342:2848;7043:3064",
-              "kind": "stack",
-              "children": [
-                {
-                  "figmaId": "I7342:2848;7043:3065",
-                  "kind": "auto",
-                  "children": []
-                }
-              ]
-            }
-          ],
-          "ref": {
-            "widgetName": "IconNotificationWidget",
-            "namedArgs": {}
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
           "figmaId": "7342:2849",
-          "kind": "extracted",
+          "kind": "wrap",
           "children": [
             {
               "figmaId": "7342:2850",
-              "kind": "text",
+              "kind": "auto",
               "children": []
             },
             {
@@ -432,21 +41,481 @@
                 }
               ]
             }
+          ]
+        },
+        {
+          "figmaId": "band-7342:2821",
+          "kind": "row",
+          "children": [
+            {
+              "figmaId": "7342:2821",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "7342:2822",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Hi, Welcome Back",
+                    "accessibilityLabel": "Hi, Welcome Back",
+                    "textColor": "0xFF052224",
+                    "fontSize": 20.0
+                  },
+                  "layoutHints": {
+                    "heightFit": "min"
+                  },
+                  "maxLines": 1,
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "7342:2823",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "Good Morning",
+                    "accessibilityLabel": "Good Morning",
+                    "textColor": "0xFF052224",
+                    "fontSize": 14.0
+                  },
+                  "layoutHints": {
+                    "heightFit": "min"
+                  },
+                  "maxLines": 1,
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "layoutHints": {
+                "minHeight": 35.0,
+                "heightFit": "min"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2848",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I7342:2848;7043:3064",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I7342:2848;7043:3065",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ],
+              "ref": {
+                "widgetName": "IconNotificationWidget",
+                "namedArgs": {}
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            }
           ],
-          "ref": {
-            "widgetName": "Frame3Widget",
-            "namedArgs": {}
-          },
           "layoutHints": {
-            "flexSpacing": 0.0,
-            "gapMode": "explicit",
-            "explicitGaps": [
-              271.0,
-              5.0,
-              5.0
-            ]
+            "flexSpacing": 48.0,
+            "gapMode": "uniform"
+          }
+        },
+        {
+          "figmaId": "band-7342:2875",
+          "kind": "container_list_tile",
+          "children": [
+            {
+              "figmaId": "7342:2875",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Total Balance",
+                "accessibilityLabel": "Total Balance",
+                "textColor": "0xFF093030",
+                "fontSize": 12.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2876",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2877",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Total Expense",
+                "accessibilityLabel": "Total Expense",
+                "textColor": "0xFF093030",
+                "fontSize": 12.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2866",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I7342:2866;7110:3904",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I7342:2866;7110:3905",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I7342:2866;7110:3906",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ],
+              "ref": {
+                "widgetName": "DirectionBadgeWidget",
+                "namedArgs": {}
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2867",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I7342:2867;7110:4418",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I7342:2867;7110:4418;7110:3904",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I7342:2867;7110:4418;7110:3905",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I7342:2867;7110:4418;7110:3906",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ],
+                  "ref": {
+                    "widgetName": "DirectionBadgeWidget",
+                    "namedArgs": {}
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "payload": {
+            "payloadKind": "container_list_tile"
           },
-          "fidelityTier": "native_verified",
+          "fidelityTier": "native_unverified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "band-7342:2873",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "7342:2873",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "$7,783.00",
+                "accessibilityLabel": "$7,783.00",
+                "fontSize": 24.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2874",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "-$1.187.40",
+                "accessibilityLabel": "-$1.187.40",
+                "fontSize": 24.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ]
+        },
+        {
+          "figmaId": "band-7342:2869",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "7342:2869",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "0xFF052224"
+              },
+              "fidelityTier": "styled_primitive",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2871",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "0xFFF1FFF3"
+              },
+              "fidelityTier": "styled_primitive",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2872",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "$20,000.00",
+                "accessibilityLabel": "$20,000.00",
+                "textColor": "0xFF052224",
+                "fontSize": 13.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2870",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "30%",
+                "accessibilityLabel": "30%",
+                "fontSize": 12.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ]
+        },
+        {
+          "figmaId": "band-7342:2868",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "7342:2868",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "30% of your expenses, looks good.",
+                "accessibilityLabel": "30% of your expenses, looks good.",
+                "textColor": "0xFF052224",
+                "fontSize": 15.0
+              },
+              "isMultiline": false,
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2878",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I7342:2878;7110:4437",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I7342:2878;7110:4438",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": true,
+              "payload": {
+                "payloadKind": "check"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ]
+        },
+        {
+          "figmaId": "band-7342:2819",
+          "kind": "container_list_tile",
+          "children": [
+            {
+              "figmaId": "7342:2819",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2820",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "0xFF00D09E"
+              },
+              "fidelityTier": "styled_primitive",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2824",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2863",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2827",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Revenue Last Week",
+                "accessibilityLabel": "Revenue Last Week",
+                "textColor": "0xFF052224",
+                "fontSize": 12.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2864",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2861",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I7342:2861;7102:2995",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2828",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "$4.000.00",
+                "accessibilityLabel": "$4.000.00",
+                "textColor": "0xFF052224",
+                "fontSize": 15.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2862",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I7342:2862;7105:3001",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2825",
+              "kind": "technical_divider",
+              "children": [],
+              "payload": {
+                "payloadKind": "technical_divider"
+              },
+              "fidelityTier": "native_unverified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "7342:2826",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Food Last Week",
+                "accessibilityLabel": "Food Last Week",
+                "textColor": "0xFF052224",
+                "fontSize": 12.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2860",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I7342:2860;7102:2971",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2865",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Savings on goals",
+                "accessibilityLabel": "Savings on goals",
+                "textColor": "0xFF093030",
+                "fontSize": 12.0
+              },
+              "isMultiline": true,
+              "maxLines": 2,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2829",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "-$100.00",
+                "accessibilityLabel": "-$100.00",
+                "fontSize": 15.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "payload": {
+            "payloadKind": "container_list_tile"
+          },
+          "fidelityTier": "native_unverified",
           "tierSource": "manifest"
         },
         {
@@ -455,7 +524,7 @@
           "children": [
             {
               "figmaId": "I7342:2856;7065:2800",
-              "kind": "auto",
+              "kind": "row",
               "children": [
                 {
                   "figmaId": "I7342:2856;7065:2800;7045:2573",
@@ -463,7 +532,7 @@
                   "children": [
                     {
                       "figmaId": "I7342:2856;7065:2800;7045:2574",
-                      "kind": "text",
+                      "kind": "auto",
                       "children": [],
                       "overrides": {
                         "text": "Daily",
@@ -491,7 +560,7 @@
             },
             {
               "figmaId": "I7342:2856;7065:2801",
-              "kind": "auto",
+              "kind": "row",
               "children": [
                 {
                   "figmaId": "I7342:2856;7065:2801;7045:2573",
@@ -499,7 +568,7 @@
                   "children": [
                     {
                       "figmaId": "I7342:2856;7065:2801;7045:2574",
-                      "kind": "text",
+                      "kind": "auto",
                       "children": [],
                       "overrides": {
                         "text": "Weekly",
@@ -527,7 +596,7 @@
             },
             {
               "figmaId": "I7342:2856;7065:2802",
-              "kind": "auto",
+              "kind": "row",
               "children": [
                 {
                   "figmaId": "I7342:2856;7065:2802;7045:2573",
@@ -535,7 +604,7 @@
                   "children": [
                     {
                       "figmaId": "I7342:2856;7065:2802;7045:2574",
-                      "kind": "text",
+                      "kind": "auto",
                       "children": [],
                       "overrides": {
                         "text": "Monthly",
@@ -578,373 +647,348 @@
           "tierSource": "policy_fallback"
         },
         {
-          "figmaId": "7342:2857",
-          "kind": "auto",
+          "figmaId": "band-7342:2857",
+          "kind": "chip_input",
           "children": [
             {
-              "figmaId": "I7342:2857;7102:2847",
-              "kind": "auto",
-              "children": [],
-              "overrides": {
-                "backgroundColor": "0xFF6DB6FE"
-              },
-              "fidelityTier": "styled_primitive",
-              "tierSource": "policy_fallback"
-            },
-            {
-              "figmaId": "I7342:2857;7102:1277",
-              "kind": "auto",
-              "children": []
-            }
-          ],
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2858",
-          "kind": "auto",
-          "children": [
-            {
-              "figmaId": "I7342:2858;7102:1245",
-              "kind": "auto",
-              "children": [],
-              "overrides": {
-                "backgroundColor": "0xFF3299FF"
-              },
-              "fidelityTier": "styled_primitive",
-              "tierSource": "policy_fallback"
-            },
-            {
-              "figmaId": "I7342:2858;7102:1254",
-              "kind": "auto",
-              "children": []
-            }
-          ],
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2859",
-          "kind": "extracted",
-          "children": [
-            {
-              "figmaId": "I7342:2859;7102:1246",
-              "kind": "container",
-              "children": []
-            },
-            {
-              "figmaId": "I7342:2859;7102:1256",
+              "figmaId": "7342:2857",
               "kind": "stack",
               "children": [
                 {
-                  "figmaId": "I7342:2859;7102:1257",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "I7342:2859;7102:1258",
-                      "kind": "auto",
-                      "children": []
-                    },
-                    {
-                      "figmaId": "I7342:2859;7102:1259",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "ref": {
-            "widgetName": "IconRentWidget",
-            "namedArgs": {}
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2860",
-          "kind": "auto",
-          "children": [
-            {
-              "figmaId": "I7342:2860;7102:2971",
-              "kind": "auto",
-              "children": []
-            }
-          ],
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2861",
-          "kind": "auto",
-          "children": [
-            {
-              "figmaId": "I7342:2861;7102:2995",
-              "kind": "auto",
-              "children": []
-            }
-          ],
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2862",
-          "kind": "auto",
-          "children": [
-            {
-              "figmaId": "I7342:2862;7105:3001",
-              "kind": "auto",
-              "children": []
-            }
-          ],
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2863",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Ellipse 182"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2864",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Ellipse 183"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2865",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Savings on goals",
-            "accessibilityLabel": "Savings on goals",
-            "textColor": "0xFF093030",
-            "fontSize": 12.0
-          },
-          "isMultiline": true,
-          "maxLines": 2,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2866",
-          "kind": "extracted",
-          "children": [
-            {
-              "figmaId": "I7342:2866;7110:3904",
-              "kind": "stack",
-              "children": [
-                {
-                  "figmaId": "I7342:2866;7110:3905",
-                  "kind": "container",
-                  "children": []
+                  "figmaId": "I7342:2857;7102:2847",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "backgroundColor": "0xFF6DB6FE"
+                  },
+                  "fidelityTier": "styled_primitive",
+                  "tierSource": "policy_fallback"
                 },
                 {
-                  "figmaId": "I7342:2866;7110:3906",
+                  "figmaId": "I7342:2857;7102:1277",
                   "kind": "auto",
                   "children": []
                 }
-              ]
+              ],
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2830",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Salary",
+                "accessibilityLabel": "Salary",
+                "textColor": "0xFF052224",
+                "fontSize": 15.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2834",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2835",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2831",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "$4.000,00",
+                "accessibilityLabel": "$4.000,00",
+                "textColor": "0xFF052224",
+                "fontSize": 15.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2833",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "18:27 - April 30",
+                "accessibilityLabel": "18:27 - April 30",
+                "fontSize": 12.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
             }
           ],
-          "ref": {
-            "widgetName": "DirectionBadgeWidget",
-            "namedArgs": {}
+          "layoutHints": {
+            "flexSpacing": 0.0,
+            "gapMode": "explicit",
+            "explicitGaps": [
+              16.0,
+              56.45507657348776,
+              93.42675626098776,
+              13.1181640625,
+              0.0
+            ]
           },
-          "fidelityTier": "native_verified",
+          "payload": {
+            "payloadKind": "chip_input"
+          },
+          "fidelityTier": "native_unverified",
           "tierSource": "policy_fallback"
         },
         {
-          "figmaId": "7342:2867",
-          "kind": "auto",
+          "figmaId": "band-7342:2858",
+          "kind": "chip_input",
           "children": [
             {
-              "figmaId": "I7342:2867;7110:4418",
-              "kind": "extracted",
+              "figmaId": "7342:2858",
+              "kind": "stack",
               "children": [
                 {
-                  "figmaId": "I7342:2867;7110:4418;7110:3904",
+                  "figmaId": "I7342:2858;7102:1245",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "backgroundColor": "0xFF3299FF"
+                  },
+                  "fidelityTier": "styled_primitive",
+                  "tierSource": "policy_fallback"
+                },
+                {
+                  "figmaId": "I7342:2858;7102:1254",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2836",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Groceries",
+                "accessibilityLabel": "Groceries",
+                "textColor": "0xFF052224",
+                "fontSize": 15.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2840",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2841",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "7342:2837",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "-$100,00",
+                "accessibilityLabel": "-$100,00",
+                "fontSize": 15.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2838",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Pantry",
+                "accessibilityLabel": "Pantry",
+                "textColor": "0xFF052224",
+                "fontSize": 13.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2839",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "17:00 - April 24",
+                "accessibilityLabel": "17:00 - April 24",
+                "fontSize": 12.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "layoutHints": {
+            "flexSpacing": 0.0,
+            "gapMode": "explicit",
+            "explicitGaps": [
+              16.0,
+              31.45507657348776,
+              93.42675626098776,
+              23.1181640625,
+              0.0,
+              0.0
+            ]
+          },
+          "payload": {
+            "payloadKind": "chip_input"
+          },
+          "fidelityTier": "native_unverified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "band-7342:2859",
+          "kind": "chip_input",
+          "children": [
+            {
+              "figmaId": "7342:2859",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I7342:2859;7102:1246",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I7342:2859;7102:1256",
                   "kind": "stack",
                   "children": [
                     {
-                      "figmaId": "I7342:2867;7110:4418;7110:3905",
-                      "kind": "container",
-                      "children": []
-                    },
-                    {
-                      "figmaId": "I7342:2867;7110:4418;7110:3906",
-                      "kind": "auto",
-                      "children": []
+                      "figmaId": "I7342:2859;7102:1257",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I7342:2859;7102:1258",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I7342:2859;7102:1259",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
                     }
                   ]
                 }
               ],
               "ref": {
-                "widgetName": "DirectionBadgeWidget",
+                "widgetName": "IconRentWidget",
                 "namedArgs": {}
               },
               "fidelityTier": "native_verified",
-              "tierSource": "policy_fallback"
-            }
-          ],
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2868",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "30% of your expenses, looks good.",
-            "accessibilityLabel": "30% of your expenses, looks good.",
-            "textColor": "0xFF052224",
-            "fontSize": 15.0
-          },
-          "isMultiline": false,
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2869",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "backgroundColor": "0xFF052224"
-          },
-          "fidelityTier": "styled_primitive",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2870",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "30%",
-            "accessibilityLabel": "30%",
-            "fontSize": 12.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2871",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "backgroundColor": "0xFFF1FFF3"
-          },
-          "fidelityTier": "styled_primitive",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2872",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "$20,000.00",
-            "accessibilityLabel": "$20,000.00",
-            "textColor": "0xFF052224",
-            "fontSize": 13.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2873",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "$7,783.00",
-            "accessibilityLabel": "$7,783.00",
-            "fontSize": 24.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2874",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "-$1.187.40",
-            "accessibilityLabel": "-$1.187.40",
-            "fontSize": 24.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2875",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Total Balance",
-            "accessibilityLabel": "Total Balance",
-            "textColor": "0xFF093030",
-            "fontSize": 12.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2876",
-          "kind": "auto",
-          "children": [],
-          "overrides": {
-            "accessibilityLabel": "Line 2"
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
-          "figmaId": "7342:2877",
-          "kind": "text",
-          "children": [],
-          "overrides": {
-            "text": "Total Expense",
-            "accessibilityLabel": "Total Expense",
-            "textColor": "0xFF093030",
-            "fontSize": 12.0
-          },
-          "maxLines": 1,
-          "fidelityTier": "native_verified",
-          "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "7342:2878",
-          "kind": "auto",
-          "children": [
+              "tierSource": "manifest"
+            },
             {
-              "figmaId": "I7342:2878;7110:4437",
+              "figmaId": "7342:2842",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Rent",
+                "accessibilityLabel": "Rent",
+                "textColor": "0xFF052224",
+                "fontSize": 15.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2846",
               "kind": "auto",
               "children": []
             },
             {
-              "figmaId": "I7342:2878;7110:4438",
+              "figmaId": "7342:2847",
               "kind": "auto",
               "children": []
+            },
+            {
+              "figmaId": "7342:2843",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "-$674,40",
+                "accessibilityLabel": "-$674,40",
+                "fontSize": 15.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2844",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Rent",
+                "accessibilityLabel": "Rent",
+                "textColor": "0xFF052224",
+                "fontSize": 13.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "7342:2845",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "8:30 - April 15",
+                "accessibilityLabel": "8:30 - April 15",
+                "fontSize": 12.0
+              },
+              "maxLines": 1,
+              "fidelityTier": "native_verified",
+              "tierSource": "policy_fallback"
             }
           ],
-          "isSelected": true,
-          "payload": {
-            "payloadKind": "check"
+          "layoutHints": {
+            "flexSpacing": 0.0,
+            "gapMode": "explicit",
+            "explicitGaps": [
+              16.0,
+              70.45507657348776,
+              93.42675626098776,
+              20.1181640625,
+              0.0,
+              0.0
+            ]
           },
+          "payload": {
+            "payloadKind": "chip_input"
+          },
+          "fidelityTier": "native_unverified",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "7342:2832",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "text": "Monthly",
+            "accessibilityLabel": "Monthly",
+            "textColor": "0xFF052224",
+            "fontSize": 13.0
+          },
+          "maxLines": 1,
           "fidelityTier": "native_verified",
           "tierSource": "policy_fallback"
         },
@@ -954,7 +998,7 @@
           "children": [
             {
               "figmaId": "I7342:2879;7045:344",
-              "kind": "auto",
+              "kind": "stack",
               "children": [
                 {
                   "figmaId": "I7342:2879;7045:344;7045:308",
@@ -985,7 +1029,7 @@
             },
             {
               "figmaId": "I7342:2879;7045:346",
-              "kind": "auto",
+              "kind": "stack",
               "children": [
                 {
                   "figmaId": "I7342:2879;7045:346;7045:312",
@@ -1005,7 +1049,7 @@
             },
             {
               "figmaId": "I7342:2879;7045:348",
-              "kind": "auto",
+              "kind": "stack",
               "children": [
                 {
                   "figmaId": "I7342:2879;7045:348;7045:311",
@@ -1025,7 +1069,7 @@
             },
             {
               "figmaId": "I7342:2879;7045:350",
-              "kind": "auto",
+              "kind": "stack",
               "children": [
                 {
                   "figmaId": "I7342:2879;7045:350;7045:310",
@@ -1045,7 +1089,7 @@
             },
             {
               "figmaId": "I7342:2879;7045:352",
-              "kind": "auto",
+              "kind": "stack",
               "children": [
                 {
                   "figmaId": "I7342:2879;7045:352;7045:309",
@@ -1079,8 +1123,11 @@
         "accessibilityLabel": "9 - A - Home - Bottom Navigation",
         "backgroundColor": "0xFF00D09E"
       },
+      "layoutHints": {
+        "scrollAxis": "vertical"
+      },
       "payload": {
-        "payloadKind": "nav_bottom_bar"
+        "payloadKind": "nav_scroll_host"
       },
       "fidelityTier": "native_verified",
       "tierSource": "policy_fallback"

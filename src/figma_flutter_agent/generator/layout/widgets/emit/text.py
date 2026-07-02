@@ -312,10 +312,20 @@ def render_text_node(
                     and layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
                 )
             ):
-                widget = wrap_tight_chip_label(
-                    widget,
-                    align="Alignment.centerRight",
+                from figma_flutter_agent.parser.interaction.icons import (
+                    layout_fact_upload_placeholder_tile,
                 )
+
+                if parent_node is not None and layout_fact_upload_placeholder_tile(parent_node):
+                    widget = wrap_tight_chip_label(
+                        widget,
+                        align="Alignment.bottomCenter",
+                    )
+                else:
+                    widget = wrap_tight_chip_label(
+                        widget,
+                        align="Alignment.centerRight",
+                    )
                 if parent_type == NodeType.ROW:
                     text_width = node.sizing.width
                     if text_width is not None and text_width > 0:

@@ -40,18 +40,37 @@ def _stroked_checkbox_visual_scale(node: CleanDesignTreeNode) -> float | None:
     return scale
 
 
-def _checkbox_theme_wrapper(widget: str, border: CleanDesignTreeNode) -> str:
+def _checkbox_theme_wrapper(
+    widget: str,
+    border: CleanDesignTreeNode,
+    *,
+    checked: bool = False,
+) -> str:
     """Apply Figma stroke color and corner radius to Material checkbox chrome."""
+    from figma_flutter_agent.generator.layout.style.colors import _border_color_expr
+
     radius = border.style.border_radius if border.style.border_radius is not None else 3.0
     width = border.style.border_width if border.style.border_width is not None else 1.0
     radius_lit = format_geometry_literal(float(radius))
     width_lit = format_geometry_literal(float(width))
-    color_expr = dart_color_expr(border.style)
+    color_expr = _border_color_expr(border.style) or dart_color_expr(
+        border.style,
+        css_key="border-color",
+        fallback="AppColors.primary",
+    )
+    fill_fields = ""
+    if checked:
+        fill_fields = (
+            f"fillColor: MaterialStateProperty.resolveWith((states) => "
+            f"states.contains(MaterialState.selected) ? {color_expr} : Colors.transparent), "
+            f"checkColor: MaterialStateProperty.all({color_expr}), "
+        )
     return (
         "Theme("
         "data: Theme.of(context).copyWith("
         "checkboxTheme: CheckboxThemeData("
         f"side: BorderSide(color: {color_expr}, width: {width_lit}), "
+        f"{fill_fields}"
         f"shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular({radius_lit}))"
         ")), "
         f"child: {widget})"
@@ -142,6 +161,8 @@ def render_stateful_toggle_checkbox(
         f"onChangedBody: () {{ {comment} }})"
     )
     border = checkbox_option_border_container(stack_ref)
-    if border is not None and border.style.border_color:
-        widget = _checkbox_theme_wrapper(widget, border)
+    if border is not None and (
+        border.style.border_color or border.style.background_color
+    ):
+        widget = _checkbox_theme_wrapper(widget, border, checked=checked)
     return widget

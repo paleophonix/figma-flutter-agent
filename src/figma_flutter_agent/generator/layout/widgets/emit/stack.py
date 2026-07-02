@@ -594,6 +594,50 @@ def render_stack(
         ) or layout_fact_checkout_sticky_footer_host(node):
             interaction = None
     if interaction == "input":
+        from figma_flutter_agent.parser.interaction.absolute_fields import (
+            find_field_shell_external_label,
+            find_field_shell_value_text,
+            layout_fact_labeled_absolute_field_stack,
+            layout_fact_painted_field_shell_container,
+        )
+        from ..input.absolute_fields import render_decomposed_absolute_field
+        from ..input.fields import _compose_external_label_input
+
+        if layout_fact_labeled_absolute_field_stack(node):
+            shell = next(
+                child
+                for child in node.children
+                if layout_fact_painted_field_shell_container(child)
+            )
+            value_node = find_field_shell_value_text(shell, node.children)
+            label_node = find_field_shell_external_label(shell, node.children)
+            if value_node is not None and label_node is not None:
+                field = render_decomposed_absolute_field(
+                    shell,
+                    value_node,
+                    theme_variant=theme_variant,
+                    parent_type=parent_type,
+                    bundled_font_families=bundled_font_families,
+                    dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                    text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                    text_theme_size_slots=text_theme_size_slots,
+                )
+                composed = _compose_external_label_input(
+                    node,
+                    field,
+                    label_node=label_node,
+                    bundled_font_families=bundled_font_families,
+                    dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                    text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                    text_theme_size_slots=text_theme_size_slots,
+                )
+                return _finalize_widget(
+                    node,
+                    composed,
+                    parent_type=parent_type,
+                    parent_node=parent_node,
+                    scroll_content_root=scroll_content_root,
+                )
         return _render_stack_input(
             node,
             theme_variant=theme_variant,

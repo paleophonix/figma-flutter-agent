@@ -232,6 +232,39 @@ def _button_icon_label_inline_row_body(node: CleanDesignTreeNode, child_widgets:
     )
 
 
+def _button_painted_surface_overlay_body(
+    node: CleanDesignTreeNode,
+    child_widgets: list[str],
+) -> str:
+    """Compose a full-bleed painted surface with centered overlaid label text."""
+    from figma_flutter_agent.parser.interaction.input_fields import surface_covers_node
+
+    text_index = next(
+        index
+        for index, child in enumerate(node.children)
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    )
+    background_index: int | None = None
+    for index, child in enumerate(node.children):
+        if child.type == NodeType.TEXT:
+            continue
+        if surface_covers_node(node, child):
+            background_index = index
+            break
+    if background_index is None:
+        return ", ".join(child_widgets)
+    background_widget = child_widgets[background_index]
+    label_widget = child_widgets[text_index]
+    return (
+        "Stack("
+        "fit: StackFit.expand, "
+        "clipBehavior: Clip.none, "
+        f"children: [Positioned.fill(child: {background_widget}), "
+        f"Center(child: {label_widget})]"
+        ")"
+    )
+
+
 def _button_list_tile_row_body(node: CleanDesignTreeNode, child_widgets: list[str]) -> str:
     """Compose a settings-style ``Row`` for auto-layout list tile buttons."""
     parts: list[str] = []

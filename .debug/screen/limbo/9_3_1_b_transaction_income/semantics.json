@@ -342,10 +342,10 @@
   "rejectedByInvariant": [
     {
       "figmaId": "band-7253:3639",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "STACK": 2,

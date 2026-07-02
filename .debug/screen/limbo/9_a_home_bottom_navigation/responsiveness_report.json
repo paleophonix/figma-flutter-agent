@@ -1,6 +1,6 @@
 {
-  "root_layout": "bottom_nav",
-  "positioned_root_children": 0,
+  "root_layout": "stack",
+  "positioned_root_children": 53,
   "responsive_flow_sections": 0,
   "scrollable": false,
   "bottom_panel_mode": "absolute_top",
@@ -9,10 +9,10 @@
   "law": null,
   "responsive_enabled": false,
   "tall_content": false,
-  "fallback_scrollable": false,
+  "fallback_scrollable": true,
   "preview_capture_scrollable": false,
   "preview_interactive_scrollable": false,
-  "active_branch_interactive_dev": "fallback",
-  "active_branch_golden_capture": "fallback",
+  "active_branch_interactive_dev": "preview_interactive",
+  "active_branch_golden_capture": "preview_capture",
   "effective_scrollable": false
 }

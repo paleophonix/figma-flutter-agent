@@ -102,6 +102,9 @@ def render_layout_file(
     extracted_helper_skip_ids = _collect_extracted_materialization_root_ids(tree)
     chunking_result = chunk_ir_tree(tree)
     tree = chunking_result.root
+    from figma_flutter_agent.parser.dedup.hydrate import hydrate_pruned_cluster_instances
+
+    hydrate_pruned_cluster_instances(tree)
     render_tree, wallpaper_children, shell_background_color = partition_wallpaper_foreground_tree(
         tree,
     )

@@ -29,6 +29,7 @@ from ..finalize import _finalize_widget
 from ..flex_sizing import (
     _button_icon_label_inline_row_body,
     _button_list_tile_row_body,
+    _button_painted_surface_overlay_body,
     _button_social_auth_icon_label_row_body,
 )
 from ..input import (
@@ -201,6 +202,7 @@ def render_button_node(
             button_has_composite_row_body,
             button_has_icon_label_inline_affordance,
             button_has_list_tile_row_body,
+            button_has_painted_surface_overlay_label,
             button_has_social_auth_icon_label_body,
             button_hosts_horizontal_social_auth_icon_cluster,
             button_hosts_multiple_auth_rows,
@@ -221,6 +223,8 @@ def render_button_node(
             stack_body = _button_list_tile_row_body(node, child_widgets)
         elif button_has_social_auth_icon_label_body(node):
             stack_body = _button_social_auth_icon_label_row_body(node, child_widgets)
+        elif button_has_painted_surface_overlay_label(node):
+            stack_body = _button_painted_surface_overlay_body(node, child_widgets)
         elif button_has_icon_label_inline_affordance(node):
             stack_body = _button_icon_label_inline_row_body(node, child_widgets)
         elif button_should_flow_as_column(node) or button_hosts_multiple_auth_rows(node):

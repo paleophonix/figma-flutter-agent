@@ -621,6 +621,7 @@ def try_render_compact_icon_label_metric_stack(
     """Emit a tight icon+label metric row without overlapping absolute placements."""
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         layout_fact_stack_compact_icon_label_metric,
+        stack_child_ordinal_left,
     )
     from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
@@ -664,20 +665,13 @@ def try_render_compact_icon_label_metric_stack(
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
     )
-    gap = 0.0
-    icon_left = icon.stack_placement.left if icon.stack_placement is not None else 0.0
-    text_left = text.stack_placement.left if text.stack_placement is not None else None
-    icon_width = icon.sizing.width
-    if text_left is not None and icon_width is not None and float(icon_width) > 0:
-        gap = float(text_left) - float(icon_left or 0.0) - float(icon_width)
-        if gap < 0.0:
-            gap = 0.0
     width = node.sizing.width
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return None
     icon_height = icon.sizing.height
-    icon_w_lit = format_geometry_literal(float(icon_width or 0.0))
+    icon_width_f = float(icon.sizing.width or 0.0)
+    icon_w_lit = format_geometry_literal(icon_width_f)
     icon_h_lit = format_geometry_literal(float(icon_height or height or 0.0))
     icon_slot = f"SizedBox(width: {icon_w_lit}, height: {icon_h_lit}, child: {icon_widget})"
     text_slot = (
@@ -690,19 +684,27 @@ def try_render_compact_icon_label_metric_stack(
     width_lit = format_geometry_literal(float(width))
     height_lit = format_geometry_literal(float(height))
     gap_widget = ""
-    icon_left = icon.stack_placement.left if icon.stack_placement is not None else 0.0
-    text_left = text.stack_placement.left if text.stack_placement is not None else None
-    icon_width = icon.sizing.width
-    if text_left is not None and icon_width is not None and float(icon_width) > 0:
-        gap = float(text_left) - float(icon_left or 0.0) - float(icon_width)
+    text_left_ord = stack_child_ordinal_left(text)
+    icon_left_ord = stack_child_ordinal_left(icon)
+    text_width = float(text.sizing.width or 0.0)
+    text_before_icon = text_width > 0 and text_left_ord + 0.5 < icon_left_ord
+    if text_before_icon:
+        gap = icon_left_ord - text_left_ord - text_width
         if gap > 0.5:
             gap_widget = f"SizedBox(width: {format_geometry_literal(gap)}), "
+        row_children = f"{text_slot}, {gap_widget}{icon_slot}"
+    else:
+        if text_left_ord is not None and icon_width_f > 0:
+            gap = text_left_ord - icon_left_ord - icon_width_f
+            if gap > 0.5:
+                gap_widget = f"SizedBox(width: {format_geometry_literal(gap)}), "
+        row_children = f"{icon_slot}, {gap_widget}{text_slot}"
     return (
         f"SizedBox(width: {width_lit}, height: {height_lit}, "
         "child: Row("
         "mainAxisSize: MainAxisSize.max, "
         "crossAxisAlignment: CrossAxisAlignment.center, "
-        f"children: [{icon_slot}, {gap_widget}{text_slot}]"
+        f"children: [{row_children}]"
         "))"
     )
 

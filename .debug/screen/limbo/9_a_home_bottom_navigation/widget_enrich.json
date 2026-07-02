@@ -1,5 +1,5 @@
 {
-  "cacheKey": "030636fbd971142d83de41598837353f19d73d2defc909d2dc01441c14764e03",
+  "cacheKey": "a6bf9ae847e05277a80dd20b75393e10653b68a7c2fe8e00effaa38fe6458658",
   "response": {
     "entries": [
       {
@@ -9,52 +9,52 @@
       },
       {
         "clusterId": "component_7045_2587",
-        "widgetName": "PeriodTabWidget",
+        "widgetName": "TimeRangeTabWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7045_322",
-        "widgetName": "TransactionsNavIconWidget",
+        "widgetName": "TransactionsNavItemWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7045_324",
-        "widgetName": "ProfileNavIconWidget",
+        "widgetName": "ProfileNavItemWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7045_326",
-        "widgetName": "HomeNavIconWidget",
+        "widgetName": "HomeNavItemWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7065_2799",
-        "widgetName": "PeriodSwitcherWidget",
+        "widgetName": "TimeRangeSwitchWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7102_1265",
-        "widgetName": "GroceriesCategoryIconWidget",
+        "widgetName": "GroceriesIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7102_1266",
-        "widgetName": "RentCategoryIconWidget",
+        "widgetName": "RentIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7102_2848",
-        "widgetName": "SalaryCategoryIconWidget",
+        "widgetName": "SalaryIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7102_2972",
-        "widgetName": "FoodTrendIconWidget",
+        "widgetName": "FoodCategoryIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7105_3002",
-        "widgetName": "CarCategoryIconWidget",
+        "widgetName": "CarIconWidget",
         "paramRenames": {}
       },
       {
@@ -64,12 +64,12 @@
       },
       {
         "clusterId": "component_7110_4439",
-        "widgetName": "CheckMarkIconWidget",
+        "widgetName": "CheckmarkIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_0",
-        "widgetName": "PeriodTabLabelWidget",
+        "widgetName": "TimeRangeLabelWidget",
         "paramRenames": {}
       }
     ]

@@ -58,7 +58,11 @@ def _load_food_root() -> CleanDesignTreeNode:
     if not path.is_file():
         pytest.skip("food_add_new_items debug bundle unavailable")
     processed = json.loads(path.read_text(encoding="utf-8"))
-    return CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    root = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    from figma_flutter_agent.parser.dedup.hydrate import hydrate_pruned_cluster_instances
+
+    hydrate_pruned_cluster_instances(root)
+    return root
 
 
 def _ingredient_chip_stack() -> CleanDesignTreeNode:
@@ -419,6 +423,7 @@ def test_checkbox_checked_from_inline_checkmark_vector() -> None:
     compact = emitted.replace("\n", "")
     assert "initialValue: true" in compact
     assert "checkboxTheme: CheckboxThemeData" in compact
+    assert "0xFFFB6D3A" in compact
     assert "spacing:" in compact
 
 
@@ -431,6 +436,7 @@ def test_food_replay_pick_up_checkbox_checked_and_spaced() -> None:
     compact = emitted.replace("\n", "")
     assert "initialValue: true" in compact
     assert "TextField(" not in compact
+    assert "0xFFFB6D3A" in compact
 
 
 def test_catalog_chip_label_uses_scale_down_not_ellipsis() -> None:
@@ -505,3 +511,200 @@ class UploadPhotoVideoWidget extends StatelessWidget {
     body = updated["lib/widgets/upload_photo_video_widget.dart"]
     assert "Group8228Widget()" in body
     assert "SizedBox.shrink" not in body
+
+
+def test_painted_surface_overlay_button_emits_centered_stack() -> None:
+    """Law: PaintedButtonOverlayLaw — full-cover surface centers overlaid label."""
+    from figma_flutter_agent.parser.interaction.buttons import (
+        button_has_icon_label_inline_affordance,
+        button_has_painted_surface_overlay_label,
+    )
+
+    button = CleanDesignTreeNode(
+        id="1:cta",
+        name="Save",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=327.0, height=62.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:bg",
+                name="Background",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/cta_bg.svg",
+                sizing=Sizing(width=327.0, height=62.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Save Changes",
+                sizing=Sizing(width=120.0, height=22.0),
+            ),
+        ],
+    )
+    assert button_has_painted_surface_overlay_label(button)
+    assert not button_has_icon_label_inline_affordance(button)
+    emitted = render_node_body(button, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "Stack(fit: StackFit.expand" in compact
+    assert "Center(child:" in compact
+    assert "Row(mainAxisAlignment: MainAxisAlignment.start" not in compact
+
+
+def test_geometric_flex_order_text_before_trailing_icon() -> None:
+    """Law: GeometricFlexOrderLaw — row children follow painted X order."""
+    metric = CleanDesignTreeNode(
+        id="see_all",
+        name="See All",
+        type=NodeType.STACK,
+        sizing=Sizing(width=58.0, height=17.0),
+        children=[
+            CleanDesignTreeNode(
+                id="label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="See All",
+                sizing=Sizing(width=44.0, height=17.0),
+                stack_placement=StackPlacement(left=0.0, width=44.0, height=17.0),
+            ),
+            CleanDesignTreeNode(
+                id="icon",
+                name="Chevron",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/chevron.svg",
+                sizing=Sizing(width=6.0, height=3.0),
+                stack_placement=StackPlacement(left=52.0, width=6.0, height=3.0),
+            ),
+        ],
+    )
+    emitted = render_node_body(metric, uses_svg=True)
+    compact = emitted.replace("\n", "")
+    assert compact.index("See All") < compact.index("chevron.svg")
+
+
+def test_labeled_absolute_field_stack_emits_external_label() -> None:
+    """Law: LabeledFieldCompositeLaw — label above painted field shell."""
+    from figma_flutter_agent.parser.interaction.absolute_fields import (
+        layout_fact_labeled_absolute_field_stack,
+    )
+
+    field_stack = CleanDesignTreeNode(
+        id="1:field",
+        name="Item name",
+        type=NodeType.STACK,
+        sizing=Sizing(width=327.0, height=74.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="item name",
+                sizing=Sizing(width=80.0, height=16.0),
+                stack_placement=StackPlacement(left=24.0, top=0.0, width=80.0, height=16.0),
+                geometry_frame={
+                    "layoutRect": {"x": 24.0, "y": 0.0, "width": 80.0, "height": 16.0},
+                },
+            ),
+            CleanDesignTreeNode(
+                id="1:shell",
+                name="Shell",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=327.0, height=50.0),
+                style=NodeStyle(
+                    background_color="0xFFFDFDFD",
+                    border_color="0xFFE8EAED",
+                    border_width=1.0,
+                ),
+                stack_placement=StackPlacement(left=0.0, top=24.0, width=327.0, height=50.0),
+                geometry_frame={
+                    "layoutRect": {"x": 0.0, "y": 24.0, "width": 327.0, "height": 50.0},
+                },
+            ),
+            CleanDesignTreeNode(
+                id="1:value",
+                name="Value",
+                type=NodeType.TEXT,
+                text="Mazalichiken Halim",
+                sizing=Sizing(width=200.0, height=20.0),
+                stack_placement=StackPlacement(left=36.0, top=42.0, width=200.0, height=20.0),
+                geometry_frame={
+                    "layoutRect": {"x": 36.0, "y": 42.0, "width": 200.0, "height": 20.0},
+                },
+            ),
+        ],
+    )
+    assert layout_fact_labeled_absolute_field_stack(field_stack)
+    emitted = render_node_body(field_stack, uses_svg=True, parent_type=NodeType.COLUMN)
+    compact = emitted.replace("\n", "")
+    assert "Text('item name'" in compact
+    assert compact.index("item name") < compact.index("Mazalichiken Halim")
+    assert "Column(" in compact
+
+
+def test_checkbox_theme_uses_border_color_not_surface_fill() -> None:
+    """Law: CheckboxVisualContractLaw — checkbox chrome follows stroke color."""
+    stack = CleanDesignTreeNode(
+        id="1:option",
+        name="Delivery",
+        type=NodeType.STACK,
+        sizing=Sizing(width=81.0, height=19.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:box",
+                name="Rectangle",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=18.0, height=18.0),
+                style=NodeStyle(
+                    background_color="0xFFFDFDFD",
+                    border_color="0xFFE8EAED",
+                    border_width=1.0,
+                    border_radius=3.0,
+                    has_stroke=True,
+                ),
+            ),
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Delivery",
+                type=NodeType.TEXT,
+                text="Delivery",
+                sizing=Sizing(width=53.0, height=16.0),
+            ),
+        ],
+    )
+    emitted = render_node_body(stack, uses_svg=True, parent_type=NodeType.COLUMN)
+    compact = emitted.replace("\n", "")
+    assert "side: BorderSide(color: Color(0xFFE8EAED)" in compact
+    assert "Color(0xFFFDFDFD)" not in compact.split("checkboxTheme")[1].split("child:")[0]
+
+
+def test_food_replay_pruned_upload_tile_rehydrates_glyph() -> None:
+    """Law: PrunedClusterRepresentativeReuseLaw — duplicate upload badge keeps glyph body."""
+    root = _load_food_root()
+    tile = _find_node(root, "602:1194")
+    assert tile is not None
+    emitted = render_node_body(tile, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "group_8227" in compact
+    assert "SizedBox.shrink()" not in compact
+
+
+def test_food_replay_layout_file_orchestration_contracts() -> None:
+    """Law: orchestration replay — full layout emit preserves repaired screen contracts."""
+    from figma_flutter_agent.generator.layout import render_layout_file
+
+    root = _load_food_root()
+    files = render_layout_file(
+        root,
+        feature_name="food_add_new_items_laws",
+        uses_svg=True,
+    )
+    compact = "".join(files.values()).replace("\n", "")
+    assert "item name" in compact
+    assert "See All" in compact
+    assert compact.index("See All") < compact.rindex(".svg")
+    assert "Save Changes" in compact
+    assert "Stack(fit: StackFit.expand" in compact or "Center(child:" in compact
+    assert "0xFFE8EAED" in compact
+    assert "0xFFFB6D3A" in compact
+    assert "group_8227" in compact
+    assert "RenderFlex overflowed" not in compact

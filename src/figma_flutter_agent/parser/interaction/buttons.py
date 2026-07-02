@@ -618,6 +618,27 @@ def button_compiles_body_as_flex_row(node: CleanDesignTreeNode) -> bool:
     return button_has_icon_label_inline_affordance(node)
 
 
+def button_has_painted_surface_overlay_label(node: CleanDesignTreeNode) -> bool:
+    """Return True when a full-bleed painted surface carries overlaid label copy."""
+    from figma_flutter_agent.parser.interaction.input_fields import surface_covers_node
+
+    if node.type != NodeType.BUTTON:
+        return False
+    text_children = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if len(text_children) != 1:
+        return False
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            continue
+        if surface_covers_node(node, child):
+            return True
+    return False
+
+
 def button_has_icon_label_inline_affordance(node: CleanDesignTreeNode) -> bool:
     """Return True when a compact button should emit icon + label as inline Row.
 
@@ -625,8 +646,11 @@ def button_has_icon_label_inline_affordance(node: CleanDesignTreeNode) -> bool:
     must compile as a single horizontal row in Flutter, not ``StackFit.expand``.
     """
     from figma_flutter_agent.parser.interaction.icons import _stack_has_vector_icon
+    from figma_flutter_agent.parser.interaction.input_fields import surface_covers_node
 
     if node.type != NodeType.BUTTON:
+        return False
+    if button_has_painted_surface_overlay_label(node):
         return False
     if button_hosts_top_navigation_bar(node):
         return False
@@ -653,6 +677,8 @@ def button_has_icon_label_inline_affordance(node: CleanDesignTreeNode) -> bool:
         if child.type == NodeType.STACK and _stack_has_vector_icon([child]):
             icon_child = child
     if icon_child is None or text_child is None:
+        return False
+    if surface_covers_node(node, icon_child):
         return False
     return len(node.children) <= 3
 

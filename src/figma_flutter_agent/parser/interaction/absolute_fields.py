@@ -131,3 +131,52 @@ def find_field_shell_value_text(
             best = sibling
             best_score = score
     return best
+
+
+def find_field_shell_external_label(
+    shell: CleanDesignTreeNode,
+    siblings: list[CleanDesignTreeNode],
+) -> CleanDesignTreeNode | None:
+    """Resolve label text placed above a painted field shell (outside the shell span)."""
+    span = field_shell_vertical_span(shell)
+    if span is None:
+        return None
+    shell_top, _ = span
+    best: CleanDesignTreeNode | None = None
+    best_gap = float("inf")
+    for sibling in siblings:
+        if sibling.id == shell.id or sibling.type != NodeType.TEXT:
+            continue
+        text = (sibling.text or "").strip()
+        if not text:
+            continue
+        text_rect = _text_layout_rect(sibling)
+        if text_rect is None or text_rect.y is None:
+            continue
+        text_bottom = float(text_rect.y) + float(text_rect.height or 0.0)
+        if text_bottom > shell_top + 2.0:
+            continue
+        gap = shell_top - text_bottom
+        if gap < 0.0:
+            continue
+        if gap < best_gap:
+            best = sibling
+            best_gap = gap
+    return best
+
+
+def layout_fact_labeled_absolute_field_stack(node: CleanDesignTreeNode) -> bool:
+    """Return True when an absolute stack hosts an external label plus painted field."""
+    if node.type != NodeType.STACK:
+        return False
+    shells = [
+        child
+        for child in node.children
+        if layout_fact_painted_field_shell_container(child)
+    ]
+    if len(shells) != 1:
+        return False
+    shell = shells[0]
+    if find_field_shell_value_text(shell, node.children) is None:
+        return False
+    return find_field_shell_external_label(shell, node.children) is not None
