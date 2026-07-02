@@ -1,8 +1,8 @@
 {
   "feature": "9_a_home_bottom_navigation",
-  "pipeline_run_id": "894220891ad6",
-  "candidate_build_run_id": "894220891ad6",
-  "committed_build_run_id": "894220891ad6",
+  "pipeline_run_id": "823af0934a40",
+  "candidate_build_run_id": "823af0934a40",
+  "committed_build_run_id": "823af0934a40",
   "writeback": "committed",
   "written_files": [
     "lib/features/9_a_home_bottom_navigation/9_a_home_bottom_navigation_screen.dart",
@@ -16,17 +16,11 @@
     "lib/theme/app_spacing.dart",
     "lib/theme/app_theme.dart",
     "lib/theme/app_typography.dart",
-    "lib/widgets/car_icon_widget.dart",
-    "lib/widgets/food_category_icon_widget.dart",
-    "lib/widgets/frame3_widget.dart",
-    "lib/widgets/groceries_icon_widget.dart",
-    "lib/widgets/icon_notification_widget.dart",
-    "lib/widgets/icon_rent_widget.dart",
-    "lib/widgets/income_indicator_widget.dart",
-    "lib/widgets/salary_icon_widget.dart",
+    "lib/widgets/frame85_widget.dart",
+    "lib/widgets/period_tab_widget.dart",
     "test/golden/9_a_home_bottom_navigation_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-02T15:18:37.404439+00:00"
+  "captured_at": "2026-07-02T16:44:09.122052+00:00"
 }

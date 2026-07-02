@@ -237,6 +237,7 @@ def _button_painted_surface_overlay_body(
     child_widgets: list[str],
 ) -> str:
     """Compose a full-bleed painted surface with centered overlaid label text."""
+    from figma_flutter_agent.generator.layout.widget_roots import strip_stack_parent_data_wrappers
     from figma_flutter_agent.parser.interaction.input_fields import surface_covers_node
 
     text_index = next(
@@ -253,8 +254,8 @@ def _button_painted_surface_overlay_body(
             break
     if background_index is None:
         return ", ".join(child_widgets)
-    background_widget = child_widgets[background_index]
-    label_widget = child_widgets[text_index]
+    background_widget = strip_stack_parent_data_wrappers(child_widgets[background_index])
+    label_widget = strip_stack_parent_data_wrappers(child_widgets[text_index])
     return (
         "Stack("
         "fit: StackFit.expand, "

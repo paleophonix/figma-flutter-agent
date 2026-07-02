@@ -14,7 +14,7 @@ from figma_flutter_agent.generator.layout.flex_policy.stack import (
     stack_should_flow_as_column,
 )
 from figma_flutter_agent.generator.widget_extractor import _bound_cluster_widget_root
-from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr, Sizing
 
 _HOME_DEBUG = Path(".debug/screen/limbo/9_a_home_bottom_navigation")
 
@@ -206,6 +206,41 @@ def test_nav_active_substrate_uses_slot_height() -> None:
     helpers = icon_nav_stateful_helpers(node_id="test")
     assert "height: tab.slotHeight," in helpers
     assert "height: tab.rowBandHeight," not in helpers.split("_buildTab")[1]
+
+
+def test_segment_tab_labels_centered_in_cells() -> None:
+    """Law: segment_label_centered_in_cell — tab switcher centers labels in each segment."""
+    from figma_flutter_agent.generator.layout.widgets.emit.tab_switcher import (
+        emit_tab_switcher_stack_children,
+    )
+
+    host = CleanDesignTreeNode(
+        id="1:tabs",
+        name="Tabs",
+        type=NodeType.STACK,
+        sizing=Sizing(width=200.0, height=32.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:a",
+                name="A",
+                type=NodeType.TEXT,
+                text="Daily",
+                sizing=Sizing(width=40.0, height=16.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:b",
+                name="B",
+                type=NodeType.TEXT,
+                text="Monthly",
+                sizing=Sizing(width=50.0, height=16.0),
+            ),
+        ],
+    )
+    pairs = [
+        (child, f"Text('{child.text}')") for child in host.children if child.type == NodeType.TEXT
+    ]
+    emitted = emit_tab_switcher_stack_children(host, emitted_pairs=pairs)
+    assert "Expanded(child: Center(child:" in emitted.replace("\n", "")
 
 
 def test_home_replay_rejects_checkbox_and_field_regressions() -> None:

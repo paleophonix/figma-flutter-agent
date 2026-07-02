@@ -2,10 +2,10 @@
   "accepted": [
     {
       "figmaId": "7342:2818",
-      "kind": "container_list_tile",
+      "kind": "input_rating",
       "confidence": 0.84,
       "evidence": {
-        "container_list_tile": true,
+        "input_rating": true,
         "child_type_counts": {
           "VECTOR": 12,
           "CONTAINER": 3,

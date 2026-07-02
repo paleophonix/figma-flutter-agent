@@ -47,7 +47,15 @@ def _field_shell_layout_rect(node: CleanDesignTreeNode) -> GeomRect | None:
     rect = frame.layout_rect
     if rect.width is None or rect.height is None or rect.width <= 0 or rect.height <= 0:
         return None
-    return rect
+    x = float(rect.x)
+    y = float(rect.y)
+    placement = node.stack_placement
+    if placement is not None:
+        if placement.left is not None:
+            x = float(placement.left)
+        if placement.top is not None:
+            y = float(placement.top)
+    return GeomRect(x=x, y=y, width=float(rect.width), height=float(rect.height))
 
 
 def layout_fact_painted_multiline_field_shell(node: CleanDesignTreeNode) -> bool:
@@ -103,7 +111,7 @@ def layout_fact_painted_field_shell_container(node: CleanDesignTreeNode) -> bool
 def field_shell_vertical_span(node: CleanDesignTreeNode) -> tuple[float, float] | None:
     """Return inclusive top/bottom span for a painted field shell."""
     rect = _field_shell_layout_rect(node)
-    if rect is not None and rect.y is not None:
+    if rect is not None:
         return float(rect.y), float(rect.y) + float(rect.height)
     placement = node.stack_placement
     height = node.sizing.height
@@ -113,24 +121,40 @@ def field_shell_vertical_span(node: CleanDesignTreeNode) -> tuple[float, float] 
     return top, top + float(height)
 
 
-def _text_layout_rect(node: CleanDesignTreeNode) -> GeomRect | None:
+def _text_layout_rect(
+    node: CleanDesignTreeNode,
+    *,
+    host_height: float | None = None,
+) -> GeomRect | None:
     frame = node.geometry_frame
     if frame is None or frame.layout_rect is None:
         return None
     rect = frame.layout_rect
     if rect.width is None or rect.height is None or rect.width <= 0 or rect.height <= 0:
         return None
-    return rect
+    x = float(rect.x)
+    y = float(rect.y)
+    placement = node.stack_placement
+    if placement is not None:
+        if placement.left is not None:
+            x = float(placement.left)
+        if placement.top is not None:
+            y = float(placement.top)
+        elif placement.bottom is not None and host_height is not None:
+            y = float(host_height) - float(placement.bottom) - float(rect.height)
+    return GeomRect(x=x, y=y, width=float(rect.width), height=float(rect.height))
 
 
 def find_field_shell_value_text(
     shell: CleanDesignTreeNode,
     siblings: list[CleanDesignTreeNode],
+    *,
+    host_height: float | None = None,
 ) -> CleanDesignTreeNode | None:
     """Resolve the in-shell value or placeholder text sibling for a field shell."""
     span = field_shell_vertical_span(shell)
     shell_rect = _field_shell_layout_rect(shell)
-    if span is None or shell_rect is None or shell_rect.x is None:
+    if span is None or shell_rect is None:
         return None
     top, bottom = span
     shell_left = float(shell_rect.x)
@@ -143,8 +167,8 @@ def find_field_shell_value_text(
         text = (sibling.text or "").strip()
         if not text:
             continue
-        text_rect = _text_layout_rect(sibling)
-        if text_rect is None or text_rect.y is None or text_rect.x is None:
+        text_rect = _text_layout_rect(sibling, host_height=host_height)
+        if text_rect is None:
             continue
         text_top = float(text_rect.y)
         if text_top < top - 2.0 or text_top > bottom - 2.0:
@@ -164,6 +188,8 @@ def find_field_shell_value_text(
 def find_field_shell_external_label(
     shell: CleanDesignTreeNode,
     siblings: list[CleanDesignTreeNode],
+    *,
+    host_height: float | None = None,
 ) -> CleanDesignTreeNode | None:
     """Resolve label text placed above a painted field shell (outside the shell span)."""
     span = field_shell_vertical_span(shell)
@@ -178,8 +204,8 @@ def find_field_shell_external_label(
         text = (sibling.text or "").strip()
         if not text:
             continue
-        text_rect = _text_layout_rect(sibling)
-        if text_rect is None or text_rect.y is None:
+        text_rect = _text_layout_rect(sibling, host_height=host_height)
+        if text_rect is None:
             continue
         text_bottom = float(text_rect.y) + float(text_rect.height or 0.0)
         if text_bottom > shell_top + 2.0:
@@ -205,6 +231,9 @@ def layout_fact_labeled_absolute_field_stack(node: CleanDesignTreeNode) -> bool:
     if len(shells) != 1:
         return False
     shell = shells[0]
-    if find_field_shell_value_text(shell, node.children) is None:
+    host_height = node.sizing.height
+    if find_field_shell_value_text(shell, node.children, host_height=host_height) is None:
         return False
-    return find_field_shell_external_label(shell, node.children) is not None
+    return (
+        find_field_shell_external_label(shell, node.children, host_height=host_height) is not None
+    )

@@ -4,7 +4,7 @@
   "screenIr": {
     "root": {
       "figmaId": "7342:2818",
-      "kind": "container_list_tile",
+      "kind": "input_rating",
       "children": [
         {
           "figmaId": "7342:2819",
@@ -1006,7 +1006,7 @@
         "backgroundColor": "0xFF00D09E"
       },
       "payload": {
-        "payloadKind": "container_list_tile"
+        "payloadKind": "input_rating"
       },
       "fidelityTier": "native_verified",
       "tierSource": "policy_fallback"

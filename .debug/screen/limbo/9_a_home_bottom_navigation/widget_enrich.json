@@ -1,5 +1,5 @@
 {
-  "cacheKey": "a6bf9ae847e05277a80dd20b75393e10653b68a7c2fe8e00effaa38fe6458658",
+  "cacheKey": "79a60df6bfc3486755347d9802cd7892561585acc8279ae4406349e0b2c7a56e",
   "response": {
     "entries": [
       {
@@ -9,67 +9,77 @@
       },
       {
         "clusterId": "component_7045_2587",
-        "widgetName": "TimeRangeTabWidget",
+        "widgetName": "PeriodTabWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7045_322",
-        "widgetName": "TransactionsNavItemWidget",
+        "widgetName": "TransactionsNavIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7045_323",
+        "widgetName": "CategoryNavIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7045_324",
-        "widgetName": "ProfileNavItemWidget",
+        "widgetName": "ProfileNavIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7045_326",
-        "widgetName": "HomeNavItemWidget",
+        "widgetName": "HomeNavIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7065_2799",
-        "widgetName": "TimeRangeSwitchWidget",
+        "widgetName": "PeriodSwitchWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7102_1265",
-        "widgetName": "GroceriesIconWidget",
+        "widgetName": "GroceriesCategoryIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7102_1266",
-        "widgetName": "RentIconWidget",
+        "widgetName": "RentCategoryIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7102_2848",
-        "widgetName": "SalaryIconWidget",
+        "widgetName": "SalaryCategoryIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7102_2972",
-        "widgetName": "FoodCategoryIconWidget",
+        "widgetName": "FoodChartIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7102_2996",
+        "widgetName": "SalaryChartIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7105_3002",
-        "widgetName": "CarIconWidget",
+        "widgetName": "CarChartIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7110_3929",
+        "widgetName": "ExpenseIndicatorIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_7110_4425",
-        "widgetName": "IncomeIndicatorWidget",
+        "widgetName": "IncomeIndicatorIconWidget",
         "paramRenames": {}
       },
       {
-        "clusterId": "component_7110_4439",
-        "widgetName": "CheckmarkIconWidget",
-        "paramRenames": {}
-      },
-      {
-        "clusterId": "shape_0",
-        "widgetName": "TimeRangeLabelWidget",
+        "clusterId": "shape_2",
+        "widgetName": "PeriodTabLabelWidget",
         "paramRenames": {}
       }
     ]

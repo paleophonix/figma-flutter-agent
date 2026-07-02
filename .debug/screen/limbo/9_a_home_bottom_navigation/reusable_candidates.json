@@ -1,12 +1,12 @@
 {
-  "cacheKey": "3ed75fba6c01100f5f4e859780b4bead0a6a82ddf0e10d92c263d1452eea4fcd",
+  "cacheKey": "db48510e21102b1fe7ab09bb7434465ed7b0873c7433543c85217f9ecf378ead",
   "response": {
     "candidates": [
       {
         "nodeId": "I7342:2856;7065:2800",
         "widgetName": "PeriodTabItem",
-        "reason": "Three sibling instances share the same Frame 85 component structure inside the switch, differing mainly by label and selected/size state.",
-        "confidence": 0.96,
+        "reason": "This tab item component appears 3 times inside the switch control with the same structure and only the label/selected state likely varying.",
+        "confidence": 0.95,
         "suggestedParams": [
           "label",
           "isSelected"
@@ -22,29 +22,27 @@
       },
       {
         "nodeId": "7342:2866",
-        "widgetName": "TrendBadgeIcon",
-        "reason": "Expense and Income use the same underlying structural cluster for a compact square badge with arrow, suggesting one reusable status icon with style direction variants.",
-        "confidence": 0.91,
+        "widgetName": "TrendIndicatorIcon",
+        "reason": "The expense/income indicators share the same small badge structure from the same structural cluster, making them a good reusable status icon family.",
+        "confidence": 0.88,
         "suggestedParams": [
-          "isPositive",
-          "backgroundColor",
-          "arrowColor"
+          "isPositive"
         ],
         "evidence": {
           "similarNodes": [
             "I7342:2867;7110:4418"
           ],
           "shapeSimilarity": 0.93,
-          "semanticRole": "income or expense indicator badge"
+          "semanticRole": "income or expense direction indicator"
         }
       },
       {
         "nodeId": "7342:2857",
         "widgetName": "TransactionCategoryIcon",
-        "reason": "Salary, Groceries, and Rent icons share the same rounded-square colored tile plus centered pictogram pattern, differing by artwork and background styling.",
-        "confidence": 0.89,
+        "reason": "Salary, groceries, and rent use the same sized framed icon treatment, suggesting a reusable category icon widget with varying artwork/background.",
+        "confidence": 0.87,
         "suggestedParams": [
-          "iconVariant",
+          "iconType",
           "backgroundColor"
         ],
         "evidence": {
@@ -52,15 +50,15 @@
             "7342:2858",
             "7342:2859"
           ],
-          "shapeSimilarity": 0.87,
-          "semanticRole": "transaction category icon tile"
+          "shapeSimilarity": 0.84,
+          "semanticRole": "transaction category icon"
         }
       },
       {
         "nodeId": "7342:2879",
-        "widgetName": "BottomNavBar",
-        "reason": "The bottom navigation is a self-contained repeated design system component with five consistent nav items and an active-state treatment.",
-        "confidence": 0.88,
+        "widgetName": "AppBottomNavigation",
+        "reason": "This is a full bottom navigation component composed of repeated nav destinations and is a natural reusable app-level widget.",
+        "confidence": 0.84,
         "suggestedParams": [
           "selectedIndex",
           "onItemTap"
@@ -80,11 +78,10 @@
       {
         "nodeId": "7342:2856",
         "widgetName": "PeriodSwitch",
-        "reason": "The switch groups three homogeneous tab items into a reusable segmented control for Daily, Weekly, and Monthly period selection.",
-        "confidence": 0.86,
+        "reason": "The switch container groups three repeated tab items and represents a self-contained segmented control widget.",
+        "confidence": 0.83,
         "suggestedParams": [
-          "selectedIndex",
-          "labels"
+          "selectedPeriod"
         ],
         "evidence": {
           "similarNodes": [
@@ -92,28 +89,28 @@
             "I7342:2856;7065:2801",
             "I7342:2856;7065:2802"
           ],
-          "shapeSimilarity": 0.9,
-          "semanticRole": "segmented period selector"
+          "shapeSimilarity": 0.85,
+          "semanticRole": "time period segmented switch"
         }
       },
       {
-        "nodeId": "I7342:2879;7045:346",
+        "nodeId": "I7342:2879;7045:344",
         "widgetName": "BottomNavItem",
-        "reason": "Navigation items inside the bottom bar form a clear reusable family with shared role and similar compact icon-only structure, differing by icon and active state.",
-        "confidence": 0.81,
+        "reason": "Bottom navigation contains a family of similarly sized destination icons that differ mainly by icon and active state.",
+        "confidence": 0.79,
         "suggestedParams": [
-          "iconVariant",
+          "itemType",
           "isActive"
         ],
         "evidence": {
           "similarNodes": [
-            "I7342:2879;7045:344",
+            "I7342:2879;7045:346",
             "I7342:2879;7045:348",
             "I7342:2879;7045:350",
             "I7342:2879;7045:352"
           ],
-          "shapeSimilarity": 0.78,
-          "semanticRole": "bottom navigation item"
+          "shapeSimilarity": 0.76,
+          "semanticRole": "bottom navigation destination"
         }
       }
     ]

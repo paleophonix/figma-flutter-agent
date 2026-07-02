@@ -33,6 +33,7 @@ def render_decomposed_absolute_field(
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
+    flow_column_child: bool = False,
 ) -> str:
     """Render a positioned TextField for a painted shell plus in-bounds value text."""
     multiline = layout_fact_painted_multiline_field_shell(shell)
@@ -102,9 +103,12 @@ def render_decomposed_absolute_field(
             box_decoration=box_decoration,
         )
     label = escape_dart_string(shell.accessibility_label or value_text or "Field")
+    body = f"Semantics(label: '{label}', child: {field})"
+    if flow_column_child:
+        return body
     return _finalize_widget(
         shell,
-        f"Semantics(label: '{label}', child: {field})",
+        body,
         parent_type=parent_type,
     )
 

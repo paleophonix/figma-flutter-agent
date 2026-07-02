@@ -709,7 +709,8 @@ def test_checkbox_theme_uses_border_color_and_white_fill() -> None:
     compact = emitted.replace("\n", "")
     theme = compact.split("checkboxTheme:")[1].split("child:")[0]
     assert "side: BorderSide(color: Color(0xFFE8EAED)" in theme
-    assert "fillColor: MaterialStateProperty.all(Color(0xFFFDFDFD))" in theme
+    assert "fillColor: MaterialStateProperty.resolveWith" in theme
+    assert "Color(0xFFFDFDFD)" in theme
 
 
 def test_checked_checkbox_uses_contrasting_tick_color() -> None:
@@ -756,7 +757,8 @@ def test_checked_checkbox_uses_contrasting_tick_color() -> None:
     compact = emitted.replace("\n", "")
     assert "checkboxTheme: CheckboxThemeData" in compact
     theme = compact.split("checkboxTheme:")[1].split("child:")[0]
-    assert "checkColor: MaterialStateProperty.all(const Color(0xFFFFFFFF))" in theme
+    assert "checkColor: MaterialStateProperty.resolveWith" in theme
+    assert "const Color(0xFFFFFFFF)" in theme
     assert "checkColor: MaterialStateProperty.all(Color(0xFFFB6D3A))" not in theme
 
 
@@ -806,6 +808,49 @@ def test_food_replay_pruned_upload_tile_rehydrates_glyph() -> None:
     compact = emitted.replace("\n", "")
     assert "group_8227" in compact
     assert "SizedBox.shrink()" not in compact
+
+
+def test_button_painted_surface_strips_nested_positioned() -> None:
+    """Law: ButtonPaintedSurfaceStackParentDataLaw — overlay stack strips Positioned children."""
+    root = _load_food_root()
+    save = _find_node(root, "602:1230")
+    assert save is not None
+    emitted = render_node_body(save, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "Positioned.fill(child: Positioned(" not in compact
+
+
+def test_fixed_field_in_flow_no_overflow_box() -> None:
+    """Law: FixedFieldInFlowMustNotEmitOverflowBox — labeled fields avoid OverflowBox in scroll."""
+    root = _load_food_root()
+    field = _find_node(root, "602:1218")
+    assert field is not None
+    emitted = render_node_body(field, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    col_children = compact.split("Column(", 1)[1].split("children: [", 1)[1]
+    depth = 1
+    end = 0
+    for index, char in enumerate(col_children):
+        if char == "[":
+            depth += 1
+        elif char == "]":
+            depth -= 1
+            if depth == 0:
+                end = index
+                break
+    assert "OverflowBox" not in col_children[:end]
+
+
+def test_food_details_labeled_multiline_field_column() -> None:
+    """Law: LabeledMultilineFieldCompositionLaw — DETAILS label stacks above multiline field."""
+    root = _load_food_root()
+    details = _find_node(root, "602:1028")
+    assert details is not None
+    emitted = render_node_body(details, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "Text('DETAILS'" in compact
+    assert "Column(" in compact
+    assert compact.index("DETAILS") < compact.index("TextField")
 
 
 def test_food_replay_layout_file_orchestration_contracts() -> None:

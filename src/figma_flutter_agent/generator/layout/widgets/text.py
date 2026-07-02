@@ -99,8 +99,24 @@ def _wrap_bounded_positioned_slot_child(
         column_bounded_slot_should_grow,
         stack_metadata_timestamp_host,
     )
+    from figma_flutter_agent.parser.interaction.absolute_fields import (
+        layout_fact_labeled_absolute_field_stack,
+    )
 
     if stack_metadata_timestamp_host(node, parent_node=parent_node):
+        return widget
+
+    if layout_fact_labeled_absolute_field_stack(node):
+        width, height = _node_layout_size(node, node.stack_placement)
+        if width is not None and height is not None and width > 0 and height > 0:
+            width_lit = format_geometry_literal(width)
+            height_lit = format_geometry_literal(height)
+            bounded = (
+                f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
+            )
+            if child_has_outward_paint(node):
+                return bounded
+            return f"ClipRect(child: {bounded})"
         return widget
 
     if column_bounded_slot_should_grow(node):

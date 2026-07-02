@@ -24,7 +24,7 @@ def emit_tab_switcher_stack_children(
     decor_pairs = [
         (child, widget) for child, widget in emitted_pairs if child.type != NodeType.TEXT
     ]
-    tab_cells = [f"Expanded(child: {widget})" for _, widget in tab_pairs]
+    tab_cells = [f"Expanded(child: Center(child: {widget}))" for _, widget in tab_pairs]
     row_widget = (
         "Row("
         "crossAxisAlignment: CrossAxisAlignment.center, "

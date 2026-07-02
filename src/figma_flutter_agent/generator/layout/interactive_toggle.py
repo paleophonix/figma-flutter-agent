@@ -63,16 +63,22 @@ def _checkbox_theme_wrapper(
         css_key="background-color",
         fallback="const Color(0xFFFFFFFF)",
     )
-    if checked:
-        fill_fields = (
-            f"fillColor: MaterialStateProperty.resolveWith((states) => "
-            f"states.contains(MaterialState.selected) ? {color_expr} : {unchecked_fill}), "
-            "checkColor: MaterialStateProperty.all(const Color(0xFFFFFFFF)), "
-        )
-    elif border.style.background_color:
-        fill_fields = f"fillColor: MaterialStateProperty.all({unchecked_fill}), "
+    stroke_only_shell = not border.style.background_color
+    if stroke_only_shell and checked:
+        selected_fill = color_expr
+        selected_check = "const Color(0xFFFFFFFF)"
+    elif stroke_only_shell:
+        selected_fill = unchecked_fill
+        selected_check = color_expr
     else:
-        fill_fields = ""
+        selected_fill = unchecked_fill
+        selected_check = color_expr
+    fill_fields = (
+        "fillColor: MaterialStateProperty.resolveWith((states) => "
+        f"states.contains(MaterialState.selected) ? {selected_fill} : {unchecked_fill}), "
+        "checkColor: MaterialStateProperty.resolveWith((states) => "
+        f"states.contains(MaterialState.selected) ? {selected_check} : Colors.transparent), "
+    )
     return (
         "Theme("
         "data: Theme.of(context).copyWith("
