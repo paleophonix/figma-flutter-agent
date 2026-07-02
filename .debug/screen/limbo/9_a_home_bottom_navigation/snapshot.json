@@ -23,7 +23,7 @@
     "lib/theme/app_edge_insets.dart": "76356432f79182a709fcf2e59d6ec93cafc111eec87cb8f061edf3f3a353e035",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "cc2214ae9f72ba1a4f136137d2032df2ab71c56cbd60f71044986e0d49fbd883",
-    "lib/generated/9_a_home_bottom_navigation_layout.dart": "05a597ec5a437903bc149836688a426e8ea7922e4bb92f07005be016d7fcac7b",
+    "lib/generated/9_a_home_bottom_navigation_layout.dart": "dbd6692bc701f8a464be91bc20cf48d81aaf4f7074efa876e74da7cc42c78ab6",
     "lib/features/9_a_home_bottom_navigation/9_a_home_bottom_navigation_screen.dart": "5b2499c37babdabe353b960141c715795c246fc92205d2bc85cd539bb584adf2",
     "test/golden/9_a_home_bottom_navigation_screen_test.dart": "3051d9f95dd327819f7709574a762e2859d6bc887c9ef1534b8838d1b280fd6f",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -38,6 +38,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 3,
-  "updated_at": "2026-07-02T13:40:32.133301+00:00"
+  "version": 4,
+  "updated_at": "2026-07-02T14:26:11.534730+00:00"
 }

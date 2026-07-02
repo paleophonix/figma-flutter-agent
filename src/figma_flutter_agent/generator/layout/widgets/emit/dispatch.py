@@ -406,6 +406,7 @@ def render_node_body(
                 node,
                 f"Semantics(label: '{label}', child: {widget})",
                 parent_type=parent_type,
+                parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
     from figma_flutter_agent.generator.layout.flex_policy import (
@@ -530,6 +531,7 @@ def render_node_body(
                 node,
                 widget_expr,
                 parent_type=parent_type,
+                parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
         if variant is not None and _sizing_like_skip_control(node):
@@ -540,6 +542,7 @@ def render_node_body(
                 node,
                 f"Semantics(label: '{label}', child: {widget_expr})",
                 parent_type=parent_type,
+                parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
         if variant is not None:
@@ -549,12 +552,14 @@ def render_node_body(
                     node,
                     f"{class_name}({args})",
                     parent_type=parent_type,
+                    parent_node=parent_node,
                     scroll_content_root=scroll_content_root,
                 )
         return _finalize_widget(
             node,
             f"const {class_name}()",
             parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
@@ -589,6 +594,7 @@ def render_node_body(
                     node,
                     f"Semantics(label: '{label}', child: {pruned})",
                     parent_type=parent_type,
+                    parent_node=parent_node,
                     scroll_content_root=scroll_content_root,
                 )
 

@@ -1,8 +1,8 @@
 {
   "feature": "9_a_home_bottom_navigation",
-  "pipeline_run_id": "0a1c8c05e1c0",
-  "candidate_build_run_id": "0a1c8c05e1c0",
-  "committed_build_run_id": "0a1c8c05e1c0",
+  "pipeline_run_id": "8eb535c50c76",
+  "candidate_build_run_id": "8eb535c50c76",
+  "committed_build_run_id": "8eb535c50c76",
   "writeback": "committed",
   "written_files": [
     "lib/features/9_a_home_bottom_navigation/9_a_home_bottom_navigation_screen.dart",
@@ -28,5 +28,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-02T13:40:32.184769+00:00"
+  "captured_at": "2026-07-02T14:26:11.587228+00:00"
 }

@@ -954,6 +954,28 @@ def stack_has_non_sequential_raster_overlay(stack: CleanDesignTreeNode) -> bool:
     return False
 
 
+def stack_dense_absolute_overlays_preserve_stack(stack: CleanDesignTreeNode) -> bool:
+    """Return True when dense absolute overlays must keep a fixed artboard as ``Stack``.
+
+    AbsoluteOverlayDensityPreservationLaw: veto column lowering when positioned
+    overlay slots outnumber growable panels on a non-sequential stack body.
+    """
+    if stack.type != NodeType.STACK:
+        return False
+    if stack_children_are_vertically_sequential(stack):
+        return False
+    if not stack_has_absolute_overlay_form_slots(stack):
+        return False
+    body_children = _stack_flow_body_children(stack)
+    overlay_count = sum(
+        1
+        for child in body_children
+        if child.stack_placement is not None and not stack_child_is_growable_panel(child)
+    )
+    growable_count = sum(1 for child in body_children if stack_child_is_growable_panel(child))
+    return overlay_count > growable_count
+
+
 def stack_has_absolute_overlay_form_slots(stack: CleanDesignTreeNode) -> bool:
     """Return True when absolute hero/card overlays must stay in ``Stack``, not flow ``Column``."""
     from figma_flutter_agent.generator.layout.stack_chrome import (
@@ -990,11 +1012,14 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     if layout_fact_stack_bottom_nav_tab_glyph_column(stack):
         return True
 
-    if stack_uses_shared_body_scroll_host(stack):
-        return True
-
     if stack_has_non_sequential_raster_overlay(stack):
         return False
+
+    if stack_dense_absolute_overlays_preserve_stack(stack):
+        return False
+
+    if stack_uses_shared_body_scroll_host(stack):
+        return True
 
     if stack_has_absolute_overlay_form_slots(stack):
         return False

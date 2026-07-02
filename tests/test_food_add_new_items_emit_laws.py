@@ -26,7 +26,6 @@ from figma_flutter_agent.parser.interaction import (
 )
 from figma_flutter_agent.parser.interaction.forms import (
     checkbox_option_stack_is_checked,
-    layout_fact_checkbox_control,
 )
 from figma_flutter_agent.parser.interaction.icons import (
     layout_fact_stack_vertical_icon_label_chip_tile,

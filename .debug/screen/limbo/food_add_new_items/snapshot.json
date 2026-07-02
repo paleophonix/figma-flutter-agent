@@ -7,8 +7,8 @@
   "typography_hash": "d97c05e72371a71cb0f5aa778aa1c22c5d8c310c6850c843377c1616a41a6105",
   "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
   "file_hashes": {
-    "lib/widgets/upload_photo_video_widget.dart": "3f538617f79e81a53a1e22d9737cd94790f9b97ef219760a06ffaed1d805d9eb",
-    "lib/widgets/ingridents_widget.dart": "31d31643c0659fefda8713488a7a6f4e723596bbfed161270ec9db7a5da2a9c1",
+    "lib/widgets/upload_photo_video_widget.dart": "5a2d7c4982a473856eb01b74a9534efca11e61d18f4fd0624f413d4eb5dc63dd",
+    "lib/widgets/ingridents_widget.dart": "167313f75706a70460096353816d1adeaa9b37047863e0d4720b9124377d6191",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "f233a46b5a2102c41acde0d1dbec95c9fbf65328d8f8dae7f9365d86c443c33b",
     "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
@@ -16,8 +16,8 @@
     "lib/theme/app_radius.dart": "474d7e026c62009f7d895430bdbdc27422eb4ce236bb1b61ae87a203f6012cdb",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "36062c5562921a35851b6958f87f9f73ebd03ae52112dc8993ae54a12727460f",
-    "lib/generated/food_add_new_items_layout.dart": "7964bed7abaec14a3d041a9e7e2fe9a341e20944ce998a1bdd035a229746da67",
-    "lib/generated/food_add_new_items_chunk_2e8d5787.dart": "a2b3e0f0e193e9c3590e21b1d84587a1293c2d5436ca9db228a2d7498db3b25e",
+    "lib/generated/food_add_new_items_layout.dart": "c91f70f8011f246b0521609b9e6b12dc6e7f06a7724d6272a69d4d4f2492eaa4",
+    "lib/generated/food_add_new_items_chunk_2e8d5787.dart": "0748acd044026ca94610f4af35dc5cf4de5c68fb6b5edcf70dbda3f9e92383e9",
     "lib/features/food_add_new_items/food_add_new_items_screen.dart": "c7b2934ebc14e97e073f6a35cbb3c1f5c693d7168cb57860f996eddcaed55e84",
     "test/golden/food_add_new_items_screen_test.dart": "3976e51c9f9ae808c521d655e09932b8e03c66a609a9b83d99246b18839783b5",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -30,6 +30,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 3,
-  "updated_at": "2026-07-02T12:51:36.921544+00:00"
+  "version": 4,
+  "updated_at": "2026-07-02T14:12:40.359726+00:00"
 }

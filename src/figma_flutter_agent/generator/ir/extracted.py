@@ -321,6 +321,9 @@ def emit_extracted_widget_code_from_ir(
 
     body = strip_stack_parent_data_wrappers(body)
     body = _preserve_extracted_widget_decoration_shell(subtree, body)
+    from figma_flutter_agent.generator.widget_extractor import _bound_cluster_widget_root
+
+    body = _bound_cluster_widget_root(subtree, body)
     class_name = _canonical_widget_class_name(widget_name)
     file_stem = to_snake_case(widget_name)
     code = render_widget_file(
