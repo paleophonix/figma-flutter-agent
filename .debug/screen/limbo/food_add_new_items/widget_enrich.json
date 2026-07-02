@@ -1,0 +1,17 @@
+{
+  "cacheKey": "5b39b0290fdf708074a30c37ecc2e23e9cb2d8e213128b65157f6f168d026e78",
+  "response": {
+    "entries": [
+      {
+        "clusterId": "cluster_0",
+        "widgetName": "AddPhotoBadgeWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "cluster_1",
+        "widgetName": "UploadIconWidget",
+        "paramRenames": {}
+      }
+    ]
+  }
+}

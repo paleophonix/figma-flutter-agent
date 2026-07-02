@@ -126,6 +126,25 @@
           "kind": "stack",
           "children": [
             {
+              "figmaId": "602:1204",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "0xFF98A8B8"
+              }
+            },
+            {
+              "figmaId": "602:1205",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Upload photo/video",
+                "accessibilityLabel": "Upload photo/video",
+                "textColor": "0xFF32343E",
+                "fontSize": 13.0
+              }
+            },
+            {
               "figmaId": "602:1184",
               "kind": "stack",
               "children": [
@@ -213,25 +232,6 @@
                   "children": []
                 }
               ]
-            },
-            {
-              "figmaId": "602:1204",
-              "kind": "auto",
-              "children": [],
-              "overrides": {
-                "backgroundColor": "0xFF98A8B8"
-              }
-            },
-            {
-              "figmaId": "602:1205",
-              "kind": "auto",
-              "children": [],
-              "overrides": {
-                "text": "Upload photo/video",
-                "accessibilityLabel": "Upload photo/video",
-                "textColor": "0xFF32343E",
-                "fontSize": 13.0
-              }
             }
           ]
         },
@@ -887,6 +887,37 @@
               "kind": "stack",
               "children": [
                 {
+                  "figmaId": "602:1178",
+                  "kind": "container_list_tile",
+                  "children": [
+                    {
+                      "figmaId": "602:1179",
+                      "kind": "technical_divider",
+                      "children": [],
+                      "payload": {
+                        "payloadKind": "technical_divider"
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "manifest"
+                    },
+                    {
+                      "figmaId": "602:1180",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ],
+                  "payload": {
+                    "payloadKind": "container_list_tile"
+                  },
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "manifest"
+                },
+                {
+                  "figmaId": "602:1181",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
                   "figmaId": "602:1126",
                   "kind": "stack",
                   "children": [
@@ -1189,37 +1220,6 @@
                       ]
                     }
                   ]
-                },
-                {
-                  "figmaId": "602:1178",
-                  "kind": "container_list_tile",
-                  "children": [
-                    {
-                      "figmaId": "602:1179",
-                      "kind": "technical_divider",
-                      "children": [],
-                      "payload": {
-                        "payloadKind": "technical_divider"
-                      },
-                      "fidelityTier": "native_unverified",
-                      "tierSource": "manifest"
-                    },
-                    {
-                      "figmaId": "602:1180",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ],
-                  "payload": {
-                    "payloadKind": "container_list_tile"
-                  },
-                  "fidelityTier": "native_unverified",
-                  "tierSource": "manifest"
-                },
-                {
-                  "figmaId": "602:1181",
-                  "kind": "auto",
-                  "children": []
                 }
               ]
             },
@@ -1906,5 +1906,5 @@
       }
     }
   ],
-  "emitterVersion": "2026.06.2"
+  "emitterVersion": "2026.07.1"
 }
