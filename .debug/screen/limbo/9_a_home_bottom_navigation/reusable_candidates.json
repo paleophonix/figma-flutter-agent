@@ -1,0 +1,118 @@
+{
+  "cacheKey": "04b3118fdfbde86e6eb7851db7372445a02db0918949de8fb60211138d0322ea",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "I7342:2856;7065:2800",
+        "widgetName": "TimeFilterTab",
+        "reason": "This tab item component is repeated 3 times inside the switch with the same structure and only the label/selected sizing differing.",
+        "confidence": 0.96,
+        "suggestedParams": [
+          "label",
+          "isSelected"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I7342:2856;7065:2801",
+            "I7342:2856;7065:2802"
+          ],
+          "shapeSimilarity": 0.98,
+          "semanticRole": "segmented control tab"
+        }
+      },
+      {
+        "nodeId": "7342:2856",
+        "widgetName": "TimeFilterSwitch",
+        "reason": "The segmented switch groups three repeated tab items into a clear reusable control for Daily/Weekly/Monthly selection.",
+        "confidence": 0.88,
+        "suggestedParams": [
+          "selectedIndex",
+          "labels"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I7342:2856;7065:2800",
+            "I7342:2856;7065:2801",
+            "I7342:2856;7065:2802"
+          ],
+          "shapeSimilarity": 0.84,
+          "semanticRole": "segmented filter control"
+        }
+      },
+      {
+        "nodeId": "7342:2879",
+        "widgetName": "HomeBottomNavigationBar",
+        "reason": "This is a full bottom navigation component with five consistent nav items, making it a strong reusable widget despite appearing once on this screen.",
+        "confidence": 0.93,
+        "suggestedParams": [
+          "selectedItem"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I7342:2879;7045:344",
+            "I7342:2879;7045:346",
+            "I7342:2879;7045:348",
+            "I7342:2879;7045:350",
+            "I7342:2879;7045:352"
+          ],
+          "shapeSimilarity": 0.9,
+          "semanticRole": "bottom navigation bar"
+        }
+      },
+      {
+        "nodeId": "7342:2866",
+        "widgetName": "TrendBadge",
+        "reason": "The small square arrow badge has a repeated structural cluster shared with the income indicator, suggesting a reusable status badge with variant styling.",
+        "confidence": 0.85,
+        "suggestedParams": [
+          "isPositive"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I7342:2867;7110:4418"
+          ],
+          "shapeSimilarity": 0.95,
+          "semanticRole": "income/expense direction indicator"
+        }
+      },
+      {
+        "nodeId": "7342:2857",
+        "widgetName": "TransactionCategoryIcon",
+        "reason": "Salary, groceries, and rent icons share the same sized icon-tile pattern and differ mainly by artwork/background treatment.",
+        "confidence": 0.83,
+        "suggestedParams": [
+          "variant"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "7342:2858",
+            "7342:2859"
+          ],
+          "shapeSimilarity": 0.8,
+          "semanticRole": "transaction category icon tile"
+        }
+      },
+      {
+        "nodeId": "7342:2830",
+        "widgetName": "RecentTransactionItem",
+        "reason": "The Salary, Groceries, and Rent rows form a repeated transaction list-item pattern with icon, title, subtitle, timestamp, and amount.",
+        "confidence": 0.77,
+        "suggestedParams": [
+          "title",
+          "category",
+          "dateTimeLabel",
+          "amount",
+          "iconVariant"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "7342:2836",
+            "7342:2842"
+          ],
+          "shapeSimilarity": 0.72,
+          "semanticRole": "recent transaction row"
+        }
+      }
+    ]
+  }
+}

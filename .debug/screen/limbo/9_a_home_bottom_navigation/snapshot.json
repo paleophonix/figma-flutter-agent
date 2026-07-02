@@ -2,7 +2,7 @@
   "file_key": "nJBqmuLJ1KXSA23yNouMOR",
   "node_id": "7342:2818",
   "feature_name": "9_a_home_bottom_navigation",
-  "tree_hash": "289134d2571191af49bd27ebdd28a9d8056d6f544827c93cab1653faa11ab752",
+  "tree_hash": "9cdacd8fc893f77ad189b63af98319a7a094e9e3a01a3cefc5a33835684c97dd",
   "colors_hash": "354ac15b8262e6312b0b3d4055e57cb3ccff43ed7a6f9c55a066d40bd3387b86",
   "typography_hash": "2f0b3bde53918e479ce53f7bc6213fa3fe80f99fa5767285f375dfe0fa74ea1e",
   "spacing_hash": "63982a27c2fb567d05dd821455859f10b8adbb6baf7759cbd5fe207f3e07de2e",
@@ -15,7 +15,7 @@
     "lib/theme/app_edge_insets.dart": "76356432f79182a709fcf2e59d6ec93cafc111eec87cb8f061edf3f3a353e035",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "cc2214ae9f72ba1a4f136137d2032df2ab71c56cbd60f71044986e0d49fbd883",
-    "lib/generated/9_a_home_bottom_navigation_layout.dart": "ef900f4c7c5c94e36099fd5f6aa89bca8cf4bb219313a47c5127b4afeaf7f4e7",
+    "lib/generated/9_a_home_bottom_navigation_layout.dart": "cd9a4d2e6d73b1bff1f80e346f4cc2b0f733f78fc6f8faeaf974b8d139fd298d",
     "lib/features/9_a_home_bottom_navigation/9_a_home_bottom_navigation_screen.dart": "5b2499c37babdabe353b960141c715795c246fc92205d2bc85cd539bb584adf2",
     "test/golden/9_a_home_bottom_navigation_screen_test.dart": "3051d9f95dd327819f7709574a762e2859d6bc887c9ef1534b8838d1b280fd6f",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -29,7 +29,7 @@
     "component_7110_3929": "847b48c09a512de1e5a6a40a80168d3c23a766c6081eb26b0eacc33f33830d90"
   },
   "reference_image_hash": null,
-  "emitter_version": "2026.06.2",
-  "version": 1,
-  "updated_at": "2026-07-01T13:17:17.390568+00:00"
+  "emitter_version": "2026.07.1",
+  "version": 2,
+  "updated_at": "2026-07-02T11:54:18.342393+00:00"
 }

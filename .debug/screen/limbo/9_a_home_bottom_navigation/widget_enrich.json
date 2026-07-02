@@ -1,0 +1,77 @@
+{
+  "cacheKey": "030636fbd971142d83de41598837353f19d73d2defc909d2dc01441c14764e03",
+  "response": {
+    "entries": [
+      {
+        "clusterId": "component_7043_3066",
+        "widgetName": "NotificationIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7045_2587",
+        "widgetName": "PeriodTabWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7045_322",
+        "widgetName": "TransactionsNavIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7045_324",
+        "widgetName": "ProfileNavIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7045_326",
+        "widgetName": "HomeNavIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7065_2799",
+        "widgetName": "PeriodSwitcherWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7102_1265",
+        "widgetName": "GroceriesCategoryIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7102_1266",
+        "widgetName": "RentCategoryIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7102_2848",
+        "widgetName": "SalaryCategoryIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7102_2972",
+        "widgetName": "FoodTrendIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7105_3002",
+        "widgetName": "CarCategoryIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7110_4425",
+        "widgetName": "IncomeIndicatorWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_7110_4439",
+        "widgetName": "CheckMarkIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_0",
+        "widgetName": "PeriodTabLabelWidget",
+        "paramRenames": {}
+      }
+    ]
+  }
+}

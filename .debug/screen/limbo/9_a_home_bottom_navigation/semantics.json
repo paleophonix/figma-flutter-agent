@@ -33,21 +33,6 @@
       "rejectReason": null
     },
     {
-      "figmaId": "7342:2849",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "TEXT": 1,
-          "VECTOR": 2,
-          "STACK": 1
-        },
-        "child_count": 4
-      },
-      "rejectReason": null
-    },
-    {
       "figmaId": "7342:2856",
       "kind": "control_switch",
       "confidence": 0.9,
@@ -317,6 +302,6 @@
     "I7342:2867;7110:4418;7110:3904"
   ],
   "llmAnnotationUsed": [],
-  "acceptedCount": 5,
-  "totalDecisions": 23
+  "acceptedCount": 4,
+  "totalDecisions": 22
 }

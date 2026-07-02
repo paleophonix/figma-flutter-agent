@@ -1,6 +1,6 @@
 {
   "featureName": "9_a_home_bottom_navigation",
-  "emitterVersion": "2026.06.2",
+  "emitterVersion": "2026.07.1",
   "checkpoints": [
     "CP0b_reprune",
     "CP1_guards",
@@ -195,20 +195,6 @@
         "technical_divider": true,
         "child_type_counts": {},
         "child_count": 0
-      }
-    },
-    {
-      "nodeId": "7342:2849",
-      "kind": "input_rating",
-      "confidence": 0.84,
-      "evidence": {
-        "input_rating": true,
-        "child_type_counts": {
-          "TEXT": 1,
-          "VECTOR": 2,
-          "STACK": 1
-        },
-        "child_count": 4
       }
     },
     {

@@ -399,7 +399,7 @@
         },
         {
           "figmaId": "7342:2849",
-          "kind": "input_rating",
+          "kind": "extracted",
           "children": [
             {
               "figmaId": "7342:2850",
@@ -445,9 +445,6 @@
               5.0,
               5.0
             ]
-          },
-          "payload": {
-            "payloadKind": "input_rating"
           },
           "fidelityTier": "native_verified",
           "tierSource": "manifest"
@@ -1492,5 +1489,5 @@
       }
     }
   ],
-  "emitterVersion": "2026.06.2"
+  "emitterVersion": "2026.07.1"
 }
