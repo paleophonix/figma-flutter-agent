@@ -674,3 +674,186 @@ def test_transaction_income_layout_emits_calendar_plate_and_salary_glyph() -> No
     assert "width: 26.0" in salary_code
     assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in salary_code
     assert salary_node.sizing.width == 57.0
+
+
+def test_icon_badge_glyph_stale_subtree_triggers_refresh() -> None:
+    from figma_flutter_agent.generator.subtree.plan import _subtree_widget_path_needs_render
+    from figma_flutter_agent.generator.subtree.spec import SubtreeWidgetSpec
+
+    stale = (
+        "class IconSalaryWidget extends StatelessWidget {\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return SvgPicture.asset('assets/icons/x.svg', "
+        "width: 57.0, height: 53.0, fit: BoxFit.fill);\n"
+        "  }\n"
+        "}\n"
+    )
+    spec = SubtreeWidgetSpec(
+        node_id="7110:1045",
+        class_name="IconSalaryWidget",
+        file_name="icon_salary_widget",
+        representative=_salary_icon_stack(),
+        vector_count=1,
+    )
+    assert _subtree_widget_path_needs_render(
+        {"lib/widgets/icon_salary_widget.dart": stale},
+        "IconSalaryWidget",
+        spec=spec,
+    )
+
+
+def test_nav_active_slot_uses_conserved_substrate_extent() -> None:
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        _nav_tab_slot_extent,
+        collect_bottom_nav_items,
+    )
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+
+    debug_root = Path(".debug/screen/limbo/9_3_1_b_transaction_income")
+    if not (debug_root / "processed.json").is_file():
+        pytest.skip("transaction income debug bundle unavailable")
+    proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    norm = normalize_clean_tree(root, screen_ir=screen_ir)
+
+    def find(node: CleanDesignTreeNode, nid: str) -> CleanDesignTreeNode | None:
+        if node.id == nid:
+            return node
+        for child in node.children:
+            found = find(child, nid)
+            if found is not None:
+                return found
+        return None
+
+    nav = find(norm, "7420:7339")
+    assert nav is not None
+    transactions = next(tab for tab in collect_bottom_nav_items(nav) if "348" in tab.id)
+    slot_width, slot_height = _nav_tab_slot_extent(transactions)
+    assert slot_width == 57.0
+    assert slot_height == 53.0
+
+
+def test_transaction_income_layout_emits_arrow_chip_stroke_frame() -> None:
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.layout import render_layout_file
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+
+    debug_root = Path(".debug/screen/limbo/9_3_1_b_transaction_income")
+    if not (debug_root / "processed.json").is_file():
+        pytest.skip("transaction income debug bundle unavailable")
+    proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    norm = normalize_clean_tree(root, screen_ir=screen_ir)
+    layout = render_layout_file(
+        norm,
+        feature_name="9_3_1_b_transaction_income",
+        uses_svg=True,
+        screen_ir=screen_ir,
+        de_archetype_pass=True,
+    )["lib/generated/9_3_1_b_transaction_income_layout.dart"]
+    chip_key = "figma-I7110_3217_7110_3187"
+    idx = layout.find(chip_key)
+    assert idx >= 0
+    window = layout[idx : idx + 900]
+    assert "Border.all" in window
+    assert "width: 12.5" in window
+
+
+def test_refresh_cluster_widget_rerenders_stale_icon_badge_glyph() -> None:
+    from figma_flutter_agent.generator.planned.reconcile import (
+        preferred_widget_path_for_class,
+    )
+    from figma_flutter_agent.generator.widget_extractor import (
+        refresh_cluster_widget_planned_files,
+    )
+
+    def salary_copy(node_id: str) -> CleanDesignTreeNode:
+        return _salary_icon_stack().model_copy(update={"id": node_id})
+
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=430.0, height=932.0),
+        children=[
+            salary_copy("7110:1045"),
+            salary_copy("7110:1051"),
+            salary_copy("7110:1057"),
+        ],
+    )
+    stale = (
+        "class IconSalaryWidget extends StatelessWidget {\n"
+        "  const IconSalaryWidget({super.key});\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return SvgPicture.asset('assets/icons/vector_salary.svg', "
+        "width: 57.0, height: 53.0, fit: BoxFit.fill);\n"
+        "  }\n"
+        "}\n"
+    )
+    path = preferred_widget_path_for_class("IconSalaryWidget")
+    updated = refresh_cluster_widget_planned_files(
+        {path: stale},
+        clean_tree=screen,
+        cluster_summary={"component_7102_2848": 3},
+        uses_svg=True,
+    )
+    body = updated[path]
+    assert "width: 26.0" in body
+    assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in body
+
+
+def test_refresh_stale_icon_badge_alias_widget_rerenders_renamed_class() -> None:
+    import json
+    import re
+    from pathlib import Path
+
+    import pytest
+
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.generator.planned.reconcile import (
+        preferred_widget_path_for_class,
+    )
+    from figma_flutter_agent.generator.widget_extractor import (
+        refresh_stale_icon_badge_planned_widget_files,
+    )
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+
+    debug_root = Path(".debug/screen/limbo/9_3_1_b_transaction_income")
+    if not (debug_root / "processed.json").is_file():
+        pytest.skip("transaction income debug bundle unavailable")
+    proc = json.loads((debug_root / "processed.json").read_text(encoding="utf-8"))
+    pre = json.loads((debug_root / "pre_emit.json").read_text(encoding="utf-8"))
+    plan = (debug_root / "plan.dart").read_text(encoding="utf-8")
+    root = CleanDesignTreeNode.model_validate(proc["cleanTree"])
+    screen_ir = ScreenIr.model_validate(pre["screenIr"])
+    norm = normalize_clean_tree(root, screen_ir=screen_ir)
+    match = re.search(
+        r"class TransactionCategoryIconWidget.*?(?=class |\Z)",
+        plan,
+        re.S,
+    )
+    stale = match.group(0) if match else ""
+    path = preferred_widget_path_for_class("TransactionCategoryIconWidget")
+    updated = refresh_stale_icon_badge_planned_widget_files(
+        {path: stale},
+        clean_tree=norm,
+        uses_svg=True,
+    )
+    body = updated[path]
+    assert "width: 26.0" in body
+    assert "width: 57.0, height: 53.0, fit: BoxFit.fill" not in body

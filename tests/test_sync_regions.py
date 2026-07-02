@@ -14,6 +14,7 @@ from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 from figma_flutter_agent.sync.diff import select_files_for_sync
 from figma_flutter_agent.sync.regions import (
+    IncrementalFileBindings,
     RegionSyncState,
     build_incremental_bindings,
 )
@@ -419,3 +420,125 @@ def test_layout_rewrites_when_on_disk_content_drifts_from_planned(tmp_path: Path
 
     assert layout_path in selected
     assert selected[layout_path] == planned_body
+
+
+def test_cluster_widget_rewrites_on_planned_hash_drift_without_cluster_delta() -> None:
+    """Cluster widget files must sync when reconcile changes emit, not only cluster geometry."""
+    widget_path = "lib/widgets/icon_salary_widget.dart"
+    layout_path = "lib/generated/reminders_layout.dart"
+    screen_path = screen_file_path("reminders", architecture="feature_first")
+    stale_widget = "// stale stretched glyph plate fill"
+    fixed_widget = "// intrinsic glyph width: 26.0"
+    layout_body = "// layout shell unchanged"
+    screen_body = "class RemindersScreen { Widget build() => const RemindersLayout(); }"
+    planned_v2 = {
+        screen_path: screen_body,
+        layout_path: layout_body,
+        widget_path: fixed_widget,
+    }
+    planned_v1 = {**planned_v2, widget_path: stale_widget}
+    minimal_tree = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.CONTAINER,
+        children=[],
+    )
+    region = RegionSyncState.from_tree(minimal_tree)
+    bindings = IncrementalFileBindings(
+        widget_files={widget_path: "component_7102_2848"},
+        layout_path=layout_path,
+        screen_paths=frozenset({screen_path}),
+    )
+    tokens = DesignTokens()
+    colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
+    tree_hash = hash_clean_tree(minimal_tree)
+    snapshot = GenerationSnapshot(
+        file_key="abc",
+        node_id="1:1",
+        feature_name="reminders",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        file_hashes={path: hash_file_contents(content) for path, content in planned_v1.items()},
+        layout_region_hash=region.layout_region_hash,
+        cluster_hashes=region.cluster_hashes,
+        emitter_version=EMITTER_VERSION,
+    )
+
+    selected = select_files_for_sync(
+        snapshot,
+        file_key="abc",
+        node_id="1:1",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        planned_files=planned_v2,
+        region_state=region,
+        bindings=bindings,
+    )
+
+    assert widget_path in selected
+    assert selected[widget_path] == fixed_widget
+    assert layout_path not in selected
+    assert screen_path not in selected
+
+
+def test_cluster_widget_rewrites_when_emitter_version_changes_without_cluster_delta() -> None:
+    """Emitter semver bumps must rewrite cluster widgets even when planned hash is unchanged."""
+    widget_path = "lib/widgets/icon_salary_widget.dart"
+    layout_path = "lib/generated/reminders_layout.dart"
+    screen_path = screen_file_path("reminders", architecture="feature_first")
+    widget_body = "// intrinsic glyph width: 26.0"
+    layout_body = "// layout shell unchanged"
+    screen_body = "class RemindersScreen { Widget build() => const RemindersLayout(); }"
+    planned = {
+        screen_path: screen_body,
+        layout_path: layout_body,
+        widget_path: widget_body,
+    }
+    minimal_tree = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.CONTAINER,
+        children=[],
+    )
+    region = RegionSyncState.from_tree(minimal_tree)
+    bindings = IncrementalFileBindings(
+        widget_files={widget_path: "component_7102_2848"},
+        layout_path=layout_path,
+        screen_paths=frozenset({screen_path}),
+    )
+    tokens = DesignTokens()
+    colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
+    tree_hash = hash_clean_tree(minimal_tree)
+    snapshot = GenerationSnapshot(
+        file_key="abc",
+        node_id="1:1",
+        feature_name="reminders",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        file_hashes={path: hash_file_contents(content) for path, content in planned.items()},
+        layout_region_hash=region.layout_region_hash,
+        cluster_hashes=region.cluster_hashes,
+        emitter_version="2026.01.0",
+    )
+
+    selected = select_files_for_sync(
+        snapshot,
+        file_key="abc",
+        node_id="1:1",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        planned_files=planned,
+        region_state=region,
+        bindings=bindings,
+    )
+
+    assert widget_path in selected
+    assert selected[widget_path] == widget_body

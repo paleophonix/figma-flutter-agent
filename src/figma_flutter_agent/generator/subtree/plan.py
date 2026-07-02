@@ -108,6 +108,15 @@ def _media_avatar_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> 
     return False
 
 
+def _icon_badge_glyph_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
+    """True when a cached icon-badge subtree still stretches its glyph to the plate."""
+    from figma_flutter_agent.generator.ir.extracted_paint import (
+        icon_badge_planned_widget_needs_rematerialization,
+    )
+
+    return icon_badge_planned_widget_needs_rematerialization(spec.representative, source)
+
+
 def _decorative_icon_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
     """True when a passive tile icon widget still carries back-nav tap chrome."""
     from figma_flutter_agent.parser.interaction import passive_decorative_icon_glyph
@@ -191,6 +200,8 @@ def _subtree_widget_path_needs_render(
         if _notification_badge_widget_needs_refresh(existing, spec):
             return True
         if _success_glyph_stack_needs_refresh(existing, spec):
+            return True
+        if _icon_badge_glyph_widget_needs_refresh(existing, spec):
             return True
         if _trailing_selection_glyph_needs_refresh(existing, spec):
             return True

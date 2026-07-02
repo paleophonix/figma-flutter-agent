@@ -345,6 +345,18 @@ def reconcile_planned_dart_files(
             use_package_imports=use_package_imports,
             destination_trees=destination_trees,
         )
+        from figma_flutter_agent.generator.widget_extractor import (
+            refresh_stale_icon_badge_planned_widget_files,
+        )
+
+        updated = refresh_stale_icon_badge_planned_widget_files(
+            updated,
+            clean_tree=clean_tree,
+            uses_svg=uses_svg,
+            package_name=package_name,
+            use_package_imports=use_package_imports,
+            project_dir=project_dir,
+        )
         updated = consolidate_planned_widget_paths(updated)
         _log_reconcile_phase("refresh_cluster", end=True)
     if clean_tree is not None and widget_suffix:

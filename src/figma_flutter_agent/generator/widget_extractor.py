@@ -616,6 +616,10 @@ def refresh_cluster_widget_planned_files(
     if not specs:
         return planned
 
+    from figma_flutter_agent.generator.ir.extracted_paint import (
+        icon_badge_planned_widget_needs_rematerialization,
+    )
+
     to_render: list[ClusterWidgetSpec] = []
     for spec in specs:
         preferred = preferred_widget_path_for_class(spec.class_name)
@@ -626,6 +630,7 @@ def refresh_cluster_widget_planned_files(
             _is_shrink_only_widget_source(existing)
             or _is_self_referential_widget_build(existing, spec.class_name)
             or _is_foreign_delegate_widget_build(existing, spec.class_name)
+            or icon_badge_planned_widget_needs_rematerialization(spec.representative, existing)
         ):
             to_render.append(spec)
 
@@ -659,4 +664,96 @@ def refresh_cluster_widget_planned_files(
         merged[preferred] = fresh
         if legacy_path != preferred:
             merged.pop(legacy_path, None)
+    return merged
+
+
+def _collect_icon_badge_stack_nodes(root: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Return every icon-badge stack subtree under ``root``."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
+
+    found: list[CleanDesignTreeNode] = []
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if layout_fact_icon_badge_stack(node):
+            found.append(node)
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return found
+
+
+def _icon_badge_representative_for_stale_body(
+    badge_nodes: list[CleanDesignTreeNode],
+    existing: str,
+) -> CleanDesignTreeNode | None:
+    """Pick the badge stack that matches a stale stretched-glyph widget body."""
+    from figma_flutter_agent.generator.ir.extracted_paint import (
+        icon_badge_planned_widget_needs_rematerialization,
+    )
+
+    for node in badge_nodes:
+        if icon_badge_planned_widget_needs_rematerialization(node, existing):
+            return node
+    return None
+
+
+def refresh_stale_icon_badge_planned_widget_files(
+    planned: dict[str, str],
+    *,
+    clean_tree: CleanDesignTreeNode,
+    uses_svg: bool,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+    project_dir: Path | None = None,
+) -> dict[str, str]:
+    """Re-render alias widget files that still stretch icon-badge glyphs to the plate."""
+    from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
+        _primary_public_widget_class_name,
+        preferred_widget_path_for_class,
+    )
+
+    badge_nodes = _collect_icon_badge_stack_nodes(clean_tree)
+    if not badge_nodes:
+        return planned
+
+    merged = dict(planned)
+    refreshed = 0
+    for path, existing in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/widgets/") or not normalized.endswith(".dart"):
+            continue
+        content = (existing or "").strip()
+        if not content:
+            continue
+        representative = _icon_badge_representative_for_stale_body(badge_nodes, content)
+        if representative is None:
+            continue
+        class_name = _primary_public_widget_class_name(content)
+        if class_name is None:
+            continue
+        if project_dir is not None:
+            representative = _resolve_cluster_representative_assets(
+                representative,
+                project_dir,
+            )
+        body = render_node_body(
+            representative,
+            uses_svg=uses_svg,
+            skip_cluster_id=representative.cluster_id,
+        )
+        body = _bound_cluster_widget_root(representative, body)
+        merged[path] = render_widget_file(
+            class_name=class_name,
+            body=body,
+            uses_svg=uses_svg,
+            package_name=package_name,
+            use_package_imports=use_package_imports,
+            source_file=preferred_widget_path_for_class(class_name),
+        )
+        refreshed += 1
+    if refreshed:
+        logger.info("Refreshed {} stale icon-badge widget alias(es)", refreshed)
     return merged

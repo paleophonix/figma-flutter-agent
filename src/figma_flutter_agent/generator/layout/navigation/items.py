@@ -100,6 +100,26 @@ def _child_looks_like_icon_only_nav_tab(child: CleanDesignTreeNode) -> bool:
     return child.type in {NodeType.STACK, NodeType.COLUMN, NodeType.CONTAINER}
 
 
+def _conserved_node_paint_extent(node: CleanDesignTreeNode) -> tuple[float, float]:
+    """Return paint width/height using sizing, placement, and conserved layout rect."""
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    frame = node.geometry_frame
+    if frame is not None and frame.layout_rect is not None:
+        rect = frame.layout_rect
+        if rect.width is not None and float(rect.width) > 0:
+            width = max(width, float(rect.width))
+        if rect.height is not None and float(rect.height) > 0:
+            height = max(height, float(rect.height))
+    placement = node.stack_placement
+    if placement is not None:
+        if placement.width is not None and float(placement.width) > 0:
+            width = max(width, float(placement.width))
+        if placement.height is not None and float(placement.height) > 0:
+            height = max(height, float(placement.height))
+    return width, height
+
+
 def _nav_tab_paint_extent(child: CleanDesignTreeNode) -> tuple[float | None, float | None]:
     """Return inclusive tab paint width/height from sizing and conserved layout rect."""
     width = child.sizing.width
@@ -135,8 +155,7 @@ def _nav_tab_has_prominent_paint_surface(tab: CleanDesignTreeNode) -> bool:
             continue
         if not descendant.style.background_color:
             continue
-        surface_width = float(descendant.sizing.width or 0.0)
-        surface_height = float(descendant.sizing.height or 0.0)
+        surface_width, surface_height = _conserved_node_paint_extent(descendant)
         if surface_width > base_width * 1.05 or surface_height > base_height * 1.05:
             return True
     return False
@@ -171,8 +190,7 @@ def _nav_tab_slot_extent(tab: CleanDesignTreeNode) -> tuple[float, float]:
             continue
         if not descendant.style.background_color:
             continue
-        surface_width = float(descendant.sizing.width or 0.0)
-        surface_height = float(descendant.sizing.height or 0.0)
+        surface_width, surface_height = _conserved_node_paint_extent(descendant)
         slot_width = max(slot_width, surface_width)
         slot_height = max(slot_height, surface_height)
     slot_width = max(slot_width, 44.0)

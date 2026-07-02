@@ -2,4 +2,4 @@
 
 from __future__ import annotations
 
-EMITTER_VERSION = "2026.06.2"
+EMITTER_VERSION = "2026.07.1"

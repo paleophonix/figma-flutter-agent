@@ -1,8 +1,8 @@
 {
   "feature": "9_3_1_b_transaction_income",
-  "pipeline_run_id": "b3abf70fdc22",
-  "candidate_build_run_id": "b3abf70fdc22",
-  "committed_build_run_id": "b3abf70fdc22",
+  "pipeline_run_id": "088475681e1a",
+  "candidate_build_run_id": "088475681e1a",
+  "committed_build_run_id": "088475681e1a",
   "writeback": "committed",
   "written_files": [
     "lib/features/9_3_1_b_transaction_income/9_3_1_b_transaction_income_screen.dart",
@@ -25,5 +25,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-01T21:45:48.225594+00:00"
+  "captured_at": "2026-07-02T10:31:44.961214+00:00"
 }

@@ -105,7 +105,12 @@ def _select_by_regions(
 
         cluster_id = bindings.widget_files.get(path)
         if cluster_id is not None:
-            if cluster_id in cluster_delta:
+            new_hash = hash_file_contents(content)
+            if (
+                cluster_id in cluster_delta
+                or snapshot.file_hashes.get(path) != new_hash
+                or snapshot.emitter_version != EMITTER_VERSION
+            ):
                 selected[path] = content
             continue
 

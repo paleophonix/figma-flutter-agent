@@ -79,6 +79,7 @@ def refresh_subtree_widget_planned_files(
     from figma_flutter_agent.generator.subtree.plan import (
         _bottom_nav_widget_needs_refresh,
         _collect_subtree_specs_to_render,
+        _icon_badge_glyph_widget_needs_refresh,
         _layout_widget_class_names,
         _resolve_spec_for_layout_widget_class,
     )
@@ -114,9 +115,16 @@ def refresh_subtree_widget_planned_files(
         len(specs) + len(layout_names) - len(to_render),
     )
 
-    def _should_refresh(path: str, class_name: str) -> bool:
+    def _should_refresh(
+        path: str,
+        class_name: str,
+        *,
+        spec: SubtreeWidgetSpec | None = None,
+    ) -> bool:
         existing = merged.get(path, "")
         if not existing:
+            return True
+        if spec is not None and _icon_badge_glyph_widget_needs_refresh(existing, spec):
             return True
         if _bottom_nav_widget_needs_refresh(existing, class_name):
             return True
@@ -128,7 +136,7 @@ def refresh_subtree_widget_planned_files(
 
     def _apply_fresh(spec: SubtreeWidgetSpec, fresh: str) -> None:
         preferred = preferred_widget_path_for_class(spec.class_name)
-        if _should_refresh(preferred, spec.class_name):
+        if _should_refresh(preferred, spec.class_name, spec=spec):
             merged[preferred] = fresh
 
     for spec in to_render:
@@ -141,13 +149,13 @@ def refresh_subtree_widget_planned_files(
 
     for class_name in layout_names:
         preferred = preferred_widget_path_for_class(class_name)
-        if not _should_refresh(preferred, class_name):
-            continue
         spec = _resolve_spec_for_layout_widget_class(
             class_name,
             specs,
             clean_tree=clean_tree,
         )
+        if not _should_refresh(preferred, class_name, spec=spec):
+            continue
         if spec is None:
             continue
         if spec.class_name == class_name:

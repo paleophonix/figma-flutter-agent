@@ -84,6 +84,25 @@ def extracted_icon_badge_glyph_emit_needs_rematerialization(
     return f"width: {plate_w_token}" in existing_code and f"width: {glyph_w_token}" not in existing_code
 
 
+def icon_badge_planned_widget_needs_rematerialization(
+    subtree: CleanDesignTreeNode,
+    existing_code: str,
+) -> bool:
+    """Return True when a cached widget file stretched or dropped an icon-badge shell."""
+    from figma_flutter_agent.generator.ir.extracted import (
+        _extracted_widget_needs_decoration_rematerialization,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
+
+    if not layout_fact_icon_badge_stack(subtree):
+        return False
+    return extracted_icon_badge_glyph_emit_needs_rematerialization(
+        subtree, existing_code
+    ) or _extracted_widget_needs_decoration_rematerialization(subtree, existing_code)
+
+
 def prefers_clean_tree_extracted_widget_emit(
     widget_ir: WidgetIrNode,
     subtree: CleanDesignTreeNode,
