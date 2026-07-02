@@ -64,6 +64,8 @@ def render_icon_only_bottom_navigation(
         tab_specs.append(nav_icon_tab_spec_expr(child, uses_svg=uses_svg))
     current_index = bottom_nav_current_index(node)
     radius = format_geometry_literal(float(palette["pill_radius"]))
+    substrate_width = format_geometry_literal(float(palette["active_substrate_width"]))
+    substrate_height = format_geometry_literal(float(palette["active_substrate_height"]))
     return (
         "_LayoutIconNav("
         f"initialIndex: {current_index}, "
@@ -71,7 +73,9 @@ def render_icon_only_bottom_navigation(
         f"activeBackground: {palette['active_bg']}, "
         f"activeForeground: {palette['active_fg']}, "
         f"inactiveForeground: {palette['inactive_fg']}, "
-        f"activePillRadius: {radius}"
+        f"activePillRadius: {radius}, "
+        f"activeSubstrateWidth: {substrate_width}, "
+        f"activeSubstrateHeight: {substrate_height}"
         ")"
     )
 

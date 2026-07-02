@@ -343,6 +343,11 @@ class {class_name} extends StatelessWidget {{
     content = _relax_tight_text_positioned_heights(content, render_tree)
     content = expand_text_positioned_widths_from_tree(content, render_tree)
     content = ensure_layout_chrome_nav_helpers(content, theme_variant=theme_variant)
+    from figma_flutter_agent.generator.layout.interactive_chrome import (
+        ensure_interactive_layout_helpers,
+    )
+
+    content = ensure_interactive_layout_helpers(content)
 
     files: dict[str, str] = {layout_key: content}
     if chunk_bodies:

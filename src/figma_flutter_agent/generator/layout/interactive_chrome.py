@@ -16,11 +16,15 @@ from figma_flutter_agent.generator.layout.interactive_toggle import (
 from figma_flutter_agent.generator.layout.interactive_weekday import (
     weekday_chip_row_stateful_helpers,
 )
+from figma_flutter_agent.generator.layout.segmented_pill import (
+    segmented_pill_stateful_helpers,
+)
 
 _WIDGET_CLASS_DECL_RE = re.compile(
     r"(?:^|\n)class\s+(?!_WheelPickerColumnSpec)(?!_GeneratedTimeWheelPicker)"
     r"(?!_GeneratedWeekdayChipRow)(?!_GeneratedCircularOptionChipRow)"
-    r"(?!_GeneratedToggleCheckbox)(\w+)\s+extends\s+(?:Stateless|Stateful)Widget\b"
+    r"(?!_GeneratedToggleCheckbox)(?!_SegmentedPillControl)(\w+)\s+extends\s+"
+    r"(?:Stateless|Stateful)Widget\b"
 )
 
 _HELPER_SPECS: tuple[tuple[str, str, object, str], ...] = (
@@ -41,6 +45,12 @@ _HELPER_SPECS: tuple[tuple[str, str, object, str], ...] = (
         "class _GeneratedCircularOptionChipRow extends StatefulWidget",
         circular_option_chip_row_stateful_helpers,
         "widget-circular-chip-row",
+    ),
+    (
+        "_SegmentedPillControl(",
+        "class _SegmentedPillControl extends StatefulWidget",
+        lambda _node_id: segmented_pill_stateful_helpers(),
+        "widget-segmented-pill",
     ),
 )
 

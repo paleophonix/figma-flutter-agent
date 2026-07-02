@@ -740,6 +740,29 @@ def nav_icon_tab_spec_expr(child: CleanDesignTreeNode, *, uses_svg: bool) -> str
     )
 
 
+def _nav_active_substrate_extent(node: CleanDesignTreeNode) -> tuple[float, float]:
+    """Return fixed active-pill width/height from the painted active tab substrate."""
+    from figma_flutter_agent.parser.numeric_rounding import round_geometry
+
+    active_tab = _resolve_nav_active_tab(node)
+    if active_tab is None:
+        items = collect_bottom_nav_items(node)
+        if not items:
+            return 44.0, 44.0
+        active_tab = items[bottom_nav_current_index(node)]
+    for descendant in _walk_nav_descendants(active_tab, max_depth=4):
+        if descendant.type != NodeType.CONTAINER:
+            continue
+        if not descendant.style.background_color:
+            continue
+        if descendant.style.border_radius is None or float(descendant.style.border_radius) <= 0:
+            continue
+        width, height = _conserved_node_paint_extent(descendant)
+        if width > 0 and height > 0:
+            return round_geometry(width), round_geometry(height)
+    return _nav_tab_slot_extent(active_tab)
+
+
 def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
     """Extract pill-nav colors and radius from painted Figma tab metadata."""
     from figma_flutter_agent.generator.layout.style import dart_color_expr
@@ -803,4 +826,6 @@ def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
         "active_fg": active_fg,
         "inactive_fg": inactive_fg,
         "pill_radius": pill_radius,
+        "active_substrate_width": _nav_active_substrate_extent(node)[0],
+        "active_substrate_height": _nav_active_substrate_extent(node)[1],
     }

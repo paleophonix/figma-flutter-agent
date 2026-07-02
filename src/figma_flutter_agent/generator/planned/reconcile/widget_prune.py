@@ -257,11 +257,46 @@ def prune_duplicate_widget_classes(planned: dict[str, str]) -> dict[str, str]:
     return updated
 
 
+_WIDGET_CTOR_CALL_RE = re.compile(r"\b([A-Z][A-Za-z0-9_]*Widget\d*)\s*\(")
+
+
+def _consumer_referenced_widget_classes(planned: Mapping[str, str]) -> set[str]:
+    """Return widget class names referenced from layout/screen consumer files."""
+    from figma_flutter_agent.generator.planned.reconcile.imports import (
+        _consumer_paths_needing_widget_imports,
+    )
+
+    referenced: set[str] = set()
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith(".dart") or not _consumer_paths_needing_widget_imports(
+            normalized
+        ):
+            continue
+        if normalized.startswith("lib/widgets/"):
+            continue
+        for match in _WIDGET_CTOR_CALL_RE.finditer(content):
+            name = match.group(1)
+            if name.endswith("Widget"):
+                referenced.add(name)
+    return referenced
+
+
 def prune_unreferenced_planned_widgets(planned: dict[str, str]) -> dict[str, str]:
     """Drop ``lib/widgets`` files not referenced from layout, screens, or other widgets."""
     if not _planned_has_widget_consumers(planned):
         return planned
     referenced = transitively_referenced_widget_paths(planned)
+    consumer_classes = _consumer_referenced_widget_classes(planned)
+    from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
+        _widget_class_paths,
+    )
+
+    class_paths = _widget_class_paths(planned)
+    for class_name in consumer_classes:
+        widget_path = class_paths.get(class_name)
+        if widget_path is not None:
+            referenced.add(widget_path)
     updated = dict(planned)
     for path in list(updated.keys()):
         normalized = path.replace("\\", "/")

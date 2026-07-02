@@ -247,6 +247,76 @@ def _stack_hosts_stroked_outline_checkbox_glyph(node: CleanDesignTreeNode) -> bo
     return False
 
 
+def stack_hosts_decorative_metric_checkmark(stack: CleanDesignTreeNode) -> bool:
+    """Return True when a checkbox-like stack is a static metric summary glyph."""
+    if stack.type != NodeType.STACK:
+        return False
+    if not stack_hosts_checkbox_label_pair(stack):
+        return False
+    label_leaf: CleanDesignTreeNode | None = None
+    for child in stack.children:
+        host = checkbox_label_text_host(child)
+        if host is not None:
+            label_leaf = host
+            break
+    if label_leaf is None:
+        return False
+    text = (label_leaf.text or "").strip()
+    if "%" not in text:
+        return False
+    return not layout_fact_consent_label_text(text)
+
+
+def _parent_hosts_percent_metric_copy(parent: CleanDesignTreeNode) -> bool:
+    """Return True when a layout host also carries short percent metric copy."""
+    for child in parent.children:
+        if child.type == NodeType.TEXT:
+            text = (child.text or "").strip()
+            if "%" in text and len(text) <= 64 and not layout_fact_consent_label_text(text):
+                return True
+        if child.type not in {NodeType.STACK, NodeType.ROW, NodeType.CONTAINER}:
+            continue
+        for descendant in child.children:
+            if descendant.type != NodeType.TEXT:
+                continue
+            text = (descendant.text or "").strip()
+            if "%" in text and len(text) <= 64 and not layout_fact_consent_label_text(text):
+                return True
+    return False
+
+
+def layout_fact_decorative_metric_checkmark_glyph(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """Return True when a compact stroked check glyph decorates a percent metric row."""
+    if not _stack_hosts_stroked_outline_checkbox_glyph(node):
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) > 13.0 or float(height) > 13.0:
+        return False
+    if stack_hosts_checkbox_label_pair(node):
+        return False
+    if parent_node is None:
+        return False
+    return _parent_hosts_percent_metric_copy(parent_node)
+
+
+def layout_fact_interactive_checkbox_control(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """Return True when ``node`` should emit an interactive checkbox control."""
+    if layout_fact_decorative_metric_checkmark_glyph(node, parent_node=parent_node):
+        return False
+    return layout_fact_checkbox_control(node)
+
+
 def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Small square used as a consent, bonus, or list-tile checkbox control."""
     if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:

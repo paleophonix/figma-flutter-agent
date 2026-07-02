@@ -276,6 +276,8 @@ class _LayoutIconNav extends StatefulWidget {{
     required this.activeForeground,
     required this.inactiveForeground,
     required this.activePillRadius,
+    required this.activeSubstrateWidth,
+    required this.activeSubstrateHeight,
     super.key,
   }});
 
@@ -285,6 +287,8 @@ class _LayoutIconNav extends StatefulWidget {{
   final Color activeForeground;
   final Color inactiveForeground;
   final double activePillRadius;
+  final double activeSubstrateWidth;
+  final double activeSubstrateHeight;
 
   @override
   State<_LayoutIconNav> createState() => _LayoutIconNavState();
@@ -329,8 +333,8 @@ class _LayoutIconNavState extends State<_LayoutIconNav> {{
                     borderRadius: BorderRadius.circular(widget.activePillRadius),
                   ),
                   child: SizedBox(
-                    width: tab.slotWidth,
-                    height: tab.slotHeight,
+                    width: widget.activeSubstrateWidth,
+                    height: widget.activeSubstrateHeight,
                   ),
                 ),
               icon,

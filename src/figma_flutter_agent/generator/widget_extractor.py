@@ -248,6 +248,7 @@ def _collect_component_family_widget_specs(
     from collections import defaultdict
 
     from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
+    from figma_flutter_agent.parser.dedup.signatures import descendant_text_fingerprint
 
     families: dict[str, list[CleanDesignTreeNode]] = defaultdict(list)
     claimed = claimed_component_ids or set()
@@ -255,20 +256,26 @@ def _collect_component_family_widget_specs(
     def walk(node: CleanDesignTreeNode) -> None:
         component_id = _component_id_for_node(node)
         if component_id:
-            families[component_id].append(node)
+            cluster_key = node.cluster_id or component_cluster_id(
+                component_id,
+                text_fingerprint=descendant_text_fingerprint(node),
+            )
+            families[cluster_key].append(node)
         for child in node.children:
             walk(child)
 
     walk(root)
     specs: list[ClusterWidgetSpec] = []
-    for component_id, nodes in families.items():
+    for cluster_key, nodes in families.items():
         required = 1 if allow_single_use else min_count
         if len(nodes) < required:
             continue
-        if component_id in claimed:
+        component_id = _component_id_for_node(nodes[0])
+        if component_id and component_id in claimed:
             continue
-        base_cluster_id = component_cluster_id(component_id)
-        if _component_family_already_extracted(component_id, existing_cluster_ids):
+        if cluster_key in existing_cluster_ids:
+            continue
+        if component_id and _component_family_already_extracted(component_id, existing_cluster_ids):
             continue
         from figma_flutter_agent.parser.interaction import (
             layout_fact_hosts_compact_checkbox_control,
@@ -288,19 +295,21 @@ def _collect_component_family_widget_specs(
         with_children = [node for node in eligible if node.children]
         candidates = with_children if with_children else eligible
         representative = max(candidates, key=_representative_score)
-        class_name = _widget_class_name(representative, base_cluster_id, widget_suffix)
+        class_name = _widget_class_name(representative, cluster_key, widget_suffix)
         if class_name in existing_class_names:
             continue
         specs.append(
             ClusterWidgetSpec(
-                cluster_id=base_cluster_id,
+                cluster_id=cluster_key,
                 class_name=class_name,
                 file_name=to_snake_case(class_name),
                 representative=representative,
             )
         )
-        existing_cluster_ids.add(base_cluster_id)
+        existing_cluster_ids.add(cluster_key)
         existing_class_names.add(class_name)
+        if component_id:
+            claimed.add(component_id)
     return specs
 
 
@@ -380,16 +389,6 @@ def render_cluster_widgets(
     """
     files: dict[str, str] = {}
     cluster_classes = {spec.cluster_id: spec.class_name for spec in specs}
-    from figma_flutter_agent.generator.cluster_variants import component_id_for_node
-    from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
-
-    for spec in specs:
-        component_id = component_id_for_node(spec.representative)
-        if component_id:
-            cluster_classes.setdefault(
-                component_cluster_id(component_id),
-                spec.class_name,
-            )
     vector_variants = (
         collect_cluster_vector_variants(
             clean_trees,
@@ -510,17 +509,16 @@ def _find_cluster_representative(
     """Return the first clean-tree node tagged with ``cluster_id``."""
     found: CleanDesignTreeNode | None = None
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def visit(node: CleanDesignTreeNode) -> None:
         nonlocal found
         if found is not None:
             return
         if node.cluster_id == cluster_id:
             found = node
-            return
-        for child in node.children:
-            walk(child)
 
-    walk(root)
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(root, visit)
     return found
 
 

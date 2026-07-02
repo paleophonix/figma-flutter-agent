@@ -281,27 +281,33 @@ def _apply_ir_guards_inplace(
                 )
 
 
-def _validate_nav_bottom_bar_ir_matches_clean_root(
+def _validate_screen_root_control_kind(
     screen_ir: ScreenIr,
     tree_by_id: dict[str, CleanDesignTreeNode],
 ) -> None:
-    """Heal or reject ``nav_bottom_bar`` IR when the clean root is a screen frame."""
+    """Heal or reject forbidden control kinds on screen-sized clean roots."""
     from figma_flutter_agent.generator.ir.validate.root_kind import (
-        heal_screen_root_nav_bottom_bar_kind,
-        nav_bottom_bar_kind_contradicts_clean_node,
+        heal_screen_root_control_kind,
+        screen_root_kind_contradicts_clean_node,
     )
 
     clean_root = tree_by_id.get(screen_ir.root.figma_id)
     if clean_root is None:
         return
-    heal_screen_root_nav_bottom_bar_kind(screen_ir, clean_root)
-    if screen_ir.root.kind != WidgetIrKind.NAV_BOTTOM_BAR:
-        return
-    if nav_bottom_bar_kind_contradicts_clean_node(clean_root):
+    heal_screen_root_control_kind(screen_ir, clean_root)
+    if screen_root_kind_contradicts_clean_node(screen_ir.root.kind, clean_root):
         raise GenerationError(
-            f"screenIr root {screen_ir.root.figma_id!r} kind nav_bottom_bar "
+            f"screenIr root {screen_ir.root.figma_id!r} kind {screen_ir.root.kind.value!r} "
             "contradicts screen-sized clean-tree root"
         )
+
+
+def _validate_nav_bottom_bar_ir_matches_clean_root(
+    screen_ir: ScreenIr,
+    tree_by_id: dict[str, CleanDesignTreeNode],
+) -> None:
+    """Heal or reject ``nav_bottom_bar`` IR when the clean root is a screen frame."""
+    _validate_screen_root_control_kind(screen_ir, tree_by_id)
 
 
 def _find_parent_ir(node: WidgetIrNode, figma_id: str) -> WidgetIrNode | None:
@@ -366,6 +372,11 @@ def validate_screen_ir(
         canonical_extracted_widget_names=canonical_extracted,
         semantics=semantics,
     )
+    from figma_flutter_agent.generator.ir.validate.graph import (
+        ensure_ir_direct_children_match_clean,
+    )
+
+    ensure_ir_direct_children_match_clean(screen_ir, root)
     realign_screen_ir_children_to_clean_tree(screen_ir, root)
 
     tree_by_id = index_clean_tree(root)

@@ -63,17 +63,45 @@ def render_segmented_control_host(
     *,
     theme_variant: str,
 ) -> str:
-    """Render a pill host with mutually exclusive segmented option children."""
+    """Render a stateful segmented pill host with mutually exclusive option labels."""
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        _segmented_option_label_text,
+        layout_fact_segmented_option_host,
+    )
     from figma_flutter_agent.generator.layout.style import box_decoration_expr
+    from figma_flutter_agent.generator.variant.state import variant_is_checked
     from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 
+    _ = theme_variant
     label = escape_dart_string(node.accessibility_label or node.name)
-    body = ", ".join(child_widgets) or "const SizedBox.shrink()"
-    row = (
-        f"Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [{body}])"
-        if node.spacing and node.spacing > 0
-        else f"Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [{body}])"
-    )
+    option_nodes = [
+        child for child in node.children if layout_fact_segmented_option_host(child)
+    ]
+    option_labels = [
+        escaped
+        for child in option_nodes
+        if (escaped := escape_dart_string(_segmented_option_label_text(child) or ""))
+    ]
+    if len(option_labels) < 2:
+        body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+        row = (
+            f"Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [{body}])"
+            if node.spacing and node.spacing > 0
+            else f"Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [{body}])"
+        )
+    else:
+        selected_index = 0
+        for index, child in enumerate(option_nodes):
+            if variant_is_checked(child):
+                selected_index = index
+                break
+        labels_literal = ", ".join(f"'{item}'" for item in option_labels)
+        row = (
+            "_SegmentedPillControl("
+            f"labels: const [{labels_literal}], "
+            f"initialIndex: {selected_index}"
+            ")"
+        )
     decoration = box_decoration_expr(
         node.style,
         width=node.sizing.width,

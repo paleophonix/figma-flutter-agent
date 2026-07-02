@@ -118,14 +118,20 @@ def normalize_clean_tree(
         )
     if project_dir is not None:
         from figma_flutter_agent.parser.boundaries.assets import (
+            build_asset_node_index,
             resolve_discovered_vector_asset_keys,
             resolve_missing_image_asset_keys,
             resolve_pruned_cluster_instance_assets,
         )
 
-        resolve_missing_image_asset_keys(working, project_dir)
-        resolve_discovered_vector_asset_keys(working, project_dir)
-        resolve_pruned_cluster_instance_assets(working, project_dir)
+        asset_index = build_asset_node_index(project_dir)
+        resolve_missing_image_asset_keys(working, project_dir, asset_index=asset_index)
+        resolve_discovered_vector_asset_keys(working, project_dir, asset_index=asset_index)
+        resolve_pruned_cluster_instance_assets(
+            working,
+            project_dir,
+            asset_index=asset_index,
+        )
     from figma_flutter_agent.parser.layout import (
         reconcile_product_hero_photo_viewport_in_tree,
     )

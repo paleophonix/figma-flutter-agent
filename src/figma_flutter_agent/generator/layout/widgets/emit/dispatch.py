@@ -483,8 +483,20 @@ def render_node_body(
         cluster_classes,
         skip_cluster_id=skip_cluster_id,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_switch_hosts_segmented_options,
+    )
+
+    segmented_switch_host = layout_fact_switch_hosts_segmented_options(node)
+    segmented_switch_child = (
+        parent_node is not None and layout_fact_switch_hosts_segmented_options(parent_node)
+    )
     prefer_cluster_widget = (
-        not inline_cluster_control and not product_tile_inline and delegate_class is not None
+        not inline_cluster_control
+        and not product_tile_inline
+        and delegate_class is not None
+        and not segmented_switch_host
+        and not segmented_switch_child
     )
     if prefer_cluster_widget:
         from figma_flutter_agent.generator.cluster_variants import (

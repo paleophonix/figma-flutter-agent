@@ -151,10 +151,15 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         cluster_vector_variants=cluster_vector_variants,
     )
     if cluster_classes:
+        from figma_flutter_agent.generator.planner.timing import (
+            plan_substage_done,
+            plan_substage_start,
+        )
         from figma_flutter_agent.generator.widget_extractor import (
             materialize_missing_cluster_delegate_files,
         )
 
+        _t = plan_substage_start("materialize_missing_cluster_delegate_files")
         planned_files = materialize_missing_cluster_delegate_files(
             planned_files,
             clean_tree=context.clean_tree,
@@ -164,16 +169,24 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             use_package_imports=use_package_imports,
             project_dir=context.project_dir,
         )
+        plan_substage_done("materialize_missing_cluster_delegate_files", _t)
     deterministic_widget_imports = build_deterministic_widget_imports(cluster_specs, subtree_result)
     architecture = settings.agent.flutter.architecture
     theme_variant = settings.agent.theme.variant
 
+    from figma_flutter_agent.generator.planner.timing import (
+        plan_substage_done,
+        plan_substage_start,
+    )
+
+    _t = plan_substage_start("render_theme_and_gallery_files")
     planned_files = render_theme_and_gallery_files(
         context,
         planned_files,
         package_name=package_name,
         theme_variant=theme_variant,
     )
+    plan_substage_done("render_theme_and_gallery_files", _t)
     text_theme_slots = build_text_theme_slot_by_style_name(context.tokens)
     text_theme_size_slots = build_text_theme_size_slots(context.tokens)
     from figma_flutter_agent.generator.normalize import normalize_clean_tree
@@ -186,6 +199,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             if context.generation is not None and context.generation.screen_ir is not None
             else None
         )
+        _t = plan_substage_start("normalize_clean_tree")
         context.clean_tree = normalize_clean_tree(
             context.clean_tree,
             tokens=context.tokens,
@@ -217,6 +231,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 suppress_archetype_compensation=generation_cfg.suppress_archetype_compensation,
                 archetype_reconcile=generation_cfg.archetype_reconcile,
             )
+        plan_substage_done("normalize_clean_tree", _t)
         logger.info(
             "plan: canonicalized clean tree(s) (unified={}, render_safety={})",
             unified_canonicalizer,
@@ -233,10 +248,13 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         apply_layout_passes_to_context,
     )
 
+    _t = plan_substage_start("apply_layout_passes_to_context")
     context = apply_layout_passes_to_context(context)
+    plan_substage_done("apply_layout_passes_to_context", _t)
     if generation_cfg.use_geometry_planner:
         from figma_flutter_agent.generator.normalize import replan_geometry_after_layout_passes
 
+        _t = plan_substage_start("replan_geometry_after_layout_passes")
         context.clean_tree = replan_geometry_after_layout_passes(
             context.clean_tree,
             project_dir=context.project_dir,
@@ -246,6 +264,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 destination_tree,
                 project_dir=context.project_dir,
             )
+        plan_substage_done("replan_geometry_after_layout_passes", _t)
     if context.project_dir is not None:
         from figma_flutter_agent.debug.responsiveness import write_responsiveness_report
 

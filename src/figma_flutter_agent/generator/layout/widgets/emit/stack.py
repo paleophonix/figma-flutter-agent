@@ -295,7 +295,7 @@ def render_stack(
     )
     from figma_flutter_agent.parser.interaction import (
         find_raster_photo_leaf,
-        layout_fact_checkbox_control,
+        layout_fact_interactive_checkbox_control,
     )
 
     from ..svg import (
@@ -305,7 +305,7 @@ def render_stack(
     )
 
     has_raster_photo_fill = find_raster_photo_leaf(node) is not None
-    if layout_fact_checkbox_control(node):
+    if layout_fact_interactive_checkbox_control(node, parent_node=parent_node):
         from figma_flutter_agent.generator.layout.form import render_checkbox
 
         widget = render_checkbox(node, theme_variant=theme_variant)

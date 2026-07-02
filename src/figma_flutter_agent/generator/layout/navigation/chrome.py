@@ -18,6 +18,8 @@ _ICON_NAV_HELPER_MARKERS = (
     "required this.slotWidth",
     "required this.rowBandHeight",
     "required this.activePillRadius",
+    "required this.activeSubstrateWidth",
+    "required this.activeSubstrateHeight",
     "clipBehavior: Clip.none",
     "OverflowBox(",
     "width: tab.iconWidth",

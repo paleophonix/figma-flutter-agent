@@ -16,8 +16,10 @@ from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
 from figma_flutter_agent.debug.ir_load import resolve_screen_ir_dump_path
 from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.generator.ir.validate.root_kind import (
+    heal_screen_root_control_kind,
     heal_screen_root_nav_bottom_bar_kind,
     nav_bottom_bar_kind_contradicts_clean_node,
+    screen_root_kind_contradicts_clean_node,
 )
 from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
 from figma_flutter_agent.schemas import (
@@ -43,6 +45,21 @@ def _screen_root() -> CleanDesignTreeNode:
             CleanDesignTreeNode(id="child", name="Body", type=NodeType.TEXT, text="Body"),
         ],
     )
+
+
+def test_screen_root_vetoes_input_rating_on_artboard() -> None:
+    """Law: ScreenRootControlKindVetoLaw — full artboards cannot be input_rating roots."""
+    clean_root = _screen_root()
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id=clean_root.id,
+            kind=WidgetIrKind.INPUT_RATING,
+            children=[],
+        )
+    )
+    assert screen_root_kind_contradicts_clean_node(WidgetIrKind.INPUT_RATING, clean_root) is True
+    assert heal_screen_root_control_kind(screen_ir, clean_root) is True
+    assert screen_ir.root.kind == WidgetIrKind.STACK
 
 
 def test_nav_bottom_bar_kind_contradicts_screen_frame() -> None:

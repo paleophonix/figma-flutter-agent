@@ -230,6 +230,8 @@ def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None
 def _discover_filter_raster_fallback_path(
     node: CleanDesignTreeNode,
     project_dir: Path,
+    *,
+    asset_index: dict[str, str] | None = None,
 ) -> str | None:
     """Locate a baked PNG fallback for a filtered SVG export."""
     if not node.vector_asset_key or not node.vector_asset_key.endswith(".svg"):
@@ -243,7 +245,11 @@ def _discover_filter_raster_fallback_path(
         if candidate.is_file():
             return f"assets/{folder}/{candidate.name}".replace("\\", "/")
     for node_id in _vector_discovery_node_ids(node):
-        discovered = discover_asset_path_for_node(project_dir, node_id)
+        discovered = discover_asset_path_for_node(
+            project_dir,
+            node_id,
+            asset_index=asset_index,
+        )
         if discovered is not None and discovered.endswith(".png"):
             return discovered.replace("\\", "/")
     return None
@@ -252,6 +258,8 @@ def _discover_filter_raster_fallback_path(
 def resolve_missing_image_asset_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
+    *,
+    asset_index: dict[str, str] | None = None,
 ) -> None:
     """Attach on-disk raster exports when the processed tree omitted ``imageAssetKey``."""
     from figma_flutter_agent.parser.interaction.enrichment import find_raster_photo_leaf
@@ -261,16 +269,24 @@ def resolve_missing_image_asset_keys(
         node: CleanDesignTreeNode, *, parent: CleanDesignTreeNode | None
     ) -> str | None:
         for probe_id in _vector_discovery_node_ids(node):
-            discovered = discover_asset_path_for_node(project_dir, probe_id)
+            discovered = discover_asset_path_for_node(
+                project_dir,
+                probe_id,
+                asset_index=asset_index,
+            )
             if discovered is not None and discovered.endswith((".png", ".jpg", ".webp")):
                 return discovered.replace("\\", "/")
         if parent is not None and parent.type == NodeType.STACK:
-            discovered = discover_asset_path_for_node(project_dir, parent.id)
+            discovered = discover_asset_path_for_node(
+                project_dir,
+                parent.id,
+                asset_index=asset_index,
+            )
             if discovered is not None and discovered.endswith((".png", ".jpg", ".webp")):
                 return discovered.replace("\\", "/")
         return None
 
-    def walk(node: CleanDesignTreeNode, *, parent: CleanDesignTreeNode | None = None) -> None:
+    def visit(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
         if not node.image_asset_key and node.type == NodeType.IMAGE:
             discovered = _discover_image_key(node, parent=parent)
             if discovered is not None:
@@ -291,15 +307,19 @@ def resolve_missing_image_asset_keys(
             and not node.children
             and node.type in {NodeType.CONTAINER, NodeType.IMAGE}
         ):
-            discovered = discover_asset_path_for_node(project_dir, node.id)
+            discovered = discover_asset_path_for_node(
+                project_dir,
+                node.id,
+                asset_index=asset_index,
+            )
             if discovered is not None:
                 node.image_asset_key = discovered.replace("\\", "/")
-        for child in node.children:
-            walk(child, parent=node)
 
-    walk(tree)
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree_with_parent
+
+    walk_clean_tree_with_parent(tree, visit)
     resolve_structural_duplicate_image_assets(tree)
-    _resolve_filter_raster_fallback_keys(tree, project_dir)
+    _resolve_filter_raster_fallback_keys(tree, project_dir, asset_index=asset_index)
 
     def propagate_avatar_parent_keys(node: CleanDesignTreeNode) -> None:
         photo = find_raster_photo_leaf(node)
@@ -314,6 +334,8 @@ def resolve_missing_image_asset_keys(
 def _resolve_filter_raster_fallback_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
+    *,
+    asset_index: dict[str, str] | None = None,
 ) -> None:
     """Bind PNG raster siblings when SVG exports need a baked raster tier."""
     from figma_flutter_agent.generator.layout.widgets.svg import SVG_PATH_RASTER_THRESHOLD
@@ -324,20 +346,24 @@ def _resolve_filter_raster_fallback_keys(
         path_count = node.vector_svg_path_count
         return path_count is not None and path_count > SVG_PATH_RASTER_THRESHOLD
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def visit(node: CleanDesignTreeNode) -> None:
         if (
             not node.image_asset_key
             and node.vector_asset_key
             and node.vector_asset_key.endswith(".svg")
             and _node_prefers_raster_fallback(node)
         ):
-            fallback = _discover_filter_raster_fallback_path(node, project_dir)
+            fallback = _discover_filter_raster_fallback_path(
+                node,
+                project_dir,
+                asset_index=asset_index,
+            )
             if fallback is not None:
                 node.image_asset_key = fallback
-        for child in node.children:
-            walk(child)
 
-    walk(tree)
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(tree, visit)
 
 
 def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:
@@ -355,10 +381,18 @@ def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:
         add(flattened_id)
 
     def walk_descendants(item: CleanDesignTreeNode) -> None:
+        from figma_flutter_agent.parser.tree_walk import CleanTreeCycleError
+
+        item_key = id(item)
+        if item_key in descendant_visited:
+            msg = "Clean tree traversal cycle detected during vector asset discovery"
+            raise CleanTreeCycleError(msg)
+        descendant_visited.add(item_key)
         add(item.id)
         for child in item.children:
             walk_descendants(child)
 
+    descendant_visited: set[int] = set()
     for child in node.children:
         walk_descendants(child)
     return ordered
@@ -383,6 +417,8 @@ def _node_eligible_for_vector_asset_discovery(node: CleanDesignTreeNode) -> bool
 def resolve_discovered_vector_asset_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
+    *,
+    asset_index: dict[str, str] | None = None,
 ) -> None:
     """Attach on-disk SVG exports when the clean tree omitted ``vectorAssetKey``.
 
@@ -397,16 +433,18 @@ def resolve_discovered_vector_asset_keys(
         project_dir: Flutter project root containing ``assets/``.
     """
 
-    def walk(node: CleanDesignTreeNode) -> None:
-        for child in node.children:
-            walk(child)
+    def visit(node: CleanDesignTreeNode) -> None:
         if node.vector_asset_key or not _node_eligible_for_vector_asset_discovery(node):
             return
         if _composite_root_blocks_descendant_vector_promotion(node):
             return
         candidates: list[str] = []
         for node_id in _vector_discovery_node_ids(node):
-            discovered = discover_asset_path_for_node(project_dir, node_id)
+            discovered = discover_asset_path_for_node(
+                project_dir,
+                node_id,
+                asset_index=asset_index,
+            )
             if discovered is not None:
                 candidates.append(discovered.replace("\\", "/"))
         if candidates:
@@ -419,15 +457,18 @@ def resolve_discovered_vector_asset_keys(
         promoted = _best_descendant_vector_asset(node)
         if promoted is not None:
             node.vector_asset_key = promoted
-            return
 
-    walk(tree)
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(tree, visit, post_order=True)
 
 
 def resolve_pruned_cluster_instance_assets(
     tree: CleanDesignTreeNode,
     project_dir: Path,
     manifest: AssetManifest | None = None,
+    *,
+    asset_index: dict[str, str] | None = None,
 ) -> None:
     """Attach per-instance vector exports onto pruned duplicate cluster nodes."""
     manifest_paths: dict[str, str] = {}
@@ -441,12 +482,16 @@ def resolve_pruned_cluster_instance_assets(
         manifest_path = manifest_paths.get(node_id)
         if manifest_path:
             paths.append(manifest_path)
-        discovered = discover_asset_path_for_node(project_dir, node_id)
+        discovered = discover_asset_path_for_node(
+            project_dir,
+            node_id,
+            asset_index=asset_index,
+        )
         if discovered and discovered not in paths:
             paths.append(discovered)
         return paths
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def visit(node: CleanDesignTreeNode) -> None:
         if node.cluster_id and not node.children:
             resolved: str | None = None
             candidate_ids: list[str] = []
@@ -462,10 +507,10 @@ def resolve_pruned_cluster_instance_assets(
                     break
             if resolved is not None:
                 node.vector_asset_key = resolved
-        for child in node.children:
-            walk(child)
 
-    walk(tree)
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(tree, visit)
 
 
 def resolve_render_boundary_asset_keys(

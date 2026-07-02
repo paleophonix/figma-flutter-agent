@@ -287,22 +287,13 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
                 continue
             if name not in class_paths:
                 stale_names.add(name)
-        if not stale_names:
-            continue
-        patched = content
-        for name in sorted(stale_names, key=len, reverse=True):
-            patched = re.sub(
-                rf"\b{re.escape(name)}\s*\(",
-                "SizedBox.shrink(",
-                patched,
-            )
-        if patched != content:
-            logger.info(
-                "Rewrote stale widget ctor name(s) in consumer {}: {}",
+        if stale_names:
+            preview = ", ".join(sorted(stale_names))
+            logger.error(
+                "Planned consumer {} references missing widget class(es): {}",
                 normalized,
-                ", ".join(sorted(stale_names)),
+                preview,
             )
-            updated[path] = patched
     return updated
 
 

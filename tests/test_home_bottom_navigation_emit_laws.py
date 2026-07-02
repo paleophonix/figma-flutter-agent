@@ -69,8 +69,8 @@ def test_sectionize_rejects_dense_home_artboard() -> None:
     assert plan.reject_reason == "dense_absolute_overlay_artboard"
 
 
-def test_switch_hosts_segmented_options_emit_children_not_material_switch() -> None:
-    """Law: SegmentedSwitchHostLaw — multi-option SWITCH hosts render option row."""
+def test_switch_hosts_segmented_options_emit_stateful_pill_control() -> None:
+    """Law: StatefulSegmentedControlLaw — multi-option SWITCH hosts render pill control."""
     from figma_flutter_agent.generator.layout.widgets import render_node_body
 
     root = _load_home_root()
@@ -78,18 +78,26 @@ def test_switch_hosts_segmented_options_emit_children_not_material_switch() -> N
     assert switch is not None
     body = render_node_body(switch, uses_svg=True)
     assert "Switch(value:" not in body
+    assert "_SegmentedPillControl(" in body
+    assert "'Daily'" in body and "'Weekly'" in body and "'Monthly'" in body
 
 
-def test_stroked_glyph_checkbox_emits_interactive_control() -> None:
-    """Law: CompactCheckboxGlyphLaw — stroked square stacks emit Checkbox, not SVG."""
+def test_stroked_glyph_checkbox_emits_static_metric_glyph() -> None:
+    """Law: VectorCheckboxVisualLaw — metric summary checkmarks stay decorative SVG."""
     from figma_flutter_agent.generator.layout.widgets import render_node_body
 
     root = _load_home_root()
     checkbox = _find_node(root, "7342:2878")
     assert checkbox is not None
-    body = render_node_body(checkbox, uses_svg=True)
-    assert "Checkbox(" in body or "_GeneratedToggleCheckbox" in body
-    assert "check_7342_2878.svg" not in body
+    body = render_node_body(
+        checkbox,
+        uses_svg=True,
+        parent_node=root,
+        parent_type=NodeType.STACK,
+    )
+    assert "Checkbox(" not in body
+    assert "_GeneratedToggleCheckbox" not in body
+    assert "check_7342_2878.svg" in body or "SvgPicture" in body
 
 
 def test_extracted_widget_fixed_bounds_law_wraps_notification_icon() -> None:
@@ -164,14 +172,18 @@ def test_icon_glyph_not_checkbox() -> None:
     assert not layout_fact_checkbox_control(salary)
 
 
-def test_real_checkbox_still_detected() -> None:
-    """Law: SemanticCheckboxEvidenceLaw — genuine check glyphs remain interactive."""
-    from figma_flutter_agent.parser.interaction.forms import layout_fact_checkbox_control
+def test_decorative_metric_checkmark_not_interactive_control() -> None:
+    """Law: VectorCheckboxVisualLaw — percent metric glyphs are not toggle controls."""
+    from figma_flutter_agent.parser.interaction.forms import (
+        layout_fact_decorative_metric_checkmark_glyph,
+        layout_fact_interactive_checkbox_control,
+    )
 
     root = _load_home_root()
     checkbox = _find_node(root, "7342:2878")
     assert checkbox is not None
-    assert layout_fact_checkbox_control(checkbox)
+    assert layout_fact_decorative_metric_checkmark_glyph(checkbox, parent_node=root)
+    assert not layout_fact_interactive_checkbox_control(checkbox, parent_node=root)
 
 
 def test_painted_dashboard_card_not_multiline_field() -> None:
@@ -199,13 +211,14 @@ def test_hairline_divider_skips_double_stroke_wrap() -> None:
     assert "Positioned(width: 2.0" not in body
 
 
-def test_nav_active_substrate_uses_slot_height() -> None:
-    """Law: NavActiveSubstrateGeometryLaw — tab shell height matches active pill slot."""
+def test_nav_active_substrate_uses_fixed_extent() -> None:
+    """Law: NavActiveSubstrateInvariantLaw — active pill uses painted substrate extent."""
     from figma_flutter_agent.generator.layout.navigation.helpers import icon_nav_stateful_helpers
 
     helpers = icon_nav_stateful_helpers(node_id="test")
-    assert "height: tab.slotHeight," in helpers
-    assert "height: tab.rowBandHeight," not in helpers.split("_buildTab")[1]
+    build_tab = helpers.split("Widget _buildTab")[1]
+    assert "width: widget.activeSubstrateWidth," in build_tab
+    assert "height: widget.activeSubstrateHeight," in build_tab
 
 
 def test_segment_tab_labels_centered_in_cells() -> None:

@@ -8,7 +8,10 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 def _component_instance_key(node: CleanDesignTreeNode) -> str | None:
     """Return a stable lookup key for duplicated component instances."""
     if node.cluster_id:
-        return f"cluster:{node.cluster_id}"
+        from figma_flutter_agent.parser.dedup.signatures import cluster_structure_signature
+
+        signature = cluster_structure_signature(node) if node.children else "leaf"
+        return f"cluster:{node.cluster_id}:{signature}"
     if node.component_ref and node.variant is not None:
         props = node.variant.variant_properties or {}
         prop_key = tuple(sorted(props.items()))
