@@ -1,8 +1,8 @@
 {
   "feature": "food_add_new_items",
-  "pipeline_run_id": "c6e14c3181ca",
-  "candidate_build_run_id": "c6e14c3181ca",
-  "committed_build_run_id": "c6e14c3181ca",
+  "pipeline_run_id": "fbd07efa01b1",
+  "candidate_build_run_id": "fbd07efa01b1",
+  "committed_build_run_id": "fbd07efa01b1",
   "writeback": "committed",
   "written_files": [
     "lib/features/food_add_new_items/food_add_new_items_screen.dart",
@@ -22,5 +22,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-02T14:12:40.410340+00:00"
+  "captured_at": "2026-07-02T15:00:35.230906+00:00"
 }
