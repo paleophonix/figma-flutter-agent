@@ -9,6 +9,7 @@ from figma_flutter_agent.parser.accessibility import derive_accessibility_label
 from figma_flutter_agent.parser.components import (
     extract_component_variant,
     resolve_semantic_node_type,
+    screen_root_blocks_semantic_override,
 )
 from figma_flutter_agent.parser.dedup.clusters import (
     assign_component_clusters,
@@ -97,6 +98,12 @@ def _convert_node(
     if has_layout and children:
         node_type = infer_container_type(figma_layout_node(node))
         semantic_type = resolve_semantic_node_type(node, components, component_sets)
+        if (
+            parent is None
+            and semantic_type is not None
+            and screen_root_blocks_semantic_override(node, semantic_type)
+        ):
+            semantic_type = None
         if semantic_type is not None and semantic_type != NodeType.CONTAINER:
             node_type = semantic_type
     else:

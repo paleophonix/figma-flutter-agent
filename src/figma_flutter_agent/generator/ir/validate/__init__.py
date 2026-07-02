@@ -86,6 +86,7 @@ from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
     ExtractedWidget,
+    NodeType,
     ScreenIr,
     WidgetIrKind,
     WidgetIrNode,
@@ -280,6 +281,29 @@ def _apply_ir_guards_inplace(
                 )
 
 
+def _validate_nav_bottom_bar_ir_matches_clean_root(
+    screen_ir: ScreenIr,
+    tree_by_id: dict[str, CleanDesignTreeNode],
+) -> None:
+    """Reject nav_bottom_bar IR when the clean root is a screen frame, not a dock."""
+    if screen_ir.root.kind != WidgetIrKind.NAV_BOTTOM_BAR:
+        return
+    clean_root = tree_by_id.get(screen_ir.root.figma_id)
+    if clean_root is None:
+        return
+    height = clean_root.sizing.height
+    if height is not None and float(height) > 160.0:
+        raise GenerationError(
+            f"screenIr root {screen_ir.root.figma_id!r} kind nav_bottom_bar "
+            "contradicts screen-sized clean-tree root"
+        )
+    if clean_root.type != NodeType.BOTTOM_NAV and len(clean_root.children) > 12:
+        raise GenerationError(
+            f"screenIr root {screen_ir.root.figma_id!r} kind nav_bottom_bar "
+            "contradicts heterogeneous screen-frame clean-tree root"
+        )
+
+
 def _find_parent_ir(node: WidgetIrNode, figma_id: str) -> WidgetIrNode | None:
     for child in node.children:
         if child.figma_id == figma_id:
@@ -350,6 +374,7 @@ def validate_screen_ir(
     omit = frozenset(screen_ir.omit_figma_ids)
     extracted = canonical_extracted
 
+    _validate_nav_bottom_bar_ir_matches_clean_root(screen_ir, tree_by_id)
     _validate_ir_graph_integrity(screen_ir.root)
     if not apply_guards:
         _align_ir_stack_children_to_clean_tree(screen_ir.root, tree_by_id=tree_by_id)

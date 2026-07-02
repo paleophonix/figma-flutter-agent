@@ -77,6 +77,40 @@ def test_real_bottom_nav_with_multiple_tabs_still_matches() -> None:
     assert match_semantic_type_from_name_fallback(nav, "App Bottom Nav") == NodeType.BOTTOM_NAV
 
 
+def test_viewport_sized_screen_frame_is_not_bottom_nav() -> None:
+    screen = {
+        "type": "FRAME",
+        "name": "9 - A - Home - Bottom Navigation",
+        "absoluteBoundingBox": {"width": 430.0, "height": 932.0},
+        "children": [
+            {
+                "type": "TEXT",
+                "name": "Total Balance",
+                "characters": "Total Balance",
+                "absoluteBoundingBox": {"width": 120.0, "height": 18.0},
+            },
+            {
+                "type": "FRAME",
+                "name": "Bottom Navigation - Light Mode",
+                "absoluteBoundingBox": {"width": 430.0, "height": 108.0},
+                "children": [
+                    {
+                        "type": "FRAME",
+                        "name": "Home",
+                        "absoluteBoundingBox": {"width": 48.0, "height": 48.0},
+                    },
+                    {
+                        "type": "FRAME",
+                        "name": "Profile",
+                        "absoluteBoundingBox": {"width": 48.0, "height": 48.0},
+                    },
+                ],
+            },
+        ],
+    }
+    assert match_semantic_type_from_name_fallback(screen, screen["name"]) is None
+
+
 def test_tab_bar_named_checkout_footer_with_template_peers_is_not_bottom_nav() -> None:
     """Decorative tab-bar template slots must not veto checkout CTA footer classification."""
     from figma_flutter_agent.parser.component_raw import raw_looks_like_bottom_cta_footer

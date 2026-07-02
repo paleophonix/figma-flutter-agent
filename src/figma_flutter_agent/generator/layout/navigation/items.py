@@ -7,6 +7,8 @@ from pathlib import Path
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.navigation.constants import (
     COMPACT_ICON_NAV_TAB_MAX,
+    MAX_BOTTOM_NAV_HOST_HEIGHT,
+    MAX_BOTTOM_NAV_ITEMS,
     MIN_BOTTOM_NAV_ITEMS,
     NAV_SHELL_MIN_WIDTH,
     PILL_NAV_MAX_HEIGHT,
@@ -291,6 +293,59 @@ def _collect_icon_only_nav_tabs(node: CleanDesignTreeNode) -> list[CleanDesignTr
     return []
 
 
+def _host_is_oversized_nav_collector(node: CleanDesignTreeNode) -> bool:
+    """Return True when a node is too large to collect flat screen copy as nav tabs."""
+    height = node.sizing.height
+    width = node.sizing.width
+    if height is not None and float(height) > MAX_BOTTOM_NAV_HOST_HEIGHT:
+        return True
+    if (
+        width is not None
+        and height is not None
+        and float(width) > 0.0
+        and float(height) / float(width) > 0.45
+    ):
+        return True
+    return len(node.children) > 12
+
+
+def _nested_bottom_nav_has_compact_anatomy(node: CleanDesignTreeNode) -> bool:
+    """Return True for compact docked bottom-nav hosts with a bounded destination row."""
+    height = node.sizing.height
+    width = node.sizing.width
+    if height is None or width is None or float(height) <= 0.0 or float(width) <= 0.0:
+        return False
+    if float(height) > MAX_BOTTOM_NAV_HOST_HEIGHT:
+        return False
+    if float(height) / float(width) > 0.45:
+        return False
+    destinations = [
+        child
+        for child in node.children
+        if child.type in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER}
+    ]
+    return MIN_BOTTOM_NAV_ITEMS <= len(destinations) <= MAX_BOTTOM_NAV_ITEMS
+
+
+def _find_canonical_nested_bottom_nav(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Prefer a compact nested bottom-nav component inside an oversized host."""
+    if not _host_is_oversized_nav_collector(node):
+        return None
+
+    def walk(candidate: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+        if candidate.type == NodeType.BOTTOM_NAV and _nested_bottom_nav_has_compact_anatomy(
+            candidate
+        ):
+            return candidate
+        for child in candidate.children:
+            found = walk(child)
+            if found is not None:
+                return found
+        return None
+
+    return walk(node)
+
+
 def _node_has_nav_label(node: CleanDesignTreeNode) -> bool:
     if node.text and node.text.strip():
         return True
@@ -312,21 +367,36 @@ def _walk_nav_descendants(
     return found
 
 
-def _child_looks_like_nav_item(child: CleanDesignTreeNode) -> bool:
-    if not _node_has_nav_label(child):
-        return False
+def _child_looks_like_nav_item(
+    child: CleanDesignTreeNode,
+    *,
+    host: CleanDesignTreeNode,
+) -> bool:
     if find_nav_icon_node(child) is not None:
         return True
+    if not _node_has_nav_label(child):
+        return False
+    oversized = _host_is_oversized_nav_collector(host)
+    if oversized and child.type == NodeType.TEXT:
+        return False
+    if oversized and child.type == NodeType.COLUMN and find_nav_icon_node(child) is None:
+        width = child.sizing.width
+        if width is not None and float(width) > 80.0:
+            return False
+    if child.type == NodeType.TEXT:
+        return not oversized
     name = child.name.lower().strip()
     if name and name not in _NAV_ITEM_GENERIC_NAMES:
-        return True
-    return child.type in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK, NodeType.TEXT}
+        return child.type in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}
+    return child.type in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK}
 
 
 def _collect_nav_item_rows(node: CleanDesignTreeNode) -> list[list[CleanDesignTreeNode]]:
     rows: list[list[CleanDesignTreeNode]] = []
     if node.type == NodeType.ROW and len(node.children) >= 2:
-        nav_like = [child for child in node.children if _child_looks_like_nav_item(child)]
+        nav_like = [
+            child for child in node.children if _child_looks_like_nav_item(child, host=node)
+        ]
         if len(nav_like) >= 2:
             rows.append(nav_like)
     for child in node.children:
@@ -344,14 +414,25 @@ def bottom_nav_host_uses_icon_only_tabs(node: CleanDesignTreeNode) -> bool:
 
 def collect_bottom_nav_items(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
     """Resolve leaf bottom-nav tab items from direct or wrapped ROW containers."""
+    nested = _find_canonical_nested_bottom_nav(node)
+    if nested is not None:
+        nested_items = _collect_bottom_nav_items_from_host(nested)
+        if MIN_BOTTOM_NAV_ITEMS <= len(nested_items) <= MAX_BOTTOM_NAV_ITEMS:
+            return nested_items
+    return _collect_bottom_nav_items_from_host(node)
+
+
+def _collect_bottom_nav_items_from_host(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
     if not node.children:
         return []
-    direct = [child for child in node.children if _child_looks_like_nav_item(child)]
-    if len(direct) >= 2:
+    direct = [child for child in node.children if _child_looks_like_nav_item(child, host=node)]
+    if MIN_BOTTOM_NAV_ITEMS <= len(direct) <= MAX_BOTTOM_NAV_ITEMS:
         return direct
     rows = _collect_nav_item_rows(node)
     if rows:
-        return max(rows, key=len)
+        best = max(rows, key=len)
+        if MIN_BOTTOM_NAV_ITEMS <= len(best) <= MAX_BOTTOM_NAV_ITEMS:
+            return best
     if len(node.children) == 1:
         inner = collect_bottom_nav_items(node.children[0])
         if inner:
@@ -359,19 +440,23 @@ def collect_bottom_nav_items(node: CleanDesignTreeNode) -> list[CleanDesignTreeN
     icon_tabs = _collect_icon_only_nav_tabs(node)
     pill_tabs = _collect_pill_nav_tabs(node)
     if pill_tabs and icon_tabs:
-        return sorted(pill_tabs + icon_tabs, key=_nav_tab_sort_key)
+        merged = sorted(pill_tabs + icon_tabs, key=_nav_tab_sort_key)
+        if len(merged) <= MAX_BOTTOM_NAV_ITEMS:
+            return merged
     if pill_tabs:
         loose_icons = _collect_loose_icon_nav_tabs(
             node,
             exclude_ids=frozenset(tab.id for tab in pill_tabs),
         )
         if loose_icons:
-            return sorted(pill_tabs + loose_icons, key=_nav_tab_sort_key)
-    if pill_tabs and len(pill_tabs) >= 2:
+            merged = sorted(pill_tabs + loose_icons, key=_nav_tab_sort_key)
+            if len(merged) <= MAX_BOTTOM_NAV_ITEMS:
+                return merged
+    if pill_tabs and MIN_BOTTOM_NAV_ITEMS <= len(pill_tabs) <= MAX_BOTTOM_NAV_ITEMS:
         return pill_tabs
-    if icon_tabs:
+    if icon_tabs and len(icon_tabs) <= MAX_BOTTOM_NAV_ITEMS:
         return icon_tabs
-    if pill_tabs:
+    if pill_tabs and len(pill_tabs) <= MAX_BOTTOM_NAV_ITEMS:
         return pill_tabs
     return []
 

@@ -1,5 +1,5 @@
 {
-  "layoutTier": "reflowed",
+  "layoutTier": null,
   "aiUxSuggestions": [
     "Found 9 distinct spacing values; align to design tokens for consistency."
   ],

@@ -52,6 +52,13 @@ _MAX_COMPACT_CARD_GLYPH_SPAN = 36.0
 _MAX_SLIDER_HOST_HEIGHT_PX = 56.0
 _MIN_HORIZONTAL_CARD_PEER_WIDTH_PX = 100.0
 _MIN_HORIZONTAL_CARD_PEER_HEIGHT_PX = 48.0
+_MAX_BOTTOM_NAV_HOST_HEIGHT_PX = 160.0
+_MIN_BOTTOM_NAV_HOST_WIDTH_PX = 280.0
+_MAX_BOTTOM_NAV_HOST_ASPECT_HEIGHT_RATIO = 0.45
+_MAX_BOTTOM_NAV_HOST_CHILD_COUNT = 12
+_SCREEN_ROOT_MIN_HEIGHT_PX = 400.0
+_SCREEN_ROOT_MIN_WIDTH_PX = 300.0
+_SCREEN_ROOT_BLOCKED_SEMANTICS = frozenset({NodeType.BOTTOM_NAV})
 
 
 def _raw_is_compact_vector_glyph_host(node: dict[str, Any]) -> bool:
@@ -130,6 +137,35 @@ def _raw_has_slider_track_anatomy(node: dict[str, Any]) -> bool:
     return 0 < height <= _MAX_SLIDER_HOST_HEIGHT_PX
 
 
+def raw_looks_like_bottom_nav_dock(node: dict[str, Any]) -> bool:
+    """Return True when raw geometry matches a compact bottom navigation dock host."""
+    bbox = node_bbox_size(node)
+    if bbox is None:
+        return False
+    width, height = bbox
+    if width < _MIN_BOTTOM_NAV_HOST_WIDTH_PX or height <= 0:
+        return False
+    if height > _MAX_BOTTOM_NAV_HOST_HEIGHT_PX:
+        return False
+    if height / width > _MAX_BOTTOM_NAV_HOST_ASPECT_HEIGHT_RATIO:
+        return False
+    children = node.get("children") or []
+    return len(children) <= _MAX_BOTTOM_NAV_HOST_CHILD_COUNT
+
+
+def screen_root_blocks_semantic_override(node: dict[str, Any], semantic: NodeType) -> bool:
+    """Return True when a screen-sized root frame must keep layout typing, not controls."""
+    if semantic not in _SCREEN_ROOT_BLOCKED_SEMANTICS:
+        return False
+    if str(node.get("type") or "") not in {"FRAME", "SECTION"}:
+        return False
+    bbox = node_bbox_size(node)
+    if bbox is None:
+        return False
+    width, height = bbox
+    return width >= _SCREEN_ROOT_MIN_WIDTH_PX and height >= _SCREEN_ROOT_MIN_HEIGHT_PX
+
+
 def match_semantic_type_from_name(name: str) -> NodeType | None:
     """Map a Figma layer or component name to a semantic clean-tree type."""
     lowered = name.lower().strip()
@@ -171,6 +207,8 @@ def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) ->
             return False
     if semantic == NodeType.BOTTOM_NAV:
         if raw_looks_like_bottom_cta_footer(node):
+            return False
+        if not raw_looks_like_bottom_nav_dock(node):
             return False
         name = str(node.get("name") or "").lower()
         if "display down" in name or "home indicator" in name:
