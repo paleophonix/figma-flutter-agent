@@ -183,3 +183,18 @@ Got dependencies!
 Try `flutter pub outdated` for more information.
 
 --- flutter render errors @ 2026-07-02T15:00:39.049243+00:00 ---
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown while applying parent data.:
+50.0) wants to apply ParentData of type StackParentData to a RenderObject, which has been set up to
+Usually, this means that the Positioned widget has the wrong ancestor RenderObjectWidget. Typically,
+The ownership chain for the RenderObject that received the incompatible parent data was:
+When the exception was thrown, this was the stack:
+package:flutter/src/widgets/framework.dart 6945:7                            attachRenderObject
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: RenderConstrainedOverflowBox object was given an infinite size during layout.
+Another exception was thrown: RenderConstrainedOverflowBox object was given an infinite size during layout.
+Another exception was thrown: RenderPositionedBox object was given an infinite size during layout.
+Another exception was thrown: RenderClipRect object was given an infinite size during layout.
+Another exception was thrown: A RenderFlex overflowed by Infinity pixels on the bottom.
