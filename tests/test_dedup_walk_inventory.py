@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.parser.dedup.walk_inventory import (
     INVENTORY_JSON_REL,
+    list_pending_walk_sites,
     list_walk_sites,
     write_walk_inventory,
 )
@@ -14,6 +15,7 @@ def test_walk_inventory_is_deterministic() -> None:
     second = list_walk_sites()
     assert first == second
     assert any(site.status == "migrated" for site in first)
+    assert not list_pending_walk_sites()
 
 
 def test_write_walk_inventory_json() -> None:

@@ -9,62 +9,61 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
 def derive_definition_dependencies(
-    spec: ClusterWidgetSpec,
+    representative: CleanDesignTreeNode,
     *,
-    key_by_cluster_id: dict[str, DefinitionKey],
     self_key: DefinitionKey,
+    callsite_to_definition: dict[str, DefinitionKey],
 ) -> frozenset[DefinitionKey]:
-    """Collect nested cluster references inside a representative subtree.
+    """Collect nested delegate call-sites inside a definition body.
 
-    Single deterministic API: nested ``cluster_id`` on descendants (excluding self).
+    Edges are keyed by actual nested node ids via ``callsite_to_definition`` —
+    no intermediate ``cluster_id`` index (avoids topology last-wins).
 
     Args:
-        spec: Cluster widget spec whose representative subtree is scanned.
-        key_by_cluster_id: Plan keys indexed by ``cluster_id``.
-        self_key: Definition key for ``spec`` (excluded from deps).
+        representative: Definition body root subtree.
+        self_key: Definition key for this body (root id skipped as trivial self).
+        callsite_to_definition: Global call-site → definition map.
 
     Returns:
-        Frozen set of dependency definition keys.
+        Frozen set of referenced definition keys (self-edges preserved).
     """
-    if spec.representative is None:
-        return frozenset()
     deps: set[DefinitionKey] = set()
+    root_id = self_key.representative_node_id
 
     def visitor(node: CleanDesignTreeNode) -> None:
-        nested_id = node.cluster_id
-        if not nested_id or nested_id == spec.cluster_id:
+        if node.id == root_id:
             return
-        dep_key = key_by_cluster_id.get(nested_id)
-        if dep_key is not None and dep_key != self_key:
+        dep_key = callsite_to_definition.get(node.id)
+        if dep_key is not None:
             deps.add(dep_key)
 
-    walk_clean_tree(spec.representative, visitor, phase="bijection_dependencies")
+    walk_clean_tree(representative, visitor, phase="bijection_dependencies")
     return frozenset(deps)
 
 
 def build_definition_dependency_map(
     specs: list[ClusterWidgetSpec],
     *,
+    callsite_to_definition: dict[str, DefinitionKey],
     topology_by_cluster: dict[str, str] | None = None,
 ) -> dict[DefinitionKey, frozenset[DefinitionKey]]:
     """Build ``dependencies`` map for a full extraction plan."""
     topo = topology_by_cluster or {}
-    key_by_cluster_id = {
-        spec.cluster_id: DefinitionKey.from_spec(
+    result: dict[DefinitionKey, frozenset[DefinitionKey]] = {}
+    for spec in specs:
+        key = DefinitionKey.from_spec(
             spec,
             topology_variant=topo.get(spec.cluster_id, "default"),
         )
-        for spec in specs
-    }
-    return {
-        key: derive_definition_dependencies(
-            spec,
-            key_by_cluster_id=key_by_cluster_id,
+        if spec.representative is None:
+            result[key] = frozenset()
+            continue
+        result[key] = derive_definition_dependencies(
+            spec.representative,
             self_key=key,
+            callsite_to_definition=callsite_to_definition,
         )
-        for spec in specs
-        for key in (key_by_cluster_id[spec.cluster_id],)
-    }
+    return result
 
 
 def find_dependency_cycles(

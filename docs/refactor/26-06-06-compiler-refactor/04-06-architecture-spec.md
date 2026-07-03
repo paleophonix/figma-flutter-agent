@@ -2,7 +2,7 @@
 
 **Status:** RFC — execution authority lives in [04-05-06-refactoring-spec-cursor.md](04-05-06-refactoring-spec-cursor.md) v2.1.
 
-This document is the demoted successor to PR #6. It records **why** the three programs exist and how they connect; it does **not** override the execution TZ or contract files.
+This document is the demoted successor to **GitHub PR #6** (draft, superseded — do not merge; canonical docs live here on `main` since `d524fce6`).
 
 ## Programs
 
@@ -35,7 +35,8 @@ This document is the demoted successor to PR #6. It records **why** the three pr
 
 | Field | Description |
 |-------|-------------|
-| `law_id` | Stable law identifier (e.g. `wrong_pin_center`, `cluster_bijection`) |
+| `law_id` | Stable compiler law (e.g. `LAW-GEOM-CONSTRAINT-SEMANTICS`, `LAW-CLUSTER-BIJECTION`) |
+| `family_id` | Defect / corpus family that motivated the law (e.g. `wrong_pin_center`, `delegate_cycle`) |
 | `routes` | Code paths switched (e.g. `slots.py`, `widget_extractor.py`) |
 | `evidence` | Tests, shadow report, corpus case IDs |
 | `fallback` | How to revert to legacy (flag, commit) |

@@ -66,7 +66,7 @@
   {
     "mechanism": "audit_required",
     "module": "parser/boundaries/assets.py",
-    "note": "Migrate or document explicit path guard in follow-up PR",
+    "note": "owner=parser; defer=04-P0-1b; migrate recursive walks to walk_clean_tree",
     "phase": "assets_boundary",
     "status": "pending",
     "symbol": "asset_boundary_walks"

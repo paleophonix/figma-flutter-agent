@@ -407,7 +407,7 @@ def render_cluster_widgets(
             definition_shadow.duplicate_shadow_keys,
         )
     bijection_shadow = validate_extraction_bijection_shadow(
-        ClusterExtractionPlan.from_specs(specs),
+        ClusterExtractionPlan.from_specs_and_trees(specs, clean_trees or []),
     )
     if not bijection_shadow.ok:
         logger.bind(stage="cluster_extraction").debug(

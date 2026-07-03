@@ -67,9 +67,9 @@ def lookup_cluster_class_authoritative(
     key: DefinitionKey,
 ) -> str | None:
     """Return class name using DefinitionKey when M3 authority enabled, else legacy."""
-    from figma_flutter_agent.compiler.m3_authority import m3_authority_enabled
+    from figma_flutter_agent.compiler.m3_authority import M3RouteMode, route_mode
 
-    if m3_authority_enabled():
+    if route_mode("definition_key") == M3RouteMode.ENFORCE:
         return shadow_map.get(key)
     return legacy_map.get(key.legacy_cluster_id())
 

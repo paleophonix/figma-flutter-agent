@@ -9,6 +9,11 @@ from typing import Literal
 
 WalkStatus = Literal["migrated", "safe_snapshot", "explicit_path_guard", "pending"]
 
+# ponytail: explicit defer allowlist until assets boundary walk migrates in follow-up PR
+DEFERRED_WALK_ALLOWLIST: frozenset[tuple[str, str]] = frozenset(
+    {("parser/boundaries/assets.py", "asset_boundary_walks")},
+)
+
 INVENTORY_JSON_REL = (
     "docs/refactor/26-06-06-compiler-refactor/generated/dedup-walk-inventory.json"
 )
@@ -90,9 +95,19 @@ _WALK_SITES: tuple[WalkSiteRecord, ...] = (
         phase="assets_boundary",
         status="pending",
         mechanism="audit_required",
-        note="Migrate or document explicit path guard in follow-up PR",
+        note="owner=parser; defer=04-P0-1b; migrate recursive walks to walk_clean_tree",
     ),
 )
+
+
+def list_pending_walk_sites() -> tuple[WalkSiteRecord, ...]:
+    """Return walk sites still marked pending (excluding explicit defer allowlist)."""
+    return tuple(
+        site
+        for site in _WALK_SITES
+        if site.status == "pending"
+        and (site.module, site.symbol) not in DEFERRED_WALK_ALLOWLIST
+    )
 
 
 def list_walk_sites() -> tuple[WalkSiteRecord, ...]:
