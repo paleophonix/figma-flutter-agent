@@ -2,13 +2,13 @@
   "file_key": "nJBqmuLJ1KXSA23yNouMOR",
   "node_id": "602:751",
   "feature_name": "food_menu_2",
-  "tree_hash": "9f51cae57b5c3b9d48e49b5bbe648f10c4ffbd6302061a1749642578b0a9672f",
+  "tree_hash": "c17bccf0e87e7c26a12a7a3729e64d62e1272328e83d24138eb2d996f35b4415",
   "colors_hash": "79cf76756ca83b406ec65ccbd3736f452892bc01f2aac9480a2463c0d5e98d6b",
   "typography_hash": "738f65c2fd96f419cd24dab1bf083128ca3a78863fb7540b5981c1ed4cfa9c22",
   "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
   "file_hashes": {
-    "lib/widgets/group3362_widget.dart": "0470964b6aaa5ea15f7936d70c4aefe93d4233eafef4575d043d02dbc5c7e8bd",
-    "lib/widgets/group8264_widget.dart": "3cdf4c4d7a8c1203c72225b6e9dc9b13aeeb991dc7cebc30aaa5fb8503ca539a",
+    "lib/widgets/group3362_widget.dart": "1768bba7d398fd301c63969fdef60c33158b52502a2056b1e2aa1582079e3448",
+    "lib/widgets/group8264_widget.dart": "e19c4aaf672a8e5b81cf55f260cc3912267372d25a7205df539045a0cbd7061e",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "8480bf4906b6a8c1da48fa419af88c0669894d1ab733d9bfa71c7fe96a0f30a5",
     "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
@@ -16,8 +16,8 @@
     "lib/theme/app_radius.dart": "38d35effdd9d62c318792fdf6a0f1f3c2ed7b7bf550b26c838874c31a134a955",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "b814edf3e1ef1aa2e7800229ce799c1da654fcfc913053240737d61ec11925f2",
-    "lib/generated/food_menu_2_layout.dart": "d29a9efb94ab090891579d8acb6c4a07e71494e99870e00817bfdcb9c994c1ce",
-    "lib/features/food_menu_2/food_menu_2_screen.dart": "0188cbeefd92aad3d99b28cb591e1595f40189a3f57f56556aba1b4892262996",
+    "lib/generated/food_menu_2_layout.dart": "b1cd205b09d063d0449fab57985e6346dc19207ece814134ab7eeadfe98f645b",
+    "lib/features/food_menu_2/food_menu_2_screen.dart": "798c41b334c06c48f7ab8c91f227701bd46933285818567e82efbd99e7b07b1b",
     "test/golden/food_menu_2_screen_test.dart": "b988ae509d65b8c0feead34fa16e64773f66083925aa593e813b18899733fa18",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
     "lib/main.dart": "3ea352841cebbcdb98d20eb47d85d1c1bd3e2508d96e83f38c04e71f4bc724b3"
@@ -26,10 +26,10 @@
   "cluster_hashes": {
     "cluster_0": "ab484b51140315d47d36c730e996c19cf4298befcb6132eb297af60ae999c3be",
     "cluster_1": "7c5ff1f0f5ec8f897908347035d22370602a1262e59bd39972d7c168978e9f10",
-    "cluster_2": "a35ceae0065f92f955499c949ba3140ab18f1494b552f73bf83299b338861445"
+    "cluster_2": "fe354dd7549ffc123b63968e748b88f65d03e9e4700ca1d1163d0fbada2a5d67"
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 1,
-  "updated_at": "2026-07-02T17:16:23.222266+00:00"
+  "version": 2,
+  "updated_at": "2026-07-03T02:44:22.300484+00:00"
 }
