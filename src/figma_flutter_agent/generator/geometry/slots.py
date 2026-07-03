@@ -86,12 +86,13 @@ def stack_pins_from_placement(
         return None
 
     if placement is not None:
+        from figma_flutter_agent.compiler.m3_policy import active_m3_policy
         from figma_flutter_agent.generator.geometry.resolver_shadow import (
             compare_placement_resolver_shadow,
         )
 
-        # ponytail: shadow-only parity check; no emit change until 06-P0-1d authority
-        compare_placement_resolver_shadow(placement)
+        if active_m3_policy().shadow_enabled("geometry_slots"):
+            compare_placement_resolver_shadow(placement)
 
     free_h: str | None = "left"
     if placement is not None and placement.horizontal == "RIGHT":

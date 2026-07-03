@@ -7,6 +7,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from figma_flutter_agent.compiler.m3_policy import M3Policy
 from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
 from figma_flutter_agent.generator.layout import render_node_body, render_widget_file
 from figma_flutter_agent.generator.layout.common import to_pascal_case, to_snake_case
@@ -304,6 +305,7 @@ def _collect_component_family_widget_specs(
                 class_name=class_name,
                 file_name=to_snake_case(class_name),
                 representative=representative,
+                source_kind="component_family",
             )
         )
         existing_cluster_ids.add(cluster_key)
@@ -373,6 +375,7 @@ def render_cluster_widgets(
     use_package_imports: bool = True,
     clean_trees: list[CleanDesignTreeNode] | None = None,
     project_dir: Path | None = None,
+    m3_policy: M3Policy | None = None,
 ) -> ClusterWidgetResult:
     """Render deterministic widget files for structural clusters.
 
@@ -383,6 +386,7 @@ def render_cluster_widgets(
         use_package_imports: When True, emit package imports instead of relative paths.
         clean_trees: Optional parsed trees used to detect parameterized cluster variants.
         project_dir: When set, discover on-disk SVG exports before emit.
+        m3_policy: M3 rollout policy from pipeline boundary (shadow/enforce gates).
 
     Returns:
         Widget file contents and cluster id to class name mapping.
@@ -391,29 +395,41 @@ def render_cluster_widgets(
     cluster_classes = {spec.cluster_id: spec.class_name for spec in specs}
     from loguru import logger
 
+    from figma_flutter_agent.compiler.m3_policy import DEFAULT_M3_POLICY, M3Policy
     from figma_flutter_agent.generator.extraction.bijection_plan import (
         ClusterExtractionPlan,
+        enforce_extraction_bijection,
         validate_extraction_bijection_shadow,
     )
     from figma_flutter_agent.generator.extraction.definition_key import (
         compare_definition_key_shadow,
     )
 
-    definition_shadow = compare_definition_key_shadow(specs)
-    if definition_shadow.mismatches or definition_shadow.duplicate_shadow_keys:
-        logger.bind(stage="cluster_extraction").debug(
-            "DefinitionKey shadow mismatches={} duplicate_keys={}",
-            definition_shadow.mismatches,
-            definition_shadow.duplicate_shadow_keys,
-        )
-    bijection_shadow = validate_extraction_bijection_shadow(
-        ClusterExtractionPlan.from_specs_and_trees(specs, clean_trees or []),
-    )
-    if not bijection_shadow.ok:
-        logger.bind(stage="cluster_extraction").debug(
-            "Extraction bijection shadow diagnostics={}",
-            bijection_shadow.diagnostics,
-        )
+    policy: M3Policy = m3_policy if isinstance(m3_policy, M3Policy) else DEFAULT_M3_POLICY
+    plan = ClusterExtractionPlan.from_specs_and_trees(specs, clean_trees or [])
+
+    if policy.shadow_enabled("definition_key"):
+        definition_shadow = compare_definition_key_shadow(specs)
+        if (
+            definition_shadow.mismatches
+            or definition_shadow.duplicate_shadow_keys
+            or definition_shadow.duplicate_body_keys
+        ):
+            logger.bind(stage="cluster_extraction").debug(
+                "DefinitionKey shadow mismatches={} duplicate_keys={} duplicate_bodies={}",
+                definition_shadow.mismatches,
+                definition_shadow.duplicate_shadow_keys,
+                definition_shadow.duplicate_body_keys,
+            )
+    if policy.shadow_enabled("extraction_bijection"):
+        bijection_shadow = validate_extraction_bijection_shadow(plan)
+        if not bijection_shadow.ok:
+            logger.bind(stage="cluster_extraction").debug(
+                "Extraction bijection shadow diagnostics={}",
+                bijection_shadow.diagnostics,
+            )
+    if policy.route_mode("extraction_bijection").value == "enforce":
+        enforce_extraction_bijection(plan, policy=policy)
     vector_variants = (
         collect_cluster_vector_variants(
             clean_trees,

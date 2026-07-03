@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from figma_flutter_agent.compiler.m3_policy import M3Policy, M3RouteMode
 from figma_flutter_agent.generator.extraction.bijection_plan import (
     ClusterExtractionPlan,
     enforce_extraction_bijection,
@@ -84,19 +85,21 @@ def test_enforce_blocked_without_m3_authority() -> None:
     specs = [_spec("c1", "FooWidget", "n1")]
     trees = [_screen_with_usages(_minimal_node("use_c1", cluster_id="c1"))]
     plan = ClusterExtractionPlan.from_specs_and_trees(specs, trees)
-    with pytest.raises(RuntimeError, match="requires FIGMA_M3"):
+    with pytest.raises(RuntimeError, match="requires ENFORCE"):
         enforce_extraction_bijection(plan)
 
 
-def test_enforce_blocked_without_m2_closure_even_when_mode_enforce(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_enforce_blocked_without_m2_closure_even_when_mode_enforce() -> None:
     specs = [_spec("c1", "FooWidget", "n1")]
     trees = [_screen_with_usages(_minimal_node("use_c1", cluster_id="c1"))]
     plan = ClusterExtractionPlan.from_specs_and_trees(specs, trees)
-    monkeypatch.setenv("FIGMA_M3_BIJECTION_MODE", "enforce")
+    policy = M3Policy(
+        m2_closed=False,
+        authority_enabled=True,
+        bijection_mode=M3RouteMode.ENFORCE,
+    )
     with pytest.raises(RuntimeError, match="M2 closure"):
-        enforce_extraction_bijection(plan)
+        enforce_extraction_bijection(plan, policy=policy)
 
 
 def test_definition_key_shadow_report() -> None:
@@ -217,3 +220,65 @@ def test_bijection_two_topology_variants_same_cluster_id() -> None:
     key_a = next(k for k in plan.definitions if k.representative_node_id == "rep_a")
     key_b = next(k for k in plan.definitions if k.representative_node_id == "rep_b")
     assert key_b in plan.dependencies[key_a]
+
+
+def test_annotation_callsite_via_extracted_widget_ref() -> None:
+    usage = _minimal_node("ann_node")
+    usage.extracted_widget_ref = "AnnotatedWidget"
+    spec = ClusterWidgetSpec(
+        cluster_id="annotation_ann_node",
+        class_name="AnnotatedWidget",
+        file_name="annotated.dart",
+        representative=usage,
+        source_kind="annotation",
+    )
+    trees = [_screen_with_usages(usage)]
+    plan = ClusterExtractionPlan.from_specs_and_trees([spec], trees)
+    assert plan.callsite_to_definition["ann_node"] == plan.definitions[0]
+    report = validate_extraction_bijection_shadow(plan)
+    assert report.ok is True
+
+
+def test_callsite_key_collision_diagnostic() -> None:
+    from figma_flutter_agent.generator.extraction.callsite_index import _materialize_events
+    from figma_flutter_agent.generator.extraction.definition_key import DefinitionKey
+
+    specs = [_spec("c1", "FooWidget", "rep1"), _spec("c2", "BarWidget", "rep2")]
+    key1 = DefinitionKey.from_spec(specs[0])
+    key2 = DefinitionKey.from_spec(specs[1])
+    _, diagnostics = _materialize_events(
+        [("shared_usage", key1, "repetition"), ("shared_usage", key2, "repetition")],
+    )
+    assert any(code == "callsite_key_collision" for code, _ in diagnostics)
+
+
+def test_representative_root_not_external_callsite() -> None:
+    spec = _spec("c1", "FooWidget", "rep_only")
+    plan = ClusterExtractionPlan.from_specs_and_trees([spec], [])
+    report = validate_extraction_bijection_shadow(plan)
+    assert report.ok is False
+    assert "rep_only" not in plan.callsite_to_definition
+
+
+def test_ambiguous_topology_match_diagnostic() -> None:
+    usage = _minimal_node("ambiguous_usage", cluster_id="c_x")
+    rep_a = _minimal_node("rep_a", children=[_minimal_node("child_a")])
+    rep_b = _minimal_node("rep_b", children=[_minimal_node("child_b")])
+    specs = [
+        ClusterWidgetSpec(
+            cluster_id="c_x",
+            class_name="VariantAWidget",
+            file_name="a.dart",
+            representative=rep_a,
+        ),
+        ClusterWidgetSpec(
+            cluster_id="c_x",
+            class_name="VariantBWidget",
+            file_name="b.dart",
+            representative=rep_b,
+        ),
+    ]
+    trees = [_screen_with_usages(usage)]
+    plan = ClusterExtractionPlan.from_specs_and_trees(specs, trees)
+    assert "ambiguous_usage" not in plan.callsite_to_definition
+    assert any(code == "callsite_unresolved" for code, _ in plan.collect_diagnostics)

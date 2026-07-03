@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 
+from figma_flutter_agent.compiler.m3_authority import require_m3_authority
+from figma_flutter_agent.compiler.m3_policy import DEFAULT_M3_POLICY, M3Policy
 from figma_flutter_agent.errors import ExtractionBijectionError
 from figma_flutter_agent.generator.extraction.callsite_index import collect_cluster_callsites
 from figma_flutter_agent.generator.extraction.definition_key import DefinitionKey
@@ -24,6 +26,7 @@ class ClusterExtractionPlan:
     callsite_to_definition: dict[str, DefinitionKey]
     definition_to_class: dict[DefinitionKey, str]
     dependencies: dict[DefinitionKey, frozenset[DefinitionKey]]
+    collect_diagnostics: tuple[tuple[str, str], ...] = ()
 
     @classmethod
     def from_specs(
@@ -52,21 +55,22 @@ class ClusterExtractionPlan:
             key = DefinitionKey.from_spec(spec, topology_variant=variant)
             definitions.append(key)
             definition_to_class[key] = spec.class_name
-        callsite_to_definition = collect_cluster_callsites(
+        collected = collect_cluster_callsites(
             specs,
             clean_trees,
             topology_by_cluster=topo,
         )
         dep_map = build_definition_dependency_map(
             specs,
-            callsite_to_definition=callsite_to_definition,
+            callsite_to_definition=collected.dependency_callsites,
             topology_by_cluster=topo,
         )
         return cls(
             definitions=tuple(definitions),
-            callsite_to_definition=callsite_to_definition,
+            callsite_to_definition=collected.external_callsites,
             definition_to_class=definition_to_class,
             dependencies=dep_map,
+            collect_diagnostics=collected.diagnostics,
         )
 
 
@@ -98,6 +102,9 @@ def validate_extraction_bijection_shadow(plan: ClusterExtractionPlan) -> Bijecti
     """Shadow bijection checks — diagnostics only until 04-P0-3b."""
     diagnostics: list[BijectionDiagnostic] = []
     reverse = _definition_to_callsites(plan)
+
+    for code, message in plan.collect_diagnostics:
+        diagnostics.append(BijectionDiagnostic(code=code, message=message))
 
     for callsite, definition in plan.callsite_to_definition.items():
         class_name = plan.definition_to_class.get(definition)
@@ -132,22 +139,10 @@ def validate_extraction_bijection_shadow(plan: ClusterExtractionPlan) -> Bijecti
             diagnostics.append(
                 BijectionDiagnostic(
                     code="orphan_definition",
-                    message=f"Definition {definition!r} has no call-sites",
+                    message=f"Definition {definition!r} has no external call-sites",
                     cluster_id=definition.cluster_id,
                 ),
             )
-
-    seen_callsites: set[str] = set()
-    for callsite in plan.callsite_to_definition:
-        if callsite in seen_callsites:
-            diagnostics.append(
-                BijectionDiagnostic(
-                    code="duplicate_callsite",
-                    message=f"Duplicate callsite id {callsite!r} in bijection plan",
-                    cluster_id=None,
-                ),
-            )
-        seen_callsites.add(callsite)
 
     cycles = find_dependency_cycles(plan.dependencies)
     for cycle in cycles:
@@ -162,11 +157,13 @@ def validate_extraction_bijection_shadow(plan: ClusterExtractionPlan) -> Bijecti
     return BijectionShadowReport(ok=not diagnostics, diagnostics=diagnostics)
 
 
-def enforce_extraction_bijection(plan: ClusterExtractionPlan) -> None:
+def enforce_extraction_bijection(
+    plan: ClusterExtractionPlan,
+    *,
+    policy: M3Policy = DEFAULT_M3_POLICY,
+) -> None:
     """Blocking bijection gate (04-P0-3b) — requires M3 bijection ENFORCE mode."""
-    from figma_flutter_agent.compiler.m3_authority import require_m3_authority
-
-    require_m3_authority("extraction_bijection")
+    require_m3_authority("extraction_bijection", policy)
     report = validate_extraction_bijection_shadow(plan)
     if report.ok:
         return

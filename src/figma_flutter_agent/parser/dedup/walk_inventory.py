@@ -9,11 +9,6 @@ from typing import Literal
 
 WalkStatus = Literal["migrated", "safe_snapshot", "explicit_path_guard", "pending"]
 
-# ponytail: explicit defer allowlist until assets boundary walk migrates in follow-up PR
-DEFERRED_WALK_ALLOWLIST: frozenset[tuple[str, str]] = frozenset(
-    {("parser/boundaries/assets.py", "asset_boundary_walks")},
-)
-
 INVENTORY_JSON_REL = (
     "docs/refactor/26-06-06-compiler-refactor/generated/dedup-walk-inventory.json"
 )
@@ -91,23 +86,67 @@ _WALK_SITES: tuple[WalkSiteRecord, ...] = (
     ),
     WalkSiteRecord(
         module="parser/boundaries/assets.py",
-        symbol="asset_boundary_walks",
-        phase="assets_boundary",
-        status="pending",
-        mechanism="audit_required",
-        note="owner=parser; defer=04-P0-1b; migrate recursive walks to walk_clean_tree",
+        symbol="resolve_structural_duplicate_image_assets",
+        phase="assets_structural_image_collect",
+        status="migrated",
+        mechanism="walk_clean_tree_with_carry",
+    ),
+    WalkSiteRecord(
+        module="parser/boundaries/assets.py",
+        symbol="resolve_missing_image_asset_keys",
+        phase="assets_missing_image_keys",
+        status="migrated",
+        mechanism="walk_clean_tree_with_parent",
+    ),
+    WalkSiteRecord(
+        module="parser/boundaries/assets.py",
+        symbol="_resolve_filter_raster_fallback_keys",
+        phase="assets_filter_raster_fallback",
+        status="migrated",
+        mechanism="walk_clean_tree",
+    ),
+    WalkSiteRecord(
+        module="parser/boundaries/assets.py",
+        symbol="resolve_discovered_vector_asset_keys",
+        phase="assets_vector_discovery",
+        status="migrated",
+        mechanism="walk_clean_tree",
+    ),
+    WalkSiteRecord(
+        module="parser/boundaries/assets.py",
+        symbol="resolve_pruned_cluster_instance_assets",
+        phase="assets_pruned_cluster_instance",
+        status="migrated",
+        mechanism="walk_clean_tree",
+    ),
+    WalkSiteRecord(
+        module="parser/boundaries/assets.py",
+        symbol="resolve_render_boundary_asset_keys",
+        phase="assets_render_boundary_resolve",
+        status="migrated",
+        mechanism="walk_clean_tree",
+    ),
+    WalkSiteRecord(
+        module="parser/boundaries/assets.py",
+        symbol="collect_render_boundary_asset_plan",
+        phase="assets_render_boundary_plan",
+        status="migrated",
+        mechanism="walk_clean_tree",
+    ),
+    WalkSiteRecord(
+        module="parser/boundaries/assets.py",
+        symbol="_vector_discovery_node_ids",
+        phase="assets_vector_discovery",
+        status="migrated",
+        mechanism="walk_clean_tree",
+        note="Descendant id probe inside vector discovery",
     ),
 )
 
 
 def list_pending_walk_sites() -> tuple[WalkSiteRecord, ...]:
-    """Return walk sites still marked pending (excluding explicit defer allowlist)."""
-    return tuple(
-        site
-        for site in _WALK_SITES
-        if site.status == "pending"
-        and (site.module, site.symbol) not in DEFERRED_WALK_ALLOWLIST
-    )
+    """Return walk sites still marked pending."""
+    return tuple(site for site in _WALK_SITES if site.status == "pending")
 
 
 def list_walk_sites() -> tuple[WalkSiteRecord, ...]:

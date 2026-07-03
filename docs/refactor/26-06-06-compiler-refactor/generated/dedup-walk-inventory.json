@@ -64,11 +64,67 @@
     "symbol": "build_asset_node_index"
   },
   {
-    "mechanism": "audit_required",
+    "mechanism": "walk_clean_tree_with_carry",
     "module": "parser/boundaries/assets.py",
-    "note": "owner=parser; defer=04-P0-1b; migrate recursive walks to walk_clean_tree",
-    "phase": "assets_boundary",
-    "status": "pending",
-    "symbol": "asset_boundary_walks"
+    "note": "",
+    "phase": "assets_structural_image_collect",
+    "status": "migrated",
+    "symbol": "resolve_structural_duplicate_image_assets"
+  },
+  {
+    "mechanism": "walk_clean_tree_with_parent",
+    "module": "parser/boundaries/assets.py",
+    "note": "",
+    "phase": "assets_missing_image_keys",
+    "status": "migrated",
+    "symbol": "resolve_missing_image_asset_keys"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/boundaries/assets.py",
+    "note": "",
+    "phase": "assets_filter_raster_fallback",
+    "status": "migrated",
+    "symbol": "_resolve_filter_raster_fallback_keys"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/boundaries/assets.py",
+    "note": "",
+    "phase": "assets_vector_discovery",
+    "status": "migrated",
+    "symbol": "resolve_discovered_vector_asset_keys"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/boundaries/assets.py",
+    "note": "",
+    "phase": "assets_pruned_cluster_instance",
+    "status": "migrated",
+    "symbol": "resolve_pruned_cluster_instance_assets"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/boundaries/assets.py",
+    "note": "",
+    "phase": "assets_render_boundary_resolve",
+    "status": "migrated",
+    "symbol": "resolve_render_boundary_asset_keys"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/boundaries/assets.py",
+    "note": "",
+    "phase": "assets_render_boundary_plan",
+    "status": "migrated",
+    "symbol": "collect_render_boundary_asset_plan"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/boundaries/assets.py",
+    "note": "Descendant id probe inside vector discovery",
+    "phase": "assets_vector_discovery",
+    "status": "migrated",
+    "symbol": "_vector_discovery_node_ids"
   }
 ]

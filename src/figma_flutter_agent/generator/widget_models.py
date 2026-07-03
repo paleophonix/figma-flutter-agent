@@ -3,8 +3,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode
+
+ClusterSourceKind = Literal[
+    "repetition",
+    "annotation",
+    "inference",
+    "shape",
+    "component_family",
+]
 
 
 @dataclass(frozen=True)
@@ -17,6 +26,7 @@ class ClusterWidgetSpec:
     representative: CleanDesignTreeNode
     param_bundle: object | None = None
     shape_members: tuple[CleanDesignTreeNode, ...] = ()
+    source_kind: ClusterSourceKind = "repetition"
 
 
 @dataclass(frozen=True)

@@ -155,6 +155,7 @@ def collect_widget_specs(
                 continue
             cluster_id = f"semantic_{inference.node.id.replace(':', '_')}"
             param_bundle = _param_bundle_for_inference(inference, root, min_count=min_count)
+            inference.node.extracted_widget_ref = class_name
             specs.append(
                 ClusterWidgetSpec(
                     cluster_id=cluster_id,
@@ -162,6 +163,7 @@ def collect_widget_specs(
                     file_name=snake_case_class_name(class_name),
                     representative=inference.node,
                     param_bundle=param_bundle,
+                    source_kind="inference",
                 )
             )
             existing_cluster_ids.add(cluster_id)
@@ -203,6 +205,7 @@ def _collect_shape_widget_specs(
                 representative=representative,
                 param_bundle=bundle,
                 shape_members=tuple(members),
+                source_kind="shape",
             )
         )
     return specs
@@ -253,6 +256,7 @@ def _collect_annotated_widget_specs(
                 class_name=class_name,
                 file_name=to_snake_case(class_name),
                 representative=node,
+                source_kind="annotation",
             )
         )
         existing_cluster_ids.add(cluster_id)

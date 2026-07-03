@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from figma_flutter_agent.compiler.m3_policy import DEFAULT_M3_POLICY, M3Policy
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
 from figma_flutter_agent.schemas import (
@@ -63,3 +64,4 @@ class GenerationPlanContext:
     truth_emit_pair: object | None = None
     reusable_candidates: list[Any] = field(default_factory=list)
     llm_client_factory: Any | None = None
+    m3_policy: M3Policy = field(default_factory=lambda: DEFAULT_M3_POLICY)

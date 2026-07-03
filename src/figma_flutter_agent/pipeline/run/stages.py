@@ -773,6 +773,9 @@ async def run_llm_and_plan_phase(
     ctx.warnings.extend(llm_outcome.fallback_warnings)
 
     with log_stage(log, "plan"):
+        from figma_flutter_agent.compiler.m3_policy import m3_policy_at_pipeline_boundary
+
+        m3_policy = m3_policy_at_pipeline_boundary()
         planned_files = plan_generation_output(
             PlanStageRequest(
                 context=GenerationPlanContext(
@@ -796,6 +799,7 @@ async def run_llm_and_plan_phase(
                     truth_snapshot=ctx.truth_snapshot,
                     reusable_candidates=ctx.reusable_candidates,
                     llm_client_factory=pipeline_deps.create_llm_client,
+                    m3_policy=m3_policy,
                 ),
             ),
         ).planned_files

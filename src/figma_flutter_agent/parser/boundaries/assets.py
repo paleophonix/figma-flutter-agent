@@ -197,22 +197,22 @@ def _product_photo_stack_signature(
 
 def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None:
     """Copy ``imageAssetKey`` onto duplicate photo leaves that share the same stack shape."""
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree_with_carry
     from figma_flutter_agent.schemas import NodeType
 
     signature_to_key: dict[tuple[tuple[float, float, float, float], str], str] = {}
 
+    def carry_card(node: CleanDesignTreeNode, parent_card: CleanDesignTreeNode | None):
+        return node if node.type == NodeType.CARD else parent_card
+
     def collect(node: CleanDesignTreeNode, parent_card: CleanDesignTreeNode | None) -> None:
-        parent_card = node if node.type == NodeType.CARD else parent_card
         signature = _product_photo_stack_signature(node, parent_card=parent_card)
         if signature is not None:
             photo = node.children[0]
             if photo.image_asset_key:
                 signature_to_key.setdefault(signature, photo.image_asset_key)
-        for child in node.children:
-            collect(child, parent_card)
 
-    def walk(node: CleanDesignTreeNode, parent_card: CleanDesignTreeNode | None) -> None:
-        parent_card = node if node.type == NodeType.CARD else parent_card
+    def apply(node: CleanDesignTreeNode, parent_card: CleanDesignTreeNode | None) -> None:
         signature = _product_photo_stack_signature(node, parent_card=parent_card)
         if signature is not None:
             photo = node.children[0]
@@ -220,11 +220,21 @@ def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None
                 shared = signature_to_key.get(signature)
                 if shared is not None:
                     photo.image_asset_key = shared
-        for child in node.children:
-            walk(child, parent_card)
 
-    collect(tree, None)
-    walk(tree, None)
+    walk_clean_tree_with_carry(
+        tree,
+        collect,
+        carry_card,
+        None,
+        phase="assets_structural_image_collect",
+    )
+    walk_clean_tree_with_carry(
+        tree,
+        apply,
+        carry_card,
+        None,
+        phase="assets_structural_image_apply",
+    )
 
 
 def _discover_filter_raster_fallback_path(
@@ -325,10 +335,10 @@ def resolve_missing_image_asset_keys(
         photo = find_raster_photo_leaf(node)
         if photo is not None and not photo.image_asset_key and node.image_asset_key:
             photo.image_asset_key = node.image_asset_key
-        for child in node.children:
-            propagate_avatar_parent_keys(child)
 
-    propagate_avatar_parent_keys(tree)
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(tree, propagate_avatar_parent_keys, phase="assets_avatar_propagate")
 
 
 def _resolve_filter_raster_fallback_keys(
@@ -380,21 +390,10 @@ def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:
     for flattened_id in node.flatten_figma_node_ids or ():
         add(flattened_id)
 
-    def walk_descendants(item: CleanDesignTreeNode) -> None:
-        from figma_flutter_agent.parser.tree_walk import CleanTreeCycleError
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 
-        item_key = id(item)
-        if item_key in descendant_visited:
-            msg = "Clean tree traversal cycle detected during vector asset discovery"
-            raise CleanTreeCycleError(msg)
-        descendant_visited.add(item_key)
-        add(item.id)
-        for child in item.children:
-            walk_descendants(child)
-
-    descendant_visited: set[int] = set()
     for child in node.children:
-        walk_descendants(child)
+        walk_clean_tree(child, lambda item, _add=add: _add(item.id), phase="assets_vector_discovery")
     return ordered
 
 
@@ -528,10 +527,8 @@ def resolve_render_boundary_asset_keys(
 
     unresolved: list[str] = []
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def visit_boundary(node: CleanDesignTreeNode) -> None:
         if not node.render_boundary:
-            for child in node.children:
-                walk(child)
             return
         candidates: list[str] = []
         manifest_path = manifest_paths.get(node.id)
@@ -552,10 +549,10 @@ def resolve_render_boundary_asset_keys(
             if not strict:
                 node.vector_asset_key = None
                 node.image_asset_key = None
-        for child in node.children:
-            walk(child)
 
-    walk(tree)
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(tree, visit_boundary, phase="assets_render_boundary_resolve")
     if unresolved:
         if strict:
             from figma_flutter_agent.errors import GenerationError
@@ -577,13 +574,13 @@ def collect_render_boundary_asset_plan(
     export_ids: set[str] = set()
     exclude_ids: set[str] = set()
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def visit(node: CleanDesignTreeNode) -> None:
         if node.render_boundary:
             export_ids.add(node.id)
             for flattened_id in node.flatten_figma_node_ids or ():
                 exclude_ids.add(flattened_id)
-        for child in node.children:
-            walk(child)
 
-    walk(root)
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(root, visit, phase="assets_render_boundary_plan")
     return frozenset(export_ids), frozenset(exclude_ids)

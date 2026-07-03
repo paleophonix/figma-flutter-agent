@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import TypeVar
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.schemas import CleanDesignTreeNode
+
+Carry = TypeVar("Carry")
 
 
 class CleanTreeCycleError(GenerationError):
@@ -115,3 +118,39 @@ def walk_clean_tree_with_parent(
             dfs(child, node, current_path)
 
     dfs(root, None, [])
+
+
+def walk_clean_tree_with_carry(
+    root: CleanDesignTreeNode,
+    visitor: Callable[[CleanDesignTreeNode, Carry], None],
+    carry: Callable[[CleanDesignTreeNode, Carry], Carry],
+    initial: Carry,
+    *,
+    phase: str | None = None,
+) -> None:
+    """Pre-order DFS with downward-propagated carry state (cycle-safe).
+
+    Args:
+        root: Clean design tree root.
+        visitor: ``visitor(node, carry)`` invoked pre-order.
+        carry: ``carry(node, parent_carry)`` produces child carry state.
+        initial: Carry state before visiting ``root``.
+        phase: Optional compiler phase label for ``CleanTreeCycleError``.
+
+    Raises:
+        CleanTreeCycleError: When the same node instance appears twice on the walk path.
+    """
+    visited: set[int] = set()
+
+    def dfs(node: CleanDesignTreeNode, state: Carry, path_ids: list[str]) -> None:
+        node_key = id(node)
+        if node_key in visited:
+            _raise_cycle(node, path_ids, phase=phase)
+        visited.add(node_key)
+        current_path = [*path_ids, node.id or "?"]
+        visitor(node, state)
+        child_state = carry(node, state)
+        for child in node.children:
+            dfs(child, child_state, current_path)
+
+    dfs(root, initial, [])

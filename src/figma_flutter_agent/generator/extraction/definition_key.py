@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from figma_flutter_agent.compiler.m3_authority import route_enforce_enabled
+from figma_flutter_agent.compiler.m3_policy import DEFAULT_M3_POLICY, M3Policy
 from figma_flutter_agent.generator.widget_models import ClusterWidgetSpec
 
 
@@ -38,6 +40,7 @@ class DefinitionKeyShadowReport:
     shadow_map: dict[DefinitionKey, str]
     mismatches: tuple[tuple[str, str, str], ...]
     duplicate_shadow_keys: tuple[str, ...]
+    duplicate_body_keys: tuple[str, ...]
 
 
 def build_legacy_cluster_classes(specs: list[ClusterWidgetSpec]) -> dict[str, str]:
@@ -49,15 +52,26 @@ def build_shadow_definition_map(
     specs: list[ClusterWidgetSpec],
     *,
     topology_by_cluster: dict[str, str] | None = None,
-) -> dict[DefinitionKey, str]:
-    """Shadow topology-aware map — diagnostics only until 04-P0-2b."""
+) -> tuple[dict[DefinitionKey, str], tuple[str, ...], tuple[str, ...]]:
+    """Build shadow map with pre-dict collision validation."""
     topo = topology_by_cluster or {}
-    result: dict[DefinitionKey, str] = {}
+    entries: list[tuple[DefinitionKey, str]] = []
+    duplicate_keys: list[str] = []
+    duplicate_bodies: list[str] = []
     for spec in specs:
         variant = topo.get(spec.cluster_id, "default")
         key = DefinitionKey.from_spec(spec, topology_variant=variant)
-        result[key] = spec.class_name
-    return result
+        for existing_key, existing_class in entries:
+            if existing_key == key and existing_class != spec.class_name:
+                duplicate_bodies.append(f"{key.cluster_id}:{key.topology_variant}")
+            elif (
+                existing_key.cluster_id == key.cluster_id
+                and existing_key.topology_variant == key.topology_variant
+                and existing_key != key
+            ):
+                duplicate_keys.append(f"{key.cluster_id}:{key.topology_variant}")
+        entries.append((key, spec.class_name))
+    return dict(entries), tuple(duplicate_keys), tuple(duplicate_bodies)
 
 
 def lookup_cluster_class_authoritative(
@@ -65,11 +79,10 @@ def lookup_cluster_class_authoritative(
     legacy_map: dict[str, str],
     *,
     key: DefinitionKey,
+    policy: M3Policy = DEFAULT_M3_POLICY,
 ) -> str | None:
-    """Return class name using DefinitionKey when M3 authority enabled, else legacy."""
-    from figma_flutter_agent.compiler.m3_authority import M3RouteMode, route_mode
-
-    if route_mode("definition_key") == M3RouteMode.ENFORCE:
+    """Return class name using DefinitionKey when route enforce enabled, else legacy."""
+    if route_enforce_enabled("definition_key", policy):
         return shadow_map.get(key)
     return legacy_map.get(key.legacy_cluster_id())
 
@@ -81,7 +94,10 @@ def compare_definition_key_shadow(
 ) -> DefinitionKeyShadowReport:
     """Compare legacy last-wins dict against shadow DefinitionKey map."""
     legacy = build_legacy_cluster_classes(specs)
-    shadow = build_shadow_definition_map(specs, topology_by_cluster=topology_by_cluster)
+    shadow, duplicate_keys, duplicate_bodies = build_shadow_definition_map(
+        specs,
+        topology_by_cluster=topology_by_cluster,
+    )
     mismatches: list[tuple[str, str, str]] = []
     for spec in specs:
         variant = (topology_by_cluster or {}).get(spec.cluster_id, "default")
@@ -90,15 +106,10 @@ def compare_definition_key_shadow(
         shadow_class = shadow.get(key)
         if legacy_class != shadow_class:
             mismatches.append((spec.cluster_id, legacy_class or "", shadow_class or ""))
-    seen: set[DefinitionKey] = set()
-    duplicate_keys: list[str] = []
-    for key in shadow:
-        if key in seen:
-            duplicate_keys.append(f"{key.cluster_id}:{key.topology_variant}")
-        seen.add(key)
     return DefinitionKeyShadowReport(
         legacy_map=legacy,
         shadow_map=shadow,
         mismatches=tuple(mismatches),
-        duplicate_shadow_keys=tuple(duplicate_keys),
+        duplicate_shadow_keys=duplicate_keys,
+        duplicate_body_keys=duplicate_bodies,
     )

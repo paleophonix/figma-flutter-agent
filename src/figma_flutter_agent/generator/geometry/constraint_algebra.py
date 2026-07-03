@@ -35,7 +35,7 @@ class AxisConstraint(BaseModel):
 
 
 class ResolvedAxisSlot(BaseModel):
-    """Planner-facing resolved slot for one axis."""
+    """Symbolic planner slot (op + parameters, no target parent extent)."""
 
     model_config = IMMUTABLE_TREE_CONFIG
 
@@ -46,6 +46,18 @@ class ResolvedAxisSlot(BaseModel):
     center_delta: float = 0.0
     scale_offset_ratio: float = 0.0
     scale_size_ratio: float = 1.0
+
+
+class ResolvedAxisGeometry(BaseModel):
+    """Concrete axis geometry for a target parent extent."""
+
+    model_config = IMMUTABLE_TREE_CONFIG
+
+    start: float
+    end: float
+    extent: float
+    center: float
+    residual: float
 
 
 _H_TO_OP: dict[str, ConstraintOp] = {
@@ -89,9 +101,11 @@ def axis_constraint_from_placement(
     bottom: float = 0.0,
     width: float | None = None,
     height: float | None = None,
-    parent_extent: float = 0.0,
+    source_parent_extent: float = 0.0,
+    parent_extent: float | None = None,
 ) -> AxisConstraint:
-    """Build ``AxisConstraint`` from raw placement fields (additive, no side effects)."""
+    """Build symbolic ``AxisConstraint`` using source parent extent for ratios."""
+    extent = source_parent_extent if parent_extent is None else parent_extent
     op = raw_axis_to_constraint_op(raw, axis=axis)
     if axis == "horizontal":
         start, end, size = left, right, width
@@ -100,12 +114,12 @@ def axis_constraint_from_placement(
     center_delta = 0.0
     scale_offset_ratio = 0.0
     scale_size_ratio = 1.0
-    if op == ConstraintOp.CENTER and parent_extent > 0 and size is not None:
-        center_delta = start + size / 2.0 - parent_extent / 2.0
-    if op == ConstraintOp.SCALE and parent_extent > 0:
-        scale_offset_ratio = start / parent_extent
+    if op == ConstraintOp.CENTER and extent > 0 and size is not None:
+        center_delta = start + size / 2.0 - extent / 2.0
+    if op == ConstraintOp.SCALE and extent > 0:
+        scale_offset_ratio = start / extent
         if size is not None:
-            scale_size_ratio = size / parent_extent
+            scale_size_ratio = size / extent
     return AxisConstraint(
         op=op,
         start_offset=start,
@@ -117,8 +131,52 @@ def axis_constraint_from_placement(
     )
 
 
-def resolve_constraint_axis(constraint: AxisConstraint) -> ResolvedAxisSlot:
-    """Pure authoritative resolver for one axis constraint."""
+def resolve_constraint_axis(
+    constraint: AxisConstraint,
+    *,
+    target_parent_extent: float,
+    child_extent: float | None = None,
+) -> ResolvedAxisGeometry:
+    """Resolve symbolic constraint to concrete geometry for a target parent extent."""
+    size = child_extent if child_extent is not None else (constraint.size or 0.0)
+    if constraint.op == ConstraintOp.PIN_START:
+        start = constraint.start_offset
+        extent = size
+        end = start + extent
+    elif constraint.op == ConstraintOp.PIN_END:
+        end = target_parent_extent - constraint.end_offset
+        extent = size
+        start = end - extent
+    elif constraint.op == ConstraintOp.PIN_BOTH:
+        start = constraint.start_offset
+        end = target_parent_extent - constraint.end_offset
+        extent = max(0.0, end - start)
+    elif constraint.op == ConstraintOp.CENTER:
+        center = target_parent_extent / 2.0 + constraint.center_delta
+        extent = size
+        start = center - extent / 2.0
+        end = center + extent / 2.0
+    elif constraint.op == ConstraintOp.SCALE:
+        start = target_parent_extent * constraint.scale_offset_ratio
+        extent = target_parent_extent * constraint.scale_size_ratio
+        end = start + extent
+    else:
+        start = constraint.start_offset
+        extent = size
+        end = start + extent
+    center = start + extent / 2.0
+    residual = target_parent_extent - end - start
+    return ResolvedAxisGeometry(
+        start=start,
+        end=end,
+        extent=extent,
+        center=center,
+        residual=residual,
+    )
+
+
+def resolve_constraint_symbolic(constraint: AxisConstraint) -> ResolvedAxisSlot:
+    """Map constraint parameters to symbolic slot without target extent."""
     stretch = constraint.op == ConstraintOp.PIN_BOTH
     fixed_start = constraint.start_offset if constraint.op == ConstraintOp.PIN_START else None
     fixed_end = constraint.end_offset if constraint.op == ConstraintOp.PIN_END else None
@@ -136,7 +194,7 @@ def resolve_constraint_axis(constraint: AxisConstraint) -> ResolvedAxisSlot:
     )
 
 
-def raw_to_resolved_slot(
+def raw_to_resolved_geometry(
     raw: str,
     *,
     axis: Literal["horizontal", "vertical"],
@@ -146,9 +204,10 @@ def raw_to_resolved_slot(
     bottom: float = 0.0,
     width: float | None = None,
     height: float | None = None,
-    parent_extent: float = 0.0,
-) -> ResolvedAxisSlot:
-    """Round-trip helper: raw placement → resolved slot."""
+    source_parent_extent: float,
+    target_parent_extent: float,
+) -> ResolvedAxisGeometry:
+    """Parse at source extent, resolve at target extent."""
     typed = axis_constraint_from_placement(
         raw=raw,
         axis=axis,
@@ -158,6 +217,11 @@ def raw_to_resolved_slot(
         bottom=bottom,
         width=width,
         height=height,
-        parent_extent=parent_extent,
+        source_parent_extent=source_parent_extent,
     )
-    return resolve_constraint_axis(typed)
+    child = width if axis == "horizontal" else height
+    return resolve_constraint_axis(
+        typed,
+        target_parent_extent=target_parent_extent,
+        child_extent=child,
+    )

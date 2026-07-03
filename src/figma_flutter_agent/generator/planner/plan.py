@@ -57,6 +57,17 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     Returns:
         Mapping of relative project paths to generated file contents.
     """
+    from figma_flutter_agent.compiler.m3_policy import bind_m3_policy, reset_m3_policy
+
+    policy_token = bind_m3_policy(context.m3_policy)
+    try:
+        return _plan_generation_files_impl(context)
+    finally:
+        reset_m3_policy(policy_token)
+
+
+def _plan_generation_files_impl(context: GenerationPlanContext) -> dict[str, str]:
+    """Internal planner body with active ``context.m3_policy`` binding."""
     settings = context.settings
     planned_files: dict[str, str] = {}
     from figma_flutter_agent.debug.provenance import set_visual_pixel_mutation_enforcement
@@ -118,6 +129,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 use_package_imports=use_package_imports,
                 clean_trees=clean_trees,
                 project_dir=context.project_dir,
+                m3_policy=context.m3_policy,
             )
             planned_files.update(cluster_result.files)
 
