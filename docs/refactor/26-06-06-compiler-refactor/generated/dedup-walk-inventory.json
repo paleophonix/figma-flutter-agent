@@ -1,0 +1,74 @@
+[
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/dedup/prune.py",
+    "note": "",
+    "phase": "dedup_prune_extracted",
+    "status": "migrated",
+    "symbol": "prune_extracted_subtree_nodes"
+  },
+  {
+    "mechanism": "walk_clean_tree_with_parent",
+    "module": "parser/dedup/prune.py",
+    "note": "",
+    "phase": "dedup_prune_clusters",
+    "status": "migrated",
+    "symbol": "prune_duplicated_cluster_subtrees"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/dedup/hydrate.py",
+    "note": "",
+    "phase": "dedup_hydrate_collect",
+    "status": "migrated",
+    "symbol": "hydrate_pruned_cluster_instances"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/dedup/clusters.py",
+    "note": "",
+    "phase": "dedup_cluster_collect",
+    "status": "migrated",
+    "symbol": "assign_structural_clusters"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/dedup/clusters.py",
+    "note": "",
+    "phase": "dedup_component_cluster",
+    "status": "migrated",
+    "symbol": "assign_component_clusters"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "parser/dedup/signatures.py",
+    "note": "",
+    "phase": "dedup_signature_text",
+    "status": "migrated",
+    "symbol": "descendant_text_fingerprint"
+  },
+  {
+    "mechanism": "recursive_json_payload",
+    "module": "parser/dedup/signatures.py",
+    "note": "Bounded by tree depth; cycle raises via parent walks first",
+    "phase": "dedup_signature_structural",
+    "status": "safe_snapshot",
+    "symbol": "node_signature_payload"
+  },
+  {
+    "mechanism": "walk_clean_tree",
+    "module": "generator/extraction/asset_index.py",
+    "note": "",
+    "phase": "asset_index",
+    "status": "migrated",
+    "symbol": "build_asset_node_index"
+  },
+  {
+    "mechanism": "audit_required",
+    "module": "parser/boundaries/assets.py",
+    "note": "Migrate or document explicit path guard in follow-up PR",
+    "phase": "assets_boundary",
+    "status": "pending",
+    "symbol": "asset_boundary_walks"
+  }
+]

@@ -27,4 +27,26 @@ This document is the demoted successor to PR #6. It records **why** the three pr
 
 ## Principle (Option B)
 
-`parallel implementation ≠ parallel authority switch`. Shadow and additive models may merge before M2 closure; production authority switches (DefinitionKey, blocking bijection, per-route resolver) require M2 closure record + green CI.
+`parallel implementation ≠ parallel authority switch`. Shadow and additive models may merge before M2 closure; production authority switches require M2 closure record + green CI.
+
+## Enforce decision records
+
+**M3 signoff ≠ global enforce approval.** Each law family / route needs a separate record under `generated/`:
+
+| Field | Description |
+|-------|-------------|
+| `law_id` | Stable law identifier (e.g. `wrong_pin_center`, `cluster_bijection`) |
+| `routes` | Code paths switched (e.g. `slots.py`, `widget_extractor.py`) |
+| `evidence` | Tests, shadow report, corpus case IDs |
+| `fallback` | How to revert to legacy (flag, commit) |
+| `rollback` | Owner action if production regression |
+| `owner` | Engineer / reviewer |
+| `approval` | Date + M2/M3 gate passed |
+
+Rollout per family:
+
+```text
+off → report_only → shadow → enforce
+```
+
+Never combine additive model + authority switch in one PR.

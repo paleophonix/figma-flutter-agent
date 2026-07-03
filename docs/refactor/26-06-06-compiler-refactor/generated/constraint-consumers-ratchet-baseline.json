@@ -682,7 +682,7 @@
   {
     "axis": "horizontal",
     "category": "emit_positioned",
-    "line": 351,
+    "line": 349,
     "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
     "rationale": "Emit-time positioned or flex constraint branch",
     "status": "active",
@@ -692,7 +692,7 @@
   {
     "axis": "horizontal",
     "category": "emit_positioned",
-    "line": 384,
+    "line": 382,
     "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
     "rationale": "Emit-time positioned or flex constraint branch",
     "status": "active",
@@ -702,7 +702,7 @@
   {
     "axis": "horizontal",
     "category": "emit_positioned",
-    "line": 399,
+    "line": 397,
     "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
     "rationale": "Emit-time positioned or flex constraint branch",
     "status": "active",
@@ -712,7 +712,7 @@
   {
     "axis": "horizontal",
     "category": "emit_positioned",
-    "line": 409,
+    "line": 407,
     "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
     "rationale": "Emit-time positioned or flex constraint branch",
     "status": "active",
@@ -722,7 +722,7 @@
   {
     "axis": "horizontal",
     "category": "emit_positioned",
-    "line": 337,
+    "line": 335,
     "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
     "rationale": "Emit-time positioned or flex constraint branch",
     "status": "active",
@@ -732,7 +732,7 @@
   {
     "axis": "horizontal",
     "category": "emit_positioned",
-    "line": 346,
+    "line": 344,
     "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
     "rationale": "Emit-time positioned or flex constraint branch",
     "status": "active",

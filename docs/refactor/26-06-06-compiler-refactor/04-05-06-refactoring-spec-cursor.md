@@ -3,7 +3,8 @@
 **Программы:** [04_extraction-dedup-bijection.md](04_extraction-dedup-bijection.md), [05_visual-ownership-layout-inference.md](05_visual-ownership-layout-inference.md), [06_geometry-constraint-algebra.md](06_geometry-constraint-algebra.md)  
 **Стыковка:** [00-01-cursor-alignment.md](00-01-cursor-alignment.md) · [02-03-refactoring-spec-cursor.md](02-03-refactoring-spec-cursor.md) (Milestone 2 — prerequisite)  
 **Контракт стрелок:** [contracts/PIPELINE_ARROWS.md](contracts/PIPELINE_ARROWS.md) · Cursor: `.cursor/rules/pipeline-contracts.mdc`  
-**Статус:** consilium-approved v2 — Milestone 3 (Programs 04–06); поправки №1–№9 внесены  
+**Статус:** consilium-approved **v2.1** — Milestone 3 (Programs 04–06); review fixes 2026-07-03  
+**Канонический путь:** `docs/refactor/26-06-06-compiler-refactor/` (см. [docs/README.md](../../README.md))
 **Аудитория:** агент / инженер в Cursor, владелец продукта (обзор инкрементов)  
 **Architecture RFC:** [04-06-architecture-spec.md](04-06-architecture-spec.md) (non-normative)  
 **Contracts:** [geometry_algebra.md](contracts/geometry_algebra.md) · [cluster_signature.md](contracts/cluster_signature.md) · [layout_hypothesis.md](contracts/layout_hypothesis.md)  
@@ -84,6 +85,41 @@ Figma parent tree  ≠  cluster equivalence  ≠  visual ownership  ≠  constra
 
 **05 без 06** — запрещён merge в `main` (ownership без algebra = новый if/elif слой).
 
+### M2 freeze (normative)
+
+До **M2 final stamp** (`generated/m2-closure-record.md` → `CLOSED` + green CI на `M2_FINAL_COMMIT`):
+
+| Allowed | Blocked |
+|---------|---------|
+| Contracts, inventories, additive models, shadow/report-only diagnostics, tests, corpus cases | **Любые authority switches** во всех Programs **04–06** |
+| Parallel implementation Track 04 + Track 06 | **Любые production-output changes** во всех Programs **04–06** |
+| Merge increments 06-P0-0a … 04-P0-3a (shadow only) | M3 enforce, M3 final signoff |
+
+**Запрещено до M2 closure (явно, не только Program 05):**
+
+- `DefinitionKey` authority → меняет выбор generated widget
+- blocking `ExtractionBijectionError` → меняет успех генерации на error
+- discriminator authority → меняет cluster partition
+- per-route resolver authority → меняет geometry и Dart
+
+**Core principle:** `parallel implementation ≠ parallel authority switch`
+
+### Enforce rollout (normative)
+
+Каждый law family / route проходит отдельно:
+
+```text
+off → report_only → shadow → enforce
+```
+
+**M3 signoff ≠ global enforce approval.** После M3 signoff каждый law/route требует отдельный **decision record** в `generated/`:
+
+```text
+law_id, routes, evidence, fallback, rollback, owner, approval
+```
+
+Шаблон rollout: [04-06-architecture-spec.md](04-06-architecture-spec.md#enforce-decision-records).
+
 ---
 
 ## 3. Baseline (после Milestone 2)
@@ -116,8 +152,8 @@ Figma parent tree  ≠  cluster equivalence  ≠  visual ownership  ≠  constra
 ```text
 .cursor/rules/project-bible-lite.mdc
 .cursor/rules/pipeline-contracts.mdc
-docs/refactor/04-05-06-refactoring-spec-cursor.md
-docs/refactor/contracts/PIPELINE_ARROWS.md
+docs/refactor/26-06-06-compiler-refactor/04-05-06-refactoring-spec-cursor.md
+docs/refactor/26-06-06-compiler-refactor/contracts/PIPELINE_ARROWS.md
 corpus/families.yaml
 AGENTS.md
 ```
@@ -139,18 +175,30 @@ AGENTS.md
 ### Merge order (после M2 на `main`)
 
 ```text
-Commit 0 (docs-only): 04-05-06-refactoring-spec-cursor.md + contract stubs (empty headers OK)
+Commit 0 (docs-only): TZ v2.1 + contract stubs
   ↓
-06-P0-0  geometry_algebra.md contract
+06-P0-0a + 04-P0-1 (parallel, no authority)
   ↓
-04-P0-0  cluster_signature.md contract     } parallel
+06-P0-0b + 06-P0-1a  ||  04-P0-2a (additive/shadow, parallel)
   ↓
-06-P0-1 … 06-P0-3  ||  04-P0-1 … 04-P0-4
+06-P0-1b + 06-P0-1c  ||  04-P0-3a (shadow proof, parallel)
   ↓
-05-P0-0 … 05-P0-3
+[M2 closure record CLOSED]
   ↓
-M3 signoff
+04-P0-2b + 04-P0-3b + 06-P0-1d* (authority, per-route PRs)
+  ↓
+04-P0-4 + 04-P0-5
+  ↓
+05-P0-0 … 05-P0-3 (after 06-P0-0b)
+  ↓
+05-P0-4 scorer shadow (after 06-P0-1c)
+  ↓
+M3 signoff (≠ global enforce)
 ```
+
+`*` `06-P0-1d1..d4` — отдельный PR на route: `slots.py` → `validate/graph.py` → positioned emit → remaining consumers.
+
+**PR discipline:** один increment = один PR. Не смешивать additive model + authority switch, shadow + legacy deletion, несколько resolver routes в одном PR.
 
 ---
 
@@ -160,11 +208,14 @@ M3 signoff
 
 | ID | Задача | Файлы | DoD |
 |----|--------|-------|-----|
-| **06-P0-0a** | **Raw constraint consumer inventory + ratchet** (поправка №4). Machine-readable список всех прямых чтений raw строк (`"LEFT_RIGHT"`, `"TOP_BOTTOM"`, `"SCALE"`). Verified baseline: **11 файлов** (reconcilers_align/media, placement, positioned/text/svg/position emit, responsive, slots, validate/graph, schemas/types) | `docs/refactor/generated/constraint-consumers.json`, `tests/test_constraint_consumer_ratchet.py` | CI: новый direct read → FAIL; удаление → ALLOW; существующий → временно ALLOW. Паттерн M2 shadow ratchet |
-| **06-P0-0b** | Contract: types (constraint op, static edge, resolved pin), legal transforms, viewport regions | `docs/refactor/contracts/geometry_algebra.md` | Parser facts vs planner slots vs emit law — одна таблица; replan documented as compensator |
-| **06-P0-1** | **Law 1:** wrong pin/center. Typed **`AxisConstraint(op, start_offset, end_offset, size, center_delta, scale_offset_ratio, scale_size_ratio)`** (поправка №5 — параметризованная операция, не голый enum; raw `horizontal`/`vertical` остаются для compatibility/audit; аддитивно, ноль output-изменений в первом commit) + authoritative resolver `resolve_constraint_axis`. В P0 мигрируют только authoritative consumers: planner/slots, `validate/graph.py`, positioned emit; остальные — под ratchet | `schemas/geometry.py`, `generator/geometry/slots.py`, `parser/layout/placement.py`, `tests/test_layout_constraints.py` | bell / center constraint family FIXED case; round-trip raw↔typed; inventory count ↓ |
-| **06-P0-2** | **Law 2:** absolute→flow slot loss — named transform + provenance on parser reconcile clamp | `parser/layout/placement.py`, `sectionize.py` audit | FID-26 class: flatten must not drop absolute slot without deviation |
-| **06-P0-3** | **Law 3:** viewport/chrome partition — region owner field on clean tree (`layout_region` or equivalent) | `viewport_inset.py`, `stack_chrome.py`, IR guards | bottom nav + tall scroll body laws green; documented in contract |
+| **06-P0-0a** | Raw constraint consumer inventory + ratchet | `docs/refactor/26-06-06-compiler-refactor/generated/constraint-consumers.json`, `tests/test_constraint_consumer_ratchet.py` | новый direct read → FAIL; shrink → ALLOW; taxonomy в `geometry_algebra.md` |
+| **06-P0-0b** | Contract: positional ops, slots, laws, replan | `contracts/geometry_algebra.md` | parser vs planner vs emit — одна таблица; **без** смешения sizing/backend/viewport в `AxisConstraintOp` |
+| **06-P0-1a** | **Additive:** `AxisConstraint` + raw↔typed mapping | `generator/geometry/constraint_algebra.py`, `schemas/geometry.py` | round-trip tests; **zero output change**; legacy raw strings authoritative |
+| **06-P0-1b** | **Pure resolver** `resolve_constraint_axis()` + metamorphic tests | same module | isolated; **not wired** to emit; math proofs green |
+| **06-P0-1c** | **Shadow:** legacy vs resolver per-route comparison artifact | `generator/geometry/resolver_shadow.py`, `generated/resolver-shadow-report.json` | parity green on CENTER/PIN_END/PIN_BOTH/SCALE; **legacy authoritative** |
+| **06-P0-1d1..d4** | **Authority** per-route resolver migration (**post-M2 closure**) | `slots.py` → `validate/graph.py` → positioned emit → ratchet shrink | each PR: law tests + rollback; one route per PR |
+| **06-P0-2** | Law 2: absolute→flow slot loss + provenance | `parser/layout/placement.py` | named deviation on clamp |
+| **06-P0-3** | Law 3: viewport/chrome partition | `viewport_inset.py`, `stack_chrome.py` | region owner on clean tree |
 
 **06-P0 verify:**
 
@@ -196,13 +247,14 @@ poetry run figma-flutter defects validate
 
 | ID | Задача | Файлы | DoD |
 |----|--------|-------|-----|
-| **04-P0-0** | Contract: signature fields, discriminators, component vs structural cluster, prune/hydrate bijection | `docs/refactor/contracts/cluster_signature.md` | explicit IN/OUT of hash; asset ownership on prune |
-| **04-P0-1** | **Discriminator pass** before structural bucket (role band: chrome / icon-row / content) — не только тоньше hash | `parser/dedup/clusters.py` или sibling `discriminators.py` | test: status bar ≠ tab bar на synthetic fixture |
-| **04-P0-2a** | **Ранний bijection gate** (поправка №1): `ExtractionPlan` validation call-site ↔ definition **до** render Dart → typed `ExtractionBijectionError`. `PlannedDartGraph` не перегружать extraction-корректностью | `widget_extraction/collect.py` / новый `validate.py`, `errors.py` | missing/duplicate definition пойман pre-render; `delegate_repair` `SizedBox.shrink()` surgery не достигается на fixture |
-| **04-P0-2b** | `PlannedDartGraph` остаётся финальным projection gate (imports/classes/files closure), без новых обязанностей | — (guard test) | regression: planned-graph gate unchanged |
-| **04-P0-2c** | **Topology variant identity — silent wrong widget, P0** (поправка №3). Verified last-wins `{spec.cluster_id: spec.class_name}` на **двух** сайтах: `widget_extractor.py:391` и `subtree/render.py:42`. `DefinitionKey` различает topology variants; lookup не через `dict[cluster_id]` для split family | `widget_extractor.py`, `generator/subtree/render.py`, `cluster_variants.py` | два topology groups одного cluster → distinct authoritative keys; callsite → конкретный variant; regression: no last-wins на обоих сайтах; empty body closed |
-| **04-P0-3** | All dedup/asset walks on `walk_clean_tree`; budget test plan normalize | `prune.py`, `hydrate.py`, `clusters.py`, `assets.py` | `CleanTreeCycleError` on malformed tree; N=500 M=200 smoke < 30s |
-| **04-P0-4** | Asset `build_asset_node_index` на plan/asset finalize paths | `cluster_variants.py`, `stages/assets.py` | no per-node glob in plan stage (extend AssetIndexReuseLaw) |
+| **04-P0-0** | Contract: signature, bijection, traversal | `contracts/cluster_signature.md` | IN/OUT hash; `ClusterExtractionPlan` includes `dependencies` |
+| **04-P0-1** | **Critical walk inventory + cycle-safe migration** (не greenfield) | `parser/dedup/*`, `boundaries/assets.py`, `tree_walk.py` | inventory всех walks; migrate → `walk_clean_tree`; `CleanTreeCycleError(node_id, path, phase)`; valid trees byte-identical |
+| **04-P0-2a** | **DefinitionKey additive/shadow** — parallel mapping + diagnostics | `generator/extraction/definition_key.py`, `widget_extractor.py`, `subtree/render.py` | legacy `dict[cluster_id]` **остаётся authoritative** |
+| **04-P0-2b** | **DefinitionKey authority** (**post-M2 closure**) | same + `cluster_variants.py` | atomic switch всех lookup paths |
+| **04-P0-3a** | **Bijection shadow** — `ClusterExtractionPlan` validation → diagnostics only | `generator/extraction/bijection_plan.py` | pre-render checks; **no blocking** pre-M2 |
+| **04-P0-3b** | **Blocking bijection** `ExtractionBijectionError` (**post-M2 closure**) | `errors.py`, plan validate call-site | missing/duplicate definition → error pre-render |
+| **04-P0-4** | **Discriminator shadow** (role band: chrome / icon-row / content) | `parser/dedup/discriminators.py` | **без `ownership_role`** в P0; status bar ≠ tab bar fixture; authority — отдельное решение P1 |
+| **04-P0-5** | Asset `build_asset_node_index` на plan paths + perf evidence | `cluster_variants.py`, `stages/assets.py` | no per-node glob; `<30s` advisory until `m3-perf` job |
 
 **04-P0 verify:**
 
@@ -242,7 +294,7 @@ food_add_new_items + 9_a_home_bottom_navigation — plan stage < 30s
 | **05-P0-1** | **Ownership pass** (parse/normalize): build `visual_ownership` edges on clean tree | новый модуль под `parser/boundaries/` или `parser/layout/ownership.py` | persisted or sidecar on node; provenance recorded |
 | **05-P0-2** | Reconcile registry: `conflicts_with`, `priority`, runner order | `reconcile_registry.py` | hero inside runner OR explicit late-pass slot with conflict declaration |
 | **05-P0-3** | **5 ownership laws** + tests: card surface, icon plate, navbar chrome, field host, scroll chrome | tests `test_ownership_*.py` | card siblings case without hero-at-index-0 patch |
-| **05-P0-4** | Layout chooser (tier-0): ≥2 candidates on ambiguous subtree only. **Score = breakdown struct, не float** (поправка №6): `LayoutCandidateScore(geometry_residual, exceptional_offsets, paint_order_penalty, ownership_violations, flutter_invalidity, complexity_cost, total)`; `aabb_residual` — компонент, не вся scorecard. **Merge blocked до 06-P0 resolver API** (gate). Кандидаты P0 — только текущие (preserve-stack, row/column/wrap); ownership-derived (row-of-groups, scroll+overlay) — **только 05-P1** (поправка №7 — иначе костыль для будущего костыля) | `layout_criteria.py` extension | no full-tree search; beam width ≤ 3; breakdown в provenance |
+| **05-P0-4** | Layout chooser tier-0 **shadow** | `generator/ir/passes/layout_scorer.py` | **Gates:** dev after **06-P0-1b**; merge shadow after **06-P0-1c** parity green; enforce per route only after matching **06-P0-1d** + decision record. `LayoutCandidateScore` breakdown; candidates P0: preserve-stack/row/column/wrap only; ownership score diagnostic-only |
 
 **05-P0 verify:**
 
@@ -326,14 +378,18 @@ M3 закрывается **только вместе**:
 
 ## 8. Gates
 
-| Уровень | Команда |
-|---------|---------|
-| 06 fast | `pytest tests/test_geometry_invariants.py tests/test_layout_constraints.py tests/test_placement_conservation.py tests/test_sectionize_root_pass.py -q` |
-| 04 fast | `pytest tests/test_cluster_dedup_ref.py tests/test_pruned_cluster_assets.py tests/test_plan_asset_resolution.py tests/test_cluster_delegate_cycles.py -q` |
-| 05 fast | `pytest tests/test_sectionize_root_pass.py tests/test_layout_criteria.py tests/test_ir_layout_passes.py tests/test_ownership_laws.py -q` |
-| M2 regression | `pytest tests/test_conservation_registry.py tests/test_shadow_classifier_inventory.py tests/test_semantics_emit_gate.py -q` |
-| Corpus | `poetry run figma-flutter defects validate` |
-| Full | `.\scripts\signoff.ps1` |
+### Verification bundles
+
+| Track | Command | Tier |
+|-------|---------|------|
+| 06 | `pytest tests/test_geometry_invariants.py tests/test_layout_constraints.py tests/test_constraint_consumer_ratchet.py tests/test_planner_corpus_gate.py -q` | **available now** + **[introduced]** constraint ratchet |
+| 04 | `pytest tests/test_cluster_dedup_ref.py tests/test_plan_asset_resolution.py tests/test_cluster_delegate_cycles.py tests/test_cluster_bijection_plan.py -q` | **available now** + **[introduced]** bijection/cycle |
+| 05 | `pytest tests/test_ownership_laws.py tests/test_layout_criteria.py tests/test_ir_layout_passes.py tests/test_layout_scorer.py -q` | **available now** + **[introduced]** ownership/scorer |
+| M2 regression | `pytest tests/test_conservation_registry.py tests/test_shadow_classifier_inventory.py tests/test_semantics_emit_gate.py tests/test_pass_contract.py -q` | **available now** |
+| Corpus | `poetry run figma-flutter defects validate` | **available now** |
+| Full signoff | `.\scripts\signoff.ps1` | **M3 final bundle** (after M2 closure + M3 increments merged) |
+
+**Legend:** `available now` = gate exists on `main` today; `[introduced]` = added by named M3 increment; `M3 final bundle` = signoff only at M3 close, not per-increment.
 
 ---
 
@@ -353,12 +409,12 @@ M3 закрывается **только вместе**:
 
 | Инкремент | `family_id` | `law_ids` / notes |
 |-----------|-------------|-------------------|
-| 06-P0-1 | `wrong_pin_center` | geometry algebra Law 1 |
+| 06-P0-1a..1d | `wrong_pin_center` | geometry algebra Law 1; enforce only after 06-P0-1d + decision record |
 | 06-P0-2 | `absolute_slot_loss` | geometry algebra Law 2 |
 | 06-P0-3 | `viewport_partition_drift` | geometry algebra Law 3 |
-| 04-P0-1 | `cluster_wrong_merge` | `cluster_signature` discriminator |
-| 04-P0-2 | `cluster_empty_body` | bijection table |
-| 04-P1-3 | `cluster_delegate_cycle` | delegate repair + bijection |
+| 04-P0-4 | `cluster_wrong_merge` | discriminator shadow (not ownership_role) |
+| 04-P0-3b | `cluster_empty_body` | blocking bijection |
+| 04-P1-3 | `cluster_delegate_cycle` | delegate repair + dependency graph |
 | 05-P0-3 | `ownership_surface_content_sibling` | ownership Law: card |
 | 05-P0-3 | `ownership_navbar_chrome` | ownership Law: navbar |
 | 05-P0-2 | `reconcile_pass_conflict` | registry priority |
@@ -367,22 +423,16 @@ M3 закрывается **только вместе**:
 
 ## 11. Checklist (implementation)
 
-1. [ ] **Commit 0** — этот ТЗ + пустые заголовки contract stubs в `docs/refactor/contracts/`
-2. [ ] **06-P0-0a** — constraint consumer inventory + ratchet
-3. [ ] **06-P0-0b** — `geometry_algebra.md`; **04-P0-0** — `cluster_signature.md` (parallel)
-4. [ ] **06-P0-1** — AxisConstraint + resolver + wrong pin/center law + case
-5. [ ] **06-P0-2** — absolute slot provenance
-6. [ ] **06-P0-3** — viewport region owner
-7. [ ] **04-P0-1** — cluster discriminator + wrong merge test
-8. [ ] **04-P0-2a/2b/2c** — early bijection gate + planned-graph guard + DefinitionKey (last-wins, оба сайта)
-9. [ ] **04-P0-3** — walk_clean_tree + budget test
-10. [ ] **04-P0-4** — asset index on plan paths
-11. [ ] **05-P0-0** — `layout_hypothesis.md`
-12. [ ] **05-P0-1** — ownership pass
-13. [ ] **05-P0-2** — reconcile conflict registry
-14. [ ] **05-P0-3** — 5 ownership laws
-15. [ ] **05-P0-4** — tier-0 layout chooser
-16. [ ] M3 signoff — §7 criteria + `signoff.ps1`
+1. [ ] **Commit 0** — TZ v2.1 + contract stubs в `docs/refactor/26-06-06-compiler-refactor/contracts/`
+2. [ ] **06-P0-0a** + **04-P0-1** (parallel, no authority)
+3. [ ] **06-P0-0b** + **06-P0-1a** || **04-P0-2a** (additive/shadow)
+4. [ ] **06-P0-1b** + **06-P0-1c** || **04-P0-3a** (shadow proof)
+5. [ ] **[M2 closure record CLOSED]** — before any authority PR
+6. [ ] **04-P0-2b** + **04-P0-3b** + **06-P0-1d*** (authority, one route per PR)
+7. [ ] **04-P0-4** + **04-P0-5**
+8. [ ] **05-P0-0 … 05-P0-3** (after 06-P0-0b)
+9. [ ] **05-P0-4** scorer shadow (after 06-P0-1c)
+10. [ ] M3 signoff — §7 criteria (≠ global enforce; decision records per law)
 
 ---
 
@@ -391,4 +441,5 @@ M3 закрывается **только вместе**:
 | Дата | Изменение |
 |------|-----------|
 | 2026-07-03 | Initial Milestone 3 TZ (Programs 04–06) after M2 research + analysis |
-| 2026-07-03 | Consilium v2 (3:0): поправки №1–№9 — early bijection gate (04-P0-2a/2b), DefinitionKey topology split P0 (04-P0-2c, два сайта verified), constraint consumer inventory+ratchet (06-P0-0a), параметризованный AxisConstraint, LayoutCandidateScore breakdown, ownership-derived candidates → 05-P1, scoped replan dependency closure + full replan safety oracle, responsive MVP per-axis. PR #6 → architecture RFC |
+| 2026-07-03 | Consilium v2 (3:0): поправки №1–№9 |
+| 2026-07-03 | **v2.1 review fixes:** M2 freeze all Programs 04–06; 06-P0-1a..d split; 04-P0-2a/b + 03a/b split; scorer gates; canonical doc path; walk inventory DoD; verification tiers; enforce decision records; no ownership_role in P0 discriminator |

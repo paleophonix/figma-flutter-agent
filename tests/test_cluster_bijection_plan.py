@@ -14,8 +14,19 @@ from figma_flutter_agent.generator.widget_models import ClusterWidgetSpec
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
-def _minimal_node(node_id: str) -> CleanDesignTreeNode:
-    return CleanDesignTreeNode(id=node_id, name="n", type=NodeType.CONTAINER, children=[])
+def _minimal_node(
+    node_id: str,
+    *,
+    cluster_id: str | None = None,
+    children: list[CleanDesignTreeNode] | None = None,
+) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="n",
+        type=NodeType.CONTAINER,
+        children=children or [],
+        cluster_id=cluster_id,
+    )
 
 
 def _spec(cluster_id: str, class_name: str, rep_id: str) -> ClusterWidgetSpec:
@@ -54,3 +65,49 @@ def test_definition_key_shadow_report() -> None:
     report = compare_definition_key_shadow(specs)
     assert report.legacy_map["c1"] == "FooWidget"
     assert not report.mismatches
+
+
+def test_bijection_plan_dependencies_nested_cluster() -> None:
+    nested = _minimal_node("nested_rep", cluster_id="c_child")
+    outer_rep = _minimal_node("outer_rep", children=[nested])
+    specs = [
+        ClusterWidgetSpec(
+            cluster_id="c_parent",
+            class_name="ParentWidget",
+            file_name="parentwidget.dart",
+            representative=outer_rep,
+        ),
+        ClusterWidgetSpec(
+            cluster_id="c_child",
+            class_name="ChildWidget",
+            file_name="childwidget.dart",
+            representative=nested,
+        ),
+    ]
+    plan = ClusterExtractionPlan.from_specs(specs)
+    parent_key = next(key for key in plan.definitions if key.cluster_id == "c_parent")
+    child_key = next(key for key in plan.definitions if key.cluster_id == "c_child")
+    assert child_key in plan.dependencies[parent_key]
+
+
+def test_bijection_shadow_detects_dependency_cycle() -> None:
+    a_rep = _minimal_node("rep_a", cluster_id="c_b")
+    b_rep = _minimal_node("rep_b", cluster_id="c_a")
+    specs = [
+        ClusterWidgetSpec(
+            cluster_id="c_a",
+            class_name="AWidget",
+            file_name="a.dart",
+            representative=a_rep,
+        ),
+        ClusterWidgetSpec(
+            cluster_id="c_b",
+            class_name="BWidget",
+            file_name="b.dart",
+            representative=b_rep,
+        ),
+    ]
+    plan = ClusterExtractionPlan.from_specs(specs)
+    report = validate_extraction_bijection_shadow(plan)
+    assert report.ok is False
+    assert any(item.code == "delegate_dependency_cycle" for item in report.diagnostics)

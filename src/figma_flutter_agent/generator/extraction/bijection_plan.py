@@ -6,16 +6,21 @@ from dataclasses import dataclass, field
 
 from figma_flutter_agent.errors import ExtractionBijectionError
 from figma_flutter_agent.generator.extraction.definition_key import DefinitionKey
+from figma_flutter_agent.generator.extraction.dependencies import (
+    build_definition_dependency_map,
+    find_dependency_cycles,
+)
 from figma_flutter_agent.generator.widget_models import ClusterWidgetSpec
 
 
 @dataclass(frozen=True, slots=True)
 class ClusterExtractionPlan:
-    """Early extraction bijection table: callsite → definition → class."""
+    """Early extraction bijection table: callsite → definition → class → dependencies."""
 
     definitions: tuple[DefinitionKey, ...]
     callsite_to_definition: dict[str, DefinitionKey]
     definition_to_class: dict[DefinitionKey, str]
+    dependencies: dict[DefinitionKey, frozenset[DefinitionKey]]
 
     @classmethod
     def from_specs(
@@ -36,10 +41,12 @@ class ClusterExtractionPlan:
             definition_to_class[key] = spec.class_name
             callsite = spec.representative.id if spec.representative else spec.cluster_id
             callsite_to_definition[callsite] = key
+        dep_map = build_definition_dependency_map(specs, topology_by_cluster=topo)
         return cls(
             definitions=tuple(definitions),
             callsite_to_definition=callsite_to_definition,
             definition_to_class=definition_to_class,
+            dependencies=dep_map,
         )
 
 
@@ -106,6 +113,16 @@ def validate_extraction_bijection_shadow(plan: ClusterExtractionPlan) -> Bijecti
                 code="duplicate_callsite",
                 message="Multiple definitions share the same callsite id",
                 cluster_id=None,
+            ),
+        )
+    cycles = find_dependency_cycles(plan.dependencies)
+    for cycle in cycles:
+        labels = " -> ".join(item.cluster_id for item in cycle)
+        diagnostics.append(
+            BijectionDiagnostic(
+                code="delegate_dependency_cycle",
+                message=f"Delegate dependency cycle: {labels}",
+                cluster_id=cycle[0].cluster_id if cycle else None,
             ),
         )
     return BijectionShadowReport(ok=not diagnostics, diagnostics=diagnostics)

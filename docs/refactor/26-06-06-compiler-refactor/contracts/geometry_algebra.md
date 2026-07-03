@@ -1,16 +1,22 @@
 # Geometry constraint algebra (contract)
 
-**Track:** Program 06 · **Authority:** normative for constraint vocabulary after 06-P0-0b.
+**Track:** Program 06 · **Authority:** normative after 06-P0-0b.  
+**Path:** `docs/refactor/26-06-06-compiler-refactor/contracts/geometry_algebra.md`
 
-## Layers
+## Layers (orthogonal — do not merge into one enum)
 
-| Layer | Owns | Must not |
-|-------|------|----------|
-| Parser | Figma placement facts (`StackPlacement`, sizing) | Invent emit slots |
-| Planner | `ResolvedAxisSlot`, flex/stack intent | Silent absolute→flow without deviation |
-| Emitter | Dart `Positioned` / flex children | Raw string pin branches without resolver |
+| Layer | Types | Examples |
+|-------|-------|----------|
+| **Positional constraint (per axis)** | `AxisConstraintOp` | `PIN_START`, `PIN_END`, `PIN_BOTH`, `CENTER`, `SCALE` |
+| **Sizing** | `SizingMode`, explicit width/height | `HUG`, `FILL`, `FIXED` — see `Sizing` |
+| **Layout backend** | `LayoutBackend`, flex participation | row/column/stack/scroll — separate from pin |
+| **Viewport / region** | region owner field | chrome band, scroll host — Law 3; not a pin op |
 
-## Constraint operations (`ConstraintOp`)
+**Forbidden:** `AxisConstraint(op=FLOW, center_delta=...)` — FLOW is not a positional operator.
+
+Existing schema already separates: `StackPlacement`, `SizingMode`, `LayoutBackend`, `LayoutSlotIr`.
+
+## Positional operations (`AxisConstraintOp`)
 
 | Op | Figma axis value | Resolved slot |
 |----|------------------|---------------|
@@ -22,7 +28,14 @@
 
 ## Typed model (`AxisConstraint`)
 
-Additive model (06-P0-1a): `op`, `start_offset`, `end_offset`, `size`, `center_delta`, `scale_offset_ratio`, `scale_size_ratio`. Raw `horizontal`/`vertical` strings remain for audit; authoritative resolver: `resolve_constraint_axis()`.
+| Increment | Mode |
+|-----------|------|
+| **06-P0-1a** | Additive: `op`, offsets, size, center_delta, scale ratios; **no output change** |
+| **06-P0-1b** | Pure `resolve_constraint_axis()` + metamorphic tests |
+| **06-P0-1c** | Shadow parity vs legacy branches |
+| **06-P0-1d** | Per-route authority (**post-M2 closure**) |
+
+Raw `horizontal`/`vertical` strings remain for audit; legacy authoritative until 06-P0-1d.
 
 ## Consumer taxonomy (06-P0-0a)
 
@@ -35,14 +48,15 @@ Additive model (06-P0-1a): `op`, `start_offset`, `end_offset`, `size`, `center_d
 | `ir_guard` | IR validate graph checks |
 | `schema_type` | Pydantic / enum definition |
 
-Machine inventory: `docs/refactor/generated/constraint-consumers.json`. Ratchet baseline: `constraint-consumers-ratchet-baseline.json`.
+Machine inventory: `docs/refactor/26-06-06-compiler-refactor/generated/constraint-consumers.json`  
+Ratchet baseline: `docs/refactor/26-06-06-compiler-refactor/generated/constraint-consumers-ratchet-baseline.json`
 
 ## Laws (P0)
 
-1. **Wrong pin/center** — resolver is single authority for pin semantics (06-P0-1).
-2. **Absolute→flow slot loss** — named deviation on clamp (06-P0-2).
-3. **Viewport/chrome partition** — region owner on clean tree (06-P0-3).
+1. **Wrong pin/center** — resolver single authority after 06-P0-1d per route
+2. **Absolute→flow slot loss** — named deviation on clamp (06-P0-2)
+3. **Viewport/chrome partition** — region owner on clean tree (06-P0-3)
 
 ## Replan
 
-`replan_geometry_after_layout_passes` is a compensator for double-truth until scoped replan (06-P1) proves equivalence.
+`replan_geometry_after_layout_passes` is a compensator until scoped replan (06-P1) proves equivalence.

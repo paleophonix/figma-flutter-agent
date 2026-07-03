@@ -89,6 +89,11 @@ def _record_key(record: ConstraintConsumerRecord) -> str:
     return f"{record.path}|{record.symbol}|{record.token}|{record.line}"
 
 
+def _ratchet_key(record: ConstraintConsumerRecord) -> str:
+    """Stable ratchet identity — line numbers excluded (reformat-safe)."""
+    return f"{record.path}|{record.symbol}|{record.token}"
+
+
 def classify_constraint_consumer(
     *,
     rel_path: str,
@@ -236,8 +241,8 @@ def compare_constraint_ratchet(
     current: list[ConstraintConsumerRecord],
 ) -> ConstraintRatchetReport:
     """Block new direct consumers in ratchet categories; allow shrink."""
-    baseline_map = {_record_key(record): record for record in baseline}
-    current_map = {_record_key(record): record for record in current}
+    baseline_map = {_ratchet_key(record): record for record in baseline}
+    current_map = {_ratchet_key(record): record for record in current}
     new_direct: list[ConstraintConsumerRecord] = []
     for key, record in current_map.items():
         if key in baseline_map:
