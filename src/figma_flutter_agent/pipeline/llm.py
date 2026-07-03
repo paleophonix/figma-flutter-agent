@@ -73,6 +73,34 @@ def load_cached_ir_llm_outcome(
         clean_tree,
         dump_path=ir_path,
     )
+    from figma_flutter_agent.debug.ir_cache_report import write_ir_cache_compatibility_report
+
+    verdict, report_path = write_ir_cache_compatibility_report(
+        project_dir=project_dir,
+        feature_name=resolved_feature,
+        dump_path=ir_path,
+        clean_tree=clean_tree,
+        settings=settings,
+    )
+    if verdict == "legacy_unknown":
+        log.warning(
+            "Cached IR identity incomplete (legacy_unknown); authoritative read continues ({})",
+            report_path.name,
+        )
+    elif verdict == "incompatible":
+        log.warning(
+            "Cached IR identity mismatch (shadow); authoritative read continues ({})",
+            report_path.name,
+        )
+    from figma_flutter_agent.compiler.ir_cache_policy import load_ir_cache_policy
+
+    policy = load_ir_cache_policy()
+    if policy.enforce_enabled() and verdict in {"incompatible", "legacy_unknown"}:
+        from figma_flutter_agent.errors import FlutterProjectError
+
+        raise FlutterProjectError(
+            f"Cached screen IR rejected ({verdict}). Refresh IR via generate for this screen."
+        )
     extracted = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     generation = _normalize_cached_ir_generation(
         generation,

@@ -1,0 +1,1064 @@
+[
+  {
+    "line": 20,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 1,
+    "marker": "export",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'export'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 1,
+    "marker": "svg",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'svg'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 149,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "_collect_button_icon_groups_under"
+  },
+  {
+    "line": 102,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "_is_figma_button_icon_group"
+  },
+  {
+    "line": 107,
+    "marker": "svg",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'svg'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "_is_figma_button_icon_group"
+  },
+  {
+    "line": 124,
+    "marker": "export",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'export'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "_is_figma_interactive_icon_host"
+  },
+  {
+    "line": 112,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "_mark_composite_icon_descendants_skip"
+  },
+  {
+    "line": 113,
+    "marker": "export",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'export'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "_mark_composite_icon_descendants_skip"
+  },
+  {
+    "line": 157,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "collect_figma_composite_icon_groups"
+  },
+  {
+    "line": 160,
+    "marker": "export",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'export'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "collect_figma_composite_icon_groups"
+  },
+  {
+    "line": 211,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "is_composite_icon_export_node"
+  },
+  {
+    "line": 211,
+    "marker": "export",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'export'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "is_composite_icon_export_node"
+  },
+  {
+    "line": 212,
+    "marker": "svg",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'svg'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "is_composite_icon_export_node"
+  },
+  {
+    "line": 189,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "is_composite_icon_stack_shape"
+  },
+  {
+    "line": 190,
+    "marker": "export",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'export'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "is_composite_icon_stack_shape"
+  },
+  {
+    "line": 60,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "is_figma_composite_icon_node"
+  },
+  {
+    "line": 272,
+    "marker": "export",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'export'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "layout_fact_compact_vector_icon_export_node"
+  },
+  {
+    "line": 273,
+    "marker": "svg",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'svg'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "layout_fact_compact_vector_icon_export_node"
+  },
+  {
+    "line": 255,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "layout_fact_compact_vector_icon_shape"
+  },
+  {
+    "line": 252,
+    "marker": "export",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'export'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "layout_fact_compact_vector_icon_shape"
+  },
+  {
+    "line": 174,
+    "marker": "composite",
+    "path": "src/figma_flutter_agent/assets/composite_icons.py",
+    "rationale": "Decorative route composite_export marker 'composite'",
+    "route": "composite_export",
+    "status": "active",
+    "symbol": "walk"
+  },
+  {
+    "line": 63,
+    "marker": "icon_badge",
+    "path": "src/figma_flutter_agent/generator/ir/extracted_paint.py",
+    "rationale": "Decorative route extracted_paint marker 'icon_badge'",
+    "route": "extracted_paint",
+    "status": "active",
+    "symbol": "extracted_icon_badge_glyph_emit_needs_rematerialization"
+  },
+  {
+    "line": 67,
+    "marker": "plate",
+    "path": "src/figma_flutter_agent/generator/ir/extracted_paint.py",
+    "rationale": "Decorative route extracted_paint marker 'plate'",
+    "route": "extracted_paint",
+    "status": "active",
+    "symbol": "extracted_icon_badge_glyph_emit_needs_rematerialization"
+  },
+  {
+    "line": 144,
+    "marker": "icon_badge",
+    "path": "src/figma_flutter_agent/generator/ir/extracted_paint.py",
+    "rationale": "Decorative route extracted_paint marker 'icon_badge'",
+    "route": "extracted_paint",
+    "status": "active",
+    "symbol": "icon_badge_planned_widget_needs_rematerialization"
+  },
+  {
+    "line": 38,
+    "marker": "icon_badge",
+    "path": "src/figma_flutter_agent/generator/ir/extracted_paint.py",
+    "rationale": "Decorative route extracted_paint marker 'icon_badge'",
+    "route": "extracted_paint",
+    "status": "active",
+    "symbol": "icon_badge_stack_intrinsic_glyph_size"
+  },
+  {
+    "line": 49,
+    "marker": "plate",
+    "path": "src/figma_flutter_agent/generator/ir/extracted_paint.py",
+    "rationale": "Decorative route extracted_paint marker 'plate'",
+    "route": "extracted_paint",
+    "status": "active",
+    "symbol": "icon_badge_stack_intrinsic_glyph_size"
+  },
+  {
+    "line": 130,
+    "marker": "icon_badge",
+    "path": "src/figma_flutter_agent/generator/ir/extracted_paint.py",
+    "rationale": "Decorative route extracted_paint marker 'icon_badge'",
+    "route": "extracted_paint",
+    "status": "active",
+    "symbol": "icon_badge_widget_identity_matches_subtree"
+  },
+  {
+    "line": 169,
+    "marker": "icon_badge",
+    "path": "src/figma_flutter_agent/generator/ir/extracted_paint.py",
+    "rationale": "Decorative route extracted_paint marker 'icon_badge'",
+    "route": "extracted_paint",
+    "status": "active",
+    "symbol": "prefers_clean_tree_extracted_widget_emit"
+  },
+  {
+    "line": 6,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/bottom.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 83,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/bottom.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "render_bottom_navigation"
+  },
+  {
+    "line": 52,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/bottom.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "render_icon_only_bottom_navigation"
+  },
+  {
+    "line": 110,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/bottom.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "render_pill_bottom_navigation"
+  },
+  {
+    "line": 8,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/chrome.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 92,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/chrome.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "ensure_layout_chrome_nav_helpers"
+  },
+  {
+    "line": 5,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/constants.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 11,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/helpers.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "bottom_nav_stateful_helpers"
+  },
+  {
+    "line": 5,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/host.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 9,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/host.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "bottom_nav_has_compact_pill_tabs"
+  },
+  {
+    "line": 129,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/host.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "bottom_nav_has_figma_chrome"
+  },
+  {
+    "line": 113,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/host.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "bottom_nav_host_should_stretch_horizontal"
+  },
+  {
+    "line": 49,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/host.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "compose_bottom_navigation_host"
+  },
+  {
+    "line": 26,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/host.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "wrap_bottom_nav_figma_chrome"
+  },
+  {
+    "line": 10,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 425,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "_collect_bottom_nav_items_from_host"
+  },
+  {
+    "line": 330,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "_find_canonical_nested_bottom_nav"
+  },
+  {
+    "line": 300,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "_host_is_oversized_nav_collector"
+  },
+  {
+    "line": 749,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "_nav_active_substrate_extent"
+  },
+  {
+    "line": 312,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "_nested_bottom_nav_has_compact_anatomy"
+  },
+  {
+    "line": 205,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "_resolve_nav_active_tab"
+  },
+  {
+    "line": 685,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "bottom_nav_current_index"
+  },
+  {
+    "line": 407,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "bottom_nav_host_uses_icon_only_tabs"
+  },
+  {
+    "line": 415,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "collect_bottom_nav_items"
+  },
+  {
+    "line": 625,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "layout_fact_stack_bottom_nav_active_tab_pill"
+  },
+  {
+    "line": 672,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "layout_fact_stack_bottom_nav_icon_tab_slot"
+  },
+  {
+    "line": 653,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "layout_fact_stack_bottom_nav_tab_glyph_column"
+  },
+  {
+    "line": 775,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "nav_pill_palette"
+  },
+  {
+    "line": 336,
+    "marker": "bottom_nav",
+    "path": "src/figma_flutter_agent/generator/layout/navigation/items.py",
+    "rationale": "Decorative route navigation_substrate marker 'bottom_nav'",
+    "route": "navigation_substrate",
+    "status": "active",
+    "symbol": "walk"
+  },
+  {
+    "line": 23,
+    "marker": "VECTOR",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py",
+    "rationale": "Decorative route vector_dispatch marker 'VECTOR'",
+    "route": "vector_dispatch",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 16,
+    "marker": "render_boundary",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py",
+    "rationale": "Decorative route vector_dispatch marker 'render_boundary'",
+    "route": "vector_dispatch",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 22,
+    "marker": "svg",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py",
+    "rationale": "Decorative route vector_dispatch marker 'svg'",
+    "route": "vector_dispatch",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 49,
+    "marker": "VECTOR",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py",
+    "rationale": "Decorative route vector_dispatch marker 'VECTOR'",
+    "route": "vector_dispatch",
+    "status": "active",
+    "symbol": "render_node_body"
+  },
+  {
+    "line": 282,
+    "marker": "render_boundary",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py",
+    "rationale": "Decorative route vector_dispatch marker 'render_boundary'",
+    "route": "vector_dispatch",
+    "status": "active",
+    "symbol": "render_node_body"
+  },
+  {
+    "line": 44,
+    "marker": "svg",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py",
+    "rationale": "Decorative route vector_dispatch marker 'svg'",
+    "route": "vector_dispatch",
+    "status": "active",
+    "symbol": "render_node_body"
+  },
+  {
+    "line": 1,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 650,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_apply_node_transform"
+  },
+  {
+    "line": 276,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_compact_icon_glyph_group_should_preserve_child_vectors"
+  },
+  {
+    "line": 476,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_composite_glyph_slot_count"
+  },
+  {
+    "line": 678,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_intrinsic_glyph_svg_dimensions"
+  },
+  {
+    "line": 485,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_is_composite_icon_stack"
+  },
+  {
+    "line": 48,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_is_skip_control_stack"
+  },
+  {
+    "line": 766,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_preserve_full_frame_svg_dimensions"
+  },
+  {
+    "line": 392,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_render_exported_vector"
+  },
+  {
+    "line": 814,
+    "marker": "SvgPicture",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'SvgPicture'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_render_svg_picture"
+  },
+  {
+    "line": 522,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_should_center_in_parent_stack"
+  },
+  {
+    "line": 445,
+    "marker": "render_boundary",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'render_boundary'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_should_prefer_exported_svg"
+  },
+  {
+    "line": 441,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_should_prefer_exported_svg"
+  },
+  {
+    "line": 621,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_skip_redundant_pi_vector_rotation"
+  },
+  {
+    "line": 153,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_slider_thumb_top"
+  },
+  {
+    "line": 193,
+    "marker": "render_boundary",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'render_boundary'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_svg_fit_mode"
+  },
+  {
+    "line": 297,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "_vector_needs_baked_raster"
+  },
+  {
+    "line": 260,
+    "marker": "vector",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Decorative route svg_emit marker 'vector'",
+    "route": "svg_emit",
+    "status": "active",
+    "symbol": "stack_should_emit_flattened_vector_group"
+  },
+  {
+    "line": 7,
+    "marker": "render_boundary",
+    "path": "src/figma_flutter_agent/parser/boundaries/collapse.py",
+    "rationale": "Decorative route collapse_boundary marker 'render_boundary'",
+    "route": "collapse_boundary",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 61,
+    "marker": "children = []",
+    "path": "src/figma_flutter_agent/parser/boundaries/collapse.py",
+    "rationale": "Decorative route collapse_boundary marker 'children = []'",
+    "route": "collapse_boundary",
+    "status": "active",
+    "symbol": "_collapse_node"
+  },
+  {
+    "line": 63,
+    "marker": "flatten_figma_node_ids",
+    "path": "src/figma_flutter_agent/parser/boundaries/collapse.py",
+    "rationale": "Decorative route collapse_boundary marker 'flatten_figma_node_ids'",
+    "route": "collapse_boundary",
+    "status": "active",
+    "symbol": "_collapse_node"
+  },
+  {
+    "line": 62,
+    "marker": "render_boundary",
+    "path": "src/figma_flutter_agent/parser/boundaries/collapse.py",
+    "rationale": "Decorative route collapse_boundary marker 'render_boundary'",
+    "route": "collapse_boundary",
+    "status": "active",
+    "symbol": "_collapse_node"
+  },
+  {
+    "line": 15,
+    "marker": "render_boundary",
+    "path": "src/figma_flutter_agent/parser/boundaries/collapse.py",
+    "rationale": "Decorative route collapse_boundary marker 'render_boundary'",
+    "route": "collapse_boundary",
+    "status": "active",
+    "symbol": "_pin_render_boundary_placement"
+  },
+  {
+    "line": 20,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "<module>"
+  },
+  {
+    "line": 135,
+    "marker": "decorative",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'decorative'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "_hosts_decorative_icon_glyph"
+  },
+  {
+    "line": 577,
+    "marker": "decorative",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'decorative'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "_is_input_decorative_control"
+  },
+  {
+    "line": 214,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "_stack_hosts_stroked_outline_checkbox_glyph"
+  },
+  {
+    "line": 191,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "_stroked_vector_fills_host_as_icon_glyph"
+  },
+  {
+    "line": 151,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "_stroked_vector_is_checkbox_outline"
+  },
+  {
+    "line": 203,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "_vector_reads_as_checkbox_mark"
+  },
+  {
+    "line": 207,
+    "marker": "checkmark",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkmark'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "_vector_reads_as_checkbox_mark"
+  },
+  {
+    "line": 375,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "checkbox_label_text_host"
+  },
+  {
+    "line": 799,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "checkbox_option_border_container"
+  },
+  {
+    "line": 821,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "checkbox_option_label_gap"
+  },
+  {
+    "line": 783,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "checkbox_option_stack_is_checked"
+  },
+  {
+    "line": 784,
+    "marker": "checkmark",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkmark'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "checkbox_option_stack_is_checked"
+  },
+  {
+    "line": 364,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "compact_checkbox_leaf"
+  },
+  {
+    "line": 320,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_checkbox_control"
+  },
+  {
+    "line": 340,
+    "marker": "decorative",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'decorative'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_checkbox_control"
+  },
+  {
+    "line": 128,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_consent_label_text"
+  },
+  {
+    "line": 294,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_decorative_metric_checkmark_glyph"
+  },
+  {
+    "line": 288,
+    "marker": "checkmark",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkmark'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_decorative_metric_checkmark_glyph"
+  },
+  {
+    "line": 288,
+    "marker": "decorative",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'decorative'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_decorative_metric_checkmark_glyph"
+  },
+  {
+    "line": 354,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_hosts_compact_checkbox_control"
+  },
+  {
+    "line": 309,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_interactive_checkbox_control"
+  },
+  {
+    "line": 315,
+    "marker": "checkmark",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkmark'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_interactive_checkbox_control"
+  },
+  {
+    "line": 315,
+    "marker": "decorative",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'decorative'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_interactive_checkbox_control"
+  },
+  {
+    "line": 519,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "layout_fact_row_bounded_inline_control_row"
+  },
+  {
+    "line": 415,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "row_hosts_checkbox_label_pair"
+  },
+  {
+    "line": 387,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "stack_hosts_checkbox_label_pair"
+  },
+  {
+    "line": 251,
+    "marker": "checkbox",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkbox'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "stack_hosts_decorative_metric_checkmark"
+  },
+  {
+    "line": 250,
+    "marker": "checkmark",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'checkmark'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "stack_hosts_decorative_metric_checkmark"
+  },
+  {
+    "line": 250,
+    "marker": "decorative",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'decorative'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "stack_hosts_decorative_metric_checkmark"
+  },
+  {
+    "line": 641,
+    "marker": "decorative",
+    "path": "src/figma_flutter_agent/parser/interaction/forms.py",
+    "rationale": "Decorative route forms_checkmark marker 'decorative'",
+    "route": "forms_checkmark",
+    "status": "active",
+    "symbol": "walk"
+  }
+]

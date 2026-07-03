@@ -38,6 +38,15 @@ def _pin_render_boundary_placement(
     )
 
 
+def _decorative_role_for_collapse(node: CleanDesignTreeNode) -> str:
+    """Shadow role map before children are cleared (Program 07 P0-2)."""
+    if node.vector_asset_key:
+        return "glyph"
+    if node.children:
+        return "plate"
+    return "glyph"
+
+
 def _collapse_node(
     node: CleanDesignTreeNode,
     result: RenderBoundaryCollapseResult,
@@ -45,6 +54,10 @@ def _collapse_node(
     parent_height: float | None,
 ) -> None:
     flattened = collect_descendant_figma_ids(node)
+    result.decorative_role_map[node.id] = _decorative_role_for_collapse(node)
+    for child_id in flattened:
+        if child_id not in result.decorative_role_map:
+            result.decorative_role_map[child_id] = "glyph"
     node.children = []
     node.render_boundary = True
     node.flatten_figma_node_ids = flattened

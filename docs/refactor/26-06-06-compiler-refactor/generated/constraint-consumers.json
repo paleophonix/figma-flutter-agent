@@ -2,7 +2,7 @@
   {
     "axis": "vertical",
     "category": "unknown",
-    "line": 61,
+    "line": 73,
     "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
@@ -12,7 +12,7 @@
   {
     "axis": "horizontal",
     "category": "unknown",
-    "line": 55,
+    "line": 67,
     "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
@@ -22,7 +22,7 @@
   {
     "axis": "horizontal",
     "category": "unknown",
-    "line": 63,
+    "line": 75,
     "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
@@ -32,42 +32,12 @@
   {
     "axis": "horizontal",
     "category": "unknown",
-    "line": 54,
+    "line": 66,
     "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
     "symbol": "<module>",
     "token": "LEFT_RIGHT"
-  },
-  {
-    "axis": "horizontal",
-    "category": "unknown",
-    "line": 52,
-    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "<module>",
-    "token": "LEFT"
-  },
-  {
-    "axis": "horizontal",
-    "category": "unknown",
-    "line": 53,
-    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "<module>",
-    "token": "RIGHT"
-  },
-  {
-    "axis": "horizontal",
-    "category": "unknown",
-    "line": 56,
-    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "<module>",
-    "token": "SCALE"
   },
   {
     "axis": "horizontal",
@@ -77,127 +47,87 @@
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
     "symbol": "<module>",
-    "token": "SCALE"
-  },
-  {
-    "axis": "vertical",
-    "category": "unknown",
-    "line": 62,
-    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "<module>",
-    "token": "TOP_BOTTOM"
-  },
-  {
-    "axis": "vertical",
-    "category": "unknown",
-    "line": 60,
-    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "<module>",
-    "token": "TOP"
-  },
-  {
-    "axis": "horizontal",
-    "category": "unknown",
-    "line": 34,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "_legacy_op_label",
-    "token": "LEFT"
-  },
-  {
-    "axis": "vertical",
-    "category": "unknown",
-    "line": 66,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "compare_placement_resolver_shadow",
-    "token": "BOTTOM"
-  },
-  {
-    "axis": "horizontal",
-    "category": "unknown",
-    "line": 69,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "compare_placement_resolver_shadow",
-    "token": "CENTER"
-  },
-  {
-    "axis": "horizontal",
-    "category": "unknown",
-    "line": 67,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "compare_placement_resolver_shadow",
-    "token": "LEFT_RIGHT"
-  },
-  {
-    "axis": "horizontal",
-    "category": "unknown",
-    "line": 63,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
-    "rationale": "Unclassified direct raw constraint read pending review",
-    "status": "active",
-    "symbol": "compare_placement_resolver_shadow",
     "token": "LEFT"
   },
   {
     "axis": "horizontal",
     "category": "unknown",
     "line": 65,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
-    "symbol": "compare_placement_resolver_shadow",
+    "symbol": "<module>",
     "token": "RIGHT"
   },
   {
     "axis": "horizontal",
     "category": "unknown",
-    "line": 70,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "line": 68,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
-    "symbol": "compare_placement_resolver_shadow",
+    "symbol": "<module>",
+    "token": "SCALE"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 76,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
     "token": "SCALE"
   },
   {
     "axis": "vertical",
     "category": "unknown",
-    "line": 68,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "line": 74,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
-    "symbol": "compare_placement_resolver_shadow",
+    "symbol": "<module>",
     "token": "TOP_BOTTOM"
   },
   {
     "axis": "vertical",
     "category": "unknown",
-    "line": 64,
-    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "line": 72,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
     "rationale": "Unclassified direct raw constraint read pending review",
     "status": "active",
-    "symbol": "compare_placement_resolver_shadow",
+    "symbol": "<module>",
     "token": "TOP"
   },
   {
     "axis": "vertical",
     "category": "planner_slot",
-    "line": 106,
+    "line": 107,
     "path": "src/figma_flutter_agent/generator/geometry/slots.py",
     "rationale": "Planner slot derivation from placement",
     "status": "active",
     "symbol": "stack_pins_from_placement",
     "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 102,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 111,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "CENTER"
   },
   {
     "axis": "horizontal",
@@ -207,32 +137,12 @@
     "rationale": "Planner slot derivation from placement",
     "status": "active",
     "symbol": "stack_pins_from_placement",
-    "token": "CENTER"
-  },
-  {
-    "axis": "horizontal",
-    "category": "planner_slot",
-    "line": 110,
-    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
-    "rationale": "Planner slot derivation from placement",
-    "status": "active",
-    "symbol": "stack_pins_from_placement",
-    "token": "CENTER"
-  },
-  {
-    "axis": "horizontal",
-    "category": "planner_slot",
-    "line": 100,
-    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
-    "rationale": "Planner slot derivation from placement",
-    "status": "active",
-    "symbol": "stack_pins_from_placement",
     "token": "LEFT_RIGHT"
   },
   {
     "axis": "horizontal",
     "category": "planner_slot",
-    "line": 97,
+    "line": 98,
     "path": "src/figma_flutter_agent/generator/geometry/slots.py",
     "rationale": "Planner slot derivation from placement",
     "status": "active",
@@ -242,7 +152,7 @@
   {
     "axis": "horizontal",
     "category": "planner_slot",
-    "line": 100,
+    "line": 101,
     "path": "src/figma_flutter_agent/generator/geometry/slots.py",
     "rationale": "Planner slot derivation from placement",
     "status": "active",
@@ -252,7 +162,7 @@
   {
     "axis": "horizontal",
     "category": "planner_slot",
-    "line": 109,
+    "line": 110,
     "path": "src/figma_flutter_agent/generator/geometry/slots.py",
     "rationale": "Planner slot derivation from placement",
     "status": "active",
@@ -262,7 +172,7 @@
   {
     "axis": "vertical",
     "category": "planner_slot",
-    "line": 109,
+    "line": 110,
     "path": "src/figma_flutter_agent/generator/geometry/slots.py",
     "rationale": "Planner slot derivation from placement",
     "status": "active",

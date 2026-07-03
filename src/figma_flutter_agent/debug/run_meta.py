@@ -13,6 +13,9 @@ from figma_flutter_agent.debug.paths import RUN_META_JSON, screen_root
 WritebackOutcome = Literal["committed", "rollback", "skipped", "failed"]
 
 
+RUN_META_SCHEMA_VERSION = "2"
+
+
 @dataclass(frozen=True)
 class RunMetaRecord:
     """Serialized run.meta.json payload."""
@@ -25,10 +28,16 @@ class RunMetaRecord:
     written_files: tuple[str, ...]
     analyze_passed: bool | None
     captured_at: str
+    run_meta_schema_version: str = RUN_META_SCHEMA_VERSION
+    status: str = "completed"
+    cached_ir_verdict: str | None = None
+    clean_tree_hash: str | None = None
+    generation_config_hash: str | None = None
+    timed_out_stage: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to JSON-serializable dict."""
-        return {
+        payload: dict[str, Any] = {
             "feature": self.feature,
             "pipeline_run_id": self.pipeline_run_id,
             "candidate_build_run_id": self.candidate_build_run_id,
@@ -37,7 +46,18 @@ class RunMetaRecord:
             "written_files": list(self.written_files),
             "analyze_passed": self.analyze_passed,
             "captured_at": self.captured_at,
+            "runMetaSchemaVersion": self.run_meta_schema_version,
+            "status": self.status,
         }
+        if self.cached_ir_verdict is not None:
+            payload["cached_ir_verdict"] = self.cached_ir_verdict
+        if self.clean_tree_hash is not None:
+            payload["clean_tree_hash"] = self.clean_tree_hash
+        if self.generation_config_hash is not None:
+            payload["generation_config_hash"] = self.generation_config_hash
+        if self.timed_out_stage is not None:
+            payload["timed_out_stage"] = self.timed_out_stage
+        return payload
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> RunMetaRecord:
@@ -55,6 +75,24 @@ class RunMetaRecord:
             written_files=tuple(str(path) for path in data.get("written_files") or []),
             analyze_passed=data.get("analyze_passed"),
             captured_at=str(data.get("captured_at") or ""),
+            run_meta_schema_version=str(
+                data.get("runMetaSchemaVersion") or RUN_META_SCHEMA_VERSION,
+            ),
+            status=str(data.get("status") or "completed"),
+            cached_ir_verdict=(
+                str(data["cached_ir_verdict"]) if data.get("cached_ir_verdict") else None
+            ),
+            clean_tree_hash=(
+                str(data["clean_tree_hash"]) if data.get("clean_tree_hash") else None
+            ),
+            generation_config_hash=(
+                str(data["generation_config_hash"])
+                if data.get("generation_config_hash")
+                else None
+            ),
+            timed_out_stage=(
+                str(data["timed_out_stage"]) if data.get("timed_out_stage") else None
+            ),
         )
 
 
@@ -72,6 +110,11 @@ def write_run_meta(
     written_files: list[str] | None = None,
     committed_build_run_id: str | None = None,
     analyze_passed: bool | None = None,
+    status: str = "completed",
+    cached_ir_verdict: str | None = None,
+    clean_tree_hash: str | None = None,
+    generation_config_hash: str | None = None,
+    timed_out_stage: str | None = None,
 ) -> Path:
     """Persist run.meta.json after a generate pipeline run.
 
@@ -98,6 +141,11 @@ def write_run_meta(
         written_files=tuple(written_files or []),
         analyze_passed=analyze_passed,
         captured_at=datetime.now(tz=UTC).isoformat(),
+        status=status,
+        cached_ir_verdict=cached_ir_verdict,
+        clean_tree_hash=clean_tree_hash,
+        generation_config_hash=generation_config_hash,
+        timed_out_stage=timed_out_stage,
     )
     path = root / RUN_META_JSON
     path.write_text(

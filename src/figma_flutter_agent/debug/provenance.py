@@ -315,3 +315,14 @@ def write_provenance_dump(recorder: ProvenanceRecorder | None = None) -> Path | 
     )
     logger.debug("Wrote provenance dump to {}", destination.as_posix())
     return destination
+
+
+def merge_pass_provenance(*layers: dict[str, Any] | None) -> dict[str, Any]:
+    """Merge advisory pass provenance layers deterministically (Program 10 P1-c)."""
+    merged: dict[str, Any] = {}
+    for layer in layers:
+        if not layer:
+            continue
+        for key in sorted(layer):
+            merged[key] = layer[key]
+    return merged

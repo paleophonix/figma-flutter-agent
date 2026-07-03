@@ -12,3 +12,4 @@ class RenderBoundaryCollapseResult:
     collapsed_count: int = 0
     flattened_node_ids: frozenset[str] = field(default_factory=frozenset)
     boundary_node_ids: frozenset[str] = field(default_factory=frozenset)
+    decorative_role_map: dict[str, str] = field(default_factory=dict)

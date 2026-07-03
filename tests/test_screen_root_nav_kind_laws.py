@@ -149,6 +149,10 @@ def test_cached_ir_load_heals_poisoned_nav_root(tmp_path: Path) -> None:
 
 def test_ir_cache_fingerprint_matches_hash_clean_tree() -> None:
     tree = _screen_root()
-    meta = ir_cache_metadata_for_write(tree)
+    settings = Settings()
+    meta = ir_cache_metadata_for_write(tree, settings=settings)
     assert meta["cleanTreeHash"] == hash_clean_tree(tree)
     assert meta["cleanRootFigmaId"] == tree.id
+    assert meta["parserVersion"]
+    assert meta["irSchemaVersion"] == "1"
+    assert meta["generationConfigHash"]

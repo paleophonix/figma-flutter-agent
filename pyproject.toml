@@ -34,6 +34,7 @@ dev = [
     "pre-commit>=3.7.0",
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
+    "hypothesis>=6.100.0",
     "respx>=0.21.0",
     "ruff>=0.4.0",
 ]
@@ -82,6 +83,7 @@ mypy = ">=1.10.0,<2"
 pre-commit = "^4.6.0"
 pytest = "^9.0.3"
 pytest-asyncio = "^1.3.0"
+hypothesis = "^6.100.0"
 
 [dependency-groups]
 dev = [
@@ -89,6 +91,7 @@ dev = [
     "pre-commit>=3.7.0",
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
+    "hypothesis>=6.100.0",
     "respx>=0.21.0",
     "ruff>=0.4.0",
 ]
@@ -103,6 +106,8 @@ markers = [
     "discord: Discord bot integration tests (optional control_panel deps)",
     "control_panel: Control panel tests (Postgres, Redis, FastAPI, ARQ)",
     "repair_live: live OpenCode repair smoke (require pinned opencode serve)",
+    "property_fast: fast property-based conservation tests (<60s CI guard)",
+    "property_nightly: slow property-based tests (10k examples, advisory CI)",
 ]
 
 [tool.ruff]
