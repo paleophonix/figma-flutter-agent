@@ -9,7 +9,10 @@ from figma_flutter_agent.compiler.m3_authority import require_m3_authority
 from figma_flutter_agent.compiler.m3_policy import DEFAULT_M3_POLICY, M3Policy
 from figma_flutter_agent.errors import ExtractionBijectionError
 from figma_flutter_agent.generator.extraction.callsite_index import collect_cluster_callsites
-from figma_flutter_agent.generator.extraction.definition_key import DefinitionKey
+from figma_flutter_agent.generator.extraction.definition_key import (
+    DefinitionKey,
+    topology_variant_for_spec,
+)
 from figma_flutter_agent.generator.extraction.dependencies import (
     build_definition_dependency_map,
     find_dependency_cycles,
@@ -29,41 +32,30 @@ class ClusterExtractionPlan:
     collect_diagnostics: tuple[tuple[str, str], ...] = ()
 
     @classmethod
-    def from_specs(
-        cls,
-        specs: list[ClusterWidgetSpec],
-        *,
-        topology_by_cluster: dict[str, str] | None = None,
-    ) -> ClusterExtractionPlan:
+    def from_specs(cls, specs: list[ClusterWidgetSpec]) -> ClusterExtractionPlan:
         """Build plan from specs only (tests); prefers ``from_specs_and_trees`` in production."""
-        return cls.from_specs_and_trees(specs, [], topology_by_cluster=topology_by_cluster)
+        return cls.from_specs_and_trees(specs, [])
 
     @classmethod
     def from_specs_and_trees(
         cls,
         specs: list[ClusterWidgetSpec],
         clean_trees: list[CleanDesignTreeNode],
-        *,
-        topology_by_cluster: dict[str, str] | None = None,
     ) -> ClusterExtractionPlan:
         """Build plan from specs and real clean-tree call-site nodes."""
-        topo = topology_by_cluster or {}
         definitions: list[DefinitionKey] = []
         definition_to_class: dict[DefinitionKey, str] = {}
         for spec in specs:
-            variant = topo.get(spec.cluster_id, "default")
-            key = DefinitionKey.from_spec(spec, topology_variant=variant)
+            key = DefinitionKey.from_spec(
+                spec,
+                topology_variant=topology_variant_for_spec(spec),
+            )
             definitions.append(key)
             definition_to_class[key] = spec.class_name
-        collected = collect_cluster_callsites(
-            specs,
-            clean_trees,
-            topology_by_cluster=topo,
-        )
+        collected = collect_cluster_callsites(specs, clean_trees)
         dep_map = build_definition_dependency_map(
             specs,
             callsite_to_definition=collected.dependency_callsites,
-            topology_by_cluster=topo,
         )
         return cls(
             definitions=tuple(definitions),

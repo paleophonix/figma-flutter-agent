@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.extraction.definition_key import DefinitionKey
+from figma_flutter_agent.generator.extraction.definition_key import (
+    DefinitionKey,
+    topology_variant_for_spec,
+)
 from figma_flutter_agent.generator.widget_models import ClusterWidgetSpec
 from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode
@@ -45,15 +48,13 @@ def build_definition_dependency_map(
     specs: list[ClusterWidgetSpec],
     *,
     callsite_to_definition: dict[str, DefinitionKey],
-    topology_by_cluster: dict[str, str] | None = None,
 ) -> dict[DefinitionKey, frozenset[DefinitionKey]]:
     """Build ``dependencies`` map for a full extraction plan."""
-    topo = topology_by_cluster or {}
     result: dict[DefinitionKey, frozenset[DefinitionKey]] = {}
     for spec in specs:
         key = DefinitionKey.from_spec(
             spec,
-            topology_variant=topo.get(spec.cluster_id, "default"),
+            topology_variant=topology_variant_for_spec(spec),
         )
         if spec.representative is None:
             result[key] = frozenset()

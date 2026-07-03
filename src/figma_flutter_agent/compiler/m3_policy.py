@@ -3,19 +3,18 @@
 from __future__ import annotations
 
 import os
-import re
 from contextvars import ContextVar, Token
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
-M3Route = Literal["definition_key", "extraction_bijection", "geometry_slots"]
-
-M2_CLOSURE_RECORD_REL = (
-    "docs/refactor/26-06-06-compiler-refactor/generated/m2-closure-record.md"
+from figma_flutter_agent.compiler.m2_closure import (
+    load_m2_closure_record,
+    m2_closure_record_is_valid,
 )
-_STATUS_CLOSED = re.compile(r"\*\*Status:\*\*\s*`?CLOSED`?", re.IGNORECASE)
+
+M3Route = Literal["definition_key", "extraction_bijection", "geometry_slots"]
 
 
 class M3RouteMode(StrEnum):
@@ -83,12 +82,9 @@ def active_m3_policy() -> M3Policy:
 
 
 def is_m2_closure_closed(*, repo_root: Path | None = None) -> bool:
-    """Read M2 closure record status from canonical generated doc."""
-    root = repo_root or Path(__file__).resolve().parents[3]
-    path = root / M2_CLOSURE_RECORD_REL
-    if not path.is_file():
-        return False
-    return _STATUS_CLOSED.search(path.read_text(encoding="utf-8")) is not None
+    """Return True only when closure record is fully valid (not status word alone)."""
+    record = load_m2_closure_record(repo_root=repo_root)
+    return m2_closure_record_is_valid(record)
 
 
 def m3_policy_at_pipeline_boundary(*, repo_root: Path | None = None) -> M3Policy:

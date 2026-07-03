@@ -182,7 +182,22 @@ def test_bijection_shadow_detects_self_cycle() -> None:
     assert any(item.code == "delegate_dependency_cycle" for item in report.diagnostics)
 
 
-def test_bijection_plan_shape_members_are_callsites() -> None:
+def test_shape_member_on_clean_tree_is_external_callsite() -> None:
+    member = _minimal_node("shape_member")
+    member.shape_cluster_id = "c1"
+    spec = ClusterWidgetSpec(
+        cluster_id="c1",
+        class_name="FooWidget",
+        file_name="foo.dart",
+        representative=_minimal_node("rep"),
+        shape_members=(member,),
+    )
+    trees = [_screen_with_usages(member)]
+    plan = ClusterExtractionPlan.from_specs_and_trees([spec], trees)
+    assert plan.callsite_to_definition["shape_member"] == plan.definitions[0]
+
+
+def test_shape_member_evidence_only_not_external_callsite() -> None:
     member = _minimal_node("shape_member", cluster_id="c1")
     spec = ClusterWidgetSpec(
         cluster_id="c1",
@@ -192,7 +207,48 @@ def test_bijection_plan_shape_members_are_callsites() -> None:
         shape_members=(member,),
     )
     plan = ClusterExtractionPlan.from_specs_and_trees([spec], [])
-    assert plan.callsite_to_definition["shape_member"] == plan.definitions[0]
+    assert "shape_member" not in plan.callsite_to_definition
+    report = validate_extraction_bijection_shadow(plan)
+    assert report.ok is False
+    assert any(item.code == "orphan_definition" for item in report.diagnostics)
+
+
+def test_shape_member_excluded_by_inline_policy_not_reachable() -> None:
+    from unittest.mock import patch
+
+    member = _minimal_node("shape_member")
+    member.shape_cluster_id = "c1"
+    spec = ClusterWidgetSpec(
+        cluster_id="c1",
+        class_name="FooWidget",
+        file_name="foo.dart",
+        representative=_minimal_node("rep"),
+        shape_members=(member,),
+    )
+    trees = [_screen_with_usages(member)]
+    with patch(
+        "figma_flutter_agent.parser.interaction.must_inline_extracted_widget_host",
+        return_value=True,
+    ):
+        plan = ClusterExtractionPlan.from_specs_and_trees([spec], trees)
+    assert "shape_member" not in plan.callsite_to_definition
+    report = validate_extraction_bijection_shadow(plan)
+    assert report.ok is False
+    assert any(item.code == "orphan_definition" for item in report.diagnostics)
+
+
+def test_duplicate_class_name_diagnostic() -> None:
+    specs = [_spec("c1", "SharedWidget", "rep_a"), _spec("c2", "SharedWidget", "rep_b")]
+    usage = _minimal_node("usage")
+    usage.extracted_widget_ref = "SharedWidget"
+    trees = [_screen_with_usages(usage)]
+    plan = ClusterExtractionPlan.from_specs_and_trees(specs, trees)
+    assert "usage" not in plan.callsite_to_definition
+    assert any(code == "duplicate_class_definition" for code, _ in plan.collect_diagnostics)
+    assert any(
+        code in {"callsite_ambiguous", "callsite_unresolved"}
+        for code, _ in plan.collect_diagnostics
+    )
 
 
 def test_bijection_two_topology_variants_same_cluster_id() -> None:
@@ -219,6 +275,8 @@ def test_bijection_two_topology_variants_same_cluster_id() -> None:
     assert len(plan.definitions) == 2
     key_a = next(k for k in plan.definitions if k.representative_node_id == "rep_a")
     key_b = next(k for k in plan.definitions if k.representative_node_id == "rep_b")
+    assert key_a.topology_variant == "rep_a"
+    assert key_b.topology_variant == "rep_b"
     assert key_b in plan.dependencies[key_a]
 
 

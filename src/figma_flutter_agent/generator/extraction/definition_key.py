@@ -18,18 +18,26 @@ class DefinitionKey:
     representative_node_id: str
 
     @classmethod
-    def from_spec(cls, spec: ClusterWidgetSpec, *, topology_variant: str = "default") -> DefinitionKey:
-        """Build key from extraction spec and topology variant label."""
+    def from_spec(cls, spec: ClusterWidgetSpec, *, topology_variant: str | None = None) -> DefinitionKey:
+        """Build key from extraction spec and variant label."""
         rep = spec.representative.id if spec.representative else spec.cluster_id
+        variant = topology_variant if topology_variant is not None else rep
         return cls(
             cluster_id=spec.cluster_id,
-            topology_variant=topology_variant,
+            topology_variant=variant,
             representative_node_id=rep,
         )
 
     def legacy_cluster_id(self) -> str:
         """Legacy dict key — authoritative until 04-P0-2b."""
         return self.cluster_id
+
+
+def topology_variant_for_spec(spec: ClusterWidgetSpec) -> str:
+    """Variant label keyed by representative node id (not cluster_id last-wins)."""
+    if spec.representative is None:
+        return spec.cluster_id
+    return spec.representative.id
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,6 +49,7 @@ class DefinitionKeyShadowReport:
     mismatches: tuple[tuple[str, str, str], ...]
     duplicate_shadow_keys: tuple[str, ...]
     duplicate_body_keys: tuple[str, ...]
+    duplicate_class_names: tuple[str, ...]
 
 
 def build_legacy_cluster_classes(specs: list[ClusterWidgetSpec]) -> dict[str, str]:
@@ -48,19 +57,22 @@ def build_legacy_cluster_classes(specs: list[ClusterWidgetSpec]) -> dict[str, st
     return {spec.cluster_id: spec.class_name for spec in specs}
 
 
+def _duplicate_class_names(specs: list[ClusterWidgetSpec]) -> tuple[str, ...]:
+    by_name: dict[str, list[ClusterWidgetSpec]] = {}
+    for spec in specs:
+        by_name.setdefault(spec.class_name, []).append(spec)
+    return tuple(name for name, items in sorted(by_name.items()) if len(items) > 1)
+
+
 def build_shadow_definition_map(
     specs: list[ClusterWidgetSpec],
-    *,
-    topology_by_cluster: dict[str, str] | None = None,
 ) -> tuple[dict[DefinitionKey, str], tuple[str, ...], tuple[str, ...]]:
     """Build shadow map with pre-dict collision validation."""
-    topo = topology_by_cluster or {}
     entries: list[tuple[DefinitionKey, str]] = []
     duplicate_keys: list[str] = []
     duplicate_bodies: list[str] = []
     for spec in specs:
-        variant = topo.get(spec.cluster_id, "default")
-        key = DefinitionKey.from_spec(spec, topology_variant=variant)
+        key = DefinitionKey.from_spec(spec, topology_variant=topology_variant_for_spec(spec))
         for existing_key, existing_class in entries:
             if existing_key == key and existing_class != spec.class_name:
                 duplicate_bodies.append(f"{key.cluster_id}:{key.topology_variant}")
@@ -89,19 +101,13 @@ def lookup_cluster_class_authoritative(
 
 def compare_definition_key_shadow(
     specs: list[ClusterWidgetSpec],
-    *,
-    topology_by_cluster: dict[str, str] | None = None,
 ) -> DefinitionKeyShadowReport:
     """Compare legacy last-wins dict against shadow DefinitionKey map."""
     legacy = build_legacy_cluster_classes(specs)
-    shadow, duplicate_keys, duplicate_bodies = build_shadow_definition_map(
-        specs,
-        topology_by_cluster=topology_by_cluster,
-    )
+    shadow, duplicate_keys, duplicate_bodies = build_shadow_definition_map(specs)
     mismatches: list[tuple[str, str, str]] = []
     for spec in specs:
-        variant = (topology_by_cluster or {}).get(spec.cluster_id, "default")
-        key = DefinitionKey.from_spec(spec, topology_variant=variant)
+        key = DefinitionKey.from_spec(spec, topology_variant=topology_variant_for_spec(spec))
         legacy_class = legacy.get(spec.cluster_id)
         shadow_class = shadow.get(key)
         if legacy_class != shadow_class:
@@ -112,4 +118,5 @@ def compare_definition_key_shadow(
         mismatches=tuple(mismatches),
         duplicate_shadow_keys=duplicate_keys,
         duplicate_body_keys=duplicate_bodies,
+        duplicate_class_names=_duplicate_class_names(specs),
     )

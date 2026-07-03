@@ -1,4 +1,4 @@
-"""Resolver shadow comparison: legacy branches vs pure resolver (06-P0-1c)."""
+"""Resolver shadow comparison: legacy positioned consumer vs typed resolver (06-P0-1c)."""
 
 from __future__ import annotations
 
@@ -8,8 +8,10 @@ from typing import Literal
 from figma_flutter_agent.generator.geometry.constraint_algebra import (
     ResolvedAxisGeometry,
     axis_constraint_from_placement,
-    raw_to_resolved_geometry,
     resolve_constraint_axis,
+)
+from figma_flutter_agent.generator.geometry.legacy_positioned import (
+    legacy_axis_geometry_from_positioned,
 )
 from figma_flutter_agent.schemas.geometry import StackPlacement
 
@@ -20,7 +22,7 @@ _DEFAULT_SOURCE_EXTENT = 320.0
 
 @dataclass(frozen=True, slots=True)
 class ResolverShadowMismatch:
-    """One axis/parent extent where resolver geometry disagrees with reference."""
+    """One axis/parent extent where resolver geometry disagrees with legacy consumer."""
 
     axis: str
     parent_extent: float
@@ -38,35 +40,6 @@ class ResolverShadowReport:
     mismatches: tuple[ResolverShadowMismatch, ...]
 
 
-def _legacy_expected_geometry(
-    placement: StackPlacement,
-    *,
-    axis: Literal["horizontal", "vertical"],
-    source_parent_extent: float,
-    target_parent_extent: float,
-) -> ResolvedAxisGeometry:
-    """Reference geometry: parse at source extent, apply ratios at target extent."""
-    if axis == "horizontal":
-        return raw_to_resolved_geometry(
-            str(placement.horizontal),
-            axis="horizontal",
-            left=placement.left,
-            right=placement.right,
-            width=placement.width,
-            source_parent_extent=source_parent_extent,
-            target_parent_extent=target_parent_extent,
-        )
-    return raw_to_resolved_geometry(
-        str(placement.vertical),
-        axis="vertical",
-        top=placement.top,
-        bottom=placement.bottom,
-        height=placement.height,
-        source_parent_extent=source_parent_extent,
-        target_parent_extent=target_parent_extent,
-    )
-
-
 def _resolved_geometry(
     placement: StackPlacement,
     *,
@@ -74,7 +47,7 @@ def _resolved_geometry(
     source_parent_extent: float,
     target_parent_extent: float,
 ) -> ResolvedAxisGeometry:
-    """Resolver path under test."""
+    """Typed resolver path under test."""
     if axis == "horizontal":
         typed = axis_constraint_from_placement(
             raw=str(placement.horizontal),
@@ -136,7 +109,7 @@ def compare_placement_resolver_shadow(
     source_parent_extent: float = _DEFAULT_SOURCE_EXTENT,
     parent_extents: tuple[float, ...] | None = None,
 ) -> ResolverShadowReport:
-    """Compare resolver geometry: constraint frozen at source, resolved at targets."""
+    """Compare typed resolver against legacy ``_positioned_fields`` consumer."""
     mismatches: list[ResolverShadowMismatch] = []
     targets = parent_extents or _DEFAULT_PARENT_EXTENTS
     for axis, raw in (
@@ -146,11 +119,11 @@ def compare_placement_resolver_shadow(
         for target_extent in targets:
             if target_extent <= 0 or source_parent_extent <= 0:
                 continue
-            reference = _legacy_expected_geometry(
+            reference = legacy_axis_geometry_from_positioned(
                 placement,
                 axis=axis,  # type: ignore[arg-type]
-                source_parent_extent=source_parent_extent,
                 target_parent_extent=target_extent,
+                parent_height=target_extent if axis == "vertical" else None,
             )
             resolved = _resolved_geometry(
                 placement,
