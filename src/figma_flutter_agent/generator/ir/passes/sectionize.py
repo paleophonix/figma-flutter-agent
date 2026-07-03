@@ -360,6 +360,8 @@ def _sync_ir_from_clean_subtree(
     *,
     ir_index: dict[str, WidgetIrNode],
 ) -> WidgetIrNode:
+    if ir_node.kind == WidgetIrKind.EXTRACTED:
+        return ir_node.model_copy(update={"children": []})
     child_ir: list[WidgetIrNode] = []
     for child in clean_node.children:
         mapped = ir_index.get(child.id)

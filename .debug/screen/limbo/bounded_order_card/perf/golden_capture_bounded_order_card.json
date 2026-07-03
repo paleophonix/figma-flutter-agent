@@ -4,7 +4,7 @@
   "fastCapture": true,
   "workspace": "docker",
   "timingsSec": {
-    "totalCapture": 11.296000000002095
+    "totalCapture": 7.405999999988126
   },
   "screenId": "bounded_order_card"
 }

@@ -1,0 +1,10 @@
+{
+  "feature": "flex_summary_row",
+  "mode": "docker",
+  "fastCapture": true,
+  "workspace": "docker",
+  "timingsSec": {
+    "totalCapture": 8.452999999979511
+  },
+  "screenId": "flex_summary_row"
+}

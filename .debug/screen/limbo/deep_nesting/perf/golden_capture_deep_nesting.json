@@ -4,7 +4,7 @@
   "fastCapture": true,
   "workspace": "docker",
   "timingsSec": {
-    "totalCapture": 11.547000000005937
+    "totalCapture": 8.172000000020489
   },
   "screenId": "deep_nesting"
 }

@@ -1,10 +1,10 @@
 {
-  "feature": "reminders",
+  "feature": "consent_checkbox",
   "mode": "docker",
   "fastCapture": true,
   "workspace": "docker",
   "timingsSec": {
-    "totalCapture": 10.078000000008615
+    "totalCapture": 8.0
   },
-  "screenId": "reminders"
+  "screenId": "consent_checkbox"
 }

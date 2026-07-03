@@ -4,7 +4,7 @@
   "fastCapture": true,
   "workspace": "docker",
   "timingsSec": {
-    "totalCapture": 12.0
+    "totalCapture": 10.327999999979511
   },
   "screenId": "sign_up_and_sign_in"
 }

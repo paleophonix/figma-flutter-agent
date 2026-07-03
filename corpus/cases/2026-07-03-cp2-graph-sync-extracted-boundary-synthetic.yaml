@@ -45,9 +45,13 @@ occurrences:
     repair:
       changed_files:
         - src/figma_flutter_agent/generator/geometry/invariants/conservation.py
+        - src/figma_flutter_agent/generator/ir/passes/sectionize.py
       regression_tests:
         - tests/test_extracted_ir_terminal_law.py::test_check_graph_sync_allows_extracted_terminal_with_clean_subtree
         - tests/test_extracted_ir_terminal_law.py::test_check_graph_sync_rejects_extracted_host_with_inline_children
-        - tests/test_conservation_invariants.py::test_graph_sync_detects_child_mismatch
+        - tests/test_extracted_ir_terminal_law.py::test_check_graph_sync_rejects_orphan_ref_on_inline_kind
+        - tests/test_extracted_ir_terminal_law.py::test_sectionize_preserves_extracted_boundary
+        - tests/test_extracted_ir_terminal_law.py::test_layout_passes_preserve_extracted_boundary
+        - tests/test_extracted_ir_terminal_law.py::test_apply_ir_layout_passes_food_menu_2_extracted_boundaries
       verification:
         - poetry run pytest -q tests/test_extracted_ir_terminal_law.py tests/test_conservation_invariants.py

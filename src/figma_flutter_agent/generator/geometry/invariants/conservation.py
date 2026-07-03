@@ -312,6 +312,16 @@ def check_graph_sync(
                     ),
                 )
             continue
+        ref_name = (ir_node.ref.widget_name if ir_node.ref else "").strip()
+        if ref_name:
+            violations.append(
+                geometry_violation(
+                    code="inv_graph_sync",
+                    node_id=figma_id,
+                    detail="inline IR node must not retain extracted widget ref",
+                ),
+            )
+            continue
         ir_child_ids = {child.figma_id for child in ir_node.children}
         clean_child_ids = {child.id for child in clean_node.children}
         if ir_child_ids != clean_child_ids:

@@ -1,0 +1,10 @@
+{
+  "feature": "prefilled_input",
+  "mode": "docker",
+  "fastCapture": true,
+  "workspace": "docker",
+  "timingsSec": {
+    "totalCapture": 8.296000000002095
+  },
+  "screenId": "prefilled_input"
+}
