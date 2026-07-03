@@ -261,6 +261,15 @@ async def run_pipeline(
     )
     resolved_feature = ctx.resolved_feature
     reset_pipeline_run_debug_dirs(project_dir, resolved_feature)
+    if resolved_feature and not dry_run:
+        from figma_flutter_agent.debug.run_meta import update_run_meta_stage
+
+        update_run_meta_stage(
+            project_dir,
+            resolved_feature,
+            pipeline_run_id=run_id,
+            status="started",
+        )
     bind_terminal_log_session(project_dir, resolved_feature)
     bind_dart_error_session(
         run_id=run_id,
@@ -377,6 +386,21 @@ async def run_pipeline(
         pipeline_deps=pipeline_deps,
         execute_llm_stage_fn=execute_llm_stage,
     )
+    if ctx.resolved_feature and not dry_run:
+        from figma_flutter_agent.compiler.generation_config_fingerprint import (
+            generation_config_fingerprint,
+        )
+        from figma_flutter_agent.debug.run_meta import update_run_meta_stage
+
+        _, cfg_hash = generation_config_fingerprint(settings)
+        update_run_meta_stage(
+            project_dir,
+            ctx.resolved_feature,
+            pipeline_run_id=run_id,
+            status="planned",
+            clean_tree_hash=hashes.tree_hash,
+            generation_config_hash=cfg_hash,
+        )
 
     package_name = read_pubspec_name(project_dir)
     architecture = settings.agent.flutter.architecture

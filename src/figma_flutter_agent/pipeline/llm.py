@@ -8,6 +8,7 @@ from typing import Any
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.config.models import SemanticsSettings
+from figma_flutter_agent.compiler.ir_cache_policy import DEFAULT_IR_CACHE_POLICY, IrCachePolicy
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.generator.paths import Architecture, screen_file_path
@@ -40,6 +41,8 @@ def load_cached_ir_llm_outcome(
     clean_tree: CleanDesignTreeNode,
     tokens: DesignTokens,
     from_ir_path: Path | None = None,
+    ir_cache_policy: IrCachePolicy | None = None,
+    allow_regenerate: bool = True,
 ) -> LlmPipelineOutcome:
     """Skip LLM and load ``FlutterGenerationResponse`` from ``.debug/ir``.
 
@@ -82,24 +85,30 @@ def load_cached_ir_llm_outcome(
         clean_tree=clean_tree,
         settings=settings,
     )
-    if verdict == "legacy_unknown":
-        log.warning(
-            "Cached IR identity incomplete (legacy_unknown); authoritative read continues ({})",
-            report_path.name,
-        )
-    elif verdict == "incompatible":
-        log.warning(
-            "Cached IR identity mismatch (shadow); authoritative read continues ({})",
-            report_path.name,
-        )
-    from figma_flutter_agent.compiler.ir_cache_policy import load_ir_cache_policy
-
-    policy = load_ir_cache_policy()
+    policy = ir_cache_policy or DEFAULT_IR_CACHE_POLICY
+    if policy.shadow_enabled():
+        if verdict == "legacy_unknown":
+            log.warning(
+                "Cached IR identity incomplete (legacy_unknown); authoritative read continues ({})",
+                report_path.name,
+            )
+        elif verdict == "incompatible":
+            log.warning(
+                "Cached IR identity mismatch (shadow); authoritative read continues ({})",
+                report_path.name,
+            )
     if policy.enforce_enabled() and verdict in {"incompatible", "legacy_unknown"}:
-        from figma_flutter_agent.errors import FlutterProjectError
+        from figma_flutter_agent.errors import CachedIrRegenerationRequired, FlutterProjectError
 
+        if allow_regenerate:
+            raise CachedIrRegenerationRequired(
+                verdict=verdict,
+                report_name=report_path.name,
+            )
         raise FlutterProjectError(
-            f"Cached screen IR rejected ({verdict}). Refresh IR via generate for this screen."
+            "Cached screen IR is stale and cannot be regenerated in this mode. "
+            f"Verdict={verdict}. Run generate for this screen to refresh IR "
+            f"(see {report_path.name})."
         )
     extracted = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     generation = _normalize_cached_ir_generation(

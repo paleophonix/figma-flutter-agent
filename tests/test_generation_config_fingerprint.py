@@ -7,15 +7,25 @@ import json
 from figma_flutter_agent.compiler.generation_config_fingerprint import (
     generation_config_fingerprint,
     load_allowlist_paths,
+    packaged_allowlist_path,
 )
 from figma_flutter_agent.config import Settings
+from tests.fixtures.generation_config_fingerprint_allowlist import (
+    TEST_ALLOWLIST_FIXTURE,
+)
 
 
-def test_allowlist_fixture_loads() -> None:
+def test_runtime_allowlist_loads_from_package() -> None:
     version, paths = load_allowlist_paths()
     assert version == "1"
+    assert packaged_allowlist_path().is_file()
     assert "generation.use_screen_ir" in paths
-    assert "semantics.strict_fidelity" in paths
+
+
+def test_test_fixture_matches_packaged_allowlist() -> None:
+    runtime = json.loads(packaged_allowlist_path().read_text(encoding="utf-8"))
+    fixture = json.loads(TEST_ALLOWLIST_FIXTURE.read_text(encoding="utf-8"))
+    assert runtime == fixture
 
 
 def test_fingerprint_stable_for_default_settings() -> None:
@@ -34,21 +44,3 @@ def test_fingerprint_changes_when_semantics_toggle() -> None:
     _, base_hash = generation_config_fingerprint(base)
     _, toggled_hash = generation_config_fingerprint(toggled)
     assert base_hash != toggled_hash
-
-
-def test_allowlist_paths_are_json_serializable_snapshot() -> None:
-    settings = Settings()
-    version, paths = load_allowlist_paths()
-    agent = settings.agent
-    snapshot = {}
-    for dot_path in paths:
-        parts = dot_path.split(".")
-        current = agent
-        for part in parts:
-            current = getattr(current, part)
-        if hasattr(current, "model_dump"):
-            snapshot[dot_path] = current.model_dump(mode="json")
-        else:
-            snapshot[dot_path] = current
-    encoded = json.dumps(snapshot, sort_keys=True)
-    assert encoded

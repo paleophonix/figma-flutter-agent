@@ -75,6 +75,18 @@ class FlutterProjectError(FigmaFlutterError):
     """Raised when the target Flutter project path is invalid."""
 
 
+class CachedIrRegenerationRequired(FlutterProjectError):
+    """Enforce-mode signal: stale cached IR must be regenerated via LLM."""
+
+    def __init__(self, *, verdict: str, report_name: str | None = None) -> None:
+        detail = f"Cached screen IR stale ({verdict})"
+        if report_name:
+            detail = f"{detail}; see {report_name}"
+        super().__init__(detail)
+        self.verdict = verdict
+        self.report_name = report_name
+
+
 class FlutterPreviewLaunchError(FlutterProjectError):
     """Raised when ``flutter run`` preview launch fails after codegen succeeded."""
 

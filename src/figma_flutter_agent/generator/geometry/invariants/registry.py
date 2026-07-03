@@ -23,6 +23,7 @@ from figma_flutter_agent.generator.geometry.invariants.conservation import (
 )
 from figma_flutter_agent.generator.geometry.invariants.models import (
     GeometryInvariantViolation,
+    geometry_violation,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr
 
@@ -127,8 +128,14 @@ def _cp1_style_truth_check(ctx: ConservationLawContext) -> list[GeometryInvarian
 
 
 def _cp1_type_truth_check(ctx: ConservationLawContext) -> list[GeometryInvariantViolation]:
-    if ctx.type_baseline is None:
-        return []
+    if ctx.type_baseline is None or not ctx.type_baseline:
+        return [
+            geometry_violation(
+                code="inv_type_truth_unavailable",
+                node_id=ctx.current_clean.id,
+                detail="type baseline missing; evidence unavailable",
+            ),
+        ]
     return check_type_truth(
         ctx.type_baseline,
         ctx.current_clean,
@@ -221,7 +228,7 @@ CONSERVATION_LAWS: tuple[ConservationLaw, ...] = (
     ),
     ConservationLaw(
         law_id="LAW-CP1-TYPE-TRUTH",
-        violation_codes=("inv_type_truth",),
+        violation_codes=("inv_type_truth", "inv_type_truth_unavailable"),
         check_symbol="check_type_truth",
         check_fn=_cp1_type_truth_check,
         stage="CP1",

@@ -27,7 +27,11 @@ class IrCachePolicy:
         return self.mode == IrCachePolicyMode.ENFORCE
 
 
-def load_ir_cache_policy() -> IrCachePolicy:
+DEFAULT_IR_CACHE_POLICY = IrCachePolicy()
+
+
+def ir_cache_policy_at_pipeline_boundary() -> IrCachePolicy:
+    """Load IR cache policy once at pipeline boundary (env override)."""
     raw = os.environ.get("FIGMA_IR_CACHE_POLICY", "shadow").strip().lower()
     try:
         mode = IrCachePolicyMode(raw)

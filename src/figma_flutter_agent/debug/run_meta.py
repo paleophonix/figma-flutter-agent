@@ -9,11 +9,23 @@ from pathlib import Path
 from typing import Any, Literal
 
 from figma_flutter_agent.debug.paths import RUN_META_JSON, screen_root
+from figma_flutter_agent.generator.writing.io import atomic_write_text
 
 WritebackOutcome = Literal["committed", "rollback", "skipped", "failed"]
-
+RunMetaStatus = Literal[
+    "started",
+    "parsed",
+    "planned",
+    "validated",
+    "completed",
+    "failed",
+    "timed_out",
+    "legacy",
+    "unknown",
+]
 
 RUN_META_SCHEMA_VERSION = "2"
+LEGACY_RUN_META_SCHEMA_VERSION = "legacy"
 
 
 @dataclass(frozen=True)
@@ -28,8 +40,8 @@ class RunMetaRecord:
     written_files: tuple[str, ...]
     analyze_passed: bool | None
     captured_at: str
-    run_meta_schema_version: str = RUN_META_SCHEMA_VERSION
-    status: str = "completed"
+    run_meta_schema_version: str
+    status: RunMetaStatus
     cached_ir_verdict: str | None = None
     clean_tree_hash: str | None = None
     generation_config_hash: str | None = None
@@ -61,7 +73,19 @@ class RunMetaRecord:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> RunMetaRecord:
-        """Parse run.meta.json dict."""
+        """Parse run.meta.json dict without upgrading legacy artifacts."""
+        schema_raw = data.get("runMetaSchemaVersion")
+        if schema_raw is None:
+            schema_version = LEGACY_RUN_META_SCHEMA_VERSION
+        else:
+            schema_version = str(schema_raw)
+
+        status_raw = data.get("status")
+        if status_raw is None:
+            status: RunMetaStatus = "legacy"
+        else:
+            status = str(status_raw)  # type: ignore[assignment]
+
         return cls(
             feature=str(data.get("feature") or ""),
             pipeline_run_id=str(data.get("pipeline_run_id") or ""),
@@ -75,10 +99,8 @@ class RunMetaRecord:
             written_files=tuple(str(path) for path in data.get("written_files") or []),
             analyze_passed=data.get("analyze_passed"),
             captured_at=str(data.get("captured_at") or ""),
-            run_meta_schema_version=str(
-                data.get("runMetaSchemaVersion") or RUN_META_SCHEMA_VERSION,
-            ),
-            status=str(data.get("status") or "completed"),
+            run_meta_schema_version=schema_version,
+            status=status,
             cached_ir_verdict=(
                 str(data["cached_ir_verdict"]) if data.get("cached_ir_verdict") else None
             ),
@@ -101,6 +123,41 @@ def run_meta_path(project_dir: Path, feature_name: str) -> Path:
     return screen_root(project_dir, feature_name) / RUN_META_JSON
 
 
+def _read_run_meta_dict(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data if isinstance(data, dict) else {}
+
+
+def _write_run_meta_dict(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    atomic_write_text(path, json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+
+
+def update_run_meta_stage(
+    project_dir: Path,
+    feature_name: str,
+    *,
+    pipeline_run_id: str,
+    status: RunMetaStatus,
+    **fields: Any,
+) -> Path:
+    """Read-modify-write run.meta with atomic replace; preserves unknown keys."""
+    path = run_meta_path(project_dir, feature_name)
+    payload = _read_run_meta_dict(path)
+    payload.update(fields)
+    payload["feature"] = feature_name
+    payload["pipeline_run_id"] = pipeline_run_id
+    payload["status"] = status
+    payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
+    payload["captured_at"] = datetime.now(tz=UTC).isoformat()
+    if "candidate_build_run_id" not in payload:
+        payload["candidate_build_run_id"] = pipeline_run_id
+    _write_run_meta_dict(path, payload)
+    return path
+
+
 def write_run_meta(
     project_dir: Path,
     feature_name: str,
@@ -110,48 +167,36 @@ def write_run_meta(
     written_files: list[str] | None = None,
     committed_build_run_id: str | None = None,
     analyze_passed: bool | None = None,
-    status: str = "completed",
+    status: RunMetaStatus = "completed",
     cached_ir_verdict: str | None = None,
     clean_tree_hash: str | None = None,
     generation_config_hash: str | None = None,
     timed_out_stage: str | None = None,
 ) -> Path:
-    """Persist run.meta.json after a generate pipeline run.
-
-    Args:
-        project_dir: Flutter project root.
-        feature_name: Screen feature slug.
-        pipeline_run_id: Correlation id for this pipeline execution.
-        writeback: Whether project lib write committed, rolled back, or was skipped.
-        written_files: Relative paths written to the Flutter project.
-        committed_build_run_id: Run id stamped in committed project lib after write.
-        analyze_passed: Pre-write analyze outcome when known.
-
-    Returns:
-        Path to written run.meta.json.
-    """
-    root = screen_root(project_dir, feature_name)
-    root.mkdir(parents=True, exist_ok=True)
+    """Persist final run.meta.json after a generate pipeline run."""
+    path = run_meta_path(project_dir, feature_name)
+    existing = _read_run_meta_dict(path)
     record = RunMetaRecord(
         feature=feature_name,
         pipeline_run_id=pipeline_run_id,
-        candidate_build_run_id=pipeline_run_id,
+        candidate_build_run_id=str(existing.get("candidate_build_run_id") or pipeline_run_id),
         committed_build_run_id=committed_build_run_id or pipeline_run_id,
         writeback=writeback,
         written_files=tuple(written_files or []),
         analyze_passed=analyze_passed,
         captured_at=datetime.now(tz=UTC).isoformat(),
+        run_meta_schema_version=RUN_META_SCHEMA_VERSION,
         status=status,
         cached_ir_verdict=cached_ir_verdict,
         clean_tree_hash=clean_tree_hash,
         generation_config_hash=generation_config_hash,
         timed_out_stage=timed_out_stage,
     )
-    path = root / RUN_META_JSON
-    path.write_text(
-        json.dumps(record.to_dict(), indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
+    payload = record.to_dict()
+    for key, value in existing.items():
+        if key not in payload:
+            payload[key] = value
+    _write_run_meta_dict(path, payload)
     return path
 
 
@@ -160,7 +205,4 @@ def read_run_meta(project_dir: Path, feature_name: str) -> RunMetaRecord | None:
     path = run_meta_path(project_dir, feature_name)
     if not path.is_file():
         return None
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        return None
-    return RunMetaRecord.from_dict(data)
+    return RunMetaRecord.from_dict(_read_run_meta_dict(path))

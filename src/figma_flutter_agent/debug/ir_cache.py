@@ -56,12 +56,13 @@ def cached_ir_clean_tree_hash(path: Path) -> str | None:
 def screen_ir_cache_fingerprint(
     clean_tree: CleanDesignTreeNode,
     *,
-    settings: Settings | None = None,
+    settings: Settings,
 ) -> dict[str, object]:
     """Build a compatibility fingerprint for the current processed clean tree."""
     width = clean_tree.sizing.width
     height = clean_tree.sizing.height
-    fingerprint: dict[str, object] = {
+    cfg_version, cfg_hash = generation_config_fingerprint(settings)
+    return {
         "irCacheFingerprintVersion": IR_CACHE_FINGERPRINT_VERSION,
         "cleanTreeHash": hash_clean_tree(clean_tree),
         "cleanRootFigmaId": clean_tree.id,
@@ -70,22 +71,18 @@ def screen_ir_cache_fingerprint(
         "cleanRootHeight": float(height) if height is not None else None,
         "parserVersion": PARSER_VERSION,
         "irSchemaVersion": IR_SCHEMA_VERSION,
+        "generationConfigFingerprintVersion": cfg_version,
+        "generationConfigHash": cfg_hash,
     }
-    if settings is not None:
-        cfg_version, cfg_hash = generation_config_fingerprint(settings)
-        fingerprint["generationConfigFingerprintVersion"] = cfg_version
-        fingerprint["generationConfigHash"] = cfg_hash
-    return fingerprint
 
 
 def ir_cache_metadata_for_write(
     clean_tree: CleanDesignTreeNode,
     *,
-    settings: Settings | None = None,
+    settings: Settings,
 ) -> dict[str, object]:
     """Return metadata merged into persisted screen IR snapshots."""
-    resolved = settings if settings is not None else Settings()
-    return screen_ir_cache_fingerprint(clean_tree, settings=resolved)
+    return screen_ir_cache_fingerprint(clean_tree, settings=settings)
 
 
 def compare_ir_cache_compatibility(

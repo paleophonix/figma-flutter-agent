@@ -1,0 +1,29 @@
+{
+  "generationConfigFingerprintVersion": "1",
+  "paths": [
+    "generation.use_screen_ir",
+    "generation.require_screen_ir",
+    "generation.enforce_cluster_widgets",
+    "generation.cluster_min_count",
+    "generation.widget_extraction",
+    "generation.true_subtree_pruning",
+    "semantics.enabled",
+    "semantics.report_only",
+    "semantics.confidence_threshold",
+    "semantics.grey_zone_min",
+    "semantics.authoritative_classifier",
+    "semantics.strict_fidelity",
+    "semantics.strict_l10n",
+    "semantics.strict_a11y",
+    "layout",
+    "layout_passes",
+    "responsive.mode",
+    "responsive.require_reflow",
+    "responsive.macro_height_threshold_px",
+    "assets.strict_render_boundary",
+    "naming.widget_suffix",
+    "naming.feature_name",
+    "quality",
+    "validation.emit_parse_gate"
+  ]
+}

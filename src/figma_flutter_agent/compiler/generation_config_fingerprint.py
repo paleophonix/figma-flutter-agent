@@ -5,25 +5,26 @@ from __future__ import annotations
 import hashlib
 import json
 from functools import lru_cache
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
 from figma_flutter_agent.config import Settings
 
-ALLOWLIST_FIXTURE = (
-    Path(__file__).resolve().parents[3] / "tests/fixtures/generation_config_fingerprint_allowlist.json"
-)
-
 DEFAULT_FINGERPRINT_VERSION = "1"
+_ALLOWLIST_RESOURCE = "generation_config_fingerprint_allowlist.json"
 
 
-def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[3]
+def packaged_allowlist_path() -> Path:
+    """Return on-disk path to the packaged allowlist JSON (wheel-safe)."""
+    ref = resources.files("figma_flutter_agent.compiler.data").joinpath(_ALLOWLIST_RESOURCE)
+    with resources.as_file(ref) as path:
+        return path
 
 
 def load_allowlist_paths(*, fixture_path: Path | None = None) -> tuple[str, tuple[str, ...]]:
     """Load canonical settings dot-paths included in generation config hash."""
-    path = fixture_path or ALLOWLIST_FIXTURE
+    path = fixture_path or packaged_allowlist_path()
     payload = json.loads(path.read_text(encoding="utf-8"))
     version = str(payload.get("generationConfigFingerprintVersion", DEFAULT_FINGERPRINT_VERSION))
     paths = tuple(str(item) for item in payload.get("paths", []))

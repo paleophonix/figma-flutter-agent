@@ -7,6 +7,7 @@ from typing import Any
 
 from loguru import logger
 
+from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.clients import LlmClient
 from figma_flutter_agent.parser.dedup.hints import build_widget_extraction_hints
@@ -47,6 +48,7 @@ def build_destination_trees(
 async def _generate_destination_screen(
     llm: LlmClient,
     *,
+    settings: Settings,
     destination_tree: CleanDesignTreeNode,
     tokens: DesignTokens,
     feature_name: str,
@@ -62,6 +64,7 @@ async def _generate_destination_screen(
     return await llm.generate_async(
         destination_tree,
         tokens,
+        settings=settings,
         feature_name=feature_name,
         asset_manifest=asset_manifest,
         widget_hints=widget_hints,
@@ -77,6 +80,7 @@ async def _generate_destination_screen(
 async def generate_destination_screens(
     llm: LlmClient,
     *,
+    settings: Settings,
     routes: list[RouteDefinition],
     current_feature: str,
     frame_index: dict[str, dict[str, Any]],
@@ -142,6 +146,7 @@ async def generate_destination_screens(
         try:
             response = await _generate_destination_screen(
                 llm,
+                settings=settings,
                 destination_tree=destination_tree,
                 tokens=tokens,
                 feature_name=route.name,

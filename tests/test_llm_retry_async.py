@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.clients import AnthropicLlmClient
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
@@ -35,6 +36,7 @@ async def test_generate_async_retries_with_asyncio_sleep() -> None:
         response = await client.generate_async(
             clean_tree,
             tokens,
+            settings=Settings(),
             feature_name="test",
             asset_manifest=[],
         )
@@ -68,6 +70,7 @@ async def test_generate_async_retries_on_json_validation_failure() -> None:
         response = await client.generate_async(
             clean_tree,
             tokens,
+            settings=Settings(),
             feature_name="test",
             asset_manifest=[],
         )

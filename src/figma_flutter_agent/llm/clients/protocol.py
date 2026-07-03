@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.config import Settings
 
 from figma_flutter_agent.llm.refine_context import RefineAttemptSummary, RefineFocus
 from figma_flutter_agent.schemas import (
@@ -76,6 +79,7 @@ class LlmClient(Protocol):
         clean_tree: CleanDesignTreeNode,
         tokens: DesignTokens,
         *,
+        settings: Settings,
         feature_name: str,
         asset_manifest: list[dict[str, str]],
         widget_hints: list[str] | None = None,
@@ -94,6 +98,7 @@ class LlmClient(Protocol):
         clean_tree: CleanDesignTreeNode,
         tokens: DesignTokens,
         *,
+        settings: Settings,
         feature_name: str,
         asset_manifest: list[dict[str, str]],
         widget_hints: list[str] | None = None,
@@ -133,6 +138,7 @@ class LlmClient(Protocol):
         clean_tree: CleanDesignTreeNode,
         tokens: DesignTokens,
         *,
+        settings: Settings,
         feature_name: str,
         asset_manifest: list[dict[str, str]],
         current_generation: FlutterGenerationResponse,

@@ -128,6 +128,7 @@ async def run_llm_ir_compare(
         response = await llm_client.generate_async(
             clean_tree,
             tokens,
+            settings=settings,
             feature_name=resolved_feature,
             asset_manifest=asset_entries,
             widget_hints=widget_hints,

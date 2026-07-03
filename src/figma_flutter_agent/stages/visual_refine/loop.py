@@ -354,6 +354,7 @@ async def run_visual_refine_loop(
                 refined = await _llm_client().visual_refine_async(
                     request.clean_tree,
                     request.tokens,
+                    settings=request.settings,
                     feature_name=request.resolved_feature,
                     asset_manifest=asset_entries,
                     current_generation=request.llm_result.generation,

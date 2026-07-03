@@ -74,6 +74,7 @@ packages = ["src/figma_flutter_agent", "src/control_panel"]
 "src/figma_flutter_agent/generator/ir/data" = "figma_flutter_agent/generator/ir/data"
 "src/figma_flutter_agent/fonts/data" = "figma_flutter_agent/fonts/data"
 "src/figma_flutter_agent/validation/data" = "figma_flutter_agent/validation/data"
+"src/figma_flutter_agent/compiler/data" = "figma_flutter_agent/compiler/data"
 
 
 [tool.poetry.group.dev.dependencies]

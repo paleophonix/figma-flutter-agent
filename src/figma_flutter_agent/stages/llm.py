@@ -158,6 +158,7 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
         result.generation = await llm_client.generate_async(
             request.clean_tree,
             request.tokens,
+            settings=request.settings,
             feature_name=request.resolved_feature,
             asset_manifest=asset_entries,
             widget_hints=request.widget_hints,
@@ -184,6 +185,7 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
     ):
         destination_generations, destination_warnings = await generate_destination_screens(
             llm_client,
+            settings=request.settings,
             routes=request.navigation_plan.routes,
             current_feature=request.resolved_feature,
             frame_index=request.frame_index,

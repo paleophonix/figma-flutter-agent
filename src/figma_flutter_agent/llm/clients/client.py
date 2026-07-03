@@ -6,9 +6,12 @@ import asyncio
 from abc import ABC, abstractmethod
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.config import Settings
 
 from figma_flutter_agent.errors import LlmError, format_error_for_log
 from figma_flutter_agent.llm.capabilities import (
@@ -723,6 +726,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         clean_tree: CleanDesignTreeNode,
         tokens: DesignTokens,
         *,
+        settings: Settings,
         feature_name: str,
         asset_manifest: list[dict[str, str]],
         widget_hints: list[str] | None = None,
@@ -760,6 +764,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             return self._finalize_generation_response(
                 self._parse_generation_response(raw_text),
                 clean_tree=clean_tree,
+                settings=settings,
                 use_screen_ir=use_screen_ir,
                 require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
@@ -775,6 +780,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         clean_tree: CleanDesignTreeNode,
         tokens: DesignTokens,
         *,
+        settings: Settings,
         feature_name: str,
         asset_manifest: list[dict[str, str]],
         widget_hints: list[str] | None = None,
@@ -815,6 +821,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             return self._finalize_generation_response(
                 self._parse_generation_response(raw_text),
                 clean_tree=clean_tree,
+                settings=settings,
                 use_screen_ir=use_screen_ir,
                 require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
@@ -891,6 +898,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         clean_tree: CleanDesignTreeNode,
         tokens: DesignTokens,
         *,
+        settings: Settings,
         feature_name: str,
         asset_manifest: list[dict[str, str]],
         current_generation: FlutterGenerationResponse,
@@ -963,6 +971,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             return self._finalize_generation_response(
                 self._parse_generation_response(raw_text),
                 clean_tree=clean_tree,
+                settings=settings,
                 use_screen_ir=use_screen_ir,
                 require_screen_ir=require_screen_ir,
                 project_dir=project_dir,

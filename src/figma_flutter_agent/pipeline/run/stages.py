@@ -728,20 +728,59 @@ async def run_llm_and_plan_phase(
     """
     from figma_flutter_agent.generator.planner import GenerationPlanContext
     from figma_flutter_agent.generator.pubspec import read_pubspec_name
+    from figma_flutter_agent.compiler.ir_cache_policy import ir_cache_policy_at_pipeline_boundary
+    from figma_flutter_agent.errors import CachedIrRegenerationRequired
     from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
     from figma_flutter_agent.stages import PlanStageRequest, plan_generation_output
 
+    ir_cache_policy = ir_cache_policy_at_pipeline_boundary()
+
     with log_stage(log, "llm"):
         if use_cached_ir:
-            llm_outcome = load_cached_ir_llm_outcome(
-                log,
-                settings=settings,
-                project_dir=project_dir,
-                resolved_feature=ctx.resolved_feature,
-                clean_tree=clean_tree,
-                tokens=tokens,
-                from_ir_path=from_ir_path,
-            )
+            try:
+                llm_outcome = load_cached_ir_llm_outcome(
+                    log,
+                    settings=settings,
+                    project_dir=project_dir,
+                    resolved_feature=ctx.resolved_feature,
+                    clean_tree=clean_tree,
+                    tokens=tokens,
+                    from_ir_path=from_ir_path,
+                    ir_cache_policy=ir_cache_policy,
+                    allow_regenerate=not dry_run,
+                )
+            except CachedIrRegenerationRequired as exc:
+                log.warning(
+                    "Cached IR {} under enforce; regenerating via LLM ({})",
+                    exc.verdict,
+                    exc.report_name or "ir-cache-compatibility-report.json",
+                )
+                llm_outcome = await execute_llm_stage_fn(
+                    log,
+                    settings=settings,
+                    dry_run=dry_run,
+                    resolved_sync=resolved_sync,
+                    incremental=incremental,
+                    clean_tree=clean_tree,
+                    tokens=tokens,
+                    resolved_feature=ctx.resolved_feature,
+                    asset_manifest=ctx.asset_manifest,
+                    widget_hints=widget_hints,
+                    navigation_hints=navigation_hints,
+                    routing_on=routing_on,
+                    navigation_plan=navigation_plan,
+                    frame_index=ctx.frame_index,
+                    published_styles=ctx.published_styles,
+                    components=ctx.components,
+                    component_sets=ctx.component_sets,
+                    destination_trees=ctx.destination_trees,
+                    destination_widget_hints=ctx.destination_widget_hints,
+                    style_paint_index=ctx.style_paint_index,
+                    force_llm_regen=force_llm_regen,
+                    llm_client_factory=pipeline_deps.create_llm_client,
+                    figma_reference_png=ctx.reference_image_png,
+                    project_dir=project_dir,
+                )
         else:
             llm_outcome = await execute_llm_stage_fn(
                 log,

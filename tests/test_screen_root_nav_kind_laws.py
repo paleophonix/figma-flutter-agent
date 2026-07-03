@@ -104,7 +104,7 @@ def test_cached_ir_rejected_when_processed_tree_changed(tmp_path: Path) -> None:
         feature_name="home",
         screen_ir=screen_ir,
         project_dir=project,
-        extra=ir_cache_metadata_for_write(tree),
+        extra=ir_cache_metadata_for_write(tree, settings=Settings()),
     )
     path = resolve_screen_ir_dump_path(project, "home")
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -131,7 +131,7 @@ def test_cached_ir_load_heals_poisoned_nav_root(tmp_path: Path) -> None:
         feature_name="home",
         screen_ir=screen_ir,
         project_dir=project,
-        extra=ir_cache_metadata_for_write(tree),
+        extra=ir_cache_metadata_for_write(tree, settings=Settings()),
     )
     outcome = load_cached_ir_llm_outcome(
         __import__("loguru").logger,

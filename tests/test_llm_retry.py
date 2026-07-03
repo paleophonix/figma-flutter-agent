@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
+from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.clients import AnthropicLlmClient
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
@@ -32,6 +33,7 @@ def test_llm_client_retries_on_transient_error() -> None:
         response = client.generate(
             clean_tree,
             tokens,
+            settings=Settings(),
             feature_name="test",
             asset_manifest=[],
         )
@@ -65,6 +67,7 @@ def test_llm_client_does_not_retry_on_client_error() -> None:
         client.generate(
             clean_tree,
             tokens,
+            settings=Settings(),
             feature_name="test",
             asset_manifest=[],
         )
@@ -96,6 +99,7 @@ def test_llm_client_retries_on_json_validation_failure() -> None:
         response = client.generate(
             clean_tree,
             tokens,
+            settings=Settings(),
             feature_name="test",
             asset_manifest=[],
         )

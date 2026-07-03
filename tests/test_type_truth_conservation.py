@@ -83,11 +83,9 @@ def test_type_truth_permit_wrong_field_pair_still_violates() -> None:
     assert check_type_truth(baseline, mutated, allowed_mutations=allowed)
 
 
-def test_type_truth_delete_recreate_mask_not_in_baseline() -> None:
-    """Deleted node id absent from baseline does not mask a sibling type drift."""
+def test_delete_recreate_caught_by_conservation_bundle() -> None:
     tree = _tree()
     baseline = capture_type_baseline(tree)
-    # simulate delete/recreate: new id, old id gone
     replaced = CleanDesignTreeNode(
         id="root",
         name="root",
@@ -96,8 +94,13 @@ def test_type_truth_delete_recreate_mask_not_in_baseline() -> None:
             CleanDesignTreeNode(id="leaf-new", name="leaf", type=NodeType.BUTTON),
         ],
     )
-    violations = check_type_truth(baseline, replaced)
-    assert violations == []
+    ctx = ConservationLawContext(
+        baseline_clean=tree,
+        current_clean=replaced,
+        type_baseline=baseline,
+    )
+    cp2_violations = execute_conservation_laws("CP2", ctx)
+    assert any(v.code == "inv_node_multiset" for v in cp2_violations)
 
 
 def test_type_truth_empty_baseline_unavailable_not_silent_pass() -> None:
@@ -110,7 +113,5 @@ def test_type_truth_empty_baseline_unavailable_not_silent_pass() -> None:
         type_baseline=None,
     )
     registry_result = _run_type_truth_law(ctx)
-    direct = check_type_truth({}, mutated)
-    assert registry_result == []
-    assert len(direct) == 0
-    assert ctx.type_baseline is None
+    assert len(registry_result) == 1
+    assert registry_result[0].code == "inv_type_truth_unavailable"

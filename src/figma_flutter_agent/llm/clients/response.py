@@ -5,7 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from typing import TYPE_CHECKING
+
 from loguru import logger
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.config import Settings
 
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.schema import StructuredOutputSpec  # noqa: F401  (re-export context)
@@ -30,6 +35,7 @@ class ResponseMixin:
         response: FlutterGenerationResponse,
         *,
         clean_tree: CleanDesignTreeNode,
+        settings: Settings,
         use_screen_ir: bool,
         require_screen_ir: bool = False,
         project_dir: Path | None = None,
@@ -51,7 +57,7 @@ class ResponseMixin:
             if persist_ir_snapshots and project_dir is not None and feature_name:
                 from figma_flutter_agent.debug.ir_cache import ir_cache_metadata_for_write
 
-                cache_meta = ir_cache_metadata_for_write(clean_tree)
+                cache_meta = ir_cache_metadata_for_write(clean_tree, settings=settings)
                 write_screen_ir_snapshot(
                     stage="llm_parsed",
                     feature_name=feature_name,
@@ -99,7 +105,7 @@ class ResponseMixin:
             ):
                 from figma_flutter_agent.debug.ir_cache import ir_cache_metadata_for_write
 
-                cache_meta = ir_cache_metadata_for_write(clean_tree)
+                cache_meta = ir_cache_metadata_for_write(clean_tree, settings=settings)
                 write_screen_ir_snapshot(
                     stage="llm_validated",
                     feature_name=feature_name,
