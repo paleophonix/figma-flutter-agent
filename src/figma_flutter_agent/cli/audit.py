@@ -21,14 +21,14 @@ audit_app = typer.Typer(help="Systemic pipeline audit tooling", no_args_is_help=
 
 
 def _docs_audit_dir() -> Path:
-    return Path(__file__).resolve().parents[3] / "docs" / "audit"
+    return Path(__file__).resolve().parents[3] / "docs" / "audit" / "26-06-13-pipeline-audit"
 
 
 @audit_app.command("baseline")
 def audit_baseline_command(
     run_pytest: bool = typer.Option(False, "--run-pytest", help="Run pytest before capture"),
 ) -> None:
-    """Write docs/audit/baseline.md from current repo state."""
+    """Write docs/audit/26-06-13-pipeline-audit/baseline.md from current repo state."""
     report = capture_baseline_report(run_pytest=run_pytest)
     path = _docs_audit_dir() / "baseline.md"
     write_baseline_markdown(report, path)
@@ -37,7 +37,7 @@ def audit_baseline_command(
 
 @audit_app.command("diff-triada")
 def audit_diff_triada_command() -> None:
-    """Run diff-triada on audit corpus; write docs/audit/artifacts/diff_triada.json."""
+    """Run diff-triada on audit corpus; write pipeline-audit artifacts/diff_triada.json."""
     out = _docs_audit_dir() / "artifacts"
     records = run_diff_triada(output_dir=out)
     console.print(f"Diff-triada: {len(records)} layouts → {out / 'diff_triada.json'}")
@@ -72,7 +72,7 @@ def audit_fixtures_command() -> None:
 
 @audit_app.command("docs")
 def audit_docs_command() -> None:
-    """Generate phase markdown docs under docs/audit/."""
+    """Generate phase markdown docs under docs/audit/26-06-13-pipeline-audit/."""
     paths = write_all_audit_docs(_docs_audit_dir())
     for path in paths:
         console.print(f"Wrote {path}")
@@ -82,7 +82,7 @@ def audit_docs_command() -> None:
 def audit_all_command(
     run_pytest: bool = typer.Option(False, "--run-pytest"),
 ) -> None:
-    """Regenerate all audit artifacts under docs/audit/."""
+    """Regenerate all audit artifacts under docs/audit/26-06-13-pipeline-audit/."""
     audit_fixtures_command()
     audit_baseline_command(run_pytest=run_pytest)
     audit_predicate_matrix_command()

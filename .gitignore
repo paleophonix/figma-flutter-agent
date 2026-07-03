@@ -12,9 +12,6 @@ build/
 .mypy_cache/
 # .cursor/
 .VSCodeCounter/
-docs/*
-!docs/refactor/
-!docs/refactor/**
 logs/
 .figma_debug/
 .env

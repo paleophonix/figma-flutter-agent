@@ -298,7 +298,7 @@ Wizard **view** and **launch** respect `runtime.flutter_device_id` (default: aut
 | **Visual refine loop** | Optional LLM patches driven by pixel diff (off by default) |
 | **Typography specimen** | Optional font/glyph golden for text-heavy screens |
 
-Golden capture runtime: `auto` \| `docker` \| `host` — see [docs/reference/development.md](docs/reference/development.md).
+Golden capture runtime: `auto` \| `docker` \| `host` — see [docs/reference/26-07-01-engineering-reference/development.md](docs/reference/26-07-01-engineering-reference/development.md).
 
 ---
 
@@ -400,7 +400,7 @@ Not promised in the default `generate` path:
 | **Auto-commit from Figma webhooks** | Control panel publishes MRs; local wizard does not |
 | **Greenfield `flutter create`** | You bring the Flutter project; agent fills `lib/` |
 
-See [docs/reference/technical-notes.md](docs/reference/technical-notes.md) for engineering detail and MVP deltas.
+See [docs/reference/26-07-01-engineering-reference/technical-notes.md](docs/reference/26-07-01-engineering-reference/technical-notes.md) for engineering detail and MVP deltas.
 
 ---
 
@@ -598,10 +598,10 @@ Details: [src/control_panel/README.md](src/control_panel/README.md).
 
 | Doc | For |
 |-----|-----|
-| [docs/reference/cli.md](docs/reference/cli.md) | All CLI commands, batch scopes, flags |
-| [docs/reference/debug-artifacts.md](docs/reference/debug-artifacts.md) | `.debug/screen/` triage |
-| [docs/reference/development.md](docs/reference/development.md) | Tests, signoff, widgets, CI smoke |
-| [docs/reference/technical-notes.md](docs/reference/technical-notes.md) | Limitations, sync, spec interpretation |
+| [docs/reference/26-07-01-engineering-reference/cli.md](docs/reference/26-07-01-engineering-reference/cli.md) | All CLI commands, batch scopes, flags |
+| [docs/reference/26-07-01-engineering-reference/debug-artifacts.md](docs/reference/26-07-01-engineering-reference/debug-artifacts.md) | `.debug/screen/` triage |
+| [docs/reference/26-07-01-engineering-reference/development.md](docs/reference/26-07-01-engineering-reference/development.md) | Tests, signoff, widgets, CI smoke |
+| [docs/reference/26-07-01-engineering-reference/technical-notes.md](docs/reference/26-07-01-engineering-reference/technical-notes.md) | Limitations, sync, spec interpretation |
 | [AGENTS.md](AGENTS.md) | Coding assistant context |
 | [scripts/README.md](scripts/README.md) | Release gates |
 | [docs/README.md](docs/README.md) | Full docs index (incl. localized overviews) |

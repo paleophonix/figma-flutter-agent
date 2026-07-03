@@ -1,0 +1,153 @@
+# Docs layout (`docs/`)
+
+Canonical index: [docs/README.md](../docs/README.md). **Do not** drop loose files at `docs/` root — only `docs/README.md` lives there.
+
+## Golden rules
+
+1. **Use an existing category** — pick from the table below. Do not invent a new top-level folder unless the doc truly fits nowhere and the user explicitly approves a new category.
+2. **One file → dated filename** in the category folder.
+3. **Several related files → dated project folder**; plain names inside (no `YY-MM-DD-` on inner files).
+4. **Date prefix `YY-MM-DD-`** — year two digits, month, day. For folders, use the **earliest** file date in that project.
+5. **Slug** — lowercase kebab-case (`semantic-core`, `repair-opencode`). Multi-word → hyphen, not underscore.
+6. **Language** — body English unless stakeholder doc; RU product docs: `*.ru.md` suffix.
+7. **`docs/README.md` is mandatory** — every new, moved, or renamed doc/project must be reflected in the index before the task is done (see below).
+
+## README index (`docs/README.md`)
+
+`docs/README.md` is the **canonical catalog** of documentation. Agents must keep it in sync with the tree.
+
+### When to update
+
+| Action | README change |
+|--------|----------------|
+| New single-file doc | Add row: link + one-line description |
+| New multi-file project | Add row for the folder (link to folder or overview); optional sub-bullets for key files |
+| Move or rename | Update path in existing row; do not leave stale links |
+| Delete or archive | Remove row (or mark archived with reason) |
+| New category (rare) | Add category section + row in category table here and in this rule |
+
+### Format
+
+- Place entry under the **correct category section** (Product, Reference, Projects, …).
+- Table columns: **Doc** (markdown link) | **Contents** (≤10 words, what it is for).
+- Multi-file project: one row for `YY-MM-DD-<slug>/`; inner files listed only when readers need a direct jump.
+- Sort within section: **newest `YY-MM-DD` first** (or keep existing order if the section is chronological).
+
+### Examples
+
+```markdown
+| [projects/26-07-03-foo-bar.md](projects/26-07-03-foo-bar.md) | Widget foo rollout checklist |
+| [projects/26-06-11-semantic-core/](projects/26-06-11-semantic-core/) | Semantic core epics |
+```
+
+### Exemptions (no README row)
+
+- Ephemeral/generated artifacts inside an **already-indexed** project folder (`generated/`, CLI audit refresh) — the folder row covers them.
+- Trivial typo fix in an existing indexed file — no README edit.
+
+### Handoff rule
+
+Creating or moving a doc **without** updating `docs/README.md` is an incomplete task — same bar as leaving broken imports.
+
+## Layout
+
+```
+docs/
+  <category>/
+    YY-MM-DD-<slug>.md              # single file
+    YY-MM-DD-<slug>/                # multi-file project
+      overview.md                   # or semantic name, no date prefix
+      epic-1.md
+      generated/                    # tool output only when needed
+```
+
+## Categories (do not add new ones casually)
+
+| Category | Purpose | Examples |
+|----------|---------|----------|
+| `product/` | Stakeholder-facing: overview, assessment, evaluation | `26-07-01-product-overview.ru.md` |
+| `reference/` | Engineering how-to: CLI, dev workflow, debug triage, technical notes | `26-07-01-engineering-reference/` |
+| `spec/` | Product specification, amendments, known limitations, IDE setup | `26-05-24-product-spec/` |
+| `coverage/` | Feature / widget coverage matrices (Figma, Cupertino, …) | `26-06-12-figma-feature-coverage.md` |
+| `theory/` | Compiler theory, policies, conceptual audits (not implementation TZ) | `26-07-02-widget-extraction-policy.md` |
+| `audit/` | Systemic pipeline audit — mostly CLI-generated (`figma-flutter audit`) | `26-06-13-pipeline-audit/` |
+| `refactor/` | Compiler refactor program (RAR): specs, contracts, ratchet JSON | `26-06-06-compiler-refactor/` |
+| `planning/` | Product roadmaps, epic lists, prompt strategy at product level | `26-06-06-roadmap-p3-epics.md` |
+| `projects/` | Implementation epics: TZ, checklists, execution plans, playbooks | `26-06-11-semantic-core/` |
+| `research/` | External research, explorations, deep-dive notes | `26-06-20-research-notes/` |
+| `governance/` | Process rules, debt budgets, team constraints | `26-06-13-debt-budgets.md` |
+| `architecture/` | Single-module or layer architecture descriptions | `26-05-24-core-module.md` |
+| `rules/` | **Archived** agent-rule snapshots — not live `.cursor/rules/` | `26-04-15-agent-rules-archive/` |
+| `sessions/` | One-off debug session logs, annotated traces | `26-06-12-wizard-sign-up-launch/` |
+
+## Where to put a new doc (quick routing)
+
+| If the doc is… | Category |
+|----------------|----------|
+| For product/design, non-technical | `product/` |
+| How to run CLI, test, signoff, triage `.debug/` | `reference/` |
+| What the product must do / MVP contract | `spec/` |
+| “Do we support X in Figma/Flutter?” matrix | `coverage/` |
+| Why the compiler works this way (theory, law) | `theory/` |
+| Output of `figma-flutter audit` or systemic review pack | `audit/` |
+| RAR refactor track, arrow contracts, ratchet baselines | `refactor/` |
+| Roadmap or quarterly plan | `planning/` |
+| Concrete epic with checklist / TZ / playbook | `projects/` |
+| Literature review, vendor research | `research/` |
+| Debt budget, eng process policy | `governance/` |
+| One module’s design | `architecture/` |
+| Copy of rules for history | `rules/` |
+| Annotated log from one debug run | `sessions/` |
+
+**`projects/` vs `planning/`:** planning = direction for the product; projects = executable work package with scope and DoD.
+
+**`theory/` vs `refactor/`:** theory = durable concepts; refactor = active program files tied to compiler refactor milestones.
+
+## Refactor program numbering (`refactor/26-06-06-compiler-refactor/`)
+
+RAR track files use **program numbers** — do not strip or rename them:
+
+| Pattern | Meaning |
+|---------|---------|
+| `00_…` / `00-01-…` | Corpus / alignment (phase 0) |
+| `01_…` / `01_refactoring-spec-cursor.md` | Program 01 theory + Cursor TZ |
+| `02_…` / `02-03-…` | Programs 02–03 |
+| `03_…` / `03-shadow-classifier-inventory.md` | Program 03 (+ derived inventory MD) |
+| `04_…` / `04-05-06-…` / `04-06-…` | Programs 04–06 |
+| `05_`–`10_` | Later theory tracks (phase order in README table) |
+
+Folder date prefix (`26-06-06-compiler-refactor/`) = project container. **Inner `NN_` / `NN-` prefixes = execution order** — keep both.
+
+## Projects (`/plan`, new epics)
+
+- **Single deliverable:** `docs/projects/YY-MM-DD-<slug>.md`
+- **Multiple files expected:** `docs/projects/YY-MM-DD-<slug>/` — first file sets the folder date; add siblings without date prefix.
+- Main overview: `overview.md`, `<slug>.md`, or `README.md` inside the folder — pick one pattern per project and stick to it.
+
+## Tool-coupled paths (do not move casually)
+
+Code references these locations — update Python/tests/docker if you relocate:
+
+| Path | Consumer |
+|------|----------|
+| `docs/audit/26-06-13-pipeline-audit/` | `figma-flutter audit`, `src/figma_flutter_agent/cli/audit.py` |
+| `docs/refactor/26-06-06-compiler-refactor/generated/` | shadow-classifier & constraint-consumer ratchets |
+| `docs/projects/26-06-18-observability/prometheus.yml` | `docker-compose.*.yml` |
+| `docs/spec/26-05-24-product-spec/spec.md` | emitter reference, scripts |
+
+## Forbidden
+
+- New top-level `docs/<random>/` without user sign-off.
+- Files at `docs/*.md` except `docs/README.md`.
+- Date prefixes on files **inside** a dated project folder.
+- `docs/rules/` for live Cursor rules — those stay in `.cursor/rules/`.
+- Duplicating `reference/` content into `projects/` (link instead).
+
+## New category (last resort)
+
+Only when **no row** in the routing table fits, and merging would mislead readers. Before creating:
+
+1. State why existing categories fail.
+2. Propose name + one-line purpose.
+3. Get user approval.
+4. Add category to this rule and `docs/README.md`.

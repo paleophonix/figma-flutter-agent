@@ -464,4 +464,4 @@ which queue items are safe vs blocked
 - Repair phase: `.cursor/skills/repair/SKILL.md`
 - Artifact map and forbidden shortcuts: `.cursor/rules/debug-context.mdc`
 - Anti-patching rule: `.cursor/rules/anti-patching.mdc`
-- Layout laws reference: `docs/projects/codex-hardening/element-layout-laws.md`
+- Layout laws reference: `docs/projects/26-06-13-codex-hardening/element-layout-laws.md`

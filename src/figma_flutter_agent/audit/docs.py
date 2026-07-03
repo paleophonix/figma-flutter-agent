@@ -10,7 +10,7 @@ from figma_flutter_agent.llm.prompts.principles import SYSTEMIC_BUG_RULES
 
 
 def write_all_audit_docs(docs_dir: Path) -> list[Path]:
-    """Write phase deliverables under ``docs/audit/``.
+    """Write phase deliverables under ``docs/audit/26-06-13-pipeline-audit/``.
 
     Args:
         docs_dir: Root audit documentation directory.

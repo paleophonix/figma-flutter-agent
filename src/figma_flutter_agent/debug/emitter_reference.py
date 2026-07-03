@@ -166,7 +166,7 @@ def write_emitter_reference(
             "screenIr": debug_path_display(ir_path, project_dir),
         },
         "bundle": debug_path_display(out_path, project_dir),
-        "spec": "docs/spec.md — theme tokens, responsive shell, const widgets, no inline fontFamily",
+        "spec": "docs/spec/26-05-24-product-spec/spec.md — theme tokens, responsive shell, const widgets, no inline fontFamily",
     }
     meta_path = emitter_reference_metadata_path(project_dir, feature_name)
     meta_path.write_text(

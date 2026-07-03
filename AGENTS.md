@@ -2,7 +2,7 @@
 
 Use this file when working in **Cursor**, **Codex**, Claude Code, or other coding agents on this repository.
 
-Product feature map: [README.md — Features](README.md#features). Stakeholder overview (RU): [docs/product-overview.ru.md](docs/product-overview.ru.md). Engineering reference: [docs/README.md](docs/README.md).
+Product feature map: [README.md — Features](README.md#features). Stakeholder overview (RU): [docs/product/26-07-01-product-overview.ru.md](docs/product/26-07-01-product-overview.ru.md). Engineering reference: [docs/README.md](docs/README.md).
 
 **Prompt source of truth:** `.cursor/rules/*.mdc` (mirrored in `.claude/prompts/*.md`, `CLAUDE.md`). This file compiles them for agents that read only `AGENTS.md`. On conflict, prefer the newer `.mdc` file.
 
@@ -127,6 +127,7 @@ Optional package in `src/control_panel` — FastAPI host + optional disnake UI +
 | `debug.mdc` | `/diagnose`, `/repair`, failed `generate`, `.debug/screen/*` triage | on demand |
 | `pipeline-contracts.mdc` | IR arrows A1–A4, merge/reconcile, naming LAW-* before fix | on demand |
 | `universal-codegen.mdc` | Emitter, AST sidecar, postprocess, `SYSTEMIC_BUG_RULES`, goldens | on demand |
+| `docs-layout.mdc` | Creating, moving, or naming files under `docs/` | on demand |
 
 ### Caveman Lite
 

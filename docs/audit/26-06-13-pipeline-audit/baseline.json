@@ -1,0 +1,7 @@
+{
+  "captured_at": "2026-06-13T06:09:33.110794+00:00",
+  "git_sha": "756d14baccd6f683416f7a6a1810ecc29229d559",
+  "pytest_exit_code": 1,
+  "pytest_summary": "22 failed, 2384 passed, 70 skipped, 2 deselected in 556.95s (0:09:16)",
+  "notes": []
+}

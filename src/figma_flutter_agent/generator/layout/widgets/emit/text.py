@@ -293,9 +293,7 @@ def render_text_node(
                 widget = wrap_gradient_fill_text(widget, node.style)
             if notification_counter_glyph:
                 widget = f"Center(child: {widget})"
-            if painted_pill_label:
-                widget = wrap_painted_pill_scale_down_label(widget)
-            elif catalog_chip_label:
+            if painted_pill_label or catalog_chip_label:
                 widget = wrap_painted_pill_scale_down_label(widget)
             elif pill_label and not painted_pill_label:
                 widget = wrap_tight_chip_label(widget)

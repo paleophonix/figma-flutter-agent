@@ -1,5 +1,5 @@
 # Curated repo navigation map for OpenCode repair pipeline L6 injection.
-# Navigation aid only — not evidence. See docs/projects/repair/opencode-debug-state.md.
+# Navigation aid only — not evidence. See docs/projects/26-06-18-repair-opencode/opencode-debug-state.md.
 #
 # Code (planned): dev/opencode/repo_map.py loads this file and slices by step/board/symptoms/paths.
 

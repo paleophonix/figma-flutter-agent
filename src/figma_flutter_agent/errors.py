@@ -107,6 +107,10 @@ class PlannedDartGraphError(GenerationError):
     """Raised when planned Dart files reference missing ``lib/widgets`` targets."""
 
 
+class ExtractionBijectionError(GenerationError):
+    """Raised when cluster extraction callsite ↔ definition bijection is violated."""
+
+
 class SnapshotConflictError(FigmaFlutterError):
     """Raised when incremental sync snapshot was modified by another process."""
 

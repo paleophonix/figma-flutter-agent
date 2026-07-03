@@ -15,13 +15,6 @@ from figma_flutter_agent.schemas.generation import (
     RepairCpiSupervisorResponse,
     merge_asset_manifests,
 )
-from figma_flutter_agent.schemas.reusable_candidates import (
-    ReusableWidgetCandidate,
-    ReusableWidgetCandidatesResponse,
-    ReusableWidgetEvidence,
-    WidgetEnrichEntry,
-    WidgetEnrichResponse,
-)
 from figma_flutter_agent.schemas.geometry import (
     Affine2,
     Alignment,
@@ -60,6 +53,13 @@ from figma_flutter_agent.schemas.ir import (
     WidgetIrOverrides,
     WidgetIrRef,
     WidgetIrState,
+)
+from figma_flutter_agent.schemas.reusable_candidates import (
+    ReusableWidgetCandidate,
+    ReusableWidgetCandidatesResponse,
+    ReusableWidgetEvidence,
+    WidgetEnrichEntry,
+    WidgetEnrichResponse,
 )
 from figma_flutter_agent.schemas.style import (
     ComponentVariant,

@@ -6,6 +6,7 @@ import hashlib
 import json
 from typing import Any
 
+from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
@@ -45,15 +46,13 @@ def descendant_text_fingerprint(node: CleanDesignTreeNode) -> tuple[str, ...]:
     """Collect visible TEXT copy so clusters do not merge headings with different labels."""
     texts: list[str] = []
 
-    def walk(current: CleanDesignTreeNode) -> None:
+    def collect_text(current: CleanDesignTreeNode) -> None:
         if current.type == NodeType.TEXT:
             raw = (current.text or current.name or "").strip()
             if raw:
                 texts.append(raw)
-        for child in current.children:
-            walk(child)
 
-    walk(node)
+    walk_clean_tree(node, collect_text, phase="dedup_signature_text")
     return tuple(texts)
 
 

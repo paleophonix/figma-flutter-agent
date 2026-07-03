@@ -10,4 +10,4 @@ Orchestrator: one OpenCode invocation per attempt; `git diff` → `fix.diff`; th
 
 ## LLM context
 
-Not CP `/debug → /fix`. Not `run_analyze_repair_loop` inside debug pipeline (legacy generate only). See `docs/projects/repair/opencode-debug-state.md` §8.8.
+Not CP `/debug → /fix`. Not `run_analyze_repair_loop` inside debug pipeline (legacy generate only). See `docs/projects/26-06-18-repair-opencode/opencode-debug-state.md` §8.8.

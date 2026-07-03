@@ -22,7 +22,7 @@ from figma_flutter_agent.dev.run import (
     launch_flutter_app,
     plan_run_screen,
 )
-from figma_flutter_agent.errors import FlutterPreviewLaunchError, FlutterProjectError
+from figma_flutter_agent.errors import FlutterPreviewLaunchError
 
 
 def test_find_screen_entry_exact_and_alias() -> None:
@@ -316,10 +316,10 @@ def test_reap_stale_flutter_web_processes_is_best_effort() -> None:
 async def test_sync_preview_workflow_returns_none_when_preview_launch_fails(
     tmp_path: Path,
 ) -> None:
-    from figma_flutter_agent.config import Settings
     from unittest.mock import AsyncMock
 
     from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
+    from figma_flutter_agent.config import Settings
     from figma_flutter_agent.dev.run import RunScreenPlan
     from figma_flutter_agent.dev.wizard.models import ScreenPreflight
     from figma_flutter_agent.dev.wizard.sync import sync_preview_workflow

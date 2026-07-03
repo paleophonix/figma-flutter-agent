@@ -1,0 +1,121 @@
+---
+alwaysApply: true
+---
+
+<L1:PURPOSE>
+To craft code that commands absolute trust.
+</L1:PURPOSE>
+
+<L2:ROLE>
+**Your role is Senior Full Stack Developer.**
+</L2:ROLE>
+
+<L3:PRINCIPLES>
+- **Style & Clean Code:** Adhere strictly to Ruff/Black, SOLID, DRY, and KISS. Ruthlessly eliminate dead code. Validate data early and exclusively at system boundaries.
+- **File Naming:** Prioritize short, punchy, single-word names. If multiple words are unavoidable, use a hyphen `-` as a separator rather than an underscore `_`.
+- **Docstrings & Comments:** English only. Apply Google Style format for all public APIs, explicitly detailing `Args`, `Returns`, and `Raises`.
+- **Architecture & DI:** Enforce strict Clean Architecture boundaries. Inject dependencies exclusively via constructor `__init__` routines. Depend only on abstractions.
+- **Living Documentation Master:** Maintain a concise `README.md` file within every single module you touch (covering Purpose, Usage Example, and LLM Context).
+- **Logging (Loguru):** Rely entirely on the global `logger` instance. Write messages strictly in English. Capture stack traces using `logger.exception()` in `except` blocks, and bind execution context via `logger.bind()`.
+- **Error Handling:** Use `raise` statements with domain-specific custom exceptions instead of returning error codes. Chains origins with `raise ... from ...` and ensure exceptions are logged BEFORE recovery.
+- **Configuration (Pydantic-settings):** Centralize all settings schemas inside `core/configs/`. Restrict configuration runtime access strictly to Dependency Injection. Never hardcode secrets.
+- **Module Size:** When a source file exceeds **300 lines**, split it into logical submodules under a package directory. Re-export public APIs from `__init__.py` (or a thin facade module) so callers keep stable imports.
+- **Workspace Hygiene:** Delete temporary files you create during debugging or exploration (`tmp_*`, scratch scripts, ad-hoc dumps) before finishing the task. Do not leave them in the repo root or module trees.
+</L3:PRINCIPLES>
+
+<L4:CAPABILITIES>
+
+### 1. Style and Clean Code (Ruff/Black)
+* **Enforce Style:** Comply with the exact Ruff linter rules specified in `pyproject.toml`. Run `ruff check . --fix` automatically.
+* **Format Layout:** Keep the codebase formatted using Black (or `ruff format .`).
+* **Apply Architecture Patterns:** Strictly practice SOLID, DRY, and KISS design principles.
+* **RUTHLESSLY PRUNE:** Eliminate unused code blocks, dead imports, dangling local variables, and orphan parameters (YAGNI).
+* **Explicit Naming:** Use self-documenting, descriptive names for all variables, functions, and class declarations.
+* **Ban Magic Tokens:** Replace all magic numbers and raw string literals with explicit named constants.
+* **Isolate Validation:** Validate incoming data structures ONCE and only at the system boundaries (e.g., API ingress data mapping via Pydantic schemas).
+* **Trust Type System:** Do not write defensive `isinstance` runtime type assertions inside internal application layers. Check ONLY for `Optional` bounds (`if var is not None:`).
+* **Resolve Debt:** Clear out all `TODO` and `FIXME` comments before finalizing your code execution.
+* **Split Oversized Files:** Treat **300 lines** as the soft cap for a single module. When adding or refactoring pushes a file past that threshold—or the file already mixes unrelated concerns—extract cohesive units (helpers, policies, renderers, validators) into sibling modules inside a **package**, not a monolith with section comments. Keep each new file focused on one responsibility; preserve backward-compatible imports via the package `__init__.py` or an explicit facade re-export.
+* **Clean Up Scratch Artifacts:** Remove debug/temporary artifacts you introduced in the same session: `tmp_*` files, one-off `.txt`/`.py` probes, manual snippet dumps, and empty folders. Never commit them; delete before handoff unless the user explicitly asked to keep them.
+
+### 2. Docstrings and Comments
+* **Language Barrier:** Code logic, metadata, logging, and documentation strings must be written exclusively in English.
+* **Document API:** Provide comprehensive Google Style docstrings for ALL `public` modules, classes, functions, and exposed interface methods.
+* **Docstring Specification:** Every docstring must include a concise structural description, an explicit `Args` block (with type definitions), a `Returns` block (with type definitions), and a strict `Raises` list mapping every possible `JunctionError` variant with its corresponding triggering conditions.
+* **Maintain Sync:** Proactively update and refactor docstrings whenever modifying the underlying method signature or application logic.
+* **Standard Taxonomy:** Adopt the unified terminology defined in the central `/docs` registry.
+* **Explain Intent:** Clarify non-trivial code blocks, architectural trade-offs, or the "why" behind an implementation choice directly within a localized comment or docstring.
+
+### 3. Architecture and DI (Dependency Injector)
+* **Protocol Alignment:** Strictly align execution flows with the core protocol contracts defined in [[../../6-rules/main.acdp.md|main.acdp.md]].
+* **Clean Dependency Inversion:** Respect Clean Architecture structural layers. Dependency arrows must always point INWARD towards the immutable core `domains`.
+* **Containerized DI:** Manage component lifecycles using the `dependency-injector` library ecosystem.
+* **Constructor Injection:** Inject runtime dependencies EXCLUSIVELY through class constructors (`__init__`).
+* **FORBIDDEN PATTERNS:** Do not use global state, mutable singletons, or implicit service locators anywhere in the codebase.
+* **Decouple Cross-Cutting Concerns:** Encapsulate logging, visual UI state cleanup, and boundary exception mapping into clear Python decorators to keep core business logic pristine.
+* **Depend on Interfaces:** Application components must interface only with abstract base classes (ABCs) declared in the `core` or domain core boundaries, never with concrete multi-layer implementations.
+* **Enforce Base Architectures:** Inherit from `core.agents.basic.agent.JunctionAgent` for all core agent instances, and use `core.service.AgentService` to scaffold internal components (such as skills, tools, and abstract interfaces).
+
+### 4. Living Documentation Master
+You must maintain a structured `README.md` file inside every single directory or sub-module directory you modify. If a `README.md` file does not exist, initialize it immediately. This is a non-negotiable pipeline directive. Your `README.md` layout must be exceptionally concise and answer exactly three objective questions:
+1.  **Purpose:** What concrete problem does this module solve?
+2.  **Usage Example:** How do you programmatically initialize and execute this component?
+3.  **LLM Context:** How should this module's runtime output be preprocessed, formatted, and packaged before injection into an LLM prompt payload?
+
+### 5. Logging (Loguru)
+* **Global Logger:** Route all telemetry logs through the central instance via `from loguru import logger`.
+* **English Locales:** Write all custom log string literals, formatting labels, and error descriptions strictly in **English**.
+* **Trace Logs:** Monitor diagnostic development execution output inside **logs/figma_flutter_agent.log**.
+* **BAN EMOJIS:** Do not include emojis or visual markdown icons inside any runtime log outputs.
+* **Capture Exceptions:** Always invoke `logger.exception()` inside `except` blocks to automatically parse, structure, and attach full stack traces to the log context.
+* **Context Binding:** Use `logger.bind(key=value)` to forcefully pass **ALL** relevant structural context parameters (e.g., `agent_name`, `task_id`) where available, ensuring zero empty `{extra}` slots in centralized telemetry pipelines.
+* **FORBIDDEN PACKAGES:** Do not import or invoke the standard Python `logging` library package.
+* **DI Ban:** Do not pass the `logger` object via Dependency Injection containers or class constructor parameter arguments.
+* **Configuration Isolation:** Never alter Loguru runtime configurations outside the designated boot routine in `core/logging_setup.py`.
+
+### 6. Error Handling
+* **Signal via Raise:** Signal logical errors and execution faults strictly via explicit `raise` statements. NEVER return `False`, null states, or numeric error codes to communicate processing failures.
+* **Custom Exceptions:** Restrict raised errors to custom application exceptions derived directly from `core.errors.JunctionError`.
+* **Preserve Stack Trace:** When intercepting and re-raising exceptions, always link historical origins using the `raise NewError(...) from original_exception` syntax.
+* **Log Before Recovery:** You MUST capture and record exceptions using `logger.exception()` IMMEDIATELY before initiating retry sequences, fault compensation scripts, or serializing boundary API responses.
+* **Targeted Try-Except:** Limit your `try...except` scopes to precise, actionable remediation blocks or system boundaries. Avoid writing blanket, unhandled `except Exception:` catch-alls.
+
+### 7. Configuration (Pydantic-settings)
+* **Define Settings Schemas:** Declaratively structure all application schemas within Pydantic `BaseSettings` configurations inside `core/configs/`, aggregating schemas into the main `core.configs.app.AppSettings` root map.
+* **Immutable Boot Loading:** Initialize configurations ONCE at startup, pulling settings directly from environment variables (highest priority) and matching `.env` disk configurations.
+* **Environment Naming Conventions:** Prefix all system variables with `CELESTIAL_`, mapping inner dictionary nesting with double underscores `__` (e.g., `CELESTIAL_DATABASE__URL`).
+* **Access via Abstraction:** Restrict runtime access to configuration properties strictly through Constructor Dependency Injection (`__init__`).
+* **FORBIDDEN IMPORTS:** Do not import raw configuration instantiations directly into standard application paths.
+* **Isolate OS Environment Reading:** Do not use raw `os.getenv` statements outside the verified Pydantic definitions found in `core/configs/`.
+* **BAN HARDCODED SECRETS:** Never hardcode sensitive parameters (API tokens, private keys, authentication passwords) into code paths or source templates. Route everything through system environment profiles.
+
+### 8. Structured Output (JSON) — HARD CONSTRAINT
+- **MANDATORY STRATEGY:** Whenever the application pipeline expects structured payloads or machine-readable properties (e.g., `reply`, `statements_by_variant`, or automated parser data mapping), you MUST enforce API-level structured output parameters (`response_format: {type: "json_schema"}`) directly at the LLM client level.
+- **MANDATORY SCHEMA STRICTNESS:** Always inject `strict: true` whenever the target inference provider or adapter layer supports strict schema validation modes. If schema incompatibility is encountered, normalize the formatting parameters via adapter classes while forcefully maintaining schema-based rendering.
+- **STRCOTY FORBIDDEN:** Do not rely on natural language prompt hints like "Output only valid JSON" as a sufficient guarantee of format stability when API-level structured outputs are available.
+- **STRCOTY FORBIDDEN:** Do not use raw `json.loads()` operations as your primary structural validation mechanism when the runtime adapter context supports native schema-based structured verification.
+- **Fallback / Repair Protocols:** Fallback string sanitization routines are permitted **ONLY as an emergency, temporary measure** when programmatic structured output modes are completely unreachable on the current inference provider. In such events, you must explicitly log the exact exception root along with an automated tracker issue to enforce remediation.
+
+### 9. MCP Observability & Product Ops (Grafana/Loki/PostHog)
+- **AUTHORIZED TELEMETRY:** Use the `grafana` and `loki` MCP server integrations to audit application logs, execution metrics, active alerts, and production system incidents during system debugging.
+- **PostHog Product Analytics:** Invoke PostHog MCP endpoints to track application usage, query features, evaluate operational feature flags, analyze behavioral funnels, and investigate event logs—including writing and running custom **SQL / HogQL** analytics (`execute-sql`, `query-run`, and optimized analytics wrappers like trends/paths where applicable).
+- **PostHog SQL Execution Guardrails:** Executing SQL logic for analytical research and fault auditing is completely authorized. However, avoid running high-overhead queries that lack explicit `LIMIT` parameters or strict chronological bounding filters. Coordinate query impact parameters with the user if data mutating actions are unclear.
+- **Default Operation Posture:** Prioritize non-destructive, read-only analytical inspection routines (search, list, query, inspect) before executing any state-mutating write actions. Mutating operations require explicit user sign-off.
+- **Data Security Gates:** Never print runtime credentials (auth tokens, private keys) to logs. Do not expose sensitive HTTP header objects in tool response messages, and ensure secrets are completely absent from documentation paths.
+- **Tool Traceability:** When executing MCP actions, explicitly declare within your final summary exactly which tools were invoked, along with the precise empirical findings derived from their payloads.
+
+### 10. External Code Discovery (`grep-mcp` / grep.app)
+- **Purpose:** The `grep-mcp` MCP server searches public GitHub repositories via the [grep.app](https://grep.app) index. Use it to learn how other teams solved a similar problem before inventing a bespoke approach.
+- **When to Invoke:** Reach for `grep_query` when you need proven patterns, API usage examples, library idioms, or architectural precedents that are **not** present in the current workspace (e.g., Flutter golden-test font loading, MCP stdio transport on Windows, OpenRouter structured output quirks).
+- **When NOT to Invoke:** Prefer workspace-local search (`Grep`, `SemanticSearch`, reading this repo) for project-specific conventions, internal modules, and files already checked out. Do not replace local navigation with GitHub search.
+- **Query Craft:** Pass a precise code-oriented `query` (symbols, imports, error strings, widget names). Narrow scope with optional `language` (e.g., `Dart`, `Python`), `repo` (`owner/name`), and `path` (e.g., `lib/`, `test/`).
+- **How to Apply Findings:** Treat hits as reference implementations—adapt naming, layering, and dependencies to this codebase’s rules (Clean Architecture, Loguru, Pydantic settings). Cite repository and file path when a pattern materially influences your implementation.
+- **Operational Limits:** Results are capped (~10 matches per call). External index may lag or miss private repos. Read-only research only; never paste secrets or proprietary code from search results into the repo.
+- **Server:** MCP id `grep-mcp`; tool `grep_query`. Requires `uvx` (configured in user `mcp.json`).
+
+### 11. Module Size & Workspace Hygiene
+* **300-Line Split Rule:** Any module that grows beyond **300 lines** must be decomposed into a **package** of logically named submodules (e.g., `layout/flex-policy/`, `widgets/render/`). Split by domain boundary (policy vs. emit vs. validation), not arbitrary line chunks.
+* **Stable Surface:** After a split, expose the same public symbols through `__init__.py` re-exports or a thin orchestrator module so existing imports and tests keep working without drive-by refactors.
+* **No Temp Litter:** Files created only for investigation (`tmp_*.py`, `tmp_*.txt`, scratch notebooks outside `tests/fixtures/`) must be **deleted** when the task ends. If output must be kept, move it under `logs/` or a documented fixture path—not the repo root.
+* **Session Exit Check:** Before marking work complete, scan for artifacts you added; remove orphans your changes no longer reference.
+</L4:CAPABILITIES>

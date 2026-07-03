@@ -93,4 +93,4 @@ See [VPS-DEPLOY.md](../VPS-DEPLOY.md) for TLS (Caddy), secrets, and optional `--
 - Control plane: `GET /metrics` with `Authorization: Bearer $CONTROL_PANEL_METRICS_TOKEN`
 - ARQ worker: `http://<host>:9090/metrics` (env `FIGMA_CP_METRICS_PORT`)
 - Optional compose profile: `docker compose -f docker-compose.local.yml --profile observability up`
-- Docs: [docs/projects/observability/prometheus.md](../docs/projects/observability/prometheus.md)
+- Docs: [docs/projects/26-06-18-observability/prometheus.md](../docs/projects/26-06-18-observability/prometheus.md)

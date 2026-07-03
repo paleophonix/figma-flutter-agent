@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
@@ -106,12 +107,10 @@ def hydrate_pruned_cluster_instances(root: CleanDesignTreeNode) -> None:
             existing = templates.get(key)
             if existing is None or _inline_content_score(node) > _inline_content_score(existing):
                 templates[key] = node
-        for child in node.children:
-            collect(child)
 
-    collect(root)
+    walk_clean_tree(root, collect, phase="dedup_hydrate_collect")
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def apply_hydration(node: CleanDesignTreeNode) -> None:
         key = _component_instance_key(node)
         if key and _should_hydrate_pruned_instance(node):
             template = templates.get(key)
@@ -122,7 +121,5 @@ def hydrate_pruned_cluster_instances(root: CleanDesignTreeNode) -> None:
                 if node.type == NodeType.CARD:
                     node.vector_asset_key = hydrated.vector_asset_key
                     node.image_asset_key = hydrated.image_asset_key
-        for child in node.children:
-            walk(child)
 
-    walk(root)
+    walk_clean_tree(root, apply_hydration, phase="dedup_hydrate_apply")

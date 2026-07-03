@@ -1,0 +1,62 @@
+---
+description: Mandatory `.debug/` artifact map and debugging workflow (canonical sandbox/limbo)
+alwaysApply: true
+---
+
+# Debug context — `sandbox/limbo/.debug`
+
+Canonical Flutter debug project: **`sandbox/limbo`**. Every `generate` writes the same tree under **`<project_dir>/.debug/`** (limbo is the reference layout).
+
+## Artifact map (what each path is)
+
+| Path | Purpose | When to read first |
+|------|---------|-------------------|
+| `logs/last.log` | **Single per-run transcript**: subprocess stdout/stderr + `dart analyze` JSON blocks. Cleared at pipeline start. | Any failure, timeout, or analyzer error |
+| `raw/<feature>_layout.json` | Raw Figma REST subtree (truth from API). | Fetch/parse bugs, missing nodes, wrong geometry |
+| `processed/<feature>_layout.json` | Parsed **clean tree** after `parser/tree.py` (dedup, classification input). | Layout/classification wrong but raw looks fine |
+| `ir/<feature>_llm_parsed.json` | LLM screen IR right after JSON parse. | IR shape / schema issues |
+| `ir/<feature>_llm_validated.json` | IR after `generator/ir/validate.py` guards. | Render-safety, stack/scroll/token violations |
+| `ir/<feature>_pre_emit.json` | IR snapshot immediately before emitter. | Emitter/layout mismatch |
+| `dart/<feature>_plan.dart` | Planned Dart bundle (post-planner, pre-write). | Planner/template bugs |
+| `dart/<feature>_screen.dart` | Final debug Dart bundle (pre-write gate). | Compare vs emitted `lib/` without opening project |
+| `dart.bug/<feature>_screen.dart` | Dart bundle when analyze/gate failed (if present). | Last known bad codegen |
+| `semantics/<feature>.json` | Node classification report (BUTTON, INPUT, …). | Wrong widget types, missed components |
+| `provenance/<feature>.json` | Mutation + classification decision trail across pipeline. | “Why did this node become X?” |
+| `reports/<feature>_ai_ux.json` | AI UX / a11y / nesting / spacing suggestions. | UX polish, touch targets, token drift |
+| `reports/<feature>_animations.json` | Prototype / routing / animation manifest hints. | Navigation, transitions |
+| `reports/*_design_coverage.json` | Design coverage gaps (when emitted). | Unsupported Figma features |
+| `reference/figma/<feature>_figma.png` + `_figma.json` | Figma visual gold (PNG + metadata). | Pixel / layout fidelity vs Flutter |
+| `reference/emitter/<feature>_screen.dart` | IR emitter golden bundle (when present). | Deterministic emitter regressions |Golden capture / `flutter test` harness issues |
+| `renders/<session>/` | Combat-mode PNG sessions (wizard / visual refine). | Interactive refine loops |
+| `perf/*.json` | Golden-capture phase timings. | Slow capture / pub get / build |
+| `sync/snapshot.json` | Incremental sync file hashes + tree/token hashes. | “What changed since last generate?” |
+| `wizard-state.yml` | Wizard active screen slug. | Which feature limbo last targeted |
+| `pubspec_resolve.sha256` | Stamp of last successful `pub get` for this project. | Stale deps / skipped pub get |
+| `.artifact-layout-v2` | Migration marker (layout version **5** = `.debug` rename). | Legacy path confusion |
+
+**Not in limbo until relevant run:** `logs/last.log` (empty until next generate), `renders/`, flat `capture/*` PNGs, `reference/emitter/`, `dart.bug/`, `fidelity/`.
+
+**Agent repo `logs/`** = global telemetry only (`figma_flutter_agent.log`). Deprecated `logs/{figma-debug,dart,reports,semantics}` are purged each `generate` — do **not** read or write them.
+
+---
+
+## MANDATORY debugging protocol
+
+When investigating **any** pipeline, layout, IR, analyzer, golden, or fidelity bug:
+
+1. **STOP** — do not guess from memory or hand-edit `demo_app` / `limbo/lib` to “make it pass”.
+2. **OPEN `sandbox/limbo/.debug/` first** (or the active `--project-dir/.debug/`). List timestamps and the active `<feature>` from `wizard-state.yml` or CLI args.
+3. **Read in this order** unless evidence points elsewhere:
+   - `logs/last.log` → exact failing command / analyzer payload
+   - `processed/` vs `raw/` → parse layer
+   - `ir/*` chain (`llm_parsed` → `llm_validated` → `pre_emit`) → IR layer
+   - `provenance/` + `semantics/` → classification decisions
+   - `dart/` vs on-disk `lib/` → planner/emitter/write
+   - `reference/figma/` + `capture/` or `renders/` → visual layer
+   - `reports/` → secondary UX/coverage hints
+   - `sync/snapshot.json` → incremental drift
+4. **Cite evidence** from these files in the diagnosis (paths + field/node ids). If an artifact is missing, say which pipeline stage should have created it and re-run that stage — do not skip straight to code changes.
+5. **Reproduce with fixtures** (`tests/fixtures/`) for fixes; limbo `.debug` is for **observation**, not a substitute for universal tests.
+6. **Forbidden shortcuts:** debugging from agent `logs/renders*`, resurrecting `dart-errors/` or `terminal/`, or screen-specific patches (see `anti-patching.mdc`).
+
+If you have not consulted the relevant `.debug` artifacts above, you have **not** finished triage.

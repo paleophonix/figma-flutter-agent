@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.parser.tree_walk import walk_clean_tree, walk_clean_tree_with_parent
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _DECORATIVE_VECTOR_MAX_WIDTH_PX = 300.0
@@ -20,12 +21,10 @@ def prune_extracted_subtree_nodes(
     if not extracted_node_ids:
         return
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def visitor(node: CleanDesignTreeNode) -> None:
         node.children = [child for child in node.children if child.id not in extracted_node_ids]
-        for child in node.children:
-            walk(child)
 
-    walk(root)
+    walk_clean_tree(root, visitor, phase="dedup_prune_extracted")
 
 
 def is_decorative_absolute_vector(
@@ -114,13 +113,11 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
     seen_clusters: set[str] = set()
     cluster_assets: dict[str, tuple[str | None, str | None]] = {}
 
-    def walk(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
+    def visitor(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
         cluster_id = node.cluster_id
         parent_width = parent.sizing.width if parent is not None else None
         if cluster_id and cluster_id in seen_clusters:
             if parent is not None and parent.type in {NodeType.TABS, NodeType.CAROUSEL}:
-                for child in node.children:
-                    walk(child, node)
                 return
             from figma_flutter_agent.generator.layout.flex_policy import (
                 layout_fact_row_status_pill_badge,
@@ -132,8 +129,6 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
             )
 
             if node.type == NodeType.INPUT:
-                for child in node.children:
-                    walk(child, node)
                 return
 
             if (
@@ -142,8 +137,6 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                 or layout_fact_hosts_compact_checkbox_control(node)
                 or layout_fact_stack_category_component_tile(node)
             ):
-                for child in node.children:
-                    walk(child, node)
                 return
             from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
             from figma_flutter_agent.parser.boundaries.ids import collect_descendant_figma_ids
@@ -194,10 +187,8 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                     forward = asset
                 cluster_assets[cluster_id] = (forward, backward)
             seen_clusters.add(cluster_id)
-        for child in node.children:
-            walk(child, node)
 
-    walk(root, None)
+    walk_clean_tree_with_parent(root, visitor, phase="dedup_prune_clusters")
 
 
 def _node_layout_width_px(node: CleanDesignTreeNode) -> float | None:

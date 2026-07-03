@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import Literal
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode
@@ -34,6 +35,49 @@ ARCHETYPE_RECONCILE_PASS_NAMES: frozenset[str] = frozenset(
         "reconcile_product_hero_photo_viewport_in_tree",
     }
 )
+
+
+@dataclass(frozen=True, slots=True)
+class ReconcilePassMeta:
+    """Conflict registry metadata for one reconcile pass (05-P0-2)."""
+
+    name: str
+    priority: int
+    conflicts_with: frozenset[str]
+    reads: frozenset[str]
+    writes: frozenset[str]
+
+
+RECONCILE_PASS_REGISTRY: dict[str, ReconcilePassMeta] = {
+    "reconcile_stack_placements_in_tree": ReconcilePassMeta(
+        name="reconcile_stack_placements_in_tree",
+        priority=10,
+        conflicts_with=frozenset(),
+        reads=frozenset({"stack_placement", "sizing"}),
+        writes=frozenset({"stack_placement"}),
+    ),
+    "reconcile_product_hero_photo_viewport_in_tree": ReconcilePassMeta(
+        name="reconcile_product_hero_photo_viewport_in_tree",
+        priority=90,
+        conflicts_with=frozenset({"reconcile_stack_placements_in_tree"}),
+        reads=frozenset({"stack_placement", "viewport"}),
+        writes=frozenset({"stack_placement", "image_asset_key"}),
+    ),
+}
+
+
+def reconcile_pass_meta(pass_name: str) -> ReconcilePassMeta | None:
+    """Return conflict metadata when registered; None for legacy passes."""
+    return RECONCILE_PASS_REGISTRY.get(pass_name)
+
+
+def list_reconcile_conflicts() -> list[tuple[str, str]]:
+    """Return directed conflict pairs for diagnostic report."""
+    pairs: list[tuple[str, str]] = []
+    for meta in RECONCILE_PASS_REGISTRY.values():
+        for other in meta.conflicts_with:
+            pairs.append((meta.name, other))
+    return sorted(pairs)
 
 
 def reconcile_pass_tier(pass_name: str) -> ReconcileTier:

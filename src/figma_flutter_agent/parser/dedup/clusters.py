@@ -10,6 +10,7 @@ from figma_flutter_agent.parser.dedup.signatures import (
     cluster_structure_signature,
     descendant_text_fingerprint,
 )
+from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -24,10 +25,8 @@ def assign_structural_clusters(
     def collect(node: CleanDesignTreeNode) -> None:
         if node.children:
             by_signature[cluster_structure_signature(node)].append(node.id)
-        for child in node.children:
-            collect(child)
 
-    collect(root)
+    walk_clean_tree(root, collect, phase="dedup_cluster_collect")
 
     id_to_cluster: dict[str, str] = {}
     summary: dict[str, int] = {}
@@ -45,10 +44,8 @@ def assign_structural_clusters(
         cluster_id = id_to_cluster.get(node.id)
         if cluster_id is not None:
             node.cluster_id = cluster_id
-        for child in node.children:
-            apply(child)
 
-    apply(root)
+    walk_clean_tree(root, apply, phase="dedup_cluster_apply")
     return summary
 
 
@@ -75,17 +72,15 @@ def assign_component_clusters(
     summary: dict[str, int] = {}
     cluster_counts: dict[str, int] = defaultdict(int)
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def assign(node: CleanDesignTreeNode) -> None:
         component_id = dedup.component_refs.get(node.id)
         if component_id and dedup.instance_count.get(component_id, 0) >= min_count:
             fingerprint = descendant_text_fingerprint(node)
             cluster_id = component_cluster_id(component_id, text_fingerprint=fingerprint)
             node.cluster_id = cluster_id
             cluster_counts[cluster_id] += 1
-        for child in node.children:
-            walk(child)
 
-    walk(root)
+    walk_clean_tree(root, assign, phase="dedup_component_cluster")
     for cluster_id, count in cluster_counts.items():
         if count >= min_count:
             summary[cluster_id] = count

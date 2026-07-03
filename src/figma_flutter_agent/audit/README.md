@@ -16,7 +16,7 @@ poetry run figma-flutter audit predicate-matrix
 from figma_flutter_agent.audit import run_diff_triada, build_predicate_matrix
 from pathlib import Path
 
-records = run_diff_triada(output_dir=Path("docs/audit/artifacts"))
+records = run_diff_triada(output_dir=Path("docs/audit/26-06-13-pipeline-audit/artifacts"))
 cells = build_predicate_matrix()
 ```
 

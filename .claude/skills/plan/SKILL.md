@@ -17,21 +17,21 @@ Stage 5 of the CELESTIAL PIPELINE. Run **only** this stage — do not write appl
 
 <S5:PLAN>
 **Objective:** Turn the solution into a step-by-step instruction and persist it locally.
-**Allowed:** Creating a detailed technical specification, breaking work into subtasks (3–5), converting the plan into a numbered **CHECKLIST**, creating a project file at `docs/projects/<project_folder>/<project_name>.md`.
+**Allowed:** Creating a detailed technical specification, breaking work into subtasks (3–5), converting the plan into a numbered **CHECKLIST**, creating a project file at `docs/projects/YY-MM-DD-<slug>.md` (single file) or `docs/projects/YY-MM-DD-<slug>/<name>.md` (multi-file project folder).
 **Forbidden:** Writing final application code, using GitHub/Git issues, starting implementation without a written file.
 **Output:** A created specification file with a ready checklist.
 
 ## Workflow
 
 1. Confirm the approved solution concept from S4.
-2. Choose `project_folder` and `project_name` (kebab-case; ask if unclear).
+2. Choose `slug` (kebab-case; ask if unclear). Prefix with `YY-MM-DD-` from today's date (or project start date).
 3. Draft the spec: goal, scope, affected modules, 3–5 subtasks, numbered checklist with DoD per item.
-4. **Write the file** to `docs/projects/<project_folder>/<project_name>.md` using the Write tool — do not only paste in chat.
+4. **Write the file** to `docs/projects/YY-MM-DD-<slug>.md` (or into `docs/projects/YY-MM-DD-<slug>/` if the project will have multiple files) using the Write tool — do not only paste in chat.
 5. Report the file path and checklist summary. Stop — wait for user confirmation before S6 (work/implementation).
 
 ## Spec file template
 
-Use this structure when creating `docs/projects/<project_folder>/<project_name>.md`:
+Use this structure when creating `docs/projects/YY-MM-DD-<slug>.md` (or `overview.md` inside a project folder):
 
 ```markdown
 # [Project title]

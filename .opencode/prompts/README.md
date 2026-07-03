@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Raw ACDP layer bodies for the 7-step OpenCode repair pipeline. Tags and ordering are applied by `dev/opencode/prompt.py` via `_acdp_layer` / `_compose_acdp_prompt` (see `docs/projects/repair/opencode-debug-state.md` §8.2).
+Raw ACDP layer bodies for the 7-step OpenCode repair pipeline. Tags and ordering are applied by `dev/opencode/prompt.py` via `_acdp_layer` / `_compose_acdp_prompt` (see `docs/projects/26-06-18-repair-opencode/opencode-debug-state.md` §8.2).
 
 ## Layout
 

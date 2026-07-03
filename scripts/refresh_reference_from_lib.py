@@ -135,7 +135,7 @@ def refresh_reference_from_lib(project_dir: Path, *, feature_name: str) -> Path:
         package_name=package,
         banner="EMITTER REFERENCE",
         description=(
-            "Single-file golden per docs/spec.md — layout from lib/generated, "
+            "Single-file golden per docs/spec/26-05-24-product-spec/spec.md — layout from lib/generated, "
             "screen delegates to layout (valid Dart)."
         ),
     )

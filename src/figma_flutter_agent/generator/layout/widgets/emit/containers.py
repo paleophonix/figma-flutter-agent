@@ -11,9 +11,9 @@ from figma_flutter_agent.generator.layout.form import (
     render_dropdown,
     render_radio,
     render_radio_group,
+    render_segmented_control_host,
     render_slider,
     render_switch,
-    render_segmented_control_host,
 )
 from figma_flutter_agent.generator.layout.navigation.tabs import render_carousel, render_tabs
 from figma_flutter_agent.generator.layout.scroll import render_grid_view

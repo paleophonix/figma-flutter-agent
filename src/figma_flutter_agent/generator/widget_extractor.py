@@ -389,6 +389,31 @@ def render_cluster_widgets(
     """
     files: dict[str, str] = {}
     cluster_classes = {spec.cluster_id: spec.class_name for spec in specs}
+    from loguru import logger
+
+    from figma_flutter_agent.generator.extraction.bijection_plan import (
+        ClusterExtractionPlan,
+        validate_extraction_bijection_shadow,
+    )
+    from figma_flutter_agent.generator.extraction.definition_key import (
+        compare_definition_key_shadow,
+    )
+
+    definition_shadow = compare_definition_key_shadow(specs)
+    if definition_shadow.mismatches or definition_shadow.duplicate_shadow_keys:
+        logger.bind(stage="cluster_extraction").debug(
+            "DefinitionKey shadow mismatches={} duplicate_keys={}",
+            definition_shadow.mismatches,
+            definition_shadow.duplicate_shadow_keys,
+        )
+    bijection_shadow = validate_extraction_bijection_shadow(
+        ClusterExtractionPlan.from_specs(specs),
+    )
+    if not bijection_shadow.ok:
+        logger.bind(stage="cluster_extraction").debug(
+            "Extraction bijection shadow diagnostics={}",
+            bijection_shadow.diagnostics,
+        )
     vector_variants = (
         collect_cluster_vector_variants(
             clean_trees,

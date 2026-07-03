@@ -44,8 +44,12 @@ _FACT_READER_MARKERS = (
     "/background/detection.py",
 )
 
-INVENTORY_JSON_REL = "docs/refactor/generated/shadow-classifier-inventory.json"
-RATCHET_BASELINE_JSON_REL = "docs/refactor/generated/shadow-classifier-ratchet-baseline.json"
+INVENTORY_JSON_REL = (
+    "docs/refactor/26-06-06-compiler-refactor/generated/shadow-classifier-inventory.json"
+)
+RATCHET_BASELINE_JSON_REL = (
+    "docs/refactor/26-06-06-compiler-refactor/generated/shadow-classifier-ratchet-baseline.json"
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -258,7 +262,7 @@ def render_inventory_markdown(records: list[ShadowClassifierRecord]) -> str:
     lines = [
         "# Shadow classifier inventory",
         "",
-        "Generated from `docs/refactor/generated/shadow-classifier-inventory.json`.",
+        "Generated from `docs/refactor/26-06-06-compiler-refactor/generated/shadow-classifier-inventory.json`.",
         "CI parses JSON only; this file is for review.",
         "",
         "| Path | Host | Imported | Category | Family |",

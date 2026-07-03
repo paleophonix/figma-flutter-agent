@@ -190,7 +190,7 @@ services:
     image: prom/prometheus:v2.55.1
     restart: unless-stopped
     volumes:
-      - ./docs/projects/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docs/projects/26-06-18-observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     expose:
       - "9090"
     depends_on:

@@ -261,4 +261,4 @@ what not to touch
 - Diagnosis phase: `.cursor/skills/diagnose/SKILL.md`
 - Repair phase: `.cursor/skills/repair/SKILL.md`
 - Artifact map and forbidden shortcuts: `.cursor/rules/debug-context.mdc`
-- Layout laws reference: `docs/projects/codex-hardening/element-layout-laws.md`
+- Layout laws reference: `docs/projects/26-06-13-codex-hardening/element-layout-laws.md`

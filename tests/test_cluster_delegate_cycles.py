@@ -1,86 +1,46 @@
-"""Regression tests for cluster delegate graph acyclicity."""
+"""Tests for clean-tree cycle guard on dedup walks (04-P0-1)."""
 
-from figma_flutter_agent.generator.cluster_variants import resolve_cluster_delegate_class
-from figma_flutter_agent.generator.planned.reconcile.delegate_repair import (
-    repair_mutual_delegate_widget_cycles,
-    repair_self_referential_widget_builds,
-)
-from figma_flutter_agent.generator.widget_extractor import _component_family_already_extracted
-from figma_flutter_agent.schemas import CleanDesignTreeNode, ComponentVariant, NodeType, Sizing
+from __future__ import annotations
 
+import pytest
 
-def test_resolve_cluster_delegate_skips_same_component_family_aliases() -> None:
-    node = CleanDesignTreeNode(
-        id="btn",
-        name="Button",
-        type=NodeType.BUTTON,
-        cluster_id="component_3016_10287_d2e87d01",
-        component_ref="3016:10287",
-        variant=ComponentVariant(component_id="3016:10287", component_name="Button"),
-        sizing=Sizing(width=74.0, height=36.0),
-    )
-    cluster_classes = {
-        "component_3016_10287": "Cluster10287Widget",
-        "component_3016_10287_d2e87d01": "Clusterd2e87d01Widget",
-        "component_3016_10135_d2e87d01": "Clusterd2e87d01Widget",
-    }
-    delegate = resolve_cluster_delegate_class(
-        node,
-        cluster_classes,
-        skip_cluster_id="component_3016_10287_d2e87d01",
-    )
-    assert delegate is None
+from figma_flutter_agent.parser.dedup.hydrate import hydrate_pruned_cluster_instances
+from figma_flutter_agent.parser.dedup.prune import prune_extracted_subtree_nodes
+from figma_flutter_agent.parser.tree_walk import CleanTreeCycleError, walk_clean_tree
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
-def test_component_family_not_duplicated_when_fingerprint_cluster_exists() -> None:
-    existing = {"component_3016_10287_d2e87d01"}
-    assert _component_family_already_extracted("3016:10287", existing)
+def _cycle_tree() -> CleanDesignTreeNode:
+    a = CleanDesignTreeNode(id="a", name="a", type=NodeType.CONTAINER, children=[])
+    b = CleanDesignTreeNode(id="b", name="b", type=NodeType.CONTAINER, children=[])
+    a.children = [b]
+    b.children = [a]
+    return a
 
 
-def test_repair_mutual_delegate_widget_cycles_breaks_two_node_cycle() -> None:
-    planned = {
-        "lib/widgets/cluster10287_widget.dart": """
-class Cluster10287Widget extends StatelessWidget {
-  const Cluster10287Widget({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(width: 74.0, height: 36.0, child: const Clusterd2e87d01Widget());
-  }
-}
-""",
-        "lib/widgets/clusterd2e87d01_widget.dart": """
-class Clusterd2e87d01Widget extends StatelessWidget {
-  const Clusterd2e87d01Widget({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(width: 74.0, height: 36.0, child: const Cluster10287Widget());
-  }
-}
-""",
-    }
-    updated = repair_self_referential_widget_builds(planned)
-    a = updated["lib/widgets/cluster10287_widget.dart"]
-    b = updated["lib/widgets/clusterd2e87d01_widget.dart"]
-    assert not ("Clusterd2e87d01Widget()" in a and "Cluster10287Widget()" in b)
+def test_dedup_cluster_collect_cycle_error() -> None:
+    root = _cycle_tree()
+    with pytest.raises(CleanTreeCycleError) as exc_info:
+        prune_extracted_subtree_nodes(root, frozenset({"never"}))
+    assert exc_info.value.phase == "dedup_prune_extracted"
 
 
-def test_repair_mutual_delegate_widget_cycles_direct_api() -> None:
-    planned = {
-        "lib/widgets/a_widget.dart": """
-class AWidget extends StatelessWidget {
-  const AWidget({super.key});
-  @override
-  Widget build(BuildContext context) => const BWidget();
-}
-""",
-        "lib/widgets/b_widget.dart": """
-class BWidget extends StatelessWidget {
-  const BWidget({super.key});
-  @override
-  Widget build(BuildContext context) => const AWidget();
-}
-""",
-    }
-    updated = repair_mutual_delegate_widget_cycles(planned)
-    assert "const BWidget()" not in updated["lib/widgets/a_widget.dart"]
-    assert "const AWidget()" not in updated["lib/widgets/b_widget.dart"]
+def test_prune_extracted_subtree_cycle_error_has_path() -> None:
+    root = _cycle_tree()
+    with pytest.raises(CleanTreeCycleError) as exc_info:
+        prune_extracted_subtree_nodes(root, frozenset({"missing"}))
+    assert exc_info.value.path
+
+
+def test_hydrate_cycle_error_has_node_id() -> None:
+    root = _cycle_tree()
+    with pytest.raises(CleanTreeCycleError) as exc_info:
+        hydrate_pruned_cluster_instances(root)
+    assert exc_info.value.node_id in {"a", "b"}
+
+
+def test_walk_clean_tree_phase_label() -> None:
+    root = _cycle_tree()
+    with pytest.raises(CleanTreeCycleError) as exc_info:
+        walk_clean_tree(root, lambda _n: None, phase="inventory_test")
+    assert exc_info.value.phase == "inventory_test"

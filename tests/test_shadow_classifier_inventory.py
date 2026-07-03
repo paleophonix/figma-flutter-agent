@@ -149,6 +149,6 @@ def test_frozen_ratchet_baseline_file_exists() -> None:
 
 
 def test_generated_markdown_exists() -> None:
-    md = _repo_root() / "docs/refactor/03-shadow-classifier-inventory.md"
+    md = _repo_root() / "docs/refactor/26-06-06-compiler-refactor/03-shadow-classifier-inventory.md"
     assert md.is_file()
     assert "Shadow classifier inventory" in md.read_text(encoding="utf-8")

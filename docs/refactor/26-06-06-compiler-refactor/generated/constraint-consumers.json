@@ -1,0 +1,1672 @@
+[
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 61,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 55,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 63,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 54,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 52,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 53,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 56,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "SCALE"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 64,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "SCALE"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 62,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "TOP_BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 60,
+    "path": "src/figma_flutter_agent/generator/geometry/constraint_algebra.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "TOP"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 34,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_legacy_op_label",
+    "token": "LEFT"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 66,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "compare_placement_resolver_shadow",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 69,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "compare_placement_resolver_shadow",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 67,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "compare_placement_resolver_shadow",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 63,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "compare_placement_resolver_shadow",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 65,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "compare_placement_resolver_shadow",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 70,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "compare_placement_resolver_shadow",
+    "token": "SCALE"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 68,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "compare_placement_resolver_shadow",
+    "token": "TOP_BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 64,
+    "path": "src/figma_flutter_agent/generator/geometry/resolver_shadow.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "compare_placement_resolver_shadow",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "planner_slot",
+    "line": 106,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 101,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 110,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 100,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 97,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 100,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "SCALE"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 109,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "SCALE"
+  },
+  {
+    "axis": "vertical",
+    "category": "planner_slot",
+    "line": 109,
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Planner slot derivation from placement",
+    "status": "active",
+    "symbol": "stack_pins_from_placement",
+    "token": "TOP_BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 68,
+    "path": "src/figma_flutter_agent/generator/geometry/text_metrics.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "placement_is_center_pinned_horizontal",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 24,
+    "path": "src/figma_flutter_agent/generator/geometry/text_metrics.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "should_skip_centered_glyph_delta",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "ir_guard",
+    "line": 90,
+    "path": "src/figma_flutter_agent/generator/ir/validate/graph.py",
+    "rationale": "IR graph render-safety guard on placement",
+    "status": "active",
+    "symbol": "_stack_has_bounded_horizontal",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "ir_guard",
+    "line": 90,
+    "path": "src/figma_flutter_agent/generator/ir/validate/graph.py",
+    "rationale": "IR graph render-safety guard on placement",
+    "status": "active",
+    "symbol": "_stack_has_bounded_horizontal",
+    "token": "SCALE"
+  },
+  {
+    "axis": "horizontal",
+    "category": "ir_guard",
+    "line": 103,
+    "path": "src/figma_flutter_agent/generator/ir/validate/graph.py",
+    "rationale": "IR graph render-safety guard on placement",
+    "status": "active",
+    "symbol": "_stack_has_bounded_vertical",
+    "token": "SCALE"
+  },
+  {
+    "axis": "vertical",
+    "category": "ir_guard",
+    "line": 103,
+    "path": "src/figma_flutter_agent/generator/ir/validate/graph.py",
+    "rationale": "IR graph render-safety guard on placement",
+    "status": "active",
+    "symbol": "_stack_has_bounded_vertical",
+    "token": "TOP_BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 241,
+    "path": "src/figma_flutter_agent/generator/layout/common.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "is_short_centered_glyph_text",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 226,
+    "path": "src/figma_flutter_agent/generator/layout/common.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "layout_fact_centered_glyph_badge",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 129,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/buttons.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "button_should_center_sole_text_label",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 234,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/column.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "column_center_hug_child_wrap",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 329,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/column.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "layout_fact_column_card_metadata_slot",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 613,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/column.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "wrap_column_child_width_fill",
+    "token": "CENTER"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 888,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_children_form_phone_shell_layout",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 886,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_children_form_phone_shell_layout",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 180,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_stack_flow_body_children",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 34,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_viewport_chrome_vertical_role",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 40,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_viewport_chrome_vertical_role",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 34,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_viewport_chrome_vertical_role",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 38,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_viewport_chrome_vertical_role",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 58,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "is_viewport_chrome_band",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 58,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "is_viewport_chrome_band",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 81,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "layout_fact_stack_positioned_subtitle_line",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 1208,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "stack_flow_child_horizontal_wrap",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 1239,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "stack_flow_child_vertical_extent_wrap",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 1278,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "stack_flow_child_vertical_extent_wrap",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 1278,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "stack_flow_child_vertical_extent_wrap",
+    "token": "LEFT"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 982,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/stack.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "stack_has_non_sequential_raster_overlay",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 81,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/text.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "text_in_card_metadata_rail",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 209,
+    "path": "src/figma_flutter_agent/generator/layout/flex_policy/wrap.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "resolve_flex_wrap",
+    "token": "CENTER"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 126,
+    "path": "src/figma_flutter_agent/generator/layout/navigation/host.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "bottom_nav_host_should_stretch_horizontal",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "planner_slot",
+    "line": 164,
+    "path": "src/figma_flutter_agent/generator/layout/responsive.py",
+    "rationale": "Responsive layout constraint routing",
+    "status": "active",
+    "symbol": "should_stretch_bottom_positioned_horizontal",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 166,
+    "path": "src/figma_flutter_agent/generator/layout/responsive.py",
+    "rationale": "Responsive layout constraint routing",
+    "status": "active",
+    "symbol": "should_stretch_bottom_positioned_horizontal",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 166,
+    "path": "src/figma_flutter_agent/generator/layout/responsive.py",
+    "rationale": "Responsive layout constraint routing",
+    "status": "active",
+    "symbol": "should_stretch_bottom_positioned_horizontal",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 166,
+    "path": "src/figma_flutter_agent/generator/layout/responsive.py",
+    "rationale": "Responsive layout constraint routing",
+    "status": "active",
+    "symbol": "should_stretch_bottom_positioned_horizontal",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "planner_slot",
+    "line": 166,
+    "path": "src/figma_flutter_agent/generator/layout/responsive.py",
+    "rationale": "Responsive layout constraint routing",
+    "status": "active",
+    "symbol": "should_stretch_bottom_positioned_horizontal",
+    "token": "SCALE"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 77,
+    "path": "src/figma_flutter_agent/generator/layout/stack_chrome.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "is_bottom_docked_stack_child",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 203,
+    "path": "src/figma_flutter_agent/generator/layout/style/text_helpers.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 202,
+    "path": "src/figma_flutter_agent/generator/layout/style/text_helpers.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 204,
+    "path": "src/figma_flutter_agent/generator/layout/style/text_helpers.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 600,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "render_column",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 286,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "render_text_node",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 349,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "render_text_node",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 382,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "render_text_node",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 397,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "render_text_node",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 407,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "render_text_node",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 335,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "render_text_node",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 344,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "render_text_node",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 34,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_stack_overlay_offset_literals",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 34,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_stack_overlay_offset_literals",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 394,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_ensure_positioned_stack_bounds",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 436,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_ensure_positioned_stack_bounds",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 384,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_ensure_positioned_stack_bounds",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 429,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_ensure_positioned_stack_bounds",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 289,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_positioned_horizontal_box_fields",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 284,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_positioned_horizontal_box_fields",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 257,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_resolved_positioned_left_top",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 269,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_resolved_positioned_left_top",
+    "token": "CENTER"
+  },
+  {
+    "axis": "vertical",
+    "category": "unknown",
+    "line": 269,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_resolved_positioned_left_top",
+    "token": "TOP"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 215,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "positioned_text_explicit_width_horizontal_fields",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 121,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "top_navigation_bar_title_lane_placement",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "vertical",
+    "category": "emit_positioned",
+    "line": 162,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 129,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 168,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 142,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 121,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 125,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 145,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "SCALE"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 175,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "SCALE"
+  },
+  {
+    "axis": "vertical",
+    "category": "emit_positioned",
+    "line": 172,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "TOP_BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "emit_positioned",
+    "line": 119,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "emit_positioned",
+    "line": 158,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_positioned_fields",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "emit_positioned",
+    "line": 63,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_should_pin_bottom",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "emit_positioned",
+    "line": 59,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_should_pin_bottom",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "emit_positioned",
+    "line": 61,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_should_pin_bottom",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "emit_positioned",
+    "line": 43,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/positioned.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_stack_has_bottom_anchored_child",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 555,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_clamp_centered_text_to_parent_stack",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "unknown",
+    "line": 578,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/svg.py",
+    "rationale": "Unclassified direct raw constraint read pending review",
+    "status": "active",
+    "symbol": "_clamp_centered_text_to_parent_stack",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 256,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_apply_stack_position",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "emit_positioned",
+    "line": 495,
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Emit-time positioned or flex constraint branch",
+    "status": "active",
+    "symbol": "_position_button_stack_label",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 197,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "clamp_stack_child_placement_to_parent",
+    "token": "LEFT"
+  },
+  {
+    "axis": "vertical",
+    "category": "parser_fact",
+    "line": 57,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 52,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 57,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 61,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 65,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 52,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 52,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 53,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 52,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 52,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "SCALE"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 57,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "SCALE"
+  },
+  {
+    "axis": "vertical",
+    "category": "parser_fact",
+    "line": 57,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "TOP_BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "parser_fact",
+    "line": 57,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "parser_fact",
+    "line": 58,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "extract_stack_placement",
+    "token": "TOP"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 140,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "reconcile_center_constraint_placement_from_edges",
+    "token": "CENTER"
+  },
+  {
+    "axis": "vertical",
+    "category": "parser_fact",
+    "line": 157,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "reconcile_center_constraint_placement_from_edges",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "parser_fact",
+    "line": 108,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "reconcile_stack_placement_top_from_edges",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 368,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "refine_text_stack_placement",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 380,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "refine_text_stack_placement",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 368,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "refine_text_stack_placement",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 259,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "sync_absolute_stack_placement_from_layout_rect",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 269,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "sync_absolute_stack_placement_from_layout_rect",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 270,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "sync_absolute_stack_placement_from_layout_rect",
+    "token": "LEFT"
+  },
+  {
+    "axis": "vertical",
+    "category": "parser_fact",
+    "line": 265,
+    "path": "src/figma_flutter_agent/parser/layout/placement.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "sync_absolute_stack_placement_from_layout_rect",
+    "token": "TOP"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 100,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 116,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 198,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 96,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 109,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 202,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 215,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 247,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 98,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 125,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 274,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_align.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT"
+  },
+  {
+    "axis": "vertical",
+    "category": "reconcile_transform",
+    "line": 204,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_media.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "_photo_is_hero_full_bleed",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 201,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_media.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "_photo_is_hero_full_bleed",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 199,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_media.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "_photo_is_hero_full_bleed",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 201,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_media.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "_photo_is_hero_full_bleed",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 201,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_media.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "_photo_is_hero_full_bleed",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "vertical",
+    "category": "reconcile_transform",
+    "line": 202,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_media.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "_photo_is_hero_full_bleed",
+    "token": "TOP_BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "reconcile_transform",
+    "line": 200,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_media.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "_photo_is_hero_full_bleed",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "reconcile_transform",
+    "line": 203,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_media.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "_photo_is_hero_full_bleed",
+    "token": "TOP"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 190,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_ui.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "reconcile_transform",
+    "line": 255,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_ui.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "LEFT"
+  },
+  {
+    "axis": "vertical",
+    "category": "reconcile_transform",
+    "line": 191,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_ui.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "reconcile_transform",
+    "line": 256,
+    "path": "src/figma_flutter_agent/parser/layout/reconcilers_ui.py",
+    "rationale": "Reconcile pass mutates placement constraints",
+    "status": "active",
+    "symbol": "walk",
+    "token": "TOP"
+  },
+  {
+    "axis": "horizontal",
+    "category": "parser_fact",
+    "line": 22,
+    "path": "src/figma_flutter_agent/parser/layout/sizing.py",
+    "rationale": "Parser placement fact read or normalize",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "schema_type",
+    "line": 34,
+    "path": "src/figma_flutter_agent/schemas/geometry.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "LEFT"
+  },
+  {
+    "axis": "vertical",
+    "category": "schema_type",
+    "line": 35,
+    "path": "src/figma_flutter_agent/schemas/geometry.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "TOP"
+  },
+  {
+    "axis": "vertical",
+    "category": "schema_type",
+    "line": 12,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "BOTTOM"
+  },
+  {
+    "axis": "horizontal",
+    "category": "schema_type",
+    "line": 11,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "schema_type",
+    "line": 12,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "CENTER"
+  },
+  {
+    "axis": "horizontal",
+    "category": "schema_type",
+    "line": 11,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "LEFT_RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "schema_type",
+    "line": 11,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "LEFT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "schema_type",
+    "line": 11,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "RIGHT"
+  },
+  {
+    "axis": "horizontal",
+    "category": "schema_type",
+    "line": 11,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "SCALE"
+  },
+  {
+    "axis": "horizontal",
+    "category": "schema_type",
+    "line": 12,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "SCALE"
+  },
+  {
+    "axis": "vertical",
+    "category": "schema_type",
+    "line": 12,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "TOP_BOTTOM"
+  },
+  {
+    "axis": "vertical",
+    "category": "schema_type",
+    "line": 12,
+    "path": "src/figma_flutter_agent/schemas/types.py",
+    "rationale": "Schema or enum definition for constraint vocabulary",
+    "status": "active",
+    "symbol": "<module>",
+    "token": "TOP"
+  }
+]
