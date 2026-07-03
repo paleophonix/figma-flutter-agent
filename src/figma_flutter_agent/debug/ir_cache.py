@@ -66,7 +66,9 @@ def assert_cached_screen_ir_compatible(
     """
     screen_ir = generation.screen_ir
     if screen_ir is None:
-        raise FlutterProjectError(f"Cached screen IR at {dump_path.name} is missing screenIr.")
+        raise FlutterProjectError(
+            f"Cached screen IR at {dump_path.name} is missing screenIr."
+        )
     metadata = cached_ir_metadata(dump_path)
     current_hash = hash_clean_tree(clean_tree)
     cached_hash = metadata.get("cleanTreeHash")
