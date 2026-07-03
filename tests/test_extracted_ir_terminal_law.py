@@ -386,10 +386,11 @@ def test_apply_ir_layout_passes_food_menu_2_extracted_boundaries() -> None:
     from figma_flutter_agent.generator.geometry.invariants.conservation import check_graph_sync
     from figma_flutter_agent.generator.ir.passes import apply_ir_layout_passes
 
-    artifact = Path(".debug/screen/limbo/food_menu_2/llm_validated.json")
-    processed = Path(".debug/screen/limbo/food_menu_2/processed.json")
-    if not artifact.is_file() or not processed.is_file():
-        return
+    fixture_dir = Path("tests/fixtures/layouts/extracted/food_menu_2")
+    artifact = fixture_dir / "llm_validated.json"
+    processed = fixture_dir / "processed.json"
+    assert artifact.is_file(), f"missing fixture: {artifact}"
+    assert processed.is_file(), f"missing fixture: {processed}"
 
     payload = json.loads(artifact.read_text(encoding="utf-8"))
     proc = json.loads(processed.read_text(encoding="utf-8"))

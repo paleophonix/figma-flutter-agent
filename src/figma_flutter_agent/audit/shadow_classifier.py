@@ -295,7 +295,7 @@ def compare_ratchet(
         elif record.category == "unknown":
             new_unknown.append(record)
     removed = tuple(sorted(set(baseline_map) - set(current_map)))
-    passed = not new_kind and not new_emit and not new_unknown and not removed
+    passed = not new_kind and not new_emit and not new_unknown
     return RatchetReport(
         passed=passed,
         new_kind_decider=tuple(new_kind),

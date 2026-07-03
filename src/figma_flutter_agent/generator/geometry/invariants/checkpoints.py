@@ -12,13 +12,8 @@ from figma_flutter_agent.generator.geometry.invariants.conservation import (
     allowed_style_mutations_from_provenance,
     capture_placement_baseline,
     capture_style_baseline,
-    check_clean_tree_unchanged,
-    check_graph_sync,
-    check_ir_classification_scope,
     check_node_multiset_preserved,
-    check_omission_permits,
     check_placement_truth_preserved,
-    check_stack_paint_order_preserved,
     check_style_truth,
     check_type_truth,
     conservation_node_multiset,
@@ -26,10 +21,7 @@ from figma_flutter_agent.generator.geometry.invariants.conservation import (
 from figma_flutter_agent.generator.geometry.invariants.models import (
     GeometryInvariantViolation,
 )
-from figma_flutter_agent.generator.geometry.invariants.registry import (
-    ConservationStage,
-    laws_for_stage,
-)
+from figma_flutter_agent.generator.geometry.invariants.registry import ConservationStage
 from figma_flutter_agent.generator.geometry.invariants.reporting import (
     raise_on_hard_geometry_violations,
 )
@@ -122,29 +114,20 @@ def run_conservation_laws(
     omit_ids: frozenset[str] | None = None,
 ) -> list[GeometryInvariantViolation]:
     """Run registered conservation checks for ``stage`` and return violations."""
-    _ = laws_for_stage(stage)
-    violations: list[GeometryInvariantViolation] = []
-    if stage == "CP2":
-        effective_omit = omit_ids or frozenset()
-        violations.extend(
-            check_omission_permits(effective_omit, permitted=_omission_permits()),
-        )
-        violations.extend(
-            check_node_multiset_preserved(
-                baseline_clean,
-                current_clean,
-                omit_ids=effective_omit,
-            ),
-        )
-        violations.extend(
-            check_stack_paint_order_preserved(baseline_clean, current_clean),
-        )
-        if current_ir is not None:
-            violations.extend(check_graph_sync(current_ir, current_clean))
-    elif stage == "post_classify" and baseline_ir is not None and current_ir is not None:
-        violations.extend(check_clean_tree_unchanged(baseline_clean, current_clean))
-        violations.extend(check_ir_classification_scope(baseline_ir, current_ir))
-    return violations
+    from figma_flutter_agent.generator.geometry.invariants.registry import (
+        ConservationLawContext,
+        execute_conservation_laws,
+    )
+
+    ctx = ConservationLawContext(
+        baseline_clean=baseline_clean,
+        current_clean=current_clean,
+        baseline_ir=baseline_ir,
+        current_ir=current_ir,
+        omit_ids=omit_ids or frozenset(),
+        omission_permits=_omission_permits(),
+    )
+    return execute_conservation_laws(stage, ctx)
 
 
 def validate_multiset_checkpoint(

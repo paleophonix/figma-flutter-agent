@@ -50,12 +50,58 @@ _STRUCTURAL_NODE_TYPES = frozenset(
 )
 
 
-def _semantic_mvp_emit_enabled(ctx: IrEmitContext) -> bool:
-    """Return True when MVP semantic templates may replace layout emit."""
-    if ctx.semantic_report_only is not None:
-        return not ctx.semantic_report_only
-    return not ctx.semantics.report_only
+def _semantic_policy_routed_kind(kind: WidgetIrKind) -> bool:
+    """Return True when emit policy must be resolved before semantic routing."""
+    return kind in SEMANTIC_MVP_IR_KINDS
 
+
+def _emit_policy_semantic_widget(
+    ir: WidgetIrNode,
+    *,
+    clean: CleanDesignTreeNode,
+    parent_type: NodeType | None,
+    ctx: IrEmitContext,
+) -> str | None:
+    """Emit via PolicyDecision when allowed; otherwise return None for layout fallback."""
+    from figma_flutter_agent.generator.ir.fidelity import (
+        EmitPath,
+        emit_styled_primitive,
+    )
+    from figma_flutter_agent.generator.ir.policy import resolve_policy_decision
+
+    semantics = ctx.semantics
+    decision = resolve_policy_decision(ir, ctx=ctx)
+    if decision.native_emit_allowed:
+        widget = emit_semantic_widget(ir, clean=clean, ctx=ctx)
+        return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+    if decision.emit_path == EmitPath.STYLED_PRIMITIVE:
+        widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
+        return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+    if decision.emit_path == EmitPath.BAKED_ASSET:
+        from figma_flutter_agent.generator.ir.fidelity.baked_gate import (
+            evaluate_baked_emit,
+        )
+        from figma_flutter_agent.generator.ir.fidelity.router import (
+            FidelityRoutePolicy,
+        )
+
+        baked_decision = evaluate_baked_emit(
+            ir,
+            clean=clean,
+            policy=FidelityRoutePolicy(
+                strict_fidelity=semantics.strict_fidelity,
+                strict_l10n=semantics.strict_l10n,
+                strict_a11y=semantics.strict_a11y,
+            ),
+        )
+        if baked_decision.emit_path == EmitPath.STYLED_PRIMITIVE:
+            widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
+            return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+        from figma_flutter_agent.generator.ir.fidelity.baked_emit import emit_baked_asset
+
+        widget = emit_baked_asset(ir, clean=clean, ctx=ctx)
+        return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+    return None
 
 _FLEX_WRAP_IR_TO_KIND: dict[FlexWrapIr, FlexWrapKind] = {
     FlexWrapIr.NONE: FlexWrapKind.NONE,
@@ -103,10 +149,16 @@ def emit_widget_expression(
             figma_id_to_widget_name=figma_map,
         )
     if ir.kind == WidgetIrKind.CHIP_CHOICE:
+        from figma_flutter_agent.generator.ir.policy import resolve_policy_decision
+
+        chip_decision = resolve_policy_decision(ir, ctx=ctx)
         if (
-            not _should_ir_walk_children(clean)
-            or layout_fact_stack_circular_option_glyph_host(clean)
-            or is_tag_component_chip_row(clean)
+            not chip_decision.report_only
+            and (
+                not _should_ir_walk_children(clean)
+                or layout_fact_stack_circular_option_glyph_host(clean)
+                or is_tag_component_chip_row(clean)
+            )
         ):
             from figma_flutter_agent.generator.layout.widgets.option_chip import (
                 emit_chip_choice_layout,
@@ -114,49 +166,15 @@ def emit_widget_expression(
 
             widget = emit_chip_choice_layout(ir, clean=clean, ctx=ctx)
             return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
-    if ir.kind in SEMANTIC_MVP_IR_KINDS and _semantic_mvp_emit_enabled(ctx):
-        from figma_flutter_agent.generator.ir.fidelity import (
-            EmitPath,
-            emit_styled_primitive,
+    if _semantic_policy_routed_kind(ir.kind):
+        policy_emit = _emit_policy_semantic_widget(
+            ir,
+            clean=clean,
+            parent_type=parent_type,
+            ctx=ctx,
         )
-        from figma_flutter_agent.generator.ir.policy import resolve_policy_decision
-
-        semantics = ctx.semantics
-        decision = resolve_policy_decision(ir, ctx=ctx)
-        if decision.native_emit_allowed:
-            widget = emit_semantic_widget(ir, clean=clean, ctx=ctx)
-            return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
-        if decision.emit_path == EmitPath.STYLED_PRIMITIVE:
-            widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
-            return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
-        if decision.emit_path == EmitPath.BAKED_ASSET:
-            from figma_flutter_agent.generator.ir.fidelity.baked_gate import (
-                evaluate_baked_emit,
-            )
-            from figma_flutter_agent.generator.ir.fidelity.router import (
-                FidelityRoutePolicy,
-            )
-
-            baked_decision = evaluate_baked_emit(
-                ir,
-                clean=clean,
-                policy=FidelityRoutePolicy(
-                    strict_fidelity=semantics.strict_fidelity,
-                    strict_l10n=semantics.strict_l10n,
-                    strict_a11y=semantics.strict_a11y,
-                ),
-            )
-            if baked_decision.emit_path == EmitPath.STYLED_PRIMITIVE:
-                widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
-                return apply_ir_wrap(
-                    widget, ir=ir, parent_type=parent_type, clean=clean
-                )
-            from figma_flutter_agent.generator.ir.fidelity.baked_emit import (
-                emit_baked_asset,
-            )
-
-            widget = emit_baked_asset(ir, clean=clean, ctx=ctx)
-            return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+        if policy_emit is not None:
+            return policy_emit
     if ir.kind in STUB_IR_KINDS:
         logger.warning(
             "Stub IR kind {} for figmaId {}; falling back to layout emit",
