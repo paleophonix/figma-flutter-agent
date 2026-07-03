@@ -223,3 +223,33 @@ def test_normalize_clean_tree_passes_for_reminders_weekday_row() -> None:
         json.loads(processed_path.read_text(encoding="utf-8"))["cleanTree"],
     )
     normalize_clean_tree(tree, archetype_reconcile=False, apply_render_safety=False)
+
+
+def test_cp2_blocks_unpermitted_omit_ids() -> None:
+    """Multiset omit ids require typed OmissionReason permits."""
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+        run_conservation_laws,
+    )
+
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(id="child", name="Child", type=NodeType.TEXT, text="x"),
+        ],
+    )
+    baseline = deep_copy_clean_tree(root)
+    current = deep_copy_clean_tree(root)
+    current.children = []
+    screen_ir = default_screen_ir(root)
+    screen_ir = screen_ir.model_copy(update={"omit_figma_ids": ["child"]})
+    violations = run_conservation_laws(
+        "CP2",
+        baseline_clean=baseline,
+        current_clean=current,
+        baseline_ir=screen_ir,
+        current_ir=screen_ir,
+        omit_ids=frozenset({"child"}),
+    )
+    assert any(v.code == "inv_omission_unpermitted" for v in violations)

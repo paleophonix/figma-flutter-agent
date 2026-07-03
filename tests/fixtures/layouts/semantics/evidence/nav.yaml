@@ -1,0 +1,17 @@
+pilot_kind: nav_bottom_bar
+ir_kinds:
+  - NAV_BOTTOM_BAR
+  - NAV_TAB_BAR
+required_hits:
+  - bottom chrome band with multiple nav items
+  - icon or label nav item slots
+veto_hits:
+  - decorative pill misread as nav chrome
+  - full artboard frame labeled as bottom bar
+supporting_signals:
+  name_tokens: non_authoritative
+  text_content: non_authoritative
+fixture_positive:
+  - positive/container_list_tile_primary.json
+fixture_negative:
+  - negative/decorative_pill_not_button.json

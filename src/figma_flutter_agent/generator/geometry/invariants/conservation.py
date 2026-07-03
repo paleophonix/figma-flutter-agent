@@ -11,7 +11,13 @@ from figma_flutter_agent.generator.geometry.invariants.models import (
     geometry_violation,
 )
 from figma_flutter_agent.generator.ir.passes.sync import index_ir_nodes
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr, WidgetIrNode
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeType,
+    ScreenIr,
+    WidgetIrKind,
+    WidgetIrNode,
+)
 
 
 @dataclass(frozen=True)
@@ -171,6 +177,25 @@ def collect_subtree_node_ids(
     return frozenset(collected)
 
 
+def check_omission_permits(
+    omit_ids: frozenset[str],
+    *,
+    permitted: dict[str, str],
+) -> list[GeometryInvariantViolation]:
+    """Return violations when multiset omit ids lack a typed ``OmissionReason`` permit."""
+    violations: list[GeometryInvariantViolation] = []
+    for node_id in omit_ids:
+        if node_id not in permitted:
+            violations.append(
+                geometry_violation(
+                    code="inv_omission_unpermitted",
+                    node_id=node_id,
+                    detail="node id omitted without OmissionReason permit",
+                ),
+            )
+    return violations
+
+
 def check_node_multiset_preserved(
     baseline: CleanDesignTreeNode,
     current: CleanDesignTreeNode,
@@ -257,7 +282,12 @@ def check_graph_sync(
     screen_ir: ScreenIr,
     clean_tree: CleanDesignTreeNode,
 ) -> list[GeometryInvariantViolation]:
-    """Return violations when IR and clean-tree child structure disagree."""
+    """Return violations when IR and clean-tree child structure disagree.
+
+    Inline IR nodes must mirror clean-tree direct children. ``kind=extracted`` hosts
+    are opaque terminals: IR ``children`` must be empty while the clean subtree may
+    remain intact for widget materialization.
+    """
     ir_index = index_ir_nodes(screen_ir.root)
     clean_index = _index_clean_nodes(clean_tree)
     violations: list[GeometryInvariantViolation] = []
@@ -271,6 +301,16 @@ def check_graph_sync(
                     detail="IR node missing from clean tree",
                 ),
             )
+            continue
+        if ir_node.kind == WidgetIrKind.EXTRACTED:
+            if ir_node.children:
+                violations.append(
+                    geometry_violation(
+                        code="inv_graph_sync",
+                        node_id=figma_id,
+                        detail="extracted host must not have inline IR children",
+                    ),
+                )
             continue
         ir_child_ids = {child.figma_id for child in ir_node.children}
         clean_child_ids = {child.id for child in clean_node.children}

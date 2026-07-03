@@ -1,0 +1,17 @@
+pilot_kind: input_text_field
+ir_kinds:
+  - INPUT_TEXT_FIELD
+  - INPUT_SEARCH_BAR
+required_hits:
+  - editable field container with value or hint text
+  - input decoration or border affordance
+veto_hits:
+  - static label stack without input container
+  - decorative card without field semantics
+supporting_signals:
+  name_tokens: non_authoritative
+  text_content: supporting_only
+fixture_positive:
+  - positive/input_text_field_primary.json
+fixture_negative:
+  - negative/input_decor_not_field.json

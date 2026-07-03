@@ -121,3 +121,94 @@ families:
     description: >
       Extracted widget IR validation is skipped or silent without a named outcome.
     status: active
+
+  - id: semantic_upgrade_without_required_evidence
+    title: Semantic upgrade without required evidence
+    pipeline_arrows:
+      - A3
+    owning_stage: ir_validation
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/fidelity/stamp.py
+        symbol: _stamp_node
+    law_ids:
+      - LAW-A3-CLASSIFY
+      - LAW-A1-FIDELITY-AUTHORITY
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Native or verified semantic emit is allowed without required detector evidence
+      or manifest authority.
+    status: active
+
+  - id: semantic_veto_not_applied
+    title: Semantic veto not applied
+    pipeline_arrows:
+      - A3
+    owning_stage: classification
+    owners:
+      - module: src/figma_flutter_agent/parser/semantics/arbiter.py
+        symbol: arbitrate
+    law_ids:
+      - LAW-A3-CLASSIFY
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Arbiter veto or abstain bucket should block a semantic kind but emit proceeds.
+    status: active
+
+  - id: semantic_candidate_not_generated
+    title: Semantic candidate not generated
+    pipeline_arrows:
+      - A3
+    owning_stage: classification
+    owners:
+      - module: src/figma_flutter_agent/parser/semantics/prefilter.py
+        symbol: plausible_kinds
+      - module: src/figma_flutter_agent/parser/semantics/classify.py
+        symbol: classify_screen_ir
+    law_ids:
+      - LAW-A3-CLASSIFY
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      A plausible semantic kind never reaches detector candidates for a matching tree.
+    status: active
+
+  - id: classification_scope_violation
+    title: Classification scope violation
+    pipeline_arrows:
+      - CP2
+    owning_stage: conservation
+    owners:
+      - module: src/figma_flutter_agent/generator/geometry/invariants/conservation.py
+        symbol: check_ir_classification_scope
+      - module: src/figma_flutter_agent/generator/geometry/invariants/conservation.py
+        symbol: check_clean_tree_unchanged
+    law_ids:
+      - LAW-CP2-CLASSIFY-SCOPE
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Classification mutates clean-tree facts or non-semantic IR fields.
+    status: active
+
+  - id: screen_root_scope_veto_missing
+    title: Screen root scope veto missing
+    pipeline_arrows:
+      - A3
+    owning_stage: ir_validation
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/validate/root_kind.py
+        symbol: heal_screen_root_control_kind
+    law_ids:
+      - LAW-A3-ROOT-KIND
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Screen-root IR kind contradicts artboard scope without veto or heal.
+    status: active

@@ -118,27 +118,18 @@ def emit_widget_expression(
         from figma_flutter_agent.generator.ir.fidelity import (
             EmitPath,
             emit_styled_primitive,
-            route_by_fidelity_tier,
-            tier_allows_native,
         )
+        from figma_flutter_agent.generator.ir.policy import resolve_policy_decision
 
         semantics = ctx.semantics
-        emit_path = route_by_fidelity_tier(
-            ir,
-            ctx=ctx,
-            strict_fidelity=semantics.strict_fidelity,
-            strict_l10n=semantics.strict_l10n,
-            strict_a11y=semantics.strict_a11y,
-        )
-        if emit_path == EmitPath.NATIVE_TEMPLATE and tier_allows_native(
-            ir.fidelity_tier
-        ):
+        decision = resolve_policy_decision(ir, ctx=ctx)
+        if decision.native_emit_allowed:
             widget = emit_semantic_widget(ir, clean=clean, ctx=ctx)
             return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
-        if emit_path == EmitPath.STYLED_PRIMITIVE:
+        if decision.emit_path == EmitPath.STYLED_PRIMITIVE:
             widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
             return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
-        if emit_path == EmitPath.BAKED_ASSET:
+        if decision.emit_path == EmitPath.BAKED_ASSET:
             from figma_flutter_agent.generator.ir.fidelity.baked_gate import (
                 evaluate_baked_emit,
             )

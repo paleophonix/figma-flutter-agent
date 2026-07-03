@@ -133,9 +133,8 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
         if (
             ir_node.kind == WidgetIrKind.EXTRACTED
             and extracted_reference_valid(ir_node, extracted_widget_names)
-            and subtree_root_ids
-            and ir_node.figma_id in subtree_root_ids
         ):
+            ir_node.children = []
             return
         existing_by_id = {child.figma_id: child for child in ir_node.children}
         merged: list[WidgetIrNode] = []

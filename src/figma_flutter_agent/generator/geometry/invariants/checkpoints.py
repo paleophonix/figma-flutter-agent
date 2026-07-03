@@ -6,13 +6,17 @@ from collections.abc import Callable
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 
+from figma_flutter_agent.debug.provenance import OmissionReason
 from figma_flutter_agent.generator.geometry.invariants.conservation import (
     StyleSnapshot,
     allowed_style_mutations_from_provenance,
     capture_placement_baseline,
     capture_style_baseline,
+    check_clean_tree_unchanged,
     check_graph_sync,
+    check_ir_classification_scope,
     check_node_multiset_preserved,
+    check_omission_permits,
     check_placement_truth_preserved,
     check_stack_paint_order_preserved,
     check_style_truth,
@@ -21,6 +25,10 @@ from figma_flutter_agent.generator.geometry.invariants.conservation import (
 )
 from figma_flutter_agent.generator.geometry.invariants.models import (
     GeometryInvariantViolation,
+)
+from figma_flutter_agent.generator.geometry.invariants.registry import (
+    ConservationStage,
+    laws_for_stage,
 )
 from figma_flutter_agent.generator.geometry.invariants.reporting import (
     raise_on_hard_geometry_violations,
@@ -42,6 +50,7 @@ class ConservationSession:
     type_baseline: dict[str, NodeType] = field(default_factory=dict)
     legacy_semantic_type_ids: set[str] = field(default_factory=set)
     allowed_style_mutations: dict[tuple[str, str], str] = field(default_factory=dict)
+    omission_permits: dict[str, str] = field(default_factory=dict)
     parse_complete: bool = False
 
 
@@ -82,6 +91,60 @@ def record_allowed_style_mutation(
     if session is None:
         return
     session.allowed_style_mutations[(node_id, field)] = policy
+
+
+def record_omission_permit(node_id: str, reason: OmissionReason) -> None:
+    """Register a typed permit for a node id omitted from multiset conservation."""
+    session = get_conservation_session()
+    if session is None:
+        session = activate_conservation_session()
+    session.omission_permits[node_id] = reason.value
+
+
+def record_omission_permits(node_ids: frozenset[str], reason: OmissionReason) -> None:
+    """Register the same omission reason for multiple node ids."""
+    for node_id in node_ids:
+        record_omission_permit(node_id, reason)
+
+
+def _omission_permits() -> dict[str, str]:
+    session = get_conservation_session()
+    return dict(session.omission_permits) if session is not None else {}
+
+
+def run_conservation_laws(
+    stage: ConservationStage,
+    *,
+    baseline_clean: CleanDesignTreeNode,
+    current_clean: CleanDesignTreeNode,
+    baseline_ir: ScreenIr | None = None,
+    current_ir: ScreenIr | None = None,
+    omit_ids: frozenset[str] | None = None,
+) -> list[GeometryInvariantViolation]:
+    """Run registered conservation checks for ``stage`` and return violations."""
+    _ = laws_for_stage(stage)
+    violations: list[GeometryInvariantViolation] = []
+    if stage == "CP2":
+        effective_omit = omit_ids or frozenset()
+        violations.extend(
+            check_omission_permits(effective_omit, permitted=_omission_permits()),
+        )
+        violations.extend(
+            check_node_multiset_preserved(
+                baseline_clean,
+                current_clean,
+                omit_ids=effective_omit,
+            ),
+        )
+        violations.extend(
+            check_stack_paint_order_preserved(baseline_clean, current_clean),
+        )
+        if current_ir is not None:
+            violations.extend(check_graph_sync(current_ir, current_clean))
+    elif stage == "post_classify" and baseline_ir is not None and current_ir is not None:
+        violations.extend(check_clean_tree_unchanged(baseline_clean, current_clean))
+        violations.extend(check_ir_classification_scope(baseline_ir, current_ir))
+    return violations
 
 
 def validate_multiset_checkpoint(
@@ -146,6 +209,11 @@ def run_cp0b_reprune(
     recorder = get_provenance_recorder()
     if recorder is not None:
         recorder.note_checkpoint("CP0b_reprune")
+    if allowed_removed_ids:
+        record_omission_permits(
+            allowed_removed_ids,
+            OmissionReason.PRUNE_EXTRACTED_SUBTREE,
+        )
     validate_multiset_checkpoint(
         baseline,
         tree,
@@ -222,17 +290,17 @@ def run_cp_post_classify(
 ) -> None:
     """CP2b: classification must not mutate clean-tree or non-semantic IR fields."""
     from figma_flutter_agent.debug.provenance import get_provenance_recorder
-    from figma_flutter_agent.generator.geometry.invariants.conservation import (
-        check_clean_tree_unchanged,
-        check_ir_classification_scope,
-    )
 
     recorder = get_provenance_recorder()
     if recorder is not None:
         recorder.note_checkpoint("CP2_post_classify")
-    violations: list[GeometryInvariantViolation] = []
-    violations.extend(check_clean_tree_unchanged(baseline_clean, result_clean))
-    violations.extend(check_ir_classification_scope(baseline_ir, result_ir))
+    violations = run_conservation_laws(
+        "post_classify",
+        baseline_clean=baseline_clean,
+        current_clean=result_clean,
+        baseline_ir=baseline_ir,
+        current_ir=result_ir,
+    )
     raise_on_hard_geometry_violations(violations, context="CP2_post_classify")
 
 
@@ -244,20 +312,24 @@ def run_cp2_ir_passes(
 ) -> None:
     """CP2: validate IR pass output preserves conservation laws."""
     from figma_flutter_agent.debug.provenance import get_provenance_recorder
-
-    recorder = get_provenance_recorder()
-    if recorder is not None:
-        recorder.note_checkpoint("CP2_ir_passes")
-    omit_ids = frozenset(baseline_ir.omit_figma_ids or [])
     from figma_flutter_agent.generator.ir.passes.sectionize import (
         sectionize_synthesized_node_ids,
     )
 
-    omit_ids = omit_ids | sectionize_synthesized_node_ids(result_clean)
-    violations: list[GeometryInvariantViolation] = []
-    violations.extend(
-        check_node_multiset_preserved(baseline_clean, result_clean, omit_ids=omit_ids),
+    recorder = get_provenance_recorder()
+    if recorder is not None:
+        recorder.note_checkpoint("CP2_ir_passes")
+    for node_id in baseline_ir.omit_figma_ids or []:
+        record_omission_permit(node_id, OmissionReason.IR_OMIT_FIGMA_IDS)
+    synth_ids = sectionize_synthesized_node_ids(result_clean)
+    record_omission_permits(synth_ids, OmissionReason.SECTIONIZE_SYNTH)
+    omit_ids = frozenset(baseline_ir.omit_figma_ids or []) | synth_ids
+    violations = run_conservation_laws(
+        "CP2",
+        baseline_clean=baseline_clean,
+        current_clean=result_clean,
+        baseline_ir=baseline_ir,
+        current_ir=result_ir,
+        omit_ids=omit_ids,
     )
-    violations.extend(check_stack_paint_order_preserved(baseline_clean, result_clean))
-    violations.extend(check_graph_sync(result_ir, result_clean))
     raise_on_hard_geometry_violations(violations, context="CP2_ir_passes")

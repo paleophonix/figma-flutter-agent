@@ -44,6 +44,16 @@ class DeviationReason(StrEnum):
     IR_OVERRIDE = "ir_override"
 
 
+class OmissionReason(StrEnum):
+    """Typed permit for legitimate node-id loss across conservation checkpoints."""
+
+    SECTIONIZE_SYNTH = "sectionize_synth"
+    PRUNE_EXTRACTED_SUBTREE = "prune_extracted_subtree"
+    PRUNE_CLUSTER_DEDUP = "prune_cluster_dedup"
+    PRUNE_DECORATIVE_VECTOR = "prune_decorative_vector"
+    IR_OMIT_FIGMA_IDS = "ir_omit_figma_ids"
+
+
 class DeviationSeverity(StrEnum):
     """Whether a recorded deviation preserves or degrades intended fidelity (F2)."""
 

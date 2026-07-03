@@ -59,8 +59,8 @@ def report_preview_launch_failure() -> None:
 
 def _wizard_run(ctx: typer.Context) -> None:
     """Launch Flutter after optional generate/asset-sync submenu selection."""
+    from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.project import ensure_project_config
-    from figma_flutter_agent.wizard.capture_prompt import prompt_wizard_capture_settings
     from figma_flutter_agent.wizard.menus import _is_menu_return, _run_menu_options
     from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
     from figma_flutter_agent.wizard.state import _wizard_project_dir
@@ -75,9 +75,7 @@ def _wizard_run(ctx: typer.Context) -> None:
     command = _menu_command(mode_label)
     root = _wizard_project_dir(ctx)
     config_path = ensure_project_config(root)
-    settings = prompt_wizard_capture_settings(config_path)
-    capture_note = "on" if settings.agent.dev.debug_capture else "off"
-    console.print(f"[dim]Golden capture:[/dim] {capture_note}")
+    settings = load_settings(config_path)
     if command == "ir-offline":
         _wizard_sync_preview(ctx, prefer_live=False, use_cached_ir=True, settings=settings)
         return

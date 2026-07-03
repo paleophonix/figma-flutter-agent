@@ -1,0 +1,21 @@
+pilot_kind: button_filled
+ir_kinds:
+  - BUTTON_FILLED
+  - BUTTON_OUTLINED
+  - BUTTON_TEXT
+required_hits:
+  - tappable container with label text
+  - minimum touch target geometry
+veto_hits:
+  - decorative pill without button affordance
+  - plain text label without button container
+  - bordered box without interactive semantics
+supporting_signals:
+  name_tokens: non_authoritative
+  text_content: non_authoritative
+fixture_positive:
+  - positive/button_filled_primary.json
+  - positive/button_outlined_primary.json
+fixture_negative:
+  - negative/decorative_pill_not_button.json
+  - negative/text_label_not_button.json

@@ -384,11 +384,18 @@ def validate_screen_ir(
         semantics=semantics,
     )
     from figma_flutter_agent.generator.ir.validate.graph import (
+        enforce_extracted_screen_ir_terminals,
         ensure_ir_direct_children_match_clean,
     )
 
     ensure_ir_direct_children_match_clean(screen_ir, root)
     realign_screen_ir_children_to_clean_tree(screen_ir, root)
+    stripped = enforce_extracted_screen_ir_terminals(screen_ir.root)
+    if stripped:
+        logger.info(
+            "Cleared {} inline child node(s) from extracted screenIr terminals after graph sync",
+            stripped,
+        )
 
     tree_by_id = index_clean_tree(root)
     parent_by_id = _build_parent_map(root)

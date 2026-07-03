@@ -1,0 +1,18 @@
+pilot_kind: chip_choice
+ir_kinds:
+  - CHIP_CHOICE
+required_hits:
+  - compact horizontal chip row geometry
+  - selectable pill cells in a single row
+veto_hits:
+  - numeric size-picker row without chip affordance
+  - decorative pill without selection semantics
+supporting_signals:
+  name_tokens: non_authoritative
+  text_content: non_authoritative
+  derived_from_name: supporting_only
+fixture_positive:
+  - positive/chip_choice_weekday_row.json
+  - positive/chip_choice_compact_row.json
+fixture_negative:
+  - negative/size_picker_not_chip.json

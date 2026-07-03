@@ -1,0 +1,15 @@
+pilot_kind: checkbox
+ir_kinds:
+  - CONTROL_CHECKBOX
+required_hits:
+  - square control with label pairing
+  - compact checkbox host geometry
+veto_hits:
+  - thin decorative rectangle
+  - size picker row geometry
+supporting_signals:
+  name_tokens: non_authoritative
+fixture_positive:
+  - positive/container_list_tile_secondary.json
+fixture_negative:
+  - negative/thin_rect_not_divider.json

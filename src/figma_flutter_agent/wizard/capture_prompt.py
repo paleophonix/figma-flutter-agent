@@ -1,4 +1,4 @@
-"""Wizard golden-capture prompt shared by generate and run menus."""
+"""Wizard golden-capture prompt for the generate menu."""
 
 from __future__ import annotations
 

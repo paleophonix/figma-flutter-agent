@@ -1,0 +1,1622 @@
+[
+  {
+    "category": "unknown",
+    "imported_symbol": "must_inline_extracted_widget_host",
+    "path": "src/figma_flutter_agent/generator/chunking.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_is_extractable"
+  },
+  {
+    "category": "fact_reader",
+    "imported_symbol": "stack_interaction_kind",
+    "path": "src/figma_flutter_agent/generator/geometry/slots.py",
+    "rationale": "Reads geometry or style facts without emit archetype selection",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "layer_class"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.is_tag_component_chip_row",
+    "path": "src/figma_flutter_agent/generator/ir/expression.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "emit_widget_expression"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_paint_surface",
+    "path": "src/figma_flutter_agent/generator/layout/choice_chip_row.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_chip_palette_exprs"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_selected",
+    "path": "src/figma_flutter_agent/generator/layout/choice_chip_row.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_chip_palette_exprs"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_display_label",
+    "path": "src/figma_flutter_agent/generator/layout/choice_chip_row.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "render_circular_option_chip_row_stateful"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_label_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/choice_chip_row.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "render_circular_option_chip_row_stateful"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_paint_surface",
+    "path": "src/figma_flutter_agent/generator/layout/choice_chip_row.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "render_circular_option_chip_row_stateful"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_selected",
+    "path": "src/figma_flutter_agent/generator/layout/choice_chip_row.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "render_circular_option_chip_row_stateful"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_checkbox_control",
+    "path": "src/figma_flutter_agent/generator/layout/form.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "render_checkbox"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_wheel_time_picker_stack",
+    "path": "src/figma_flutter_agent/generator/layout/interactive.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_is_deepest_wheel_host"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_wheel_time_picker_stack",
+    "path": "src/figma_flutter_agent/generator/layout/interactive.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_wheel_layout_helpers_suppressed_for_node"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_checkbox_control",
+    "path": "src/figma_flutter_agent/generator/layout/interactive.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "walk"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_compact_chip_row",
+    "path": "src/figma_flutter_agent/generator/layout/interactive.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "walk"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_wheel_picker_text_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_time.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "extract_wheel_picker_columns"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "forms._stack_hosts_stroked_outline_checkbox_glyph",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_toggle.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "_stroked_checkbox_visual_scale"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "forms.checkbox_option_border_container",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_toggle.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "render_stateful_toggle_checkbox"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "forms.checkbox_option_stack_is_checked",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_toggle.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "render_stateful_toggle_checkbox"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._local_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_weekday.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_chip_label_text_node"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "chip_variant.chip_circular_paint_surface",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_weekday.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_weekday_chip_border_expr"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "chip_variant.chip_circular_stroke_node",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_weekday.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_weekday_chip_border_expr"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "chip_variant.chip_circular_paint_surface",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_weekday.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_weekday_chip_palette_exprs"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "chip_variant.chip_circular_stroke_node",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_weekday.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_weekday_chip_palette_exprs"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "weekday_chip_initially_selected",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_weekday.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_weekday_chip_palette_exprs"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "weekday_chip_initially_selected",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_weekday.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "render_weekday_chip_row"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "weekday_chip_label",
+    "path": "src/figma_flutter_agent/generator/layout/interactive_weekday.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "render_weekday_chip_row"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "is_link_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/checkbox_rows.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_try_render_checkbox_label_row"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "is_link_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/checkbox_rows.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_try_render_consent_checkbox_row"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_checkbox_control",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/checkbox_rows.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "_try_render_consent_checkbox_row"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/core.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stack_uses_circular_ink"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_has_circular_container",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/core.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stack_uses_circular_ink"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_compact_icon_action_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/core.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stack_uses_circular_ink"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_play_pause_control_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/core.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stack_uses_circular_ink"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_skip_control_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/core.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stack_uses_circular_ink"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "primary_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/core.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stack_uses_circular_ink"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "interaction_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/core.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_wrap_button_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "interaction_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/core.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_wrap_passive_button_surface"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_is_footer_link_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/cta_footer.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_try_render_cta_footer_split_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_local_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/cta_footer.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_try_render_cta_footer_split_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_stack_spans_primary_button_and_footer_link",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/cta_footer.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_try_render_cta_footer_split_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "primary_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/button/cta_footer.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_try_render_cta_footer_split_stack"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_bottom_docked_sheet",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/decoration.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_decorate_widget_with_box_decoration"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_compact_icon_action_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/containers.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "list_tile_leading_icon"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_checkbox_control",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/containers.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "render_simple_controls"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_compact_icon_action_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "render_button_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_favorite_icon_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "render_button_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_info_icon_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "render_button_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_plus_icon_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "render_button_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_stroke_minus_icon",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "render_button_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_stroke_plus_icon",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "render_button_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "input_children_are_presentational",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_input_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "input_flex_value_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_input_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "input_trailing_chrome_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_input_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_checkbox_control",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/controls.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "render_input_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_textarea_field",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_node_body"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "primary_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/shell.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "prepare_layout_children"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "stack_interaction_kind",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/shell.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "prepare_layout_children"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "surface_covers_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/shell.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "prepare_layout_children"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "is_back_navigation_icon_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/stack.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "nav",
+    "status": "active",
+    "symbol": "render_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_back_nav_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/stack.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "nav",
+    "status": "active",
+    "symbol": "render_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_skip_control_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/stack.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "render_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "stack_interaction_kind",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/stack.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "render_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "is_link_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/emit/text.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "render_text_node"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_checkbox_control",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/finalize.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "checkbox",
+    "status": "active",
+    "symbol": "_wrap_min_touch_target"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "_descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_detail_hero_has_editorial_overlays"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "icons.layout_fact_favorite_overlay_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_detail_hero_has_editorial_overlays"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_favorite_icon_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_detail_hero_has_editorial_overlays"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "icons.layout_fact_favorite_overlay_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_emit_detail_hero_banner_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_favorite_icon_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_emit_detail_hero_banner_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "node_is_compact_percent_badge",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_emit_detail_hero_banner_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "_descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_hero_stack_child_paint_tier"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_favorite_icon_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_hero_stack_child_paint_tier"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "_descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_render_favorite_button_overlay"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "_descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_render_favorite_overlay_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "_descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_render_percent_badge_overlay"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "icons.layout_fact_favorite_overlay_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "try_render_product_recommendation_hero_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_favorite_icon_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "try_render_product_recommendation_hero_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_stack_product_recommendation_hero",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "try_render_product_recommendation_hero_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "node_is_compact_percent_badge",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "try_render_product_recommendation_hero_stack"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "icons.layout_fact_favorite_overlay_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "visit"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "layout_fact_favorite_icon_button",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "visit"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "node_is_compact_percent_badge",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "visit"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "percent_badge_should_emit_as_overlay",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/hero.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "visit"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "absolute_fields.find_field_shell_value_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/absolute_fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "build_decomposed_absolute_field_widgets"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "absolute_fields.layout_fact_painted_field_shell_container",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/absolute_fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "build_decomposed_absolute_field_widgets"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "absolute_fields.layout_fact_painted_multiline_field_shell",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/absolute_fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_decomposed_absolute_field"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_hint_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/currency.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "try_render_prefix_labeled_currency_row"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_hint_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/currency.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "try_render_prefix_labeled_currency_row"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/currency.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "try_render_prefix_labeled_currency_row"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_value_style_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/decoration.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_flex_input_content_padding"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_value_style_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/decoration.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_input_text_style_expr"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_value_style_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/decoration.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_optical_single_line_input_content_padding"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_value_style_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/decoration.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_stack_input_decoration"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_hint_implies_obscure_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_input_obscure_flag"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_trailing_chrome_implies_obscure_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_input_obscure_flag"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_password_field_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_input_obscure_flag"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_external_label_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_flex_input_with_trailing_chrome"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_flex_value_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_flex_input_with_trailing_chrome"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_hint_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_flex_input_with_trailing_chrome"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_hint_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_flex_input_with_trailing_chrome"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_flex_input_with_trailing_chrome"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_external_label_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_stack_input"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_flex_value_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_stack_input"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_hint_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_stack_input"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_hint_text",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_stack_input"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_stack_input"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_trailing_chrome_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_stack_input"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_value_style_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_render_stack_input"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "interaction_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/fields.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_render_stack_input"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_trailing_chrome_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/icons.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "_default_trailing_input_suffix_icon"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "inline_input_hosts.coerce_inline_input_field_host",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/inline_hosts.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_inline_labeled_input_field_host"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "input_fields.input_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/inline_hosts.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_inline_labeled_input_field_host"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "inline_input_hosts.phone_composite_prefix_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/inline_hosts.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_phone_composite_field_host"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "inline_input_hosts.phone_composite_value_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/inline_hosts.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "render_phone_composite_field_host"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "inline_input_hosts.coerce_single_surface_input_field_host",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/inline_hosts.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "try_render_inline_input_field_host"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "inline_input_hosts.layout_fact_inline_labeled_input_field_host",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/inline_hosts.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "try_render_inline_input_field_host"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "inline_input_hosts.layout_fact_phone_composite_field_host",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/inline_hosts.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "try_render_inline_input_field_host"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "inline_input_hosts.layout_fact_single_surface_input_field_column",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/input/inline_hosts.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "try_render_inline_input_field_host"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_label_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_chip_label_foreground_expr"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_label_font_size",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_chip_label_strut_suffix"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_label_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_chip_label_strut_suffix"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_label_font_size",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_chip_label_text_style_fields"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_label_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_chip_label_text_style_fields"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_label_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_emit_circular_chip_choice_body"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_cluster_style_refs",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_tag_option_chip_palette"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_display_label",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "emit_chip_choice_layout"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_component_label_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "emit_chip_choice_layout"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.is_tag_component_chip_row",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "emit_chip_choice_layout"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.chip_cluster_style_refs",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "render_tag_option_chip_body"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.is_tag_component_chip_row",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "try_emit_chip_choice_layout_for_node"
+  },
+  {
+    "category": "emit_archetype_decider",
+    "imported_symbol": "chip_variant.is_tag_component_chip_row",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/option_chip.py",
+    "rationale": "Selects or gates a specialized widget emit archetype",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "wrap_tag_option_chip_reference"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_play_pause_control_stack",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/playback.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_try_render_play_pause_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "buttons.button_hosts_top_navigation_bar",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "top_navigation_bar_child_vertical_fields"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "buttons._child_is_nav_icon_affordance",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "top_navigation_bar_title_lane_placement"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "buttons.button_hosts_top_navigation_bar",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/position.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "top_navigation_bar_title_should_screen_center"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/selection.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_find_payment_option_row"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/selection.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_payment_option_text_lines"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/selection.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_selected_badge_fill_expr"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/selection.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "render_compact_trailing_selection_glyph"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/stepper.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stepper_decorative_halo_child"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/stepper.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stepper_glyph_accent_color"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/stepper.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stepper_glyph_asset_node"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/stepper.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stepper_has_axis_stroke_cross"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/stepper.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stepper_minus_plus_hosts"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/stepper.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stepper_solid_tap_disc_child"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "shared._descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/stepper.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_stepper_stroke_glyph_leaf"
+  },
+  {
+    "category": "fact_reader",
+    "imported_symbol": "extract_cart_quantity_digit",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/stepper.py",
+    "rationale": "Reads or extracts Figma facts for downstream use",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "render_compact_quantity_stepper_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "button_stack_has_left_icon",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_button_label_should_center_in_parent"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_is_footer_link_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_button_sole_cta_should_center"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_local_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_button_sole_cta_should_center"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "button_stack_has_left_icon",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_button_sole_cta_should_center"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_is_footer_link_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_position_button_stack_label"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_label_matches_action_hint",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_position_button_stack_label"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_local_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_position_button_stack_label"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_stack_spans_primary_button_and_footer_link",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_position_button_stack_label"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_stack_vertical_icon_label_chip_tile",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_position_button_stack_label"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "primary_surface_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_position_button_stack_label"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "stack_interaction_kind",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_position_button_stack_label"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_is_footer_link_text_node",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_should_center_text_in_button_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_local_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_should_center_text_in_button_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_stack_spans_primary_button_and_footer_link",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_should_center_text_in_button_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "button_stack_has_left_icon",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "_should_center_text_in_button_stack"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_stack_category_component_tile",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_should_center_text_in_button_stack"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_stack_vertical_icon_label_chip_tile",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "chip",
+    "status": "active",
+    "symbol": "_should_center_text_in_button_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "stack_interaction_kind",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/text.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_should_center_text_in_button_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_product_photo_quantity"
+  },
+  {
+    "category": "fact_reader",
+    "imported_symbol": "extract_cart_quantity_digit",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Reads or extracts Figma facts for downstream use",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_product_photo_quantity"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_cart_quantity_scrim_row",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_product_photo_quantity"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "_descendant_nodes",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_product_photo_raster_leaf"
+  },
+  {
+    "category": "fact_reader",
+    "imported_symbol": "find_raster_photo_leaf",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Reads or extracts Figma facts for downstream use",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_product_photo_raster_leaf"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "button_is_square_cart_product_thumbnail",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "button",
+    "status": "active",
+    "symbol": "try_render_cart_thumbnail_button"
+  },
+  {
+    "category": "fact_reader",
+    "imported_symbol": "find_raster_photo_leaf",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Reads or extracts Figma facts for downstream use",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "try_render_compact_raster_photo_stack"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_stack_square_product_photo_host",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "try_render_compact_raster_photo_stack"
+  },
+  {
+    "category": "fact_reader",
+    "imported_symbol": "find_raster_photo_leaf",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Reads or extracts Figma facts for downstream use",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "try_render_media_avatar_stack"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_stack_square_product_photo_host",
+    "path": "src/figma_flutter_agent/generator/layout/widgets/thumbnail.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "try_render_square_product_photo_stack"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "must_inline_extracted_widget_host",
+    "path": "src/figma_flutter_agent/generator/subtree/spec.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "_subtree_hosts_inline_form_field"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_media_controls_stack",
+    "path": "src/figma_flutter_agent/generator/subtree/spec.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "collect_subtree_widget_specs"
+  },
+  {
+    "category": "layout_policy",
+    "imported_symbol": "layout_fact_password_field_stack",
+    "path": "src/figma_flutter_agent/generator/subtree/spec.py",
+    "rationale": "Layout fact predicate outside emit dispatch",
+    "semantic_family": "input",
+    "status": "active",
+    "symbol": "collect_subtree_widget_specs"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "must_inline_extracted_widget_host",
+    "path": "src/figma_flutter_agent/generator/subtree/spec.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "collect_subtree_widget_specs"
+  },
+  {
+    "category": "unknown",
+    "imported_symbol": "stack_interaction_kind",
+    "path": "src/figma_flutter_agent/generator/subtree/spec.py",
+    "rationale": "Unclassified interaction usage pending inventory review",
+    "semantic_family": "general",
+    "status": "active",
+    "symbol": "collect_subtree_widget_specs"
+  }
+]

@@ -1,10 +1,10 @@
 {
-  "cacheKey": "68827fcb2e265f0d92821f6ee502bc601f0009e7548823159a6757704f5ad04a",
+  "cacheKey": "98cd08d338346001f7890676f7705ba559ea99a8e737a92cd8704c1f98d09ef9",
   "response": {
     "entries": [
       {
-        "clusterId": "shape_2",
-        "widgetName": "MenuItemIconBackgroundWidget",
+        "clusterId": "cluster_2",
+        "widgetName": "MenuItemLeadingIconBackgroundWidget",
         "paramRenames": {}
       }
     ]

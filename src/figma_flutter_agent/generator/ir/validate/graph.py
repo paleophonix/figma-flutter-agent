@@ -253,6 +253,10 @@ def _realign_ir_node_children_to_clean_tree(
     clean = tree_by_id.get(ir_node.figma_id)
     if clean is None:
         return 0
+    if ir_node.kind == WidgetIrKind.EXTRACTED:
+        if ir_node.children:
+            ir_node.children = []
+        return 0
     direct_ids = {child.id for child in clean.children}
     kept: list[WidgetIrNode] = []
     misplaced: list[WidgetIrNode] = []
@@ -352,6 +356,31 @@ def realign_screen_ir_children_to_clean_tree(
     return total_moved
 
 
+def enforce_extracted_screen_ir_terminals(root: WidgetIrNode) -> int:
+    """Clear inline children from opaque ``kind=extracted`` screen IR nodes.
+
+    Extracted widgets carry their subtree in ``extractedWidgets.widgetIr`` only.
+    Screen IR must treat valid extracted refs as terminal leaves.
+
+    Returns:
+        Count of inline child nodes removed from extracted hosts.
+    """
+    stripped = 0
+
+    def walk(node: WidgetIrNode) -> None:
+        nonlocal stripped
+        if node.kind == WidgetIrKind.EXTRACTED:
+            if node.children:
+                stripped += len(node.children)
+                node.children = []
+            return
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return stripped
+
+
 def ensure_ir_direct_children_match_clean(
     screen_ir: ScreenIr,
     clean_tree: CleanDesignTreeNode,
@@ -378,6 +407,9 @@ def ensure_ir_direct_children_match_clean(
         if clean is None:
             for child in ir_node.children:
                 walk(child)
+            return
+        if ir_node.kind == WidgetIrKind.EXTRACTED:
+            ir_node.children = []
             return
         existing_by_id = {child.figma_id: child for child in ir_node.children}
         merged: list[WidgetIrNode] = []

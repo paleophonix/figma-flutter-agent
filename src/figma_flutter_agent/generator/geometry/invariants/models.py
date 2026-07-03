@@ -40,6 +40,7 @@ VIOLATION_SEVERITY: dict[str, ViolationSeverity] = {
     "inv_graph_sync": "hard",
     "inv_type_truth": "hard",
     "inv_classification_scope": "hard",
+    "inv_omission_unpermitted": "hard",
     "t1_reproject": "soft",
     "inv_reproject": "soft",
     "t1_placement_origin": "soft",
