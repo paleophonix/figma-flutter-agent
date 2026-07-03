@@ -71,6 +71,8 @@ def _emit_policy_semantic_widget(
 
     semantics = ctx.semantics
     decision = resolve_policy_decision(ir, ctx=ctx)
+    if decision.report_only:
+        return None
     if decision.native_emit_allowed:
         widget = emit_semantic_widget(ir, clean=clean, ctx=ctx)
         return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
@@ -149,11 +151,14 @@ def emit_widget_expression(
             figma_id_to_widget_name=figma_map,
         )
     if ir.kind == WidgetIrKind.CHIP_CHOICE:
-        from figma_flutter_agent.generator.ir.policy import resolve_policy_decision
+        from figma_flutter_agent.generator.ir.policy import (
+            chip_special_emit_allowed,
+            resolve_policy_decision,
+        )
 
         chip_decision = resolve_policy_decision(ir, ctx=ctx)
         if (
-            not chip_decision.report_only
+            chip_special_emit_allowed(chip_decision)
             and (
                 not _should_ir_walk_children(clean)
                 or layout_fact_stack_circular_option_glyph_host(clean)

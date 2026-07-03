@@ -61,6 +61,94 @@ def test_report_only_skips_semantic_emit_for_classified_button() -> None:
     assert "FilledButton" in dart_semantic or "ElevatedButton" in dart_semantic
 
 
+def test_report_only_styled_tier_falls_back_to_layout() -> None:
+    clean = filled_button()
+    auto_ir = WidgetIrNode(figma_id="btn-filled", kind=WidgetIrKind.AUTO)
+    styled_ir = WidgetIrNode(
+        figma_id="btn-filled",
+        kind=WidgetIrKind.BUTTON_FILLED,
+        fidelity_tier=FidelityTier.STYLED_PRIMITIVE,
+    )
+    ctx = IrEmitContext(
+        uses_svg=False,
+        responsive_enabled=False,
+        semantic_report_only=True,
+    )
+    dart_auto = emit_widget_expression(
+        auto_ir,
+        clean=clean,
+        parent_type=NodeType.COLUMN,
+        ctx=ctx,
+    )
+    dart_styled = emit_widget_expression(
+        styled_ir,
+        clean=clean,
+        parent_type=NodeType.COLUMN,
+        ctx=ctx,
+    )
+    assert dart_styled == dart_auto
+    assert "Theme.of(context).colorScheme.primary" not in dart_styled
+
+
+def test_report_only_baked_tier_falls_back_to_layout() -> None:
+    clean = filled_button()
+    auto_ir = WidgetIrNode(figma_id="btn-filled", kind=WidgetIrKind.AUTO)
+    baked_ir = WidgetIrNode(
+        figma_id="btn-filled",
+        kind=WidgetIrKind.BUTTON_FILLED,
+        fidelity_tier=FidelityTier.SVG_BAKED,
+    )
+    ctx = IrEmitContext(
+        uses_svg=True,
+        responsive_enabled=False,
+        semantic_report_only=True,
+    )
+    dart_auto = emit_widget_expression(
+        auto_ir,
+        clean=clean,
+        parent_type=NodeType.COLUMN,
+        ctx=ctx,
+    )
+    dart_baked = emit_widget_expression(
+        baked_ir,
+        clean=clean,
+        parent_type=NodeType.COLUMN,
+        ctx=ctx,
+    )
+    assert dart_baked == dart_auto
+    assert "SvgPicture.asset(" not in dart_baked
+
+
+def test_chip_non_native_policy_skips_chip_special_emit(monkeypatch) -> None:
+    from tests.test_chip_choice_layout_emit import _circular_size_option_stack
+
+    calls: list[bool] = []
+
+    def _spy(*_args, **_kwargs) -> str:
+        calls.append(True)
+        return "SPY_CHIP_LAYOUT"
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.generator.layout.widgets.option_chip.emit_chip_choice_layout",
+        _spy,
+    )
+    chip = _circular_size_option_stack("1:chip", label='10"')
+    ir = WidgetIrNode(
+        figma_id="1:chip",
+        kind=WidgetIrKind.CHIP_CHOICE,
+        is_selected=False,
+        fidelity_tier=FidelityTier.STYLED_PRIMITIVE,
+    )
+    ctx = IrEmitContext(uses_svg=False, responsive_enabled=False, semantic_report_only=False)
+    emit_widget_expression(
+        ir,
+        clean=chip,
+        parent_type=NodeType.STACK,
+        ctx=ctx,
+    )
+    assert calls == []
+
+
 def test_verified_native_emit_uses_native_template() -> None:
     clean = filled_button()
     ir = WidgetIrNode(

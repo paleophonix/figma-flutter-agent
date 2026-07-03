@@ -70,3 +70,8 @@ def resolve_policy_decision(
         emit_path=emit_path,
         native_emit_allowed=native_allowed,
     )
+
+
+def chip_special_emit_allowed(decision: PolicyDecision) -> bool:
+    """Return True when chip-special layout emit is allowed by policy."""
+    return decision.native_emit_allowed

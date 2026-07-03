@@ -2,17 +2,22 @@
 
 from __future__ import annotations
 
+import json
+
 from figma_flutter_agent.audit.shadow_classifier import (
+    INVENTORY_JSON_REL,
+    RATCHET_BASELINE_JSON_REL,
     ShadowClassifierRecord,
     _repo_root,
     compare_ratchet,
+    load_ratchet_baseline_records,
     records_from_json,
+    run_shadow_ratchet_gate,
     scan_generator_interaction_usage,
 )
 
-_BASELINE_JSON = (
-    _repo_root() / "docs/refactor/generated/shadow-classifier-inventory.json"
-)
+_INVENTORY_JSON = _repo_root() / INVENTORY_JSON_REL
+_RATCHET_BASELINE_JSON = _repo_root() / RATCHET_BASELINE_JSON_REL
 
 
 def test_scan_is_deterministic() -> None:
@@ -21,19 +26,63 @@ def test_scan_is_deterministic() -> None:
     assert first == second
 
 
-def test_ratchet_live_scan_against_committed_baseline() -> None:
-    assert _BASELINE_JSON.is_file()
-    baseline = records_from_json(_BASELINE_JSON.read_text(encoding="utf-8"))
-    live = scan_generator_interaction_usage()
-    report = compare_ratchet(baseline=baseline, current=live)
+def test_ratchet_live_scan_against_approved_baseline() -> None:
+    report = run_shadow_ratchet_gate()
     assert report.passed is True
     assert not report.new_kind_decider
     assert not report.new_emit_archetype_decider
     assert not report.new_unknown
 
 
+def test_ratchet_baseline_not_loaded_from_working_tree_inventory() -> None:
+    baseline, source = load_ratchet_baseline_records()
+    assert _INVENTORY_JSON.is_file()
+    working_inventory = records_from_json(_INVENTORY_JSON.read_text(encoding="utf-8"))
+    rogue = ShadowClassifierRecord(
+        path="src/figma_flutter_agent/generator/ir/expression.py",
+        symbol="emit_widget_expression",
+        imported_symbol="synthetic_inventory_only_decider",
+        category="emit_archetype_decider",
+        semantic_family="general",
+        rationale="inventory regen bypass attempt",
+    )
+    corrupted_inventory = [*working_inventory, rogue]
+    _INVENTORY_JSON.write_text(
+        json.dumps(
+            [
+                {
+                    "path": item.path,
+                    "symbol": item.symbol,
+                    "imported_symbol": item.imported_symbol,
+                    "category": item.category,
+                    "semantic_family": item.semantic_family,
+                    "rationale": item.rationale,
+                    "status": item.status,
+                }
+                for item in corrupted_inventory
+            ],
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    try:
+        reloaded, _ = load_ratchet_baseline_records()
+        live = scan_generator_interaction_usage()
+        report = compare_ratchet(baseline=reloaded, current=live)
+        assert rogue not in reloaded
+        assert report.passed is True
+        assert "inventory.json" not in source or source.startswith("git:")
+    finally:
+        _INVENTORY_JSON.write_text(
+            _RATCHET_BASELINE_JSON.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+
 def test_ratchet_passes_on_unchanged_baseline() -> None:
-    baseline = records_from_json(_BASELINE_JSON.read_text(encoding="utf-8"))
+    baseline, _ = load_ratchet_baseline_records()
     report = compare_ratchet(baseline=baseline, current=baseline)
     assert report.passed is True
     assert not report.new_kind_decider
@@ -43,7 +92,7 @@ def test_ratchet_passes_on_unchanged_baseline() -> None:
 
 
 def test_ratchet_allows_remediation_shrink() -> None:
-    baseline = records_from_json(_BASELINE_JSON.read_text(encoding="utf-8"))
+    baseline, _ = load_ratchet_baseline_records()
     assert baseline
     current = baseline[1:]
     report = compare_ratchet(baseline=baseline, current=current)
@@ -52,7 +101,7 @@ def test_ratchet_allows_remediation_shrink() -> None:
 
 
 def test_ratchet_allows_new_fact_reader() -> None:
-    baseline = records_from_json(_BASELINE_JSON.read_text(encoding="utf-8"))
+    baseline, _ = load_ratchet_baseline_records()
     allowed = ShadowClassifierRecord(
         path="src/figma_flutter_agent/generator/ir/expression.py",
         symbol="emit_widget_expression",
@@ -66,7 +115,7 @@ def test_ratchet_allows_new_fact_reader() -> None:
 
 
 def test_ratchet_blocks_new_emit_archetype_decider() -> None:
-    baseline = records_from_json(_BASELINE_JSON.read_text(encoding="utf-8"))
+    baseline, _ = load_ratchet_baseline_records()
     rogue = ShadowClassifierRecord(
         path="src/figma_flutter_agent/generator/ir/expression.py",
         symbol="emit_widget_expression",
@@ -81,7 +130,7 @@ def test_ratchet_blocks_new_emit_archetype_decider() -> None:
 
 
 def test_ratchet_blocks_new_kind_decider() -> None:
-    baseline = records_from_json(_BASELINE_JSON.read_text(encoding="utf-8"))
+    baseline, _ = load_ratchet_baseline_records()
     rogue = ShadowClassifierRecord(
         path="src/figma_flutter_agent/generator/ir/expression.py",
         symbol="emit_widget_expression",
@@ -93,6 +142,10 @@ def test_ratchet_blocks_new_kind_decider() -> None:
     report = compare_ratchet(baseline=baseline, current=[*baseline, rogue])
     assert report.passed is False
     assert len(report.new_kind_decider) == 1
+
+
+def test_frozen_ratchet_baseline_file_exists() -> None:
+    assert _RATCHET_BASELINE_JSON.is_file()
 
 
 def test_generated_markdown_exists() -> None:

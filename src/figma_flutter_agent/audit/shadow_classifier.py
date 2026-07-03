@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import ast
 import json
+import os
+import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Literal
@@ -41,6 +43,9 @@ _FACT_READER_MARKERS = (
     "/ir/validate/guards.py",
     "/background/detection.py",
 )
+
+INVENTORY_JSON_REL = "docs/refactor/generated/shadow-classifier-inventory.json"
+RATCHET_BASELINE_JSON_REL = "docs/refactor/generated/shadow-classifier-ratchet-baseline.json"
 
 
 @dataclass(frozen=True, slots=True)
@@ -316,4 +321,81 @@ def write_inventory_artifacts(
     json_path.parent.mkdir(parents=True, exist_ok=True)
     json_path.write_text(records_to_json(items), encoding="utf-8")
     markdown_path.write_text(render_inventory_markdown(items), encoding="utf-8")
+    return items
+
+
+def _git_run(args: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        cwd=_repo_root(),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def _git_show_text(ref: str, rel_path: str) -> str | None:
+    result = _git_run(["show", f"{ref}:{rel_path}"])
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    return result.stdout
+
+
+def resolve_ratchet_baseline_git_ref() -> str | None:
+    """Resolve git ref for ratchet baseline (env override, merge-base, or parent)."""
+    explicit = os.environ.get("FIGMA_SHADOW_RATCHET_REF", "").strip()
+    if explicit:
+        verify = _git_run(["rev-parse", "--verify", explicit])
+        if verify.returncode == 0:
+            return verify.stdout.strip()
+    merge_base = _git_run(["merge-base", "HEAD", "main"])
+    if merge_base.returncode == 0 and merge_base.stdout.strip():
+        return merge_base.stdout.strip()
+    parent = _git_run(["rev-parse", "--verify", "HEAD~1"])
+    if parent.returncode == 0:
+        return parent.stdout.strip()
+    return None
+
+
+def load_ratchet_baseline_records() -> tuple[list[ShadowClassifierRecord], str]:
+    """Load approved ratchet baseline from git ref or frozen ratchet JSON.
+
+    Never reads the working-tree inventory JSON; that file may be regenerated in
+    the same commit as new shadow deciders and must not define the ratchet gate.
+    """
+    ref = resolve_ratchet_baseline_git_ref()
+    if ref:
+        for rel_path in (RATCHET_BASELINE_JSON_REL, INVENTORY_JSON_REL):
+            text = _git_show_text(ref, rel_path)
+            if text is not None:
+                return records_from_json(text), f"git:{ref}:{rel_path}"
+    frozen = _repo_root() / RATCHET_BASELINE_JSON_REL
+    if frozen.is_file():
+        return (
+            records_from_json(frozen.read_text(encoding="utf-8")),
+            f"frozen:{RATCHET_BASELINE_JSON_REL}",
+        )
+    raise FileNotFoundError(
+        "shadow classifier ratchet baseline not found "
+        f"(git ref={ref!r}, frozen={frozen})",
+    )
+
+
+def run_shadow_ratchet_gate() -> RatchetReport:
+    """Compare live scan against the approved ratchet baseline."""
+    baseline, _source = load_ratchet_baseline_records()
+    current = scan_generator_interaction_usage()
+    return compare_ratchet(baseline=baseline, current=current)
+
+
+def write_ratchet_baseline(
+    *,
+    path: Path | None = None,
+    records: list[ShadowClassifierRecord] | None = None,
+) -> list[ShadowClassifierRecord]:
+    """Persist frozen ratchet baseline after conscious remediation shrink."""
+    items = records if records is not None else scan_generator_interaction_usage()
+    target = path or (_repo_root() / RATCHET_BASELINE_JSON_REL)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(records_to_json(items), encoding="utf-8")
     return items
