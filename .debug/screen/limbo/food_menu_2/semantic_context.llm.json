@@ -932,18 +932,6 @@
       "depth": 4,
       "name": "Button/ Back",
       "type": "BUTTON",
-      "children_count": 1,
-      "size": {
-        "width": 48.0,
-        "height": 48.0
-      }
-    },
-    {
-      "id": "602:841",
-      "parent_id": "602:840",
-      "depth": 5,
-      "name": "Ellipse 1",
-      "type": "VECTOR",
       "children_count": 0,
       "size": {
         "width": 48.0,
@@ -2461,13 +2449,6 @@
       "relation": "previous_sibling",
       "distance_px": 1.0,
       "parent_id": "602:839"
-    },
-    {
-      "kind": "parent_child",
-      "from_node_id": "602:840",
-      "to_node_id": "602:841",
-      "relation": "parent_child",
-      "parent_id": "602:840"
     },
     {
       "kind": "parent_child",

@@ -571,6 +571,8 @@
             "style": {
               "strokeAlign": "INSIDE"
             },
+            "vectorAssetKey": "assets/icons/back_602_760.svg",
+            "vectorSvgPathCount": 2,
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
               "width": 45.0,
@@ -1118,6 +1120,8 @@
                       "strokeAlign": "INSIDE",
                       "clipsContent": true
                     },
+                    "vectorAssetKey": "assets/icons/chevron-right_602_775.svg",
+                    "vectorSvgPathCount": 1,
                     "clusterId": "cluster_1",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -1330,6 +1334,8 @@
                       "borderColor": "0xFFFFFFFF",
                       "hasStroke": true
                     },
+                    "vectorAssetKey": "assets/icons/ellipse_1_602_769.svg",
+                    "vectorSvgPathCount": 2,
                     "accessibilityLabel": "Ellipse 1",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -1387,6 +1393,8 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/icon_profile_602_770.svg",
+                    "vectorSvgPathCount": 2,
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
                       "horizontal": "SCALE",
@@ -1970,6 +1978,8 @@
                       "borderColor": "0xFFFFFFFF",
                       "hasStroke": true
                     },
+                    "vectorAssetKey": "assets/icons/ellipse_1_602_780.svg",
+                    "vectorSvgPathCount": 2,
                     "accessibilityLabel": "Ellipse 1",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -2027,6 +2037,8 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/icon_setting_602_781.svg",
+                    "vectorSvgPathCount": 3,
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
                       "horizontal": "SCALE",
@@ -2568,6 +2580,7 @@
                   "width": 30.0,
                   "height": 30.0
                 },
+                "extractedWidgetRef": "IconRightWidget",
                 "geometryFrame": {
                   "localTransform": {
                     "tx": 266.0,
@@ -2743,6 +2756,8 @@
                       "strokeAlign": "INSIDE",
                       "clipsContent": true
                     },
+                    "vectorAssetKey": "assets/icons/download_602_802.svg",
+                    "vectorSvgPathCount": 3,
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
                       "horizontal": "SCALE",
@@ -3105,6 +3120,8 @@
                       "backgroundColor": "0xFFFFFFFF",
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/ellipse_1_602_796.svg",
+                    "vectorSvgPathCount": 1,
                     "accessibilityLabel": "Ellipse 1",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -3538,6 +3555,7 @@
                   "width": 30.0,
                   "height": 30.0
                 },
+                "extractedWidgetRef": "IconRightWidget2",
                 "geometryFrame": {
                   "localTransform": {
                     "tx": 266.0,
@@ -3736,6 +3754,8 @@
                           "strokeAlign": "INSIDE",
                           "clipsContent": true
                         },
+                        "vectorAssetKey": "assets/icons/command_602_821.svg",
+                        "vectorSvgPathCount": 1,
                         "layoutPositioning": "ABSOLUTE",
                         "stackPlacement": {
                           "horizontal": "SCALE",
@@ -3944,6 +3964,8 @@
                           "backgroundColor": "0xFFFFFFFF",
                           "strokeAlign": "INSIDE"
                         },
+                        "vectorAssetKey": "assets/icons/ellipse_1_602_815.svg",
+                        "vectorSvgPathCount": 1,
                         "accessibilityLabel": "Ellipse 1",
                         "layoutPositioning": "ABSOLUTE",
                         "stackPlacement": {
@@ -4498,6 +4520,8 @@
                           "strokeAlign": "INSIDE",
                           "clipsContent": true
                         },
+                        "vectorAssetKey": "assets/icons/receipt-outline_602_847.svg",
+                        "vectorSvgPathCount": 3,
                         "layoutPositioning": "ABSOLUTE",
                         "stackPlacement": {
                           "horizontal": "SCALE",
@@ -4840,6 +4864,7 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/ellipse_1_602_841.svg",
                     "clusterId": "cluster_2",
                     "accessibilityLabel": "Button/ Back",
                     "accessibilityHint": "Button/ Back",
@@ -4848,6 +4873,9 @@
                       "width": 48.0,
                       "height": 48.0
                     },
+                    "flattenFigmaNodeIds": [
+                      "602:841"
+                    ],
                     "geometryFrame": {
                       "layoutRect": {
                         "width": 48.0,
@@ -5128,6 +5156,8 @@
                       "borderColor": "0xFFFFFFFF",
                       "hasStroke": true
                     },
+                    "vectorAssetKey": "assets/icons/ellipse_1_602_828.svg",
+                    "vectorSvgPathCount": 2,
                     "accessibilityLabel": "Ellipse 1",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -5261,6 +5291,8 @@
                                   "backgroundColor": "0xFFFF7622",
                                   "strokeAlign": "INSIDE"
                                 },
+                                "vectorAssetKey": "assets/icons/vector_602_832.svg",
+                                "vectorSvgPathCount": 1,
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -6582,18 +6614,6 @@
       "depth": 4,
       "name": "Button/ Back",
       "type": "BUTTON",
-      "children_count": 1,
-      "size": {
-        "width": 48.0,
-        "height": 48.0
-      }
-    },
-    {
-      "id": "602:841",
-      "parent_id": "602:840",
-      "depth": 5,
-      "name": "Ellipse 1",
-      "type": "VECTOR",
       "children_count": 0,
       "size": {
         "width": 48.0,
@@ -8114,13 +8134,6 @@
     },
     {
       "kind": "parent_child",
-      "from_node_id": "602:840",
-      "to_node_id": "602:841",
-      "relation": "parent_child",
-      "parent_id": "602:840"
-    },
-    {
-      "kind": "parent_child",
       "from_node_id": "602:823",
       "to_node_id": "602:825",
       "relation": "parent_child",
@@ -8790,13 +8803,6 @@
       "to_node_id": "602:840",
       "relation": "inside_bounds",
       "distance_px": 193.4
-    },
-    {
-      "kind": "inside_bounds",
-      "from_node_id": "602:751",
-      "to_node_id": "602:841",
-      "relation": "inside_bounds",
-      "distance_px": 271.26
     },
     {
       "kind": "inside_bounds",
@@ -10361,13 +10367,6 @@
     },
     {
       "kind": "inside_bounds",
-      "from_node_id": "602:806",
-      "to_node_id": "602:841",
-      "relation": "inside_bounds",
-      "distance_px": 124.5
-    },
-    {
-      "kind": "inside_bounds",
       "from_node_id": "602:807",
       "to_node_id": "602:808",
       "relation": "inside_bounds",
@@ -10445,13 +10444,6 @@
     },
     {
       "kind": "inside_bounds",
-      "from_node_id": "602:807",
-      "to_node_id": "602:841",
-      "relation": "inside_bounds",
-      "distance_px": 124.5
-    },
-    {
-      "kind": "inside_bounds",
       "from_node_id": "602:808",
       "to_node_id": "602:809",
       "relation": "inside_bounds",
@@ -10522,13 +10514,6 @@
     },
     {
       "kind": "inside_bounds",
-      "from_node_id": "602:808",
-      "to_node_id": "602:841",
-      "relation": "inside_bounds",
-      "distance_px": 124.0
-    },
-    {
-      "kind": "inside_bounds",
       "from_node_id": "602:809",
       "to_node_id": "602:810",
       "relation": "inside_bounds",
@@ -10585,13 +10570,6 @@
     },
     {
       "kind": "inside_bounds",
-      "from_node_id": "602:813",
-      "to_node_id": "602:841",
-      "relation": "inside_bounds",
-      "distance_px": 0.0
-    },
-    {
-      "kind": "inside_bounds",
       "from_node_id": "602:820",
       "to_node_id": "602:821",
       "relation": "inside_bounds",
@@ -10614,13 +10592,6 @@
     {
       "kind": "inside_bounds",
       "from_node_id": "602:815",
-      "to_node_id": "602:820",
-      "relation": "inside_bounds",
-      "distance_px": 0.0
-    },
-    {
-      "kind": "inside_bounds",
-      "from_node_id": "602:841",
       "to_node_id": "602:820",
       "relation": "inside_bounds",
       "distance_px": 0.0
@@ -10648,13 +10619,6 @@
     },
     {
       "kind": "inside_bounds",
-      "from_node_id": "602:841",
-      "to_node_id": "602:821",
-      "relation": "inside_bounds",
-      "distance_px": 0.0
-    },
-    {
-      "kind": "inside_bounds",
       "from_node_id": "602:814",
       "to_node_id": "602:822",
       "relation": "inside_bounds",
@@ -10663,13 +10627,6 @@
     {
       "kind": "inside_bounds",
       "from_node_id": "602:815",
-      "to_node_id": "602:822",
-      "relation": "inside_bounds",
-      "distance_px": 0.0
-    },
-    {
-      "kind": "inside_bounds",
-      "from_node_id": "602:841",
       "to_node_id": "602:822",
       "relation": "inside_bounds",
       "distance_px": 0.0
@@ -10678,20 +10635,6 @@
       "kind": "inside_bounds",
       "from_node_id": "602:814",
       "to_node_id": "602:815",
-      "relation": "inside_bounds",
-      "distance_px": 0.0
-    },
-    {
-      "kind": "inside_bounds",
-      "from_node_id": "602:814",
-      "to_node_id": "602:841",
-      "relation": "inside_bounds",
-      "distance_px": 0.0
-    },
-    {
-      "kind": "inside_bounds",
-      "from_node_id": "602:815",
-      "to_node_id": "602:841",
       "relation": "inside_bounds",
       "distance_px": 0.0
     },
@@ -11699,12 +11642,7 @@
                       ]
                     },
                     {
-                      "figmaId": "602:840",
-                      "children": [
-                        {
-                          "figmaId": "602:841"
-                        }
-                      ]
+                      "figmaId": "602:840"
                     }
                   ]
                 }

@@ -1,16 +1,17 @@
 {
-  "cacheKey": "6d7175795ab5d39f80b22299abc7da1f5345fd40e4aa6437edc21c28d2b83ff5",
+  "cacheKey": "73aea8e0f17195bed309412fe04a3529c04fecc71d1706a87ab4c0e2abb6d3ee",
   "response": {
     "candidates": [
       {
         "nodeId": "602:766",
         "widgetName": "ProfileMenuItem",
-        "reason": "This row pattern repeats across multiple menu options with a leading circular icon button, a text label, and a trailing chevron.",
-        "confidence": 0.95,
+        "reason": "This row pattern repeats across menu actions with leading circular icon, title text, and trailing chevron; cluster hints indicate a 5x shared structure.",
+        "confidence": 0.94,
         "suggestedParams": [
           "title",
           "leadingIcon",
-          "onTap"
+          "onTap",
+          "showChevron"
         ],
         "evidence": {
           "similarNodes": [
@@ -19,77 +20,100 @@
             "602:808",
             "602:825"
           ],
-          "shapeSimilarity": 0.93,
-          "semanticRole": "navigable menu row"
+          "shapeSimilarity": 0.92,
+          "semanticRole": "menu list item"
         }
       },
       {
         "nodeId": "602:764",
         "widgetName": "ProfileMenuCard",
-        "reason": "This card groups two repeated ProfileMenuItem rows under a shared rounded background, suggesting a reusable section card.",
-        "confidence": 0.89,
+        "reason": "Card container holding two stacked menu rows is a reusable section pattern and matches another 2-row card below.",
+        "confidence": 0.83,
         "suggestedParams": [
-          "firstTitle",
-          "firstLeadingIcon",
-          "secondTitle",
-          "secondLeadingIcon"
+          "items",
+          "backgroundColor"
         ],
         "evidence": {
           "similarNodes": [
             "602:823"
           ],
-          "shapeSimilarity": 0.79,
-          "semanticRole": "grouped menu/stat card"
+          "shapeSimilarity": 0.8,
+          "semanticRole": "menu section card"
         }
       },
       {
-        "nodeId": "602:823",
-        "widgetName": "StatsAndActionCard",
-        "reason": "This larger card combines a stats row and an action row using the same repeated row family inside one shared background.",
-        "confidence": 0.83,
+        "nodeId": "602:788",
+        "widgetName": "SingleActionCard",
+        "reason": "Standalone rounded card with one action row appears multiple times for Log Out and User Reviews, and also aligns structurally with the single action row inside the lower card.",
+        "confidence": 0.87,
         "suggestedParams": [
-          "metricValue",
-          "metricTitle",
-          "metricIcon",
-          "actionTitle",
-          "actionIcon",
-          "onActionTap"
+          "title",
+          "leadingIcon",
+          "onTap",
+          "showChevron"
         ],
         "evidence": {
           "similarNodes": [
-            "602:764"
+            "602:806",
+            "602:825"
           ],
-          "shapeSimilarity": 0.76,
-          "semanticRole": "grouped info and action card"
+          "shapeSimilarity": 0.85,
+          "semanticRole": "single menu action card"
+        }
+      },
+      {
+        "nodeId": "602:839",
+        "widgetName": "CircularIconBadge",
+        "reason": "48x48 circular badge wrapper for section icons repeats across menu rows and stat summary areas.",
+        "confidence": 0.82,
+        "suggestedParams": [
+          "icon",
+          "backgroundColor"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "602:768",
+            "602:779",
+            "602:795",
+            "602:813",
+            "602:827"
+          ],
+          "shapeSimilarity": 0.9,
+          "semanticRole": "icon badge"
+        }
+      },
+      {
+        "nodeId": "602:836",
+        "widgetName": "StatSummaryRow",
+        "reason": "Summary row with label, value, and circular icon is a distinct reusable metric item pattern that could scale to additional stats.",
+        "confidence": 0.71,
+        "suggestedParams": [
+          "label",
+          "value",
+          "leadingIcon"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "602:766",
+            "602:777"
+          ],
+          "shapeSimilarity": 0.58,
+          "semanticRole": "stat summary item"
         }
       },
       {
         "nodeId": "602:753",
         "widgetName": "PrimaryPillButton",
-        "reason": "Compact rounded call-to-action with background container and centered label is a common reusable button pattern.",
-        "confidence": 0.73,
+        "reason": "Compact pill CTA with text over rounded rectangle is a reusable button style independent of this screen layout.",
+        "confidence": 0.62,
         "suggestedParams": [
           "label",
           "onTap"
         ],
         "evidence": {
           "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "primary action button"
-        }
-      },
-      {
-        "nodeId": "602:759",
-        "widgetName": "CircularBackButton",
-        "reason": "Self-contained circular back control with ellipse background and arrow vector is a reusable navigation button.",
-        "confidence": 0.71,
-        "suggestedParams": [
-          "onTap"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "navigation back button"
+          "shapeSimilarity": 0.49,
+          "semanticRole": "pill action button"
         }
       }
     ]

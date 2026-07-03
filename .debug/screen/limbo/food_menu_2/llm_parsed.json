@@ -16,7 +16,7 @@
         },
         {
           "figmaId": "602:753",
-          "kind": "button_outlined",
+          "kind": "auto",
           "children": [
             {
               "figmaId": "602:754",
@@ -26,7 +26,7 @@
             },
             {
               "figmaId": "602:755",
-              "kind": "text",
+              "kind": "auto",
               "children": [],
               "overrides": {
                 "text": "Withdraw",
@@ -35,21 +35,15 @@
               }
             }
           ],
-          "overrides": {
-            "accessibilityLabel": "Withdraw"
-          },
-          "payload": {
-            "payloadKind": "button_outlined"
-          },
           "classificationHint": {
             "suggestedKind": "button_outlined",
-            "confidence": 0.76,
-            "rationale": "Pill-shaped bordered control with centered label indicates tappable action."
+            "confidence": 0.74,
+            "rationale": "Pill-shaped bordered call-to-action with centered label."
           }
         },
         {
           "figmaId": "602:756",
-          "kind": "text",
+          "kind": "auto",
           "children": [],
           "overrides": {
             "text": "Available Balance",
@@ -63,7 +57,7 @@
           "children": [
             {
               "figmaId": "602:758",
-              "kind": "text",
+              "kind": "auto",
               "children": [],
               "overrides": {
                 "text": "$500.00",
@@ -75,7 +69,7 @@
         },
         {
           "figmaId": "602:759",
-          "kind": "button_icon",
+          "kind": "auto",
           "children": [
             {
               "figmaId": "602:760",
@@ -98,24 +92,26 @@
                     "accessibilityLabel": "Back"
                   }
                 }
-              ]
+              ],
+              "classificationHint": {
+                "suggestedKind": "button_icon",
+                "confidence": 0.68,
+                "rationale": "Compact circular back affordance rendered as icon stack."
+              }
             }
           ],
           "overrides": {
             "accessibilityLabel": "Back"
           },
-          "payload": {
-            "payloadKind": "button_icon"
-          },
           "classificationHint": {
             "suggestedKind": "button_icon",
-            "confidence": 0.78,
-            "rationale": "Compact 45x45 circular back affordance with arrow vector."
+            "confidence": 0.77,
+            "rationale": "Top-left back control with 45x45 hit area."
           }
         },
         {
           "figmaId": "602:763",
-          "kind": "text",
+          "kind": "auto",
           "children": [],
           "overrides": {
             "text": "My Profile",
@@ -134,7 +130,7 @@
         },
         {
           "figmaId": "602:788",
-          "kind": "button",
+          "kind": "auto",
           "children": [
             {
               "figmaId": "602:789",
@@ -153,17 +149,18 @@
                   "kind": "extracted",
                   "children": [],
                   "ref": {
-                    "widgetName": "ChevronRightIconWidget",
+                    "widgetName": "IconRightWidget",
                     "namedArgs": {}
                   }
                 },
                 {
                   "figmaId": "602:794",
-                  "kind": "text",
+                  "kind": "auto",
                   "children": [],
                   "overrides": {
                     "text": "Log Out",
                     "accessibilityLabel": "Log Out",
+                    "textColor": "primary",
                     "fontSize": 15.0
                   }
                 },
@@ -205,15 +202,14 @@
                 },
                 {
                   "figmaId": "602:795",
-                  "kind": "button_icon",
+                  "kind": "auto",
                   "children": [
                     {
                       "figmaId": "602:796",
                       "kind": "auto",
                       "children": [],
                       "overrides": {
-                        "accessibilityLabel": "Ellipse 1",
-                        "backgroundColor": "color1"
+                        "accessibilityLabel": "Ellipse 1"
                       }
                     },
                     {
@@ -229,35 +225,29 @@
                     }
                   ],
                   "overrides": {
-                    "accessibilityLabel": "Log Out icon"
-                  },
-                  "payload": {
-                    "payloadKind": "button_icon"
+                    "accessibilityLabel": "Log Out icon button"
                   },
                   "classificationHint": {
                     "suggestedKind": "button_icon",
-                    "confidence": 0.71,
-                    "rationale": "Circular icon badge used as leading action visual in tappable row."
+                    "confidence": 0.7,
+                    "rationale": "Leading circular icon button in logout row."
                   }
                 }
-              ]
+              ],
+              "overrides": {
+                "accessibilityLabel": "Log Out"
+              },
+              "classificationHint": {
+                "suggestedKind": "button",
+                "confidence": 0.72,
+                "rationale": "Settings-style row with leading icon, label and trailing chevron."
+              }
             }
-          ],
-          "overrides": {
-            "accessibilityLabel": "Log Out"
-          },
-          "payload": {
-            "payloadKind": "button"
-          },
-          "classificationHint": {
-            "suggestedKind": "button",
-            "confidence": 0.74,
-            "rationale": "List-tile like settings row with label and chevron indicates navigation action."
-          }
+          ]
         },
         {
           "figmaId": "602:806",
-          "kind": "button",
+          "kind": "auto",
           "children": [
             {
               "figmaId": "602:807",
@@ -276,17 +266,18 @@
                   "kind": "extracted",
                   "children": [],
                   "ref": {
-                    "widgetName": "ChevronRightIconWidget",
+                    "widgetName": "IconRightWidget2",
                     "namedArgs": {}
                   }
                 },
                 {
                   "figmaId": "602:812",
-                  "kind": "text",
+                  "kind": "auto",
                   "children": [],
                   "overrides": {
                     "text": "User Reviews",
                     "accessibilityLabel": "User Reviews",
+                    "textColor": "primary",
                     "fontSize": 15.0
                   }
                 },
@@ -316,46 +307,39 @@
                     },
                     {
                       "figmaId": "602:814",
-                      "kind": "button_icon",
+                      "kind": "auto",
                       "children": [
                         {
                           "figmaId": "602:815",
                           "kind": "auto",
                           "children": [],
                           "overrides": {
-                            "accessibilityLabel": "Ellipse 1",
-                            "backgroundColor": "color1"
+                            "accessibilityLabel": "Ellipse 1"
                           }
                         }
                       ],
                       "overrides": {
-                        "accessibilityLabel": "User Reviews icon"
-                      },
-                      "payload": {
-                        "payloadKind": "button_icon"
+                        "accessibilityLabel": "User Reviews icon button"
                       },
                       "classificationHint": {
                         "suggestedKind": "button_icon",
                         "confidence": 0.69,
-                        "rationale": "Underlying circular icon button background paired with decorative vector icon stack."
+                        "rationale": "Leading circular button shell under decorative icon."
                       }
                     }
                   ]
                 }
-              ]
+              ],
+              "overrides": {
+                "accessibilityLabel": "User Reviews"
+              },
+              "classificationHint": {
+                "suggestedKind": "button",
+                "confidence": 0.72,
+                "rationale": "Profile menu row with trailing chevron."
+              }
             }
-          ],
-          "overrides": {
-            "accessibilityLabel": "User Reviews"
-          },
-          "payload": {
-            "payloadKind": "button"
-          },
-          "classificationHint": {
-            "suggestedKind": "button",
-            "confidence": 0.74,
-            "rationale": "Card row with icon, label, and chevron suggests navigation item."
-          }
+          ]
         },
         {
           "figmaId": "602:823",
@@ -374,31 +358,28 @@
       "602:756",
       "602:757",
       "602:753",
+      "602:763",
       "602:764",
       "602:823",
       "602:806",
       "602:788",
-      "602:759",
-      "602:763"
+      "602:759"
     ],
     "stateByFigmaId": {},
     "adaptiveRules": [],
     "semanticSummary": {
       "screenRole": "profile_menu",
-      "confidence": 0.86,
-      "explanation": "Screen presents profile balance header with withdrawal action and multiple navigational settings/menu rows.",
-      "warnings": [
-        "Two large vector-rich card groups were preserved as extracted widgets.",
-        "Some chevron/icon clusters are decorative subtrees inside larger tappable rows."
-      ]
+      "confidence": 0.93,
+      "explanation": "Screen presents account summary, withdrawal action, and profile/settings navigation rows.",
+      "warnings": []
     },
     "semanticVerdicts": [
       {
         "nodeId": "602:753",
         "role": "control",
-        "subtype": "action_button",
+        "subtype": "button",
         "controlNodeId": "602:753",
-        "boundaryNodeId": "602:754",
+        "boundaryNodeId": "602:753",
         "labelNodeIds": [
           "602:755"
         ],
@@ -411,30 +392,33 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "actionKind": "withdraw",
+          "isMultiline": false,
+          "maxLines": 1,
+          "actionKind": "withdrawal",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "center_label_in_pill_button",
-          "min_touch_target_44"
+          "single_line_label_centered",
+          "min_touch_target_44dp"
         ],
         "options": [],
-        "confidence": 0.89,
+        "confidence": 0.93,
         "proposedEffects": [
-          "tap_action"
+          "tap"
         ],
-        "explanation": "Bordered pill with centered Withdraw label functions as primary action in balance header."
+        "explanation": "Primary withdraw CTA shown as bordered pill with centered text."
       },
       {
         "nodeId": "602:759",
         "role": "control",
         "subtype": "back_button",
         "controlNodeId": "602:759",
-        "boundaryNodeId": "602:760",
+        "boundaryNodeId": "602:759",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [
+          "602:760",
           "602:761",
           "602:762"
         ],
@@ -446,22 +430,22 @@
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "circular_icon_button_centered",
-          "min_touch_target_44"
+          "icon_button_square_hit_target",
+          "min_touch_target_44dp"
         ],
         "options": [],
-        "confidence": 0.94,
+        "confidence": 0.95,
         "proposedEffects": [
           "navigate_back"
         ],
-        "explanation": "Top-left circular back affordance with arrow icon."
+        "explanation": "Top-left circular back affordance."
       },
       {
         "nodeId": "602:764",
         "role": "control",
         "subtype": "menu_group",
         "controlNodeId": "602:764",
-        "boundaryNodeId": "602:765",
+        "boundaryNodeId": "602:764",
         "labelNodeIds": [
           "602:767",
           "602:778"
@@ -469,9 +453,22 @@
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [
+          "602:765",
           "602:768",
+          "602:769",
+          "602:770",
+          "602:771",
+          "602:772",
+          "602:773",
           "602:774",
+          "602:775",
+          "602:776",
           "602:779",
+          "602:780",
+          "602:781",
+          "602:782",
+          "602:783",
+          "602:784",
           "602:785"
         ],
         "optionNodeIds": [
@@ -481,50 +478,65 @@
         "stateNodeIds": [],
         "contractKind": "unknown",
         "contractTraits": {
+          "actionKind": "menu_navigation",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "stacked_navigation_rows",
-          "leading_icon_trailing_chevron"
+          "list_tile_rows_preserved",
+          "leading_icon_label_trailing_chevron"
         ],
         "options": [
           {
             "nodeId": "602:766",
             "label": "Personal Info",
             "value": "personal_info",
-            "confidence": 0.87
+            "confidence": 0.89
           },
           {
             "nodeId": "602:777",
             "label": "Settings",
             "value": "settings",
-            "confidence": 0.87
+            "confidence": 0.89
           }
         ],
-        "confidence": 0.72,
+        "confidence": 0.79,
         "proposedEffects": [
-          "navigate_to_detail"
+          "tap_row_navigate"
         ],
-        "explanation": "Extracted card contains two separate navigation rows rather than a single control contract."
+        "explanation": "Card contains two tappable settings-style rows."
       },
       {
         "nodeId": "602:823",
         "role": "control",
         "subtype": "stats_and_history_group",
         "controlNodeId": "602:823",
-        "boundaryNodeId": "602:824",
+        "boundaryNodeId": "602:823",
         "labelNodeIds": [
           "602:826",
-          "602:838"
+          "602:838",
+          "602:837"
         ],
         "placeholderNodeIds": [],
         "valueNodeIds": [
           "602:837"
         ],
         "decorationNodeIds": [
+          "602:824",
           "602:827",
+          "602:828",
+          "602:829",
+          "602:830",
+          "602:831",
+          "602:832",
           "602:833",
-          "602:839"
+          "602:834",
+          "602:839",
+          "602:840",
+          "602:846",
+          "602:847",
+          "602:848",
+          "602:849",
+          "602:850"
         ],
         "optionNodeIds": [
           "602:825",
@@ -533,100 +545,120 @@
         "stateNodeIds": [],
         "contractKind": "unknown",
         "contractTraits": {
+          "currentValue": "29K",
+          "actionKind": "menu_navigation_and_stats",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "two_row_summary_card",
-          "metric_row_right_aligned_value",
-          "tappable_history_row_with_chevron"
+          "list_tile_rows_preserved",
+          "metric_value_trailing_alignment"
         ],
+        "value": "29K",
         "options": [
-          {
-            "nodeId": "602:836",
-            "label": "Number of Orders",
-            "value": "29K",
-            "confidence": 0.88
-          },
           {
             "nodeId": "602:825",
             "label": "Withdrawal History",
             "value": "withdrawal_history",
+            "confidence": 0.95
+          },
+          {
+            "nodeId": "602:836",
+            "label": "Number of Orders",
+            "value": "number_of_orders",
             "confidence": 0.91
           }
         ],
-        "confidence": 0.76,
+        "confidence": 0.83,
         "proposedEffects": [
-          "navigate_to_detail"
+          "tap_row_navigate"
         ],
-        "explanation": "Extracted card combines a non-editable metric row and a tappable history row."
+        "explanation": "Card mixes a history navigation row and a metric summary row."
       },
       {
         "nodeId": "602:806",
         "role": "control",
-        "subtype": "navigation_row",
-        "controlNodeId": "602:806",
-        "boundaryNodeId": "602:807",
+        "subtype": "menu_row",
+        "controlNodeId": "602:808",
+        "boundaryNodeId": "602:806",
         "labelNodeIds": [
           "602:812"
         ],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [
+          "602:807",
+          "602:809",
           "602:813",
-          "602:809"
+          "602:814",
+          "602:815",
+          "602:820",
+          "602:821",
+          "602:822"
         ],
         "optionNodeIds": [],
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "actionKind": "navigate",
+          "isMultiline": false,
+          "maxLines": 1,
+          "actionKind": "navigate_reviews",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "leading_icon_trailing_chevron",
-          "min_touch_target_44"
+          "leading_icon_label_trailing_chevron",
+          "min_touch_target_44dp"
         ],
         "options": [],
         "confidence": 0.9,
         "proposedEffects": [
-          "navigate_to_detail"
+          "tap"
         ],
-        "explanation": "User Reviews card row is a standard tappable navigation item."
+        "explanation": "User Reviews appears as a tappable list tile."
       },
       {
         "nodeId": "602:788",
         "role": "control",
-        "subtype": "navigation_row",
-        "controlNodeId": "602:788",
-        "boundaryNodeId": "602:789",
+        "subtype": "menu_row",
+        "controlNodeId": "602:790",
+        "boundaryNodeId": "602:788",
         "labelNodeIds": [
           "602:794"
         ],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [
-          "602:795",
+          "602:789",
           "602:791",
-          "602:801"
+          "602:795",
+          "602:796",
+          "602:797",
+          "602:798",
+          "602:801",
+          "602:802",
+          "602:803",
+          "602:804",
+          "602:805"
         ],
         "optionNodeIds": [],
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
           "actionKind": "logout",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "leading_icon_trailing_chevron",
-          "min_touch_target_44"
+          "leading_icon_label_trailing_chevron",
+          "min_touch_target_44dp"
         ],
         "options": [],
-        "confidence": 0.86,
+        "confidence": 0.94,
         "proposedEffects": [
-          "tap_action",
-          "confirm_or_logout"
+          "tap",
+          "sign_out"
         ],
-        "explanation": "Bottom card row labeled Log Out is a tappable action row."
+        "explanation": "Log Out row acts as a tappable account action."
       }
     ]
   },
@@ -647,159 +679,13 @@
           },
           {
             "figmaId": "602:766",
-            "kind": "button",
-            "children": [
-              {
-                "figmaId": "602:767",
-                "kind": "text",
-                "children": [],
-                "overrides": {
-                  "text": "Personal Info",
-                  "accessibilityLabel": "Personal Info",
-                  "textColor": "primary",
-                  "fontSize": 15.0
-                }
-              },
-              {
-                "figmaId": "602:774",
-                "kind": "extracted",
-                "children": [],
-                "ref": {
-                  "widgetName": "ChevronRightIconWidget",
-                  "namedArgs": {}
-                }
-              },
-              {
-                "figmaId": "602:768",
-                "kind": "button_icon",
-                "children": [
-                  {
-                    "figmaId": "602:769",
-                    "kind": "auto",
-                    "children": [],
-                    "overrides": {
-                      "accessibilityLabel": "Ellipse 1",
-                      "backgroundColor": "color1"
-                    }
-                  },
-                  {
-                    "figmaId": "602:770",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "602:771",
-                        "kind": "extracted",
-                        "children": [],
-                        "ref": {
-                          "widgetName": "ProfileUserIconWidget",
-                          "namedArgs": {}
-                        }
-                      }
-                    ]
-                  }
-                ],
-                "overrides": {
-                  "accessibilityLabel": "Personal Info icon"
-                },
-                "payload": {
-                  "payloadKind": "button_icon"
-                },
-                "classificationHint": {
-                  "suggestedKind": "button_icon",
-                  "confidence": 0.73,
-                  "rationale": "Leading circular icon container inside navigation row."
-                }
-              }
-            ],
-            "overrides": {
-              "accessibilityLabel": "Personal Info"
-            },
-            "payload": {
-              "payloadKind": "button"
-            },
-            "classificationHint": {
-              "suggestedKind": "button",
-              "confidence": 0.78,
-              "rationale": "Row with label, leading icon, and trailing chevron suggests tappable navigation item."
-            }
+            "kind": "auto",
+            "children": []
           },
           {
             "figmaId": "602:777",
-            "kind": "button",
-            "children": [
-              {
-                "figmaId": "602:778",
-                "kind": "text",
-                "children": [],
-                "overrides": {
-                  "text": "Settings",
-                  "accessibilityLabel": "Settings",
-                  "textColor": "primary",
-                  "fontSize": 15.0
-                }
-              },
-              {
-                "figmaId": "602:785",
-                "kind": "extracted",
-                "children": [],
-                "ref": {
-                  "widgetName": "ChevronRightIconWidget",
-                  "namedArgs": {}
-                }
-              },
-              {
-                "figmaId": "602:779",
-                "kind": "button_icon",
-                "children": [
-                  {
-                    "figmaId": "602:780",
-                    "kind": "auto",
-                    "children": [],
-                    "overrides": {
-                      "accessibilityLabel": "Ellipse 1",
-                      "backgroundColor": "color1"
-                    }
-                  },
-                  {
-                    "figmaId": "602:781",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "602:782",
-                        "kind": "extracted",
-                        "children": [],
-                        "ref": {
-                          "widgetName": "SettingsIconWidget",
-                          "namedArgs": {}
-                        }
-                      }
-                    ]
-                  }
-                ],
-                "overrides": {
-                  "accessibilityLabel": "Settings icon"
-                },
-                "payload": {
-                  "payloadKind": "button_icon"
-                },
-                "classificationHint": {
-                  "suggestedKind": "button_icon",
-                  "confidence": 0.73,
-                  "rationale": "Leading circular settings icon inside navigation row."
-                }
-              }
-            ],
-            "overrides": {
-              "accessibilityLabel": "Settings"
-            },
-            "payload": {
-              "payloadKind": "button"
-            },
-            "classificationHint": {
-              "suggestedKind": "button",
-              "confidence": 0.78,
-              "rationale": "Row with label, icon, and chevron suggests settings navigation item."
-            }
+            "kind": "auto",
+            "children": []
           }
         ]
       }
@@ -821,275 +707,74 @@
           {
             "figmaId": "602:836",
             "kind": "auto",
-            "children": [
-              {
-                "figmaId": "602:837",
-                "kind": "text",
-                "children": [],
-                "overrides": {
-                  "text": "29K",
-                  "accessibilityLabel": "29K",
-                  "fontSize": 17.0
-                }
-              },
-              {
-                "figmaId": "602:838",
-                "kind": "text",
-                "children": [],
-                "overrides": {
-                  "text": "Number of Orders",
-                  "accessibilityLabel": "Number of Orders",
-                  "textColor": "primary",
-                  "fontSize": 15.0
-                }
-              },
-              {
-                "figmaId": "602:839",
-                "kind": "auto",
-                "children": [
-                  {
-                    "figmaId": "602:846",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "602:847",
-                        "kind": "auto",
-                        "children": [
-                          {
-                            "figmaId": "602:848",
-                            "kind": "auto",
-                            "children": [],
-                            "overrides": {
-                              "accessibilityLabel": "Vector"
-                            }
-                          },
-                          {
-                            "figmaId": "602:849",
-                            "kind": "auto",
-                            "children": [],
-                            "overrides": {
-                              "accessibilityLabel": "Vector"
-                            }
-                          },
-                          {
-                            "figmaId": "602:850",
-                            "kind": "auto",
-                            "children": [],
-                            "overrides": {
-                              "accessibilityLabel": "Vector"
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "figmaId": "602:840",
-                    "kind": "button_icon",
-                    "children": [
-                      {
-                        "figmaId": "602:841",
-                        "kind": "auto",
-                        "children": [],
-                        "overrides": {
-                          "accessibilityLabel": "Ellipse 1",
-                          "backgroundColor": "color1"
-                        }
-                      }
-                    ],
-                    "overrides": {
-                      "accessibilityLabel": "Number of Orders icon"
-                    },
-                    "payload": {
-                      "payloadKind": "button_icon"
-                    },
-                    "classificationHint": {
-                      "suggestedKind": "button_icon",
-                      "confidence": 0.66,
-                      "rationale": "Circular icon background with decorative receipt icon stack."
-                    }
-                  }
-                ]
-              }
-            ]
+            "children": []
           },
           {
             "figmaId": "602:825",
-            "kind": "button",
-            "children": [
-              {
-                "figmaId": "602:826",
-                "kind": "text",
-                "children": [],
-                "overrides": {
-                  "text": "Withdrawal History",
-                  "accessibilityLabel": "Withdrawal History",
-                  "textColor": "primary",
-                  "fontSize": 15.0
-                }
-              },
-              {
-                "figmaId": "602:827",
-                "kind": "button_icon",
-                "children": [
-                  {
-                    "figmaId": "602:828",
-                    "kind": "auto",
-                    "children": [],
-                    "overrides": {
-                      "accessibilityLabel": "Ellipse 1",
-                      "backgroundColor": "color1"
-                    }
-                  },
-                  {
-                    "figmaId": "602:829",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "602:830",
-                        "kind": "auto",
-                        "children": [
-                          {
-                            "figmaId": "602:831",
-                            "kind": "auto",
-                            "children": [
-                              {
-                                "figmaId": "602:832",
-                                "kind": "auto",
-                                "children": [],
-                                "overrides": {
-                                  "accessibilityLabel": "Vector",
-                                  "backgroundColor": "color3"
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                "overrides": {
-                  "accessibilityLabel": "Withdrawal History icon"
-                },
-                "payload": {
-                  "payloadKind": "button_icon"
-                },
-                "classificationHint": {
-                  "suggestedKind": "button_icon",
-                  "confidence": 0.74,
-                  "rationale": "Leading circular withdrawal badge inside tappable history row."
-                }
-              },
-              {
-                "figmaId": "602:833",
-                "kind": "extracted",
-                "children": [],
-                "ref": {
-                  "widgetName": "ChevronRightIconWidget",
-                  "namedArgs": {}
-                }
-              }
-            ],
-            "overrides": {
-              "accessibilityLabel": "Withdrawal History"
-            },
-            "payload": {
-              "payloadKind": "button"
-            },
-            "classificationHint": {
-              "suggestedKind": "button",
-              "confidence": 0.82,
-              "rationale": "Full row labeled Withdrawal History with leading icon and trailing chevron is a navigation/action row."
-            }
+            "kind": "auto",
+            "children": []
           }
         ]
       }
     },
     {
-      "widgetName": "ChevronRightIconWidget",
+      "widgetName": "IconRightWidget",
       "widgetIr": {
-        "figmaId": "602:774",
+        "figmaId": "602:791",
         "kind": "auto",
         "children": [
           {
-            "figmaId": "602:775",
+            "figmaId": "602:792",
             "kind": "auto",
-            "children": [
-              {
-                "figmaId": "602:776",
-                "kind": "auto",
-                "children": [],
-                "overrides": {
-                  "accessibilityLabel": "Vector"
-                }
-              }
-            ]
+            "children": []
           }
-        ],
-        "overrides": {
-          "accessibilityLabel": "Chevron Right"
-        }
+        ]
       }
     },
     {
-      "widgetName": "ProfileUserIconWidget",
+      "widgetName": "ChevronRightWidget",
       "widgetIr": {
-        "figmaId": "602:771",
+        "figmaId": "602:792",
         "kind": "auto",
         "children": [
           {
-            "figmaId": "602:772",
+            "figmaId": "602:793",
             "kind": "auto",
-            "children": [],
-            "overrides": {
-              "accessibilityLabel": "Vector"
-            }
-          },
-          {
-            "figmaId": "602:773",
-            "kind": "auto",
-            "children": [],
-            "overrides": {
-              "accessibilityLabel": "Vector"
-            }
+            "children": []
           }
-        ],
-        "overrides": {
-          "accessibilityLabel": "Profile User Icon"
-        }
+        ]
       }
     },
     {
-      "widgetName": "SettingsIconWidget",
+      "widgetName": "IconRightWidget2",
       "widgetIr": {
-        "figmaId": "602:782",
+        "figmaId": "602:809",
         "kind": "auto",
         "children": [
           {
-            "figmaId": "602:783",
+            "figmaId": "602:810",
             "kind": "auto",
-            "children": [],
-            "overrides": {
-              "accessibilityLabel": "Vector"
-            }
-          },
-          {
-            "figmaId": "602:784",
-            "kind": "auto",
-            "children": [],
-            "overrides": {
-              "accessibilityLabel": "Vector"
-            }
+            "children": []
           }
-        ],
-        "overrides": {
-          "accessibilityLabel": "Settings Icon"
-        }
+        ]
+      }
+    },
+    {
+      "widgetName": "ChevronRightWidget2",
+      "widgetIr": {
+        "figmaId": "602:810",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "602:811",
+            "kind": "auto",
+            "children": []
+          }
+        ]
       }
     }
   ],
-  "cleanTreeHash": "e51d095695d887052e821a735156c61f2dfa5eef3d10c45ae55910477e017886",
+  "cleanTreeHash": "4b2b227fb4d02c07c1d67c6bf97a5a11269adea2a629ae3ba98e27030e93ea1e",
   "cleanRootFigmaId": "602:751",
   "cleanRootType": "STACK",
   "cleanRootWidth": 375.0,

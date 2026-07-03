@@ -25,7 +25,9 @@ from figma_flutter_agent.generator.layout.widgets.emit.shell import (
     render_layout_shell,
     render_leaf_body,
 )
-from figma_flutter_agent.parser.interaction.chip_variant import is_tag_component_chip_row
+from figma_flutter_agent.parser.interaction.chip_variant import (
+    is_tag_component_chip_row,
+)
 from figma_flutter_agent.schemas import (
     SEMANTIC_MVP_IR_KINDS,
     STUB_IR_KINDS,
@@ -128,15 +130,21 @@ def emit_widget_expression(
             strict_l10n=semantics.strict_l10n,
             strict_a11y=semantics.strict_a11y,
         )
-        if emit_path == EmitPath.NATIVE_TEMPLATE and tier_allows_native(ir.fidelity_tier):
+        if emit_path == EmitPath.NATIVE_TEMPLATE and tier_allows_native(
+            ir.fidelity_tier
+        ):
             widget = emit_semantic_widget(ir, clean=clean, ctx=ctx)
             return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
         if emit_path == EmitPath.STYLED_PRIMITIVE:
             widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
             return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
         if emit_path == EmitPath.BAKED_ASSET:
-            from figma_flutter_agent.generator.ir.fidelity.baked_gate import evaluate_baked_emit
-            from figma_flutter_agent.generator.ir.fidelity.router import FidelityRoutePolicy
+            from figma_flutter_agent.generator.ir.fidelity.baked_gate import (
+                evaluate_baked_emit,
+            )
+            from figma_flutter_agent.generator.ir.fidelity.router import (
+                FidelityRoutePolicy,
+            )
 
             baked_decision = evaluate_baked_emit(
                 ir,
@@ -149,8 +157,12 @@ def emit_widget_expression(
             )
             if baked_decision.emit_path == EmitPath.STYLED_PRIMITIVE:
                 widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
-                return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
-            from figma_flutter_agent.generator.ir.fidelity.baked_emit import emit_baked_asset
+                return apply_ir_wrap(
+                    widget, ir=ir, parent_type=parent_type, clean=clean
+                )
+            from figma_flutter_agent.generator.ir.fidelity.baked_emit import (
+                emit_baked_asset,
+            )
 
             widget = emit_baked_asset(ir, clean=clean, ctx=ctx)
             return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
@@ -166,7 +178,9 @@ def emit_widget_expression(
     effective_walk = walk
     effective_extracted = extracted_class_by_widget_name
     if effective_walk is not None:
-        effective_extracted = effective_extracted or effective_walk.extracted_class_by_widget_name
+        effective_extracted = (
+            effective_extracted or effective_walk.extracted_class_by_widget_name
+        )
 
     if effective_walk is not None and _should_ir_walk_children(clean):
         widget = _emit_ir_layout_container(
@@ -371,7 +385,9 @@ def emit_extracted_ref(
         class_name = extracted_class_by_widget_name.get(widget_name, class_name)
     else:
         class_name = _canonical_widget_class_name(class_name)
-    args = ", ".join(f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items())
+    args = ", ".join(
+        f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items()
+    )
     if args:
         return f"{class_name}({args})"
     return f"{class_name}()"

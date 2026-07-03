@@ -19,7 +19,9 @@ from figma_flutter_agent.generator.geometry.invariants.conservation import (
     check_type_truth,
     conservation_node_multiset,
 )
-from figma_flutter_agent.generator.geometry.invariants.models import GeometryInvariantViolation
+from figma_flutter_agent.generator.geometry.invariants.models import (
+    GeometryInvariantViolation,
+)
 from figma_flutter_agent.generator.geometry.invariants.reporting import (
     raise_on_hard_geometry_violations,
 )
@@ -202,7 +204,9 @@ def run_cp1_normalize(
         raise_on_hard_geometry_violations(type_violations, context="CP1_type_truth")
     if check_placement_truth:
         placement_baseline = capture_placement_baseline(baseline)
-        placement_violations = check_placement_truth_preserved(placement_baseline, result)
+        placement_violations = check_placement_truth_preserved(
+            placement_baseline, result
+        )
         raise_on_hard_geometry_violations(
             placement_violations,
             context="CP1_placement_truth",
