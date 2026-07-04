@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import errno
 import json
 import os
 import time
@@ -14,6 +15,15 @@ from figma_flutter_agent.errors import RunMetaStaleWriterError
 
 _DEFAULT_LOCK_TIMEOUT_SEC = 600.0
 _UTF8_ENCODING = "utf-8"
+_WINDOWS_LOCK_CONTENTION_ERRNOS = frozenset({33, 36})
+_UNIX_LOCK_CONTENTION_ERRNOS = frozenset({errno.EAGAIN, errno.EACCES, errno.EDEADLK})
+
+
+def _is_lock_contention_oserror(exc: OSError) -> bool:
+    """Return whether an OSError is expected lock contention rather than a hard failure."""
+    if os.name == "nt":
+        return exc.errno in _WINDOWS_LOCK_CONTENTION_ERRNOS
+    return exc.errno in _UNIX_LOCK_CONTENTION_ERRNOS
 
 
 @contextlib.contextmanager
@@ -41,6 +51,7 @@ def run_meta_lifecycle_lock(meta_path: Path, *, timeout_sec: float = _DEFAULT_LO
     lock_path = meta_path.parent / ".run_meta.lock"
     deadline = time.monotonic() + timeout_sec
     fd = os.open(str(lock_path), os.O_RDWR | os.O_CREAT, 0o644)
+    acquired = False
     try:
         while True:
             try:
@@ -52,25 +63,30 @@ def run_meta_lifecycle_lock(meta_path: Path, *, timeout_sec: float = _DEFAULT_LO
                     import fcntl
 
                     fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                acquired = True
                 break
-            except OSError:
+            except OSError as exc:
+                if not _is_lock_contention_oserror(exc):
+                    raise
                 if time.monotonic() >= deadline:
                     msg = f"run.meta lock timeout for {meta_path.parent.as_posix()}"
                     raise RunMetaStaleWriterError(msg) from None
                 time.sleep(0.02)
         yield
     finally:
-        try:
-            if os.name == "nt":
-                import msvcrt
+        if acquired:
+            try:
+                if os.name == "nt":
+                    import msvcrt
 
-                msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
-            else:
-                import fcntl
+                    msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+                else:
+                    import fcntl
 
-                fcntl.flock(fd, fcntl.LOCK_UN)
-        finally:
-            os.close(fd)
+                    fcntl.flock(fd, fcntl.LOCK_UN)
+            except OSError:
+                pass
+        os.close(fd)
 
 
 def atomic_write_run_meta_dict(path: Path, payload: dict[str, Any]) -> None:

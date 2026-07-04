@@ -294,7 +294,7 @@ def test_reconcile_stale_when_canonical_target_owned_by_newer_run(tmp_path: Path
     begin_run_meta(project, "checkout", pipeline_run_id="run-a")
     begin_run_meta(project, "payment_screen", pipeline_run_id="run-b")
 
-    with pytest.raises(RunMetaStaleWriterError, match="reconcile blocked"):
+    with pytest.raises(RunMetaStaleWriterError, match="superseded"):
         reconcile_run_meta_feature_identity(
             project,
             pipeline_run_id="run-a",
@@ -306,6 +306,96 @@ def test_reconcile_stale_when_canonical_target_owned_by_newer_run(tmp_path: Path
     assert record is not None
     assert record.pipeline_run_id == "run-b"
     assert run_meta_path(project, "checkout").is_file()
+
+
+def test_reconcile_stale_when_canonical_completed_by_newer_run(tmp_path: Path) -> None:
+    """Alias run A must not roll back a newer completed canonical run B."""
+    import time
+
+    project = tmp_path / "demo"
+    project.mkdir()
+    begin_run_meta(project, "checkout", pipeline_run_id="run-a")
+    time.sleep(0.05)
+    begin_run_meta(project, "payment_screen", pipeline_run_id="run-b")
+    write_run_meta(
+        project,
+        "payment_screen",
+        pipeline_run_id="run-b",
+        writeback="committed",
+        committed_build_run_id="run-b",
+        status="completed",
+    )
+
+    with pytest.raises(RunMetaStaleWriterError, match="superseded"):
+        reconcile_run_meta_feature_identity(
+            project,
+            pipeline_run_id="run-a",
+            early_feature="checkout",
+            resolved_feature="payment_screen",
+        )
+
+    record = read_run_meta(project, "payment_screen")
+    assert record is not None
+    assert record.pipeline_run_id == "run-b"
+    assert record.status == "completed"
+    assert record.committed_build_run_id == "run-b"
+
+
+def test_reconcile_rejects_missing_source_artifact(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    begin_run_meta(project, "checkout", pipeline_run_id="run-a")
+    run_meta_path(project, "checkout").unlink()
+
+    with pytest.raises(RunMetaStaleWriterError, match="missing alias source"):
+        reconcile_run_meta_feature_identity(
+            project,
+            pipeline_run_id="run-a",
+            early_feature="checkout",
+            resolved_feature="payment_screen",
+        )
+
+
+def test_reconcile_prefers_canonical_committed_over_alias_source(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    target_path = run_meta_path(project, "payment_screen")
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    target_path.write_text(
+        json.dumps(
+            {
+                "feature": "payment_screen",
+                "pipeline_run_id": "run-hist",
+                "candidate_build_run_id": "run-hist",
+                "committed_build_run_id": "run-canonical",
+                "writeback": "committed",
+                "written_files": [],
+                "analyze_passed": True,
+                "captured_at": "2020-01-01T00:00:00+00:00",
+                "run_started_at": "2020-01-01T00:00:00+00:00",
+                "runMetaSchemaVersion": "2",
+                "status": "completed",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    begin_run_meta(project, "checkout", pipeline_run_id="run-new")
+    source_path = run_meta_path(project, "checkout")
+    source_payload = json.loads(source_path.read_text(encoding="utf-8"))
+    source_payload["committed_build_run_id"] = "run-alias"
+    source_path.write_text(json.dumps(source_payload, indent=2), encoding="utf-8")
+
+    reconcile_run_meta_feature_identity(
+        project,
+        pipeline_run_id="run-new",
+        early_feature="checkout",
+        resolved_feature="payment_screen",
+    )
+
+    migrated = json.loads(run_meta_path(project, "payment_screen").read_text(encoding="utf-8"))
+    assert migrated["committed_build_run_id"] == "run-canonical"
+    assert migrated["pipeline_run_id"] == "run-new"
 
 
 def test_overlapping_runs_stale_writer_cannot_corrupt_newer(tmp_path: Path) -> None:

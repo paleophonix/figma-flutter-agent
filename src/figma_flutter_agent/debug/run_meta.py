@@ -51,6 +51,7 @@ _STAMPED_RUN_META_KEYS = frozenset(
         "generation_config_hash",
         "timed_out_stage",
         "last_error",
+        "run_started_at",
     }
 )
 
@@ -221,11 +222,42 @@ def _merge_migration_extensions(*artifacts: dict[str, Any]) -> dict[str, Any]:
     return merged
 
 
+def _utc_now_iso() -> str:
+    return datetime.now(tz=UTC).isoformat()
+
+
+def _parse_run_started_at(artifact: dict[str, Any]) -> datetime | None:
+    """Parse monotonic run start timestamp from lifecycle artifact."""
+    raw = artifact.get("run_started_at") or artifact.get("captured_at")
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _trusted_canonical_target_committed(target: dict[str, Any]) -> str | None:
+    """Return committed id from canonical target history when migration may trust it."""
+    if not target:
+        return None
+    committed = target.get("committed_build_run_id")
+    if not committed:
+        return None
+    status = str(target.get("status") or "")
+    if status in {"completed", "legacy", "failed", "timed_out"}:
+        return str(committed)
+    return None
+
+
 def _resolve_migration_committed(
     source: dict[str, Any],
     target: dict[str, Any],
 ) -> str | None:
-    """Prefer alias-path committed chain, then canonical target history."""
+    """Prefer trusted canonical target committed history, then alias source chain."""
+    trusted = _trusted_canonical_target_committed(target)
+    if trusted:
+        return trusted
     source_committed = source.get("committed_build_run_id")
     if source_committed:
         return str(source_committed)
@@ -235,22 +267,59 @@ def _resolve_migration_committed(
     return None
 
 
+def _assert_source_ownership_proof(
+    source: dict[str, Any],
+    *,
+    pipeline_run_id: str,
+    early_feature: str,
+) -> None:
+    """Require alias source artifact owned by the reconciling run."""
+    if not source:
+        msg = (
+            f"run.meta reconcile blocked: missing alias source artifact "
+            f"for {early_feature!r}, writer={pipeline_run_id!r}"
+        )
+        raise RunMetaStaleWriterError(msg)
+    _assert_run_meta_ownership(source, pipeline_run_id=pipeline_run_id)
+    if _parse_run_started_at(source) is None:
+        msg = (
+            f"run.meta reconcile blocked: alias source missing run_started_at "
+            f"for {early_feature!r}, writer={pipeline_run_id!r}"
+        )
+        raise RunMetaStaleWriterError(msg)
+
+
 def _assert_reconcile_target_writable(
+    source: dict[str, Any],
     target: dict[str, Any],
     *,
     pipeline_run_id: str,
 ) -> None:
-    """Reject reconcile when canonical target belongs to another in-flight run."""
+    """Reject reconcile when canonical target belongs to a newer competing run."""
     if not target:
         return
     target_owner = str(target.get("pipeline_run_id") or "").strip()
     if not target_owner or target_owner == pipeline_run_id:
         return
-    target_status = str(target.get("status") or "")
-    if target_status in _INCOMPLETE_RUN_STATUSES:
+
+    source_started = _parse_run_started_at(source)
+    target_started = _parse_run_started_at(target)
+    if source_started is None:
         msg = (
-            f"run.meta reconcile blocked: canonical target owned by incomplete run "
-            f"{target_owner!r}, writer={pipeline_run_id!r}"
+            f"run.meta reconcile blocked: missing source chronology, "
+            f"writer={pipeline_run_id!r}"
+        )
+        raise RunMetaStaleWriterError(msg)
+    if target_started is None:
+        msg = (
+            f"run.meta reconcile blocked: malformed target chronology "
+            f"for {target_owner!r}, writer={pipeline_run_id!r}"
+        )
+        raise RunMetaStaleWriterError(msg)
+    if target_started > source_started:
+        msg = (
+            f"run.meta reconcile blocked: canonical target superseded writer "
+            f"(target={target_owner!r}, writer={pipeline_run_id!r})"
         )
         raise RunMetaStaleWriterError(msg)
 
@@ -301,7 +370,8 @@ def begin_run_meta(
         payload["candidate_build_run_id"] = pipeline_run_id
         payload["status"] = "started"
         payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
-        payload["captured_at"] = datetime.now(tz=UTC).isoformat()
+        payload["run_started_at"] = _utc_now_iso()
+        payload["captured_at"] = payload["run_started_at"]
         if prev_committed is not None:
             payload["committed_build_run_id"] = prev_committed
         _write_run_meta_dict(path, payload)
@@ -336,8 +406,11 @@ def reconcile_run_meta_feature_identity(
 
     with run_meta_pair_lock(source_path, target_path):
         source = _read_run_meta_dict(source_path) if source_path.is_file() else {}
-        if source:
-            _assert_run_meta_ownership(source, pipeline_run_id=pipeline_run_id)
+        _assert_source_ownership_proof(
+            source,
+            pipeline_run_id=pipeline_run_id,
+            early_feature=early_feature,
+        )
 
         target = _read_run_meta_dict(target_path) if target_path.is_file() else {}
         target_owner = str(target.get("pipeline_run_id") or "").strip()
@@ -345,10 +418,15 @@ def reconcile_run_meta_feature_identity(
             _remove_owned_run_meta(source_path, pipeline_run_id=pipeline_run_id)
             return resolved_feature
 
-        _assert_reconcile_target_writable(target, pipeline_run_id=pipeline_run_id)
+        _assert_reconcile_target_writable(
+            source,
+            target,
+            pipeline_run_id=pipeline_run_id,
+        )
 
         committed = _resolve_migration_committed(source, target)
         payload = _merge_migration_extensions(target, source)
+        run_started_at = str(source.get("run_started_at") or _utc_now_iso())
         payload.update(
             {
                 "feature": resolved_feature,
@@ -356,7 +434,8 @@ def reconcile_run_meta_feature_identity(
                 "candidate_build_run_id": pipeline_run_id,
                 "status": "started",
                 "runMetaSchemaVersion": RUN_META_SCHEMA_VERSION,
-                "captured_at": datetime.now(tz=UTC).isoformat(),
+                "run_started_at": run_started_at,
+                "captured_at": _utc_now_iso(),
             }
         )
         if committed is not None:
@@ -377,14 +456,19 @@ def update_run_meta_stage(
     """Read-modify-write run.meta with atomic replace; preserves unknown keys."""
     path = run_meta_path(project_dir, feature_name)
     with run_meta_lifecycle_lock(path):
-        payload = _read_run_meta_dict(path)
-        _assert_run_meta_ownership(payload, pipeline_run_id=pipeline_run_id)
+        existing = _read_run_meta_dict(path)
+        _assert_run_meta_ownership(existing, pipeline_run_id=pipeline_run_id)
+        payload = dict(existing)
         payload.update(fields)
         payload["feature"] = feature_name
         payload["pipeline_run_id"] = pipeline_run_id
         payload["status"] = status
         payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
-        payload["captured_at"] = datetime.now(tz=UTC).isoformat()
+        if existing.get("run_started_at"):
+            payload["run_started_at"] = existing["run_started_at"]
+        elif "run_started_at" not in payload:
+            payload["run_started_at"] = _utc_now_iso()
+        payload["captured_at"] = _utc_now_iso()
         _write_run_meta_dict(path, payload)
     return path
 
@@ -413,9 +497,11 @@ def mark_run_meta_failed(
                 "written_files": [],
                 "analyze_passed": None,
                 "runMetaSchemaVersion": RUN_META_SCHEMA_VERSION,
-                "captured_at": datetime.now(tz=UTC).isoformat(),
+                "captured_at": _utc_now_iso(),
             }
         )
+        if existing.get("run_started_at"):
+            payload["run_started_at"] = existing["run_started_at"]
         payload.update(_current_run_evidence(existing, pipeline_run_id))
         if prev_committed is not None:
             payload["committed_build_run_id"] = prev_committed
@@ -471,6 +557,8 @@ def write_run_meta(
         for key, value in _extension_fields(existing).items():
             if key not in payload:
                 payload[key] = value
+        if existing.get("run_started_at"):
+            payload["run_started_at"] = existing["run_started_at"]
         _write_run_meta_dict(path, payload)
     return path
 
