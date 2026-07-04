@@ -1,0 +1,14 @@
+version: 1
+family_id: semantic_candidate_not_generated
+generated: true
+cases:
+- case_id: 2026-07-03-semantic-candidate-weekday-chip-synthetic
+  case_file: cases/2026-07-03-semantic-candidate-weekday-chip-synthetic.yaml
+  title: Weekday chip row must classify as chip choice
+  project: synthetic
+  feature: semantics_candidate
+  occurrence_id: weekday-chip-candidate
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: Weekday chip rows failed to produce CHIP_CHOICE candidates during 
+    classification.

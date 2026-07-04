@@ -1,0 +1,14 @@
+version: 1
+family_id: classification_scope_violation
+generated: true
+cases:
+- case_id: 2026-07-03-classification-scope-violation-synthetic
+  case_file: cases/2026-07-03-classification-scope-violation-synthetic.yaml
+  title: Post-classify blocks clean-tree mutation
+  project: synthetic
+  feature: classification_scope
+  occurrence_id: post-classify-clean-tree-mutation
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: Classification stage mutated clean-tree children without checkpoint 
+    failure.

@@ -750,8 +750,10 @@ Master invariant: every stage must **preserve a Figma fact**, **create a named d
 
 1. Symptom → **first arrow** where a fact changed (not where it became visible).
 2. Mechanism → `family_id` from `corpus/families.yaml` — never a visual symptom (`overflow`, `wrong_checkbox`).
-3. Fix → **owning layer** from the law table; generic algorithm only.
-4. After fix: regression test → `corpus/cases/` YAML → `poetry run figma-flutter defects validate`.
+3. **Corpus lookup** → `corpus/index/<family_id>.yaml` (scan `case_id`, `project`, `feature`, `status`, `summary`; open one matching `corpus/cases/<case_id>.yaml`). Do not glob all cases.
+4. Fix → **owning layer** from the law table; generic algorithm only.
+5. **Diagnose:** write/update `corpus/cases/` `status: OPEN` → `defects index --write` → `defects validate`.
+6. **Repair:** stay `OPEN`; `FIXED` only with conclusive proof → `defects index --write` when case status/summary/repair changes.
 
 Arrow IDs: `A1` merge, `A1b` IR reconcile/heal, `A2` normalize, `A3` emit, `CP2` IR passes, `A4` parse, `NONE` infra.
 

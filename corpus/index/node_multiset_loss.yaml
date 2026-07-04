@@ -1,0 +1,27 @@
+version: 1
+family_id: node_multiset_loss
+generated: true
+cases:
+- case_id: 2026-07-04-sectionize-nav-scroll-host-emit-drop
+  case_file: cases/2026-07-04-sectionize-nav-scroll-host-emit-drop.yaml
+  title: Cluster delegate nested lookup collapses column root to single 
+    extracted widget
+  project: limbo
+  feature: food_add_new_items
+  occurrence_id: food-add-new-items-cluster-delegate-root-collapse
+  status: FIXED
+  observed_at: '2026-07-04'
+  summary: 'Parse, IR validate, layout passes, and pre_emit all conserve the full
+    form (root 602:1027 with 7 sections: header, item name, upload, price, ingredients,
+    details, save). After sectionize the clean tree is a COLUMN with the same 7 children.
+    At A3 emit, cluster_classes maps clus...'
+- case_id: 2026-07-03-node-multiset-loss-synthetic
+  case_file: cases/2026-07-03-node-multiset-loss-synthetic.yaml
+  title: CP0 dedup drops node ids without permit
+  project: synthetic
+  feature: conservation_multiset
+  occurrence_id: multiset-loss-cp0
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: Cluster dedup removed node ids from the clean-tree multiset without a
+    conservation checkpoint failure.

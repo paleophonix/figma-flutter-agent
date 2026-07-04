@@ -20,3 +20,8 @@ def families_path() -> Path:
 def cases_dir() -> Path:
     """Return the directory containing committed case YAML files."""
     return corpus_root() / "cases"
+
+
+def index_dir() -> Path:
+    """Return the directory containing per-family case index YAML files."""
+    return corpus_root() / "index"

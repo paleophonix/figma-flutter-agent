@@ -1,9 +1,9 @@
 {
   "feature": "food_add_new_items",
-  "pipeline_run_id": "8ab4cc37f83d",
-  "candidate_build_run_id": "8ab4cc37f83d",
-  "committed_build_run_id": "8ab4cc37f83d",
-  "served_build_run_id": "8ab4cc37f83d",
+  "pipeline_run_id": "2708f438cef9",
+  "candidate_build_run_id": "2708f438cef9",
+  "committed_build_run_id": "2708f438cef9",
+  "served_build_run_id": "2708f438cef9",
   "writeback": "committed",
   "served_probe_present": true,
   "verdict": "CAPTURE_PENDING",

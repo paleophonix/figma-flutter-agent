@@ -1,0 +1,14 @@
+version: 1
+family_id: semantic_veto_not_applied
+generated: true
+cases:
+- case_id: 2026-07-03-semantic-veto-size-picker-synthetic
+  case_file: cases/2026-07-03-semantic-veto-size-picker-synthetic.yaml
+  title: Size picker row must not classify as chip choice
+  project: synthetic
+  feature: semantics_veto
+  occurrence_id: size-picker-chip-veto
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: Numeric size-picker rows were misclassified as chip choice without 
+    arbiter veto.

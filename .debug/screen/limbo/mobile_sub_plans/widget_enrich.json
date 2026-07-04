@@ -1,0 +1,27 @@
+{
+  "cacheKey": "f2be4d959d57ad22eb849ab6f0cb82456e63ba382b34959548a4834a744a296c",
+  "response": {
+    "entries": [
+      {
+        "clusterId": "component_109_2240",
+        "widgetName": "SubscriptionPlanRadioButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_126_7902_a5dd2618",
+        "widgetName": "IosStatusBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_211_5913",
+        "widgetName": "StarFilledIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_6_786_0461ab72",
+        "widgetName": "SubscribeButtonWidget",
+        "paramRenames": {}
+      }
+    ]
+  }
+}

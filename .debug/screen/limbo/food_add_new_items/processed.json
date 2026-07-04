@@ -1072,6 +1072,7 @@
                 "style": {
                   "strokeAlign": "INSIDE"
                 },
+                "vectorAssetKey": "assets/icons/ellipse_51_602_1197.svg",
                 "clusterId": "cluster_0",
                 "layoutPositioning": "ABSOLUTE",
                 "stackPlacement": {
@@ -1082,6 +1083,14 @@
                   "width": 41.5,
                   "height": 41.5
                 },
+                "flattenFigmaNodeIds": [
+                  "602:1197",
+                  "602:1198",
+                  "602:1199",
+                  "602:1200",
+                  "602:1201",
+                  "602:1202"
+                ],
                 "geometryFrame": {
                   "localTransform": {
                     "tx": 35.0,

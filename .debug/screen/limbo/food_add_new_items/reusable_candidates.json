@@ -1,36 +1,19 @@
 {
-  "cacheKey": "e555df1ad6bc771ccd69d0292ca629737b87333250ffe460df3aeb1dc35beef2",
+  "cacheKey": "5b39b0290fdf708074a30c37ecc2e23e9cb2d8e213128b65157f6f168d026e78",
   "response": {
     "candidates": [
       {
-        "nodeId": "602:1184",
-        "widgetName": "MediaAddTile",
-        "reason": "One of two nearly identical upload tiles inside the upload photo/video section; same card shape and Add label, differing mainly by inner icon/content.",
-        "confidence": 0.92,
+        "nodeId": "602:1038",
+        "widgetName": "IngredientOptionTile",
+        "reason": "Repeated ingredient tiles share the same compact card shape with an image area and centered label across both Fruit and Basic rows.",
+        "confidence": 0.96,
         "suggestedParams": [
           "label",
-          "hasIcon",
-          "showPlaceholder"
+          "iconVariant"
         ],
         "evidence": {
           "similarNodes": [
-            "602:1194"
-          ],
-          "shapeSimilarity": 0.94,
-          "semanticRole": "upload/add tile"
-        }
-      },
-      {
-        "nodeId": "602:1038",
-        "widgetName": "IngredientChipCard",
-        "reason": "Repeated ingredient card pattern in the Fruit section: label + 50x50 container + icon stack. Strong reusable family across many siblings.",
-        "confidence": 0.98,
-        "suggestedParams": [
-          "title",
-          "iconNodeId"
-        ],
-        "evidence": {
-          "similarNodes": [
+            "602:1038",
             "602:1051",
             "602:1065",
             "602:1084",
@@ -43,88 +26,25 @@
             "602:1160",
             "602:1169"
           ],
-          "shapeSimilarity": 0.96,
-          "semanticRole": "ingredient item card"
+          "shapeSimilarity": 0.97,
+          "semanticRole": "ingredient selection tile"
         }
       },
       {
-        "nodeId": "602:1033",
-        "widgetName": "IngredientCategorySection",
-        "reason": "Category block appears twice with the same structure: section title, See All affordance, and a horizontal set of ingredient cards.",
-        "confidence": 0.95,
+        "nodeId": "602:1034",
+        "widgetName": "IngredientSectionHeader",
+        "reason": "The section header pattern repeats for Fruit and Basic, combining a title with a trailing See All action.",
+        "confidence": 0.9,
         "suggestedParams": [
-          "title",
-          "showSeeAll",
-          "itemNodeIds"
+          "sectionTitle"
         ],
         "evidence": {
           "similarNodes": [
-            "602:1125"
+            "602:1034",
+            "602:1178"
           ],
           "shapeSimilarity": 0.93,
-          "semanticRole": "ingredient category section"
-        }
-      },
-      {
-        "nodeId": "602:1218",
-        "widgetName": "LabeledTextFieldCard",
-        "reason": "This looks like a reusable labeled input area with title, rounded field container, and value text; similar pattern also used by the Details field with different height/content.",
-        "confidence": 0.75,
-        "suggestedParams": [
-          "label",
-          "value",
-          "isMultiline"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "602:1028"
-          ],
-          "shapeSimilarity": 0.72,
-          "semanticRole": "form field card"
-        }
-      },
-      {
-        "nodeId": "602:1207",
-        "widgetName": "SelectableOptionChip",
-        "reason": "Delivery option is part of a small repeated selector family in the Price section; compact control with indicator box and label.",
-        "confidence": 0.81,
-        "suggestedParams": [
-          "label",
-          "isSelected",
-          "showTrailingIcon"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "602:1210"
-          ],
-          "shapeSimilarity": 0.84,
-          "semanticRole": "selection option"
-        }
-      },
-      {
-        "nodeId": "602:1230",
-        "widgetName": "PrimaryActionButton",
-        "reason": "Standalone CTA button with background shape and centered label; common reusable action pattern even if only one instance appears on this screen.",
-        "confidence": 0.62,
-        "suggestedParams": [
-          "label"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "primary action button"
-        }
-      },
-      {
-        "nodeId": "602:1224",
-        "widgetName": "CircularBackButton",
-        "reason": "Encapsulated back control made of circular background and arrow vector; useful as a reusable navigation control.",
-        "confidence": 0.68,
-        "suggestedParams": [],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "navigation back button"
+          "semanticRole": "category header with action"
         }
       }
     ]

@@ -1,0 +1,692 @@
+{
+  "schemaVersion": "1",
+  "dumpPath": "llm_validated.json",
+  "verdict": "compatible",
+  "missingIdentityFields": [],
+  "mismatchedIdentityFields": [],
+  "cachedMetadata": {
+    "cleanRootFigmaId": "240:6288",
+    "cleanRootHeight": 812.0,
+    "cleanRootType": "STACK",
+    "cleanRootWidth": 375.0,
+    "cleanTreeHash": "f03f8f267691ebb6285a996c9aa9fb30889b4694ceeb78b223e0eaeec4bf27b8",
+    "extractedWidgets": [
+      {
+        "widgetName": "PrimarySubscribeButton",
+        "widgetIr": {
+          "figmaId": "267:5949",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I267:5949;6:788",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "text": "Subscribe",
+                "accessibilityLabel": "Subscribe",
+                "textColor": "0xFF000000",
+                "fontSize": 12.0
+              },
+              "wrap": "flexibleLoose"
+            }
+          ]
+        }
+      },
+      {
+        "widgetName": "IosStatusBar",
+        "widgetIr": {
+          "figmaId": "240:6339",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I240:6339;126:7890",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I240:6339;126:7891",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "9:41",
+                    "accessibilityLabel": "9:41",
+                    "textColor": "0xFF1F2024",
+                    "fontSize": 15.0
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "I240:6339;126:7892",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I240:6339;126:7893",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "􀛨",
+                    "accessibilityLabel": "􀛨",
+                    "textColor": "0xFF1F2024",
+                    "fontSize": 17.0
+                  }
+                },
+                {
+                  "figmaId": "I240:6339;126:7899",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "text": "􀙇",
+                    "accessibilityLabel": "􀙇",
+                    "textColor": "0xFF1F2024",
+                    "fontSize": 14.0
+                  }
+                },
+                {
+                  "figmaId": "I240:6339;126:7894",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I240:6339;126:7895",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I240:6339;126:7896",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I240:6339;126:7897",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I240:6339;126:7898",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "widgetName": "RadioButtonSmallSelected",
+        "widgetIr": {
+          "figmaId": "240:6294",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I240:6294;109:2250",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "isSelected": true
+        }
+      },
+      {
+        "widgetName": "RadioButtonSmallUnselected",
+        "widgetIr": {
+          "figmaId": "240:6303",
+          "kind": "auto",
+          "children": [],
+          "isSelected": false
+        }
+      },
+      {
+        "widgetName": "StarFilledIcon",
+        "widgetIr": {
+          "figmaId": "240:6321",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I240:6321;211:5818",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "I240:6321;211:5908",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        }
+      }
+    ],
+    "featureName": "mobile_sub_plans",
+    "generationConfigFingerprintVersion": "1",
+    "generationConfigHash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
+    "irCacheFingerprintVersion": "1",
+    "irSchemaVersion": "1",
+    "parserVersion": "2026.06.1",
+    "screenIr": {
+      "root": {
+        "figmaId": "240:6288",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "240:6334",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "240:6335",
+                "kind": "auto",
+                "children": [],
+                "overrides": {
+                  "text": "Choose your subscription plan",
+                  "accessibilityLabel": "Choose your subscription plan",
+                  "textColor": "0xFF1F2024",
+                  "fontSize": 24.0
+                }
+              },
+              {
+                "figmaId": "240:6336",
+                "kind": "auto",
+                "children": [],
+                "overrides": {
+                  "text": "And get a 7-day free trial",
+                  "accessibilityLabel": "And get a 7-day free trial",
+                  "textColor": "0xFF71727A",
+                  "fontSize": 14.0
+                }
+              }
+            ]
+          },
+          {
+            "figmaId": "267:5948",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "267:5949",
+                "kind": "extracted",
+                "children": [],
+                "ref": {
+                  "widgetName": "PrimarySubscribeButton",
+                  "namedArgs": {}
+                }
+              }
+            ]
+          },
+          {
+            "figmaId": "240:6339",
+            "kind": "extracted",
+            "children": [],
+            "ref": {
+              "widgetName": "IosStatusBar",
+              "namedArgs": {}
+            }
+          },
+          {
+            "figmaId": "240:6289",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "240:6290",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "240:6291",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "240:6292",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "240:6293",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "240:6294",
+                                "kind": "auto",
+                                "children": [
+                                  {
+                                    "figmaId": "I240:6294;109:2250",
+                                    "kind": "auto",
+                                    "children": []
+                                  }
+                                ],
+                                "isSelected": true
+                              },
+                              {
+                                "figmaId": "240:6295",
+                                "kind": "auto",
+                                "children": [
+                                  {
+                                    "figmaId": "240:6296",
+                                    "kind": "auto",
+                                    "children": [],
+                                    "overrides": {
+                                      "text": "Yearly",
+                                      "accessibilityLabel": "Yearly",
+                                      "textColor": "0xFF1F2024",
+                                      "fontSize": 14.0
+                                    }
+                                  },
+                                  {
+                                    "figmaId": "240:6297",
+                                    "kind": "auto",
+                                    "children": [],
+                                    "overrides": {
+                                      "text": "-66% discount",
+                                      "accessibilityLabel": "-66% discount",
+                                      "textColor": "0xFF000000",
+                                      "fontSize": 12.0
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "figmaId": "240:6298",
+                                "kind": "auto",
+                                "children": [
+                                  {
+                                    "figmaId": "240:6299",
+                                    "kind": "auto",
+                                    "children": [],
+                                    "overrides": {
+                                      "text": "€ 94.80",
+                                      "accessibilityLabel": "€ 94.80",
+                                      "textColor": "0xFF1F2024",
+                                      "fontSize": 16.0
+                                    }
+                                  },
+                                  {
+                                    "figmaId": "240:6300",
+                                    "kind": "auto",
+                                    "children": [],
+                                    "overrides": {
+                                      "text": "every year",
+                                      "accessibilityLabel": "every year",
+                                      "textColor": "0xFF1F2024",
+                                      "fontSize": 12.0
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "240:6301",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "240:6302",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "240:6303",
+                                "kind": "extracted",
+                                "children": [],
+                                "ref": {
+                                  "widgetName": "RadioButtonSmallUnselected",
+                                  "namedArgs": {}
+                                },
+                                "isSelected": false
+                              },
+                              {
+                                "figmaId": "240:6304",
+                                "kind": "auto",
+                                "children": [
+                                  {
+                                    "figmaId": "240:6305",
+                                    "kind": "auto",
+                                    "children": [],
+                                    "overrides": {
+                                      "text": "Monthly",
+                                      "accessibilityLabel": "Monthly",
+                                      "textColor": "0xFF1F2024",
+                                      "fontSize": 14.0
+                                    }
+                                  },
+                                  {
+                                    "figmaId": "240:6306",
+                                    "kind": "auto",
+                                    "children": [],
+                                    "overrides": {
+                                      "text": "-53% discount",
+                                      "accessibilityLabel": "-53% discount",
+                                      "textColor": "0xFF000000",
+                                      "fontSize": 12.0
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "figmaId": "240:6307",
+                                "kind": "auto",
+                                "children": [
+                                  {
+                                    "figmaId": "240:6308",
+                                    "kind": "auto",
+                                    "children": [],
+                                    "overrides": {
+                                      "text": "€ 10.90",
+                                      "accessibilityLabel": "€ 10.90",
+                                      "textColor": "0xFF1F2024",
+                                      "fontSize": 16.0
+                                    }
+                                  },
+                                  {
+                                    "figmaId": "240:6309",
+                                    "kind": "auto",
+                                    "children": [],
+                                    "overrides": {
+                                      "text": "every month",
+                                      "accessibilityLabel": "every month",
+                                      "textColor": "0xFF1F2024",
+                                      "fontSize": 12.0
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "240:6310",
+                        "kind": "column",
+                        "children": [
+                          {
+                            "figmaId": "240:6311",
+                            "kind": "row",
+                            "children": [
+                              {
+                                "figmaId": "240:6312",
+                                "kind": "auto",
+                                "children": []
+                              },
+                              {
+                                "figmaId": "240:6313",
+                                "kind": "column",
+                                "children": [
+                                  {
+                                    "figmaId": "240:6314",
+                                    "kind": "text",
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "figmaId": "240:6315",
+                                "kind": "column",
+                                "children": [
+                                  {
+                                    "figmaId": "240:6316",
+                                    "kind": "text",
+                                    "children": []
+                                  },
+                                  {
+                                    "figmaId": "240:6317",
+                                    "kind": "text",
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "figmaId": "240:6318",
+                    "kind": "column",
+                    "children": [
+                      {
+                        "figmaId": "240:6319",
+                        "kind": "text",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "240:6320",
+                        "kind": "row",
+                        "children": [
+                          {
+                            "figmaId": "240:6321",
+                            "kind": "stack",
+                            "children": [
+                              {
+                                "figmaId": "I240:6321;211:5818",
+                                "kind": "auto",
+                                "children": []
+                              },
+                              {
+                                "figmaId": "I240:6321;211:5908",
+                                "kind": "container",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "figmaId": "240:6322",
+                            "kind": "column",
+                            "children": [
+                              {
+                                "figmaId": "240:6323",
+                                "kind": "text",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "240:6324",
+                        "kind": "row",
+                        "children": [
+                          {
+                            "figmaId": "240:6325",
+                            "kind": "stack",
+                            "children": []
+                          },
+                          {
+                            "figmaId": "240:6326",
+                            "kind": "column",
+                            "children": [
+                              {
+                                "figmaId": "240:6327",
+                                "kind": "text",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "240:6328",
+                        "kind": "row",
+                        "children": [
+                          {
+                            "figmaId": "240:6329",
+                            "kind": "stack",
+                            "children": []
+                          },
+                          {
+                            "figmaId": "240:6330",
+                            "kind": "column",
+                            "children": [
+                              {
+                                "figmaId": "240:6331",
+                                "kind": "text",
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "figmaId": "240:6332",
+                "kind": "stack",
+                "children": [
+                  {
+                    "figmaId": "240:6333",
+                    "kind": "stack",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omitFigmaIds": [],
+      "stackChildOrder": [
+        "240:6289",
+        "240:6334",
+        "267:5948",
+        "240:6339"
+      ],
+      "stateByFigmaId": {
+        "267:5949": "default",
+        "240:6339": "default",
+        "240:6294": "selected",
+        "240:6303": "default",
+        "240:6312": "default",
+        "240:6321": "default",
+        "240:6325": "default",
+        "240:6329": "default",
+        "240:6333": "default"
+      },
+      "adaptiveRules": [],
+      "semanticSummary": {
+        "screenRole": "subscription_plan_selection",
+        "confidence": 0.98,
+        "explanation": "Mobile subscription-plan selection screen with three mutually exclusive plan cards, a primary subscribe CTA, benefits list, and system status bar.",
+        "warnings": [
+          "System status bar is decorative/system chrome and not part of the purchase flow."
+        ]
+      },
+      "semanticVerdicts": [
+        {
+          "nodeId": "240:6290",
+          "role": "choice_group",
+          "subtype": "subscription_plan_selector",
+          "controlNodeId": "240:6294",
+          "boundaryNodeId": "240:6291",
+          "labelNodeIds": [
+            "240:6296",
+            "240:6305",
+            "240:6314"
+          ],
+          "placeholderNodeIds": [],
+          "valueNodeIds": [
+            "240:6299",
+            "240:6308",
+            "240:6316"
+          ],
+          "decorationNodeIds": [
+            "240:6294",
+            "240:6303",
+            "240:6312"
+          ],
+          "optionNodeIds": [
+            "240:6292",
+            "240:6301",
+            "240:6310"
+          ],
+          "stateNodeIds": [
+            "240:6294"
+          ],
+          "contractKind": "choice_chip_group",
+          "contractTraits": {
+            "isMultiline": false,
+            "currentValue": "Yearly",
+            "selectedOptions": [
+              "Yearly"
+            ],
+            "visualState": "selected"
+          },
+          "proposedLayoutLaws": [
+            "exclusive_single_selection_across_plan_cards",
+            "plan_card_selection_preserves_price_alignment"
+          ],
+          "value": "Yearly",
+          "options": [
+            {
+              "nodeId": "240:6292",
+              "label": "Yearly",
+              "selected": true,
+              "value": "Yearly",
+              "confidence": 0.99
+            },
+            {
+              "nodeId": "240:6301",
+              "label": "Monthly",
+              "selected": false,
+              "value": "Monthly",
+              "confidence": 0.96
+            },
+            {
+              "nodeId": "240:6310",
+              "label": "Weekly",
+              "selected": false,
+              "value": "Weekly",
+              "confidence": 0.96
+            }
+          ],
+          "confidence": 0.97,
+          "proposedEffects": [
+            "tapping_any_card_selects_that_plan",
+            "selected_state_should_update_the_radio_indicator"
+          ],
+          "explanation": "The repeated card rows behave like an exclusive plan selector with a preselected yearly option."
+        },
+        {
+          "nodeId": "267:5949",
+          "role": "button",
+          "subtype": "primary_cta",
+          "controlNodeId": "267:5949",
+          "boundaryNodeId": "267:5949",
+          "labelNodeIds": [
+            "I267:5949;6:788"
+          ],
+          "placeholderNodeIds": [],
+          "valueNodeIds": [],
+          "decorationNodeIds": [],
+          "optionNodeIds": [],
+          "stateNodeIds": [],
+          "contractKind": "button",
+          "contractTraits": {
+            "isMultiline": false,
+            "actionKind": "subscribe"
+          },
+          "proposedLayoutLaws": [
+            "primary_action_bottom_anchor"
+          ],
+          "value": "Subscribe",
+          "options": [],
+          "confidence": 0.99,
+          "proposedEffects": [
+            "subscribe_to_selected_plan",
+            "proceed_to_checkout_or_next_step"
+          ],
+          "explanation": "Primary call-to-action button for the selected subscription plan."
+        }
+      ]
+    },
+    "stage": "llm_validated"
+  },
+  "currentFingerprint": {
+    "irCacheFingerprintVersion": "1",
+    "cleanTreeHash": "f03f8f267691ebb6285a996c9aa9fb30889b4694ceeb78b223e0eaeec4bf27b8",
+    "cleanRootFigmaId": "240:6288",
+    "cleanRootType": "STACK",
+    "cleanRootWidth": 375.0,
+    "cleanRootHeight": 812.0,
+    "parserVersion": "2026.06.1",
+    "irSchemaVersion": "1",
+    "generationConfigFingerprintVersion": "1",
+    "generationConfigHash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06"
+  }
+}

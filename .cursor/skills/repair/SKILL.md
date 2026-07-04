@@ -24,6 +24,9 @@ or pasted a failed generate/wizard run on a **specific screen**.
 If no fresh queue exists, run **`/diagnose`** first (same session), then repair.
 Do not stop for per-item approval unless report-only was requested.
 
+**`/repair` is not success.** Most sessions end with items still `OPEN`.
+`FIXED` only when proof is conclusive (see Step 4). While working, status stays `OPEN`.
+
 ---
 
 ## Repair Goal
@@ -62,6 +65,39 @@ Forbidden: screen/feature/`figmaId`/text-value/asset-filename/customer-path/fixt
 Required: named law + owning compiler layer; reusable fix for any Figma tree; regression proof per queue item.
 
 If only a local workaround exists: stop — report forbidden shortcut, do not implement.
+
+## Anti-loop (mandatory)
+
+Agents often retry the same wrong fix many times. **Do not spin.**
+
+Before coding on queue item `R?`:
+
+```text
+1. Resolve family_id → read corpus/index/<family_id>.yaml (not a glob of corpus/cases/).
+2. Open the matching case row (same project+feature, status OPEN) for prior attempts.
+3. If the case documents ≥2 failed repair attempts without a new /diagnose pass
+   and fresh .debug artifacts → STOP that item; report blocked; ask for re-diagnose
+   or user direction. Do not attempt R? again in the same pattern.
+4. One mechanism → one case file. Update in place; never fork a new YAML per retry.
+```
+
+During repair:
+
+```text
+- Status stays OPEN until proof is conclusive — including while coding.
+- After a failed attempt → still OPEN; append one line to case.summary:
+  "Repair attempt N (YYYY-MM-DD): <what was tried> → <why it failed>".
+- Do not mark FIXED because pytest passed on an unrelated file or a narrower test
+  that does not prove the original law violation is gone.
+```
+
+**Max 2 implementation attempts per queue item per session** unless new evidence
+appears (new artifact, revised root cause from diagnose, or user explicitly says
+"try again with X").
+
+If the user only says `/repair` again on the same known failure with no new
+diagnose: refresh the queue from corpus + latest `.debug`, do not blindly re-apply
+the previous patch.
 
 ---
 
@@ -140,7 +176,52 @@ If the user says they will regen/sverka themselves, note it in the report under
 If a test failure is outside the touched area, report it clearly. If it blocks
 the current repair, include it in the queue and fix it when causally connected.
 
-### Step 4 — Continue Until Done Or Blocked
+### Step 4 — Corpus: OPEN or FIXED (binary)
+
+```text
+OPEN   — not proven fixed (diagnosed, in progress, or failed attempts)
+FIXED  — regression proof + repair block; original law violation addressed
+```
+
+Optional explicit closure without a fix (rare, user/agent decision):
+
+```text
+WONT_FIX            — mechanism accepted / out of scope
+DEFERRED_BY_POLICY  — intentional defer; requires defer_reason
+```
+
+For each **compiler-law** queue item with a matching case:
+
+**When R? is actually done** — all must hold:
+
+```text
+targeted regression test passes
+fix is at the owning compiler layer (not a screen patch)
+original symptom class would not recur on the same law (test encodes that)
+```
+
+Then: `status: FIXED`, fill `repair.*`, run:
+
+```yaml
+repair:
+  summary: >   # refine diagnose repair_summary_draft; mechanism not screen patch
+    …
+  changed_files: [...]
+  regression_tests: [...]
+  verification: [...]
+```
+
+```bash
+poetry run figma-flutter defects index --write
+poetry run figma-flutter defects validate
+```
+
+**When R? is not done:** stay `OPEN`, note attempt in `case.summary`. **Do not mark FIXED.**
+
+If diagnose was skipped: write `OPEN` first, then `FIXED` only if proof lands in the
+same session — never skip straight to `FIXED`.
+
+### Step 5 — Continue Until Done Or Blocked
 
 Continue through all P0/P1/P2 items. Stop only when:
 
@@ -170,13 +251,17 @@ Fixed:
   R1 [P0]: symptom -> change -> proof result
   R2 [P1]: ...
 
+Corpus status (per mechanism):
+  R1: OPEN | FIXED | WONT_FIX — path + one-line reason
+
 Still blocked:
   R?: reason / missing artifact / command needed
 
 Verification:
   commands run and result
   agent: targeted pytest / analyzer smoke on touched modules
-  compiler-law fixes: corpus case updated under `corpus/cases/` + `figma-flutter defects validate` exit 0
+  corpus: only items with conclusive proof promoted to FIXED + `defects validate`
+  items attempted but unproven: OPEN + repair attempt noted in case.summary
   user (default): full generate, sandbox regen, dart analyze, Figma/screenshot compare — only if user did not take ownership
 
 Scope control:

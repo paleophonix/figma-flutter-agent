@@ -1,0 +1,37 @@
+version: 1
+family_id: graph_sync_violation
+generated: true
+cases:
+- case_id: 2026-07-04-extracted-semantic-classify-boundary
+  case_file: cases/2026-07-04-extracted-semantic-classify-boundary.yaml
+  title: Semantic classifier upgrades extracted IR host while retaining widget 
+    ref
+  project: synthetic
+  feature: extracted_semantic_classify_boundary
+  occurrence_id: extracted-radio-semantic-upgrade
+  status: FIXED
+  observed_at: '2026-07-04'
+  summary: classify_screen_ir promoted extracted radio hosts to control_radio 
+    without clearing widget ref, triggering inv_graph_sync during 
+    classify_screen_ir pass.
+- case_id: 2026-07-03-graph-sync-violation-synthetic
+  case_file: cases/2026-07-03-graph-sync-violation-synthetic.yaml
+  title: IR clean-tree child mismatch after pass
+  project: synthetic
+  feature: conservation_graph_sync
+  occurrence_id: graph-sync-child-mismatch
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: Screen IR referenced clean-tree children that no longer exist after a
+    pass.
+- case_id: 2026-07-03-cp2-graph-sync-extracted-boundary-synthetic
+  case_file: cases/2026-07-03-cp2-graph-sync-extracted-boundary-synthetic.yaml
+  title: CP2 graph sync rejects valid extracted IR terminals
+  project: synthetic
+  feature: extracted_boundary
+  occurrence_id: cp2-graph-sync-extracted-boundary
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: check_graph_sync required clean-tree child parity on kind=extracted 
+    screen IR hosts, blocking CP2 layout passes after ExtractedIrTerminalLaw 
+    enforcement.

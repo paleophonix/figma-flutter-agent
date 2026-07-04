@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.geometry.invariants.conservation import (
+    check_flex_hosts_have_no_stack_placement,
     check_stack_paint_order_preserved,
 )
 from figma_flutter_agent.generator.geometry.invariants.validate import (
@@ -284,6 +285,24 @@ def test_sectionize_converts_root_stack_to_column() -> None:
     )
     assert updated_clean.type == NodeType.COLUMN
     assert updated_clean.children[0].stack_placement is None
+
+
+def test_sectionize_clears_stack_placement_on_viewport_chrome_children() -> None:
+    """Law: LAW-CP2-FLEX-PLACEMENT — chrome buckets must not stay positioned under COLUMN."""
+    clean = _vertical_sections_root(with_bottom_panel=True)
+    screen_ir = default_screen_ir(clean)
+    _, updated_clean = apply_ir_layout_passes(
+        screen_ir,
+        clean,
+        inject_root_scroll_host=True,
+        validate_cp2=True,
+    )
+    assert updated_clean.type == NodeType.COLUMN
+    assert check_flex_hosts_have_no_stack_placement(updated_clean) == []
+    bottom_chrome = updated_clean.children[-1]
+    assert bottom_chrome.id == "purchase"
+    assert bottom_chrome.stack_placement is None
+    assert bottom_chrome.layout_role == "responsive_section"
 
 
 def test_sectionize_emits_scroll_without_root_fitted_box() -> None:

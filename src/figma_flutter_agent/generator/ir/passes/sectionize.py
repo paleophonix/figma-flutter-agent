@@ -339,7 +339,9 @@ def _apply_sectionize_clean(
     root: CleanDesignTreeNode,
     plan: SectionizePlan,
 ) -> CleanDesignTreeNode:
-    column_children = [*plan.top_chrome, *plan.scroll_sections, *plan.bottom_chrome]
+    top_chrome = [_clear_flex_placement(child) for child in plan.top_chrome]
+    bottom_chrome = [_clear_flex_placement(child) for child in plan.bottom_chrome]
+    column_children = [*top_chrome, *plan.scroll_sections, *bottom_chrome]
     scroll_axis = "vertical" if plan.scroll_sections else "none"
     return root.model_copy(
         update={

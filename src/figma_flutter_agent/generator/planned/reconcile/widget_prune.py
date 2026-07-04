@@ -135,7 +135,7 @@ def collapse_component_family_duplicate_widgets(
     if not cluster_classes or clean_tree is None:
         return planned
 
-    from figma_flutter_agent.generator.cluster_variants import _cluster_delegate_lookup_keys
+    from figma_flutter_agent.generator.cluster_variants import _cluster_subtree_delegate_lookup_keys
     from figma_flutter_agent.generator.ir.extracted_paint import (
         collect_subtree_asset_family_keys,
         extract_dart_asset_family_keys,
@@ -155,7 +155,7 @@ def collapse_component_family_duplicate_widgets(
     for node in index_clean_tree(clean_tree).values():
         if not node.children:
             continue
-        for cluster_id in _cluster_delegate_lookup_keys(node):
+        for cluster_id in _cluster_subtree_delegate_lookup_keys(node):
             if cluster_id in canonical_by_cluster and cluster_id not in cluster_families:
                 families = collect_subtree_asset_family_keys(node)
                 if families:
@@ -186,10 +186,7 @@ def collapse_component_family_duplicate_widgets(
             score += 10
         if "width: 57.0, height: 53.0" in code and "BoxFit.contain" in code:
             score -= 15
-        if (
-            "SizedBox(width: 57.0, height: 53.0, child: RepaintBoundary(child: SvgPicture"
-            in code
-        ):
+        if "SizedBox(width: 57.0, height: 53.0, child: RepaintBoundary(child: SvgPicture" in code:
             score -= 20
         return score
 
@@ -203,9 +200,9 @@ def collapse_component_family_duplicate_widgets(
         canonical_path = class_paths.get(canonical_class)
         duplicate_body = updated.get(duplicate_path, "")
         canonical_body = updated.get(canonical_path, "") if canonical_path else ""
-        if _component_family_widget_body_score(duplicate_body) > _component_family_widget_body_score(
-            canonical_body
-        ):
+        if _component_family_widget_body_score(
+            duplicate_body
+        ) > _component_family_widget_body_score(canonical_body):
             promoted = _rename_widget_class(duplicate_body, duplicate_class, canonical_class)
             target_path = canonical_path or duplicate_path
             updated[target_path] = promoted

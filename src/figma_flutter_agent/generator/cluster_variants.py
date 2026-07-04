@@ -165,15 +165,13 @@ def cluster_classes_for_inline_widget_render(
     if not cluster_classes:
         return None
     filtered = {
-        cluster_id: mapped
-        for cluster_id, mapped in cluster_classes.items()
-        if mapped == class_name
+        cluster_id: mapped for cluster_id, mapped in cluster_classes.items() if mapped == class_name
     }
     return filtered or None
 
 
-def _cluster_delegate_lookup_keys(node: CleanDesignTreeNode) -> list[str]:
-    """Return cluster map keys in preferred lookup order for delegate resolution."""
+def _cluster_delegate_self_lookup_keys(node: CleanDesignTreeNode) -> list[str]:
+    """Return cluster map keys for the node itself (emit delegate authority)."""
     keys: list[str] = []
     if node.cluster_id:
         keys.append(node.cluster_id)
@@ -191,6 +189,20 @@ def _cluster_delegate_lookup_keys(node: CleanDesignTreeNode) -> list[str]:
         base = component_cluster_id(component_id)
         if fingerprinted == base and base not in keys:
             keys.append(base)
+    return keys
+
+
+def _cluster_delegate_lookup_keys(node: CleanDesignTreeNode) -> list[str]:
+    """Return cluster map keys for emit delegate resolution on this node only.
+
+    Descendant cluster ids must not authorize replacement of an ancestor host.
+    """
+    return _cluster_delegate_self_lookup_keys(node)
+
+
+def _cluster_subtree_delegate_lookup_keys(node: CleanDesignTreeNode) -> list[str]:
+    """Return cluster keys visible within a subtree (prune / dedup scans only)."""
+    keys = list(_cluster_delegate_self_lookup_keys(node))
 
     def append_nested_keys(current: CleanDesignTreeNode, depth: int) -> None:
         if depth > 3:
@@ -263,7 +275,9 @@ def primary_vector_asset(node: CleanDesignTreeNode) -> str | None:
 
     def walk(current: CleanDesignTreeNode) -> None:
         if current.vector_asset_key:
-            candidates.append((score_asset(current.vector_asset_key, current), current.vector_asset_key))
+            candidates.append(
+                (score_asset(current.vector_asset_key, current), current.vector_asset_key)
+            )
         for child in current.children:
             walk(child)
 

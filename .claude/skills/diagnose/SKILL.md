@@ -179,8 +179,13 @@ Read before classifying compiler/IR failures:
 .claude/prompts/project-bible-lite.md
 .claude/prompts/pipeline-contracts.md
 corpus/families.yaml
+corpus/index/<family_id>.yaml   # after family_id is known
 AGENTS.md
 ```
+
+After `family_id` is known, read `corpus/index/<family_id>.yaml` to pick the relevant
+`case_id` (prefer same `project`+`feature`, then `OPEN`, then `FIXED` with repair).
+Open only the chosen `corpus/cases/<case_id>.yaml` — do not load every case file.
 
 @.claude/prompts/pipeline-contracts.md
 
@@ -212,7 +217,40 @@ root_cause:
   corpus_status: ready_for_record | needs_evidence | unclassified
 ```
 
-Rules: diagnose is read-only; do not write corpus YAML; unknown mechanism → `unclassified` in output only; find the **first arrow** where the fact changed.
+Rules: do not invent families; unknown mechanism → `unclassified` in report only; find the
+**first arrow** where the fact changed.
+
+Incorporate **user chat notes** into the triage report and into the **corpus handoff**
+block below (for Cursor to apply) — do not write `corpus/` files from this skill.
+
+---
+
+# Step 8 — Corpus handoff (Cursor-owned writes)
+
+**Do not** create, update, or index `corpus/` YAML from `.claude/` diagnose.
+
+When `corpus_status: ready_for_record` and confidence is `high` or `medium`, emit a
+**handoff block** in the triage report so a **Cursor** agent can write the case:
+
+```yaml
+corpus_handoff:
+  action: create | update          # if matching OPEN case exists in index
+  case_id: YYYY-MM-DD-<mechanism-slug>   # proposed; Cursor confirms uniqueness
+  family_id: ...
+  project: ...
+  feature: ...
+  status: OPEN                     # diagnose never proposes FIXED
+  summary: ...                     # include user chat notes
+  evidence:
+    - kind: debug_artifact
+      path: .debug/screen/<project>/<feature>/...
+      summary: ...
+```
+
+Skip handoff when `unclassified`, `needs_evidence`, infra-only, or symptom-only.
+
+List proposed handoffs under `Corpus handoff (Cursor):` in the report — paths **not**
+written yet. **Diagnose-only still means no compiler code and no corpus file I/O.**
 
 ---
 
@@ -441,6 +479,9 @@ Out of scope (only if user narrowed or blocked by missing artifacts):
 Diagnosis summary:
   systemic vs fixture-local per item
 
+Corpus handoff (Cursor):
+  proposed case_id(s) or none — reason
+
 Regression risk:
 Rollback plan:
 
@@ -448,4 +489,6 @@ Proceed:
   BATCH REPAIR (default) | DIAGNOSE ONLY | SINGLE ITEM (user-scoped)
 ```
 
-After a **diagnose-only** report, do not code until the user asks to repair. After a **batch repair** trigger, do not wait for a separate consilium per queue item.
+After a **diagnose-only** report, do not change compiler code until repair. Corpus YAML
+writes are **Cursor-owned** — hand off Step 8 blocks when `ready_for_record`. After a
+**batch repair** trigger, do not wait for a separate consilium per queue item.

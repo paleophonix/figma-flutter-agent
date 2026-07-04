@@ -1,0 +1,14 @@
+version: 1
+family_id: screen_root_scope_veto_missing
+generated: true
+cases:
+- case_id: 2026-07-03-screen-root-scope-veto-synthetic
+  case_file: cases/2026-07-03-screen-root-scope-veto-synthetic.yaml
+  title: Screen root must veto input rating on artboard
+  project: synthetic
+  feature: screen_root_kind
+  occurrence_id: root-input-rating-veto
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: Screen-root IR accepted INPUT_RATING on full artboard without scope 
+    veto.

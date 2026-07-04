@@ -362,6 +362,40 @@ def test_check_graph_sync_rejects_orphan_ref_on_inline_kind() -> None:
     )
 
 
+def test_classify_screen_ir_preserves_extracted_radio_boundary() -> None:
+    """Law: LAW-CP2-GRAPH-SYNC — semantic upgrade must not retain extracted widget ref."""
+    from figma_flutter_agent.generator.geometry.invariants.conservation import check_graph_sync
+    from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
+
+    clean = CleanDesignTreeNode(
+        id="radio:1",
+        name="Radio Button",
+        type=NodeType.RADIO,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=24.0,
+            height=24.0,
+        ),
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="radio:1",
+            kind=WidgetIrKind.EXTRACTED,
+            children=[],
+            ref=WidgetIrRef(widget_name="RadioButtonSmallUnselected"),
+            is_selected=False,
+        ),
+    )
+    updated_ir, report = classify_screen_ir(screen_ir, clean)
+    classified = updated_ir.root
+    assert classified.kind == WidgetIrKind.EXTRACTED
+    assert classified.ref is not None
+    assert classified.ref.widget_name == "RadioButtonSmallUnselected"
+    assert not any(entry.accepted for entry in report.entries)
+    assert not check_graph_sync(updated_ir, clean)
+
+
 @pytest.mark.parametrize(
     "runner_name",
     ["sectionize", "unstack", "unpin", "scroll_host"],

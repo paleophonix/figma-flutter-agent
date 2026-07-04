@@ -80,6 +80,7 @@ class RepairRef(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    summary: str | None = None
     changed_files: list[str] = Field(default_factory=list)
     regression_tests: list[str] = Field(default_factory=list)
     verification: list[str] = Field(default_factory=list)

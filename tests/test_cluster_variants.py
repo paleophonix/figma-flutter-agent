@@ -11,6 +11,7 @@ from figma_flutter_agent.generator.cluster_variants import (
     primary_vector_asset,
     resolve_cluster_delegate_class,
 )
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.planned.reconcile import _is_shrink_only_widget_source
 from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
@@ -263,6 +264,118 @@ def _component_image_card(card_id: str, *, cluster_id: str) -> CleanDesignTreeNo
             ),
         ],
     )
+
+
+def test_resolve_cluster_delegate_class_does_not_delegate_ancestor_with_clustered_descendant() -> (
+    None
+):
+    """Law: descendant cluster ids must not delegate ancestor layout hosts."""
+    clustered_tile = CleanDesignTreeNode(
+        id="upload:tile",
+        name="Tile",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        children=[],
+    )
+    upload_section = CleanDesignTreeNode(
+        id="upload:section",
+        name="Upload",
+        type=NodeType.STACK,
+        children=[
+            clustered_tile,
+            CleanDesignTreeNode(
+                id="upload:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="UPLOAD PHOTO/VIDEO",
+            ),
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="screen:root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(
+                id="screen:header",
+                name="Header",
+                type=NodeType.TEXT,
+                text="Add New Items",
+            ),
+            upload_section,
+            CleanDesignTreeNode(
+                id="screen:price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="Price",
+            ),
+        ],
+    )
+    cluster_classes = {"cluster_0": "UploadWidget"}
+
+    assert resolve_cluster_delegate_class(root, cluster_classes) is None
+    assert resolve_cluster_delegate_class(upload_section, cluster_classes) is None
+    assert resolve_cluster_delegate_class(clustered_tile, cluster_classes) == "UploadWidget"
+
+
+def test_render_layout_file_preserves_column_siblings_with_nested_cluster_delegate() -> None:
+    """Law: cluster delegation on one section must not collapse the screen root."""
+    clustered_tile = CleanDesignTreeNode(
+        id="upload:tile",
+        name="Tile",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=111.0, height=101.0),
+        children=[],
+    )
+    upload_section = CleanDesignTreeNode(
+        id="upload:section",
+        name="Upload",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=133.0),
+        children=[
+            clustered_tile,
+            CleanDesignTreeNode(
+                id="upload:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="UPLOAD PHOTO/VIDEO",
+            ),
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="screen:root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=800.0),
+        children=[
+            CleanDesignTreeNode(
+                id="screen:header",
+                name="Header",
+                type=NodeType.TEXT,
+                text="Add New Items",
+            ),
+            upload_section,
+            CleanDesignTreeNode(
+                id="screen:save",
+                name="Save",
+                type=NodeType.TEXT,
+                text="Save Changes",
+            ),
+        ],
+    )
+    layout = render_layout_file(
+        root,
+        feature_name="nested_cluster_screen",
+        uses_svg=False,
+        cluster_classes={"cluster_0": "UploadWidget"},
+        responsive_enabled=False,
+    )["lib/generated/nested_cluster_screen_layout.dart"]
+
+    assert "Add New Items" in layout
+    assert "Save Changes" in layout
+    assert "const UploadWidget()" in layout
+    assert layout.count("Add New Items") >= 1
 
 
 def test_resolve_cluster_delegate_class_skips_component_family_alias_during_materialization() -> (

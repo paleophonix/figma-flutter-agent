@@ -1,0 +1,14 @@
+version: 1
+family_id: ir_override_without_provenance
+generated: true
+cases:
+- case_id: 2026-07-03-ir-override-provenance-synthetic
+  case_file: cases/2026-07-03-ir-override-provenance-synthetic.yaml
+  title: IR overrides mutate clean-tree facts without provenance
+  project: synthetic
+  feature: ir_override_provenance
+  occurrence_id: ir-override-no-prov
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: WidgetIrOverrides changed text and style facts during merge without 
+    recording DeviationRecord entries for each mutated field.

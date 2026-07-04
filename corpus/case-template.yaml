@@ -9,6 +9,7 @@ case:
   observed_at: 2026-07-03
   summary: >
     One paragraph describing the mechanism, not the visual symptom.
+    Include user chat observations under "User observation:" when provided.
 
 occurrences:
   - id: example-occurrence
@@ -19,7 +20,7 @@ occurrences:
     origin: COMPILER
     blast_radius: B2_SILENT_WRONG_BEHAVIOR
     confidence: high
-    status: OPEN
+    status: OPEN  # OPEN until proven; then FIXED (or WONT_FIX / DEFERRED_BY_POLICY)
     owner:
       module: src/figma_flutter_agent/generator/ir/fidelity/stamp.py
       symbol: _stamp_node
@@ -35,6 +36,9 @@ occurrences:
         path: src/figma_flutter_agent/schemas/ir.py
         summary: Schema exposes compiler-owned fidelity fields to LLM.
     repair:
+      summary: >
+        Two or three sentences: what mechanism changed, why the law holds again.
+        Not a file list — that lives in changed_files and regression_tests.
       changed_files: []
       regression_tests: []
       verification: []

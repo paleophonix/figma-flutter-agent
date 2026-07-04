@@ -73,7 +73,7 @@ class ClassificationReport:
 def _apply_payload_to_ir(
     ir_node: WidgetIrNode, kind: WidgetIrKind, payload: KindPayload
 ) -> WidgetIrNode:
-    updates: dict[str, object] = {"kind": kind, "payload": payload}
+    updates: dict[str, object] = {"kind": kind, "payload": payload, "ref": None}
     if isinstance(payload, ChipChoicePayload):
         updates["is_selected"] = payload.is_selected
     if isinstance(payload, InputTextFieldPayload):
@@ -104,6 +104,14 @@ def _record_legacy_type_signals(
             report.name_signal_used.append(figma_id)
 
 
+def _has_extracted_boundary(ir_node: WidgetIrNode) -> bool:
+    """Return True when semantic classification must not mutate this IR host."""
+    if ir_node.kind == WidgetIrKind.EXTRACTED:
+        return True
+    ref_name = (ir_node.ref.widget_name if ir_node.ref else "").strip()
+    return bool(ref_name)
+
+
 def classify_node(
     ir_node: WidgetIrNode,
     clean_node: CleanDesignTreeNode,
@@ -117,6 +125,15 @@ def classify_node(
     report: SemanticClassificationReport | None = None,
 ) -> tuple[WidgetIrNode, ClassificationReportEntry]:
     """Classify one IR node against its clean-tree counterpart."""
+    if _has_extracted_boundary(ir_node):
+        return ir_node, ClassificationReportEntry(
+            figma_id=ir_node.figma_id,
+            kind=ir_node.kind.value,
+            confidence=0.0,
+            accepted=False,
+            evidence={"skipped": "extracted_boundary"},
+        )
+
     effective_hint = llm_hint if llm_gray_zone_enabled else None
     if effective_hint is not None:
         from figma_flutter_agent.generator.ir.validate.root_kind import (

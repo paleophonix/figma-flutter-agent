@@ -1,0 +1,14 @@
+version: 1
+family_id: pass_over_mutation
+generated: true
+cases:
+- case_id: 2026-07-03-pass-over-mutation-synthetic
+  case_file: cases/2026-07-03-pass-over-mutation-synthetic.yaml
+  title: IR override mutates undeclared clean-tree fields
+  project: synthetic
+  feature: pass_contract
+  occurrence_id: pass-contract-field-leak
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: An IR override changed sizing and children outside the declared pass 
+    contract.

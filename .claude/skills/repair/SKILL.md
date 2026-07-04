@@ -41,6 +41,8 @@ INLINE
 
 If no triage exists and artifacts are stale, run diagnosis first (read `.debug`, build queue), then repair — **same session**, no stop between them.
 
+**Corpus before coding:** `families.yaml` → `corpus/index/<family_id>.yaml` → one `corpus/cases/<case_id>.yaml`. Do not glob all case files.
+
 Do not require a separate consilium approval per queue item.
 
 ---
@@ -385,7 +387,16 @@ Which test proves it?
 Why will it apply to the next screen?
 ```
 
-For compiler-law fixes (Program 00/01): create or update a case under `corpus/cases/` and run `poetry run figma-flutter defects validate` (exit 0).
+For compiler-law fixes (Program 00/01), **read** case `status` from corpus index/case files
+(`OPEN` while trying; `FIXED` only after conclusive proof). **Do not** write or reindex
+corpus YAML from `.claude/` repair — hand status updates to **Cursor**
+(`.cursor/skills/repair/`).
+
+**Corpus lookup (read-only):** `families.yaml` → `corpus/index/<family_id>.yaml` → one
+case file. Rank: same screen → `OPEN` → `FIXED` with `repair`.
+
+Anti-loop: max 2 attempts per item per session without fresh `/diagnose`. One case file
+per mechanism.
 
 The batch is done when **all in-scope P0/P1 items** are completed or explicitly blocked with evidence.
 

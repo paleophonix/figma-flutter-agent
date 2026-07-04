@@ -1,0 +1,15 @@
+version: 1
+family_id: llm_fidelity_authority_bypass
+generated: true
+cases:
+- case_id: 2026-07-03-fidelity-authority-synthetic
+  case_file: cases/2026-07-03-fidelity-authority-synthetic.yaml
+  title: LLM native_verified bypasses manifest authority
+  project: synthetic
+  feature: fidelity_authority
+  occurrence_id: fidelity-authority-bypass
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: A semantic IR node with LLM-authored native_verified tier was 
+    accepted by the fidelity stamp and could route to native template emit 
+    without manifest authority.

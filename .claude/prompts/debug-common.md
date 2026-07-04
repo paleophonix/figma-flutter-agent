@@ -10,6 +10,21 @@ Use `.debug/screen/<project>/<feature>/` at the agent repo root unless the comma
 
 Debug artifacts are for **observation and triage**. They are not a substitute for fixtures, corpus tests, or named layout laws.
 
+**Defect corpus (read-only in `.claude/`):** classify against `families.yaml` and existing
+cases; understand `OPEN` / `FIXED` lifecycle when reading. **Do not** create, update, or
+index corpus YAML from Claude prompts or skills — **Cursor** (`.cursor/`) owns all writes.
+
+**Corpus lookup (do not glob `corpus/cases/`):**
+
+```text
+corpus/families.yaml              → family_id (mechanism, not symptom)
+corpus/index/<family_id>.yaml     → case_id, project, feature, status, summary
+corpus/cases/<case_id>.yaml       → full occurrence only for the chosen row
+```
+
+Rank in index: same `project`+`feature` → `OPEN` → `FIXED` with `repair` → `observed_at` desc.
+Indexes under `corpus/index/` are **generated** — read only; never edit by hand from `.claude/`.
+
 ---
 
 # Layout model (project-scoped per-screen)

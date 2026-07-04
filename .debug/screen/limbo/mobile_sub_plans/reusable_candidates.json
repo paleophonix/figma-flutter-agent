@@ -1,0 +1,78 @@
+{
+  "cacheKey": "f2be4d959d57ad22eb849ab6f0cb82456e63ba382b34959548a4834a744a296c",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "240:6292",
+        "widgetName": "SubscriptionPlanOption",
+        "reason": "Three nearly identical plan rows repeat for yearly, monthly, and weekly options; only labels, prices, billing text, and selected state vary.",
+        "confidence": 0.98,
+        "suggestedParams": [
+          "isSelected",
+          "title",
+          "description",
+          "price",
+          "billingPeriod",
+          "showDescription",
+          "isRecommended"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "240:6301",
+            "240:6310"
+          ],
+          "shapeSimilarity": 0.97,
+          "semanticRole": "subscription plan selection item"
+        }
+      },
+      {
+        "nodeId": "240:6320",
+        "widgetName": "BenefitListItem",
+        "reason": "This benefit row repeats with the same star icon plus a single text label, making it a clear reusable list-item pattern.",
+        "confidence": 0.95,
+        "suggestedParams": [
+          "label"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "240:6324",
+            "240:6328"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "feature bullet row"
+        }
+      },
+      {
+        "nodeId": "240:6294",
+        "widgetName": "PlanRadioButton",
+        "reason": "The radio control is reused across the plan options with selected and unselected variants, so it can be exposed as a small reusable control.",
+        "confidence": 0.87,
+        "suggestedParams": [
+          "selected",
+          "size"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "240:6303",
+            "240:6312"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "selection control"
+        }
+      },
+      {
+        "nodeId": "267:5949",
+        "widgetName": "PrimaryButton",
+        "reason": "Explicit Figma button component for the main CTA; reusable across screens even though it appears once in this view.",
+        "confidence": 0.74,
+        "suggestedParams": [
+          "label",
+          "showLeftIcon",
+          "showRightIcon",
+          "isEnabled"
+        ],
+        "evidence": null
+      }
+    ]
+  }
+}

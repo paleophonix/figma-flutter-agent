@@ -1,0 +1,525 @@
+{
+  "featureName": "mobile_sub_plans",
+  "emitterVersion": "2026.07.1",
+  "checkpoints": [
+    "CP1_guards",
+    "CP1_normalize",
+    "CP2_ir_passes",
+    "CP2_semantic",
+    "CP2_post_classify",
+    "CP2_fidelity_stamp"
+  ],
+  "mutations": [
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6294",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6303",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6312",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6294",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6303",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6294",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6303",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6312",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6334",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6334",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 166.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6295",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6295",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 35.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6298",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6298",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 35.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6304",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6304",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 35.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6307",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6307",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 35.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6313",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6313",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 17.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6315",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6315",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 35.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6322",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6322",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 16.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6326",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6326",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 16.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6330",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "240:6330",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 16.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6294",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6303",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6312",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "240:6288",
+      "field": "type",
+      "old": "STACK",
+      "new": "COLUMN",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "240:6288",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "sections": 1,
+        "bands": 1,
+        "bottom_chrome": 1,
+        "top_chrome": 1
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "240:6288",
+      "field": "children_count",
+      "old": 4,
+      "new": 3,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6288",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6288",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6294",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6294",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6312",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6312",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6318",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6318",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6294",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6303",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6294",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6294",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6294",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6303",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "240:6303",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "240:6303",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    }
+  ],
+  "decisions": [
+    {
+      "nodeId": "240:6288",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "STACK": 2,
+          "COLUMN": 1
+        },
+        "child_count": 3
+      }
+    },
+    {
+      "nodeId": "240:6294",
+      "kind": "control_radio",
+      "confidence": 0.9,
+      "evidence": {
+        "control_radio": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "RADIO",
+        "component_id": "109:2240",
+        "variant.state": "Selected"
+      }
+    },
+    {
+      "nodeId": "240:6312",
+      "kind": "control_radio",
+      "confidence": 0.9,
+      "evidence": {
+        "control_radio": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "interactive_surface": "RADIO",
+        "component_id": "109:2239"
+      }
+    },
+    {
+      "nodeId": "240:6318",
+      "kind": "container_accordion",
+      "confidence": 0.82,
+      "evidence": {
+        "container_accordion": true,
+        "child_type_counts": {
+          "TEXT": 1,
+          "ROW": 3
+        },
+        "child_count": 4
+      }
+    }
+  ],
+  "deviations": []
+}

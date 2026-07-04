@@ -1,0 +1,14 @@
+version: 1
+family_id: extracted_widget_subtree_conservation_gap
+generated: true
+cases:
+- case_id: 2026-07-03-extracted-widget-conservation-synthetic
+  case_file: cases/2026-07-03-extracted-widget-conservation-synthetic.yaml
+  title: Extracted widget IR skipped when subtree pruned
+  project: synthetic
+  feature: extracted_widget_conservation
+  occurrence_id: extracted-subtree-gap
+  status: FIXED
+  observed_at: '2026-07-03'
+  summary: Materialize silently skipped extracted widget validation when the 
+    clean subtree was pruned without a named conservation outcome.
