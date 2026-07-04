@@ -222,11 +222,12 @@ async def run_pipeline(
 
     async def _complete_run() -> PipelineResult:
         nonlocal run_meta_active
+        run_log = log
 
         if from_dump is not None:
             await run_dump_fetch_parse_phase(
                 ctx,
-                log=log,
+                log=run_log,
                 parsed=parsed,
                 settings=settings,
                 project_dir=project_dir,
@@ -242,7 +243,7 @@ async def run_pipeline(
         else:
             await run_live_fetch_parse_phase(
                 ctx,
-                log=log,
+                log=run_log,
                 parsed=parsed,
                 settings=settings,
                 project_dir=project_dir,
@@ -257,7 +258,7 @@ async def run_pipeline(
             )
 
         ctx.require_parse_complete()
-        with log_stage(log, "analyze"):
+        with log_stage(run_log, "analyze"):
             ctx.collect_analysis_warnings()
 
         clean_tree = ctx.clean_tree
@@ -265,9 +266,9 @@ async def run_pipeline(
         dedup_result = ctx.dedup_result
         assert clean_tree is not None and tokens is not None and dedup_result is not None
 
-        log = apply_viewport_inset_and_resolve_feature(
+        run_log = apply_viewport_inset_and_resolve_feature(
             ctx,
-            log=log,
+            log=run_log,
             settings=settings,
             project_dir=project_dir,
             feature_name=feature_name,
@@ -350,7 +351,7 @@ async def run_pipeline(
         ):
             await resolve_offline_reference_png(
                 ctx,
-                log=log,
+                log=run_log,
                 parsed=parsed,
                 settings=settings,
                 project_dir=project_dir,
@@ -363,7 +364,7 @@ async def run_pipeline(
     
             if ctx.asset_manifest is None:
                 raise PipelineError("LLM compare requires a parsed asset manifest")
-            with log_stage(log, "llm_compare"):
+            with log_stage(run_log, "llm_compare"):
                 compare_result = await run_llm_ir_compare(
                     settings=settings,
                     project_dir=project_dir,
@@ -404,7 +405,7 @@ async def run_pipeline(
     
         llm_outcome, planned_files = await run_llm_and_plan_phase(
             ctx,
-            log=log,
+            log=run_log,
             settings=settings,
             parsed=parsed,
             project_dir=project_dir,
@@ -428,7 +429,7 @@ async def run_pipeline(
     
         planned_files, _post_gen_request = await run_validate_repair_refine_phase(
             ctx,
-            log=log,
+            log=run_log,
             settings=settings,
             parsed=parsed,
             project_dir=project_dir,
@@ -487,7 +488,7 @@ async def run_pipeline(
             planned_files=planned_files,
             package_name=package_name,
             pipeline_deps=pipeline_deps,
-            log=log,
+            log=run_log,
             force_llm_regen=force_llm_regen,
             regenerate_templates=regenerate_templates,
             resolved_sync=resolved_sync,
@@ -497,21 +498,21 @@ async def run_pipeline(
         from figma_flutter_agent.dart_error_log import bound_dart_error_log_path
         from figma_flutter_agent.debug.terminal_log import bound_terminal_log_path
     
-        run_log = bound_terminal_log_path()
-        if run_log is not None and run_log.is_file():
-            result.terminal_log = run_log.as_posix()
-            log.info("Pipeline run log: {}", result.terminal_log)
+        terminal_log_path = bound_terminal_log_path()
+        if terminal_log_path is not None and terminal_log_path.is_file():
+            result.terminal_log = terminal_log_path.as_posix()
+            run_log.info("Pipeline run log: {}", result.terminal_log)
         dart_errors_log = bound_dart_error_log_path()
         if dart_errors_log is not None and dart_errors_log.is_file():
             result.dart_errors_log = dart_errors_log.as_posix()
-            log.info("Dart analyzer errors: {}", result.dart_errors_log)
-    
+            run_log.info("Dart analyzer errors: {}", result.dart_errors_log)
+
         render_dir = bound_render_log_dir()
         if render_dir is not None and render_dir.is_dir():
             has_png = any(render_dir.glob("*.png"))
             if has_png:
                 result.render_log_dir = render_dir.as_posix()
-                log.info("Combat render captures: {}", result.render_log_dir)
+                run_log.info("Combat render captures: {}", result.render_log_dir)
     
         if settings.agent.dev.debug_capture:
             from figma_flutter_agent.debug.capture import run_project_debug_capture
@@ -527,7 +528,7 @@ async def run_pipeline(
             if capture_outcome is not None:
                 result.debug_capture_dir = capture_outcome.capture_dir.as_posix()
                 result.flutter_capture_ok = capture_outcome.flutter_capture_ok
-                log.info("Debug capture artifacts: {}", result.debug_capture_dir)
+                run_log.info("Debug capture artifacts: {}", result.debug_capture_dir)
                 if not capture_outcome.flutter_capture_ok:
                     summary = "; ".join(capture_outcome.warnings[:2]) or "flutter render capture failed"
                     result.warnings.append(f"Flutter capture blocked: {summary}")
