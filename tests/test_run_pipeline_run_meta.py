@@ -216,3 +216,44 @@ async def test_run_pipeline_single_run_meta_when_manifest_and_frame_differ(tmp_p
 
     assert not run_meta_path(project_dir, "checkout").is_file()
     assert run_meta_path(project_dir, "payment_screen").is_file()
+
+
+@pytest.mark.asyncio
+async def test_pipeline_original_error_survives_stale_failed_write(tmp_path: Path) -> None:
+    """Superseded run must not mask the real pipeline failure with RunMetaStaleWriterError."""
+    import figma_flutter_agent.pipeline.run.core as pipeline_module
+
+    from figma_flutter_agent.errors import RunMetaStaleWriterError
+
+    project_dir = tmp_path / "project"
+    dump_path = _write_minimal_flutter_project(project_dir)
+    settings = Settings()
+    deps = pipeline_test_dependencies()
+
+    async def raise_generation_error(*args: object, **kwargs: object) -> tuple[object, dict[str, str]]:
+        raise PipelineError("generation boom")
+
+    with (
+        patch.object(
+            pipeline_module,
+            "parse_figma_url",
+            return_value=MagicMock(file_key="abc", node_id="1:3570"),
+        ),
+        patch.object(pipeline_module, "run_llm_and_plan_phase", new=raise_generation_error),
+        patch(
+            "figma_flutter_agent.debug.run_meta.mark_run_meta_failed",
+            side_effect=RunMetaStaleWriterError("superseded"),
+        ),
+    ):
+        with pytest.raises(PipelineError, match="generation boom"):
+            await pipeline_module.run_pipeline(
+                settings,
+                figma_url="https://www.figma.com/design/abc/x?node-id=1-3570",
+                project_dir=project_dir,
+                feature_name="sign_in",
+                dry_run=False,
+                sync_enabled=False,
+                from_dump=dump_path,
+                from_ir=True,
+                deps=deps,
+            )

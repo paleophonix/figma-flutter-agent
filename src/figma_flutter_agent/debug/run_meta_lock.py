@@ -17,6 +17,24 @@ _UTF8_ENCODING = "utf-8"
 
 
 @contextlib.contextmanager
+def run_meta_pair_lock(
+    left: Path,
+    right: Path,
+    *,
+    timeout_sec: float = _DEFAULT_LOCK_TIMEOUT_SEC,
+):
+    """Acquire two per-screen locks in deterministic path order (deadlock-safe)."""
+    ordered = sorted({left, right}, key=lambda path: path.as_posix())
+    if len(ordered) == 1:
+        with run_meta_lifecycle_lock(ordered[0], timeout_sec=timeout_sec):
+            yield
+        return
+    with run_meta_lifecycle_lock(ordered[0], timeout_sec=timeout_sec):
+        with run_meta_lifecycle_lock(ordered[1], timeout_sec=timeout_sec):
+            yield
+
+
+@contextlib.contextmanager
 def run_meta_lifecycle_lock(meta_path: Path, *, timeout_sec: float = _DEFAULT_LOCK_TIMEOUT_SEC):
     """Serialize run.meta read-modify-write across processes for one screen."""
     meta_path.parent.mkdir(parents=True, exist_ok=True)

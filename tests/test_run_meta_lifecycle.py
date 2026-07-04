@@ -254,6 +254,60 @@ def test_reconcile_run_meta_feature_identity_migrates_to_resolved(tmp_path: Path
     assert record.status == "started"
 
 
+def test_reconcile_preserves_committed_and_extension_fields(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    write_run_meta(
+        project,
+        "checkout",
+        pipeline_run_id="run-old",
+        writeback="committed",
+        committed_build_run_id="run-old",
+        status="completed",
+    )
+    checkout_path = run_meta_path(project, "checkout")
+    payload = json.loads(checkout_path.read_text(encoding="utf-8"))
+    payload["customField"] = "keep-me"
+    checkout_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    begin_run_meta(project, "checkout", pipeline_run_id="run-new")
+    reconcile_run_meta_feature_identity(
+        project,
+        pipeline_run_id="run-new",
+        early_feature="checkout",
+        resolved_feature="payment_screen",
+    )
+
+    assert not run_meta_path(project, "checkout").is_file()
+    migrated = json.loads(run_meta_path(project, "payment_screen").read_text(encoding="utf-8"))
+    assert migrated["pipeline_run_id"] == "run-new"
+    assert migrated["candidate_build_run_id"] == "run-new"
+    assert migrated["committed_build_run_id"] == "run-old"
+    assert migrated["customField"] == "keep-me"
+    assert migrated["status"] == "started"
+
+
+def test_reconcile_stale_when_canonical_target_owned_by_newer_run(tmp_path: Path) -> None:
+    """Slow alias run A must not steal canonical metadata from newer run B."""
+    project = tmp_path / "demo"
+    project.mkdir()
+    begin_run_meta(project, "checkout", pipeline_run_id="run-a")
+    begin_run_meta(project, "payment_screen", pipeline_run_id="run-b")
+
+    with pytest.raises(RunMetaStaleWriterError, match="reconcile blocked"):
+        reconcile_run_meta_feature_identity(
+            project,
+            pipeline_run_id="run-a",
+            early_feature="checkout",
+            resolved_feature="payment_screen",
+        )
+
+    record = read_run_meta(project, "payment_screen")
+    assert record is not None
+    assert record.pipeline_run_id == "run-b"
+    assert run_meta_path(project, "checkout").is_file()
+
+
 def test_overlapping_runs_stale_writer_cannot_corrupt_newer(tmp_path: Path) -> None:
     """Run A began, run B claimed the screen; A must not overwrite B's metadata."""
     project = tmp_path / "demo"

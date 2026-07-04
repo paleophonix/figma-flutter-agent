@@ -572,13 +572,20 @@ async def run_pipeline(
         fail_feature = ctx.resolved_feature or active_run_meta_feature or early_feature
         if active_run_meta_feature and fail_feature:
             from figma_flutter_agent.debug.run_meta import mark_run_meta_failed
+            from figma_flutter_agent.errors import RunMetaStaleWriterError
 
-            mark_run_meta_failed(
-                project_dir,
-                active_run_meta_feature,
-                pipeline_run_id=run_id,
-                error=str(exc),
-            )
+            try:
+                mark_run_meta_failed(
+                    project_dir,
+                    active_run_meta_feature,
+                    pipeline_run_id=run_id,
+                    error=str(exc),
+                )
+            except RunMetaStaleWriterError:
+                log.debug(
+                    "Skipping failed run.meta write for superseded pipeline run {}",
+                    run_id,
+                )
         raise
 
 

@@ -12,6 +12,7 @@ from figma_flutter_agent.debug.paths import RUN_META_JSON, screen_root
 from figma_flutter_agent.debug.run_meta_lock import (
     atomic_write_run_meta_dict,
     run_meta_lifecycle_lock,
+    run_meta_pair_lock,
 )
 from figma_flutter_agent.errors import RunMetaStaleWriterError
 
@@ -212,6 +213,48 @@ def _extension_fields(existing: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in existing.items() if key not in _STAMPED_RUN_META_KEYS}
 
 
+def _merge_migration_extensions(*artifacts: dict[str, Any]) -> dict[str, Any]:
+    """Merge extension fields left-to-right; later artifacts win on key collision."""
+    merged: dict[str, Any] = {}
+    for artifact in artifacts:
+        merged.update(_extension_fields(artifact))
+    return merged
+
+
+def _resolve_migration_committed(
+    source: dict[str, Any],
+    target: dict[str, Any],
+) -> str | None:
+    """Prefer alias-path committed chain, then canonical target history."""
+    source_committed = source.get("committed_build_run_id")
+    if source_committed:
+        return str(source_committed)
+    target_committed = target.get("committed_build_run_id")
+    if target_committed:
+        return str(target_committed)
+    return None
+
+
+def _assert_reconcile_target_writable(
+    target: dict[str, Any],
+    *,
+    pipeline_run_id: str,
+) -> None:
+    """Reject reconcile when canonical target belongs to another in-flight run."""
+    if not target:
+        return
+    target_owner = str(target.get("pipeline_run_id") or "").strip()
+    if not target_owner or target_owner == pipeline_run_id:
+        return
+    target_status = str(target.get("status") or "")
+    if target_status in _INCOMPLETE_RUN_STATUSES:
+        msg = (
+            f"run.meta reconcile blocked: canonical target owned by incomplete run "
+            f"{target_owner!r}, writer={pipeline_run_id!r}"
+        )
+        raise RunMetaStaleWriterError(msg)
+
+
 def _current_run_evidence(existing: dict[str, Any], pipeline_run_id: str) -> dict[str, Any]:
     """Return forensic fields from the in-flight run when ids still match."""
     if str(existing.get("pipeline_run_id") or "") != pipeline_run_id:
@@ -265,21 +308,11 @@ def begin_run_meta(
     return path
 
 
-def abandon_superseded_run_meta(
-    project_dir: Path,
-    feature_name: str,
-    *,
-    pipeline_run_id: str,
-    superseded_by: str,
-) -> None:
-    """Remove a stale early-feature artifact superseded by canonical resolved feature."""
-    path = run_meta_path(project_dir, feature_name)
+def _remove_owned_run_meta(path: Path, *, pipeline_run_id: str) -> None:
     if not path.is_file():
         return
-    with run_meta_lifecycle_lock(path):
-        existing = _read_run_meta_dict(path)
-        if str(existing.get("pipeline_run_id") or "") != pipeline_run_id:
-            return
+    existing = _read_run_meta_dict(path)
+    if str(existing.get("pipeline_run_id") or "") == pipeline_run_id:
         path.unlink(missing_ok=True)
 
 
@@ -290,17 +323,46 @@ def reconcile_run_meta_feature_identity(
     early_feature: str | None,
     resolved_feature: str,
 ) -> str:
-    """Return canonical lifecycle feature slug; migrate when early != resolved."""
+    """Return canonical lifecycle feature slug; ownership-aware migrate when early != resolved."""
     if early_feature == resolved_feature:
         return resolved_feature
-    if early_feature is not None:
-        abandon_superseded_run_meta(
-            project_dir,
-            early_feature,
-            pipeline_run_id=pipeline_run_id,
-            superseded_by=resolved_feature,
+
+    source_path = run_meta_path(project_dir, early_feature) if early_feature else None
+    target_path = run_meta_path(project_dir, resolved_feature)
+
+    if source_path is None:
+        begin_run_meta(project_dir, resolved_feature, pipeline_run_id=pipeline_run_id)
+        return resolved_feature
+
+    with run_meta_pair_lock(source_path, target_path):
+        source = _read_run_meta_dict(source_path) if source_path.is_file() else {}
+        if source:
+            _assert_run_meta_ownership(source, pipeline_run_id=pipeline_run_id)
+
+        target = _read_run_meta_dict(target_path) if target_path.is_file() else {}
+        target_owner = str(target.get("pipeline_run_id") or "").strip()
+        if target_owner == pipeline_run_id:
+            _remove_owned_run_meta(source_path, pipeline_run_id=pipeline_run_id)
+            return resolved_feature
+
+        _assert_reconcile_target_writable(target, pipeline_run_id=pipeline_run_id)
+
+        committed = _resolve_migration_committed(source, target)
+        payload = _merge_migration_extensions(target, source)
+        payload.update(
+            {
+                "feature": resolved_feature,
+                "pipeline_run_id": pipeline_run_id,
+                "candidate_build_run_id": pipeline_run_id,
+                "status": "started",
+                "runMetaSchemaVersion": RUN_META_SCHEMA_VERSION,
+                "captured_at": datetime.now(tz=UTC).isoformat(),
+            }
         )
-    begin_run_meta(project_dir, resolved_feature, pipeline_run_id=pipeline_run_id)
+        if committed is not None:
+            payload["committed_build_run_id"] = committed
+        _write_run_meta_dict(target_path, payload)
+        _remove_owned_run_meta(source_path, pipeline_run_id=pipeline_run_id)
     return resolved_feature
 
 
