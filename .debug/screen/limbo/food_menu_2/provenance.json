@@ -63,42 +63,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "602:814",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:814",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:795",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:795",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "602:768",
       "field": "fidelity_tier",
       "old": null,
@@ -127,6 +91,24 @@
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "602:779",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "602:795",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "602:795",
       "field": "tier_source",
       "old": null,
       "new": "policy_fallback",
@@ -181,33 +163,6 @@
           "TEXT": 1
         },
         "child_count": 8
-      }
-    },
-    {
-      "nodeId": "602:814",
-      "kind": "button_icon",
-      "confidence": 0.83,
-      "evidence": {
-        "button_icon": true,
-        "child_type_counts": {
-          "VECTOR": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button"
-      }
-    },
-    {
-      "nodeId": "602:795",
-      "kind": "button_icon",
-      "confidence": 0.83,
-      "evidence": {
-        "button_icon": true,
-        "child_type_counts": {
-          "VECTOR": 1,
-          "STACK": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "button"
       }
     }
   ],

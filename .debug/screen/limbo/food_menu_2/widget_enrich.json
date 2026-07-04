@@ -1,10 +1,10 @@
 {
-  "cacheKey": "98cd08d338346001f7890676f7705ba559ea99a8e737a92cd8704c1f98d09ef9",
+  "cacheKey": "7a7079fdacbae90c7c7944da34b7ba37fd08cb87356357fa54f385ed7ed66b85",
   "response": {
     "entries": [
       {
         "clusterId": "cluster_2",
-        "widgetName": "MenuItemLeadingIconBackgroundWidget",
+        "widgetName": "OrdersCountButtonWidget",
         "paramRenames": {}
       }
     ]

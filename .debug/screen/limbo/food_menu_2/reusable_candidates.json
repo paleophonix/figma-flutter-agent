@@ -1,17 +1,18 @@
 {
-  "cacheKey": "73aea8e0f17195bed309412fe04a3529c04fecc71d1706a87ab4c0e2abb6d3ee",
+  "cacheKey": "8fce65e18e70bc3e96a83553261d6dc42d26de51d478a87803b718a8e9b4fa48",
   "response": {
     "candidates": [
       {
         "nodeId": "602:766",
-        "widgetName": "ProfileMenuItem",
-        "reason": "This row pattern repeats across menu actions with leading circular icon, title text, and trailing chevron; cluster hints indicate a 5x shared structure.",
-        "confidence": 0.94,
+        "widgetName": "ProfileMenuRow",
+        "reason": "Repeated menu-row pattern with title, leading icon button, and trailing chevron; appears across the profile/settings section as a shared row family.",
+        "confidence": 0.92,
         "suggestedParams": [
           "title",
           "leadingIcon",
-          "onTap",
-          "showChevron"
+          "trailingIcon",
+          "showLeadingIcon",
+          "showTrailingChevron"
         ],
         "evidence": {
           "similarNodes": [
@@ -20,100 +21,71 @@
             "602:808",
             "602:825"
           ],
-          "shapeSimilarity": 0.92,
-          "semanticRole": "menu list item"
+          "shapeSimilarity": 0.91,
+          "semanticRole": "settings/profile navigation row"
         }
       },
       {
-        "nodeId": "602:764",
-        "widgetName": "ProfileMenuCard",
-        "reason": "Card container holding two stacked menu rows is a reusable section pattern and matches another 2-row card below.",
-        "confidence": 0.83,
-        "suggestedParams": [
-          "items",
-          "backgroundColor"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "602:823"
-          ],
-          "shapeSimilarity": 0.8,
-          "semanticRole": "menu section card"
-        }
-      },
-      {
-        "nodeId": "602:788",
-        "widgetName": "SingleActionCard",
-        "reason": "Standalone rounded card with one action row appears multiple times for Log Out and User Reviews, and also aligns structurally with the single action row inside the lower card.",
-        "confidence": 0.87,
+        "nodeId": "602:808",
+        "widgetName": "MenuLinkRow",
+        "reason": "Compact navigation row variant with a left-aligned label, a right-facing chevron, and a trailing icon; suitable for reuse across menu entries with different icons and titles.",
+        "confidence": 0.88,
         "suggestedParams": [
           "title",
-          "leadingIcon",
-          "onTap",
+          "trailingIcon",
           "showChevron"
         ],
         "evidence": {
           "similarNodes": [
-            "602:806",
+            "602:766",
+            "602:777",
+            "602:790",
             "602:825"
           ],
-          "shapeSimilarity": 0.85,
-          "semanticRole": "single menu action card"
-        }
-      },
-      {
-        "nodeId": "602:839",
-        "widgetName": "CircularIconBadge",
-        "reason": "48x48 circular badge wrapper for section icons repeats across menu rows and stat summary areas.",
-        "confidence": 0.82,
-        "suggestedParams": [
-          "icon",
-          "backgroundColor"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "602:768",
-            "602:779",
-            "602:795",
-            "602:813",
-            "602:827"
-          ],
-          "shapeSimilarity": 0.9,
-          "semanticRole": "icon badge"
+          "shapeSimilarity": 0.87,
+          "semanticRole": "menu link / action row"
         }
       },
       {
         "nodeId": "602:836",
-        "widgetName": "StatSummaryRow",
-        "reason": "Summary row with label, value, and circular icon is a distinct reusable metric item pattern that could scale to additional stats.",
-        "confidence": 0.71,
+        "widgetName": "MetricSummaryCard",
+        "reason": "Stat card pattern combining a numeric value, descriptive label, and icon block inside a bordered container; likely reusable for dashboard-style metrics.",
+        "confidence": 0.81,
         "suggestedParams": [
-          "label",
-          "value",
-          "leadingIcon"
+          "valueText",
+          "labelText",
+          "iconWidget"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "602:764",
+            "602:788",
+            "602:806"
+          ],
+          "shapeSimilarity": 0.78,
+          "semanticRole": "summary metric card"
+        }
+      },
+      {
+        "nodeId": "602:825",
+        "widgetName": "ActionMenuRow",
+        "reason": "Action row with label, chevron, and leading icon badge; the structure is close to other menu options and can be parameterized for different actions.",
+        "confidence": 0.84,
+        "suggestedParams": [
+          "title",
+          "leadingIcon",
+          "trailingIcon",
+          "showChevron"
         ],
         "evidence": {
           "similarNodes": [
             "602:766",
-            "602:777"
+            "602:777",
+            "602:790",
+            "602:808"
           ],
-          "shapeSimilarity": 0.58,
-          "semanticRole": "stat summary item"
-        }
-      },
-      {
-        "nodeId": "602:753",
-        "widgetName": "PrimaryPillButton",
-        "reason": "Compact pill CTA with text over rounded rectangle is a reusable button style independent of this screen layout.",
-        "confidence": 0.62,
-        "suggestedParams": [
-          "label",
-          "onTap"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 0.49,
-          "semanticRole": "pill action button"
+          "shapeSimilarity": 0.85,
+          "semanticRole": "action/navigation row"
         }
       }
     ]

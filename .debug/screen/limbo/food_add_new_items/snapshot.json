@@ -16,7 +16,7 @@
     "lib/theme/app_radius.dart": "474d7e026c62009f7d895430bdbdc27422eb4ce236bb1b61ae87a203f6012cdb",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "36062c5562921a35851b6958f87f9f73ebd03ae52112dc8993ae54a12727460f",
-    "lib/generated/food_add_new_items_layout.dart": "298a3297a620be76c2deb5fa03a708a50c14707c30b07435aba50f84ad62c874",
+    "lib/generated/food_add_new_items_layout.dart": "a98a63b13c0b60241d4d287dec1c8d69270e0fcfc1b9c7e8fa11da531ca2baaf",
     "lib/generated/food_add_new_items_chunk_2e8d5787.dart": "0748acd044026ca94610f4af35dc5cf4de5c68fb6b5edcf70dbda3f9e92383e9",
     "lib/features/food_add_new_items/food_add_new_items_screen.dart": "c7b2934ebc14e97e073f6a35cbb3c1f5c693d7168cb57860f996eddcaed55e84",
     "test/golden/food_add_new_items_screen_test.dart": "3976e51c9f9ae808c521d655e09932b8e03c66a609a9b83d99246b18839783b5",
@@ -30,6 +30,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 10,
-  "updated_at": "2026-07-04T08:19:43.703387+00:00"
+  "version": 11,
+  "updated_at": "2026-07-04T17:57:07.212011+00:00"
 }

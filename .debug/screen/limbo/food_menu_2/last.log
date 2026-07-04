@@ -1,22 +1,25 @@
 
---- dart format @ 2026-07-04T08:34:21.867597+00:00 ---
+--- dart format @ 2026-07-04T18:05:22.798573+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\features\food_menu_2\food_menu_2_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\generated\food_menu_2_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\lib\widgets\group8264_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\test\golden\food_menu_2_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-aqjiumlk\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 1.42 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\features\food_menu_2\food_menu_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\generated\food_menu_2_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\widgets\group3304_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\widgets\group8246_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\widgets\group8264_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\lib\widgets\icon_right_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\test\golden\food_menu_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-va8ayimj\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 16 files (16 changed) in 0.72 seconds.
 
---- pub get --offline @ 2026-07-04T08:34:24.599694+00:00 ---
+--- pub get --offline @ 2026-07-04T18:05:25.480478+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -29,19 +32,22 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-07-04T08:34:26.981932+00:00 ---
+--- dart analyze (generated) @ 2026-07-04T18:05:28.337704+00:00 ---
 exit_code=0
-Analyzing group3362_widget.dart, group8264_widget.dart, icon_right_widget.dart, icon_right_widget2.dart...
+Analyzing group3304_widget.dart, group3362_widget.dart, group8246_widget.dart, group8264_widget.dart, icon_right_widget.dart...
 
+warning - lib\widgets\group3304_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\widgets\group3362_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\group8246_widget.dart:15:10 - A value for optional parameter 'visualScale' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\group8246_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\widgets\group8264_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\widgets\icon_right_widget.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\widgets\icon_right_widget2.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-   info - lib\widgets\group3362_widget.dart:64:2460 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\group3304_widget.dart:64:2702 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\group3304_widget.dart:64:2973 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-5 issues found.
+8 issues found.
 
---- dart analyze (generated) (1/3) @ 2026-07-04T08:34:29.563523+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-07-04T18:05:30.718647+00:00 ---
 exit_code=0
 Analyzing food_menu_2_screen.dart, food_menu_2_layout.dart, main.dart, app_colors.dart, app_elevation.dart, app_layout.dart...
 
@@ -53,91 +59,100 @@ warning - lib\generated\food_menu_2_layout.dart:11:8 - Unused import: 'package:f
 warning - lib\generated\food_menu_2_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\food_menu_2_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\food_menu_2_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\food_menu_2_layout.dart:27:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\food_menu_2_layout.dart:28:10 - A value for optional parameter 'visualScale' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\food_menu_2_layout.dart:29:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\food_menu_2_layout.dart:94:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
-warning - lib\generated\food_menu_2_layout.dart:116:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
-warning - lib\generated\food_menu_2_layout.dart:120:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\generated\food_menu_2_layout.dart:30:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\food_menu_2_layout.dart:31:10 - A value for optional parameter 'visualScale' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\food_menu_2_layout.dart:32:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\food_menu_2_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\food_menu_2_layout.dart:81:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\food_menu_2_layout.dart:84:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
 
-17 issues found.
+14 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-07-04T08:34:31.891435+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-07-04T18:05:32.943335+00:00 ---
 exit_code=0
-Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, group3362_widget.dart, group8264_widget.dart...
+Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, group3304_widget.dart, group3362_widget.dart...
 
+warning - lib\widgets\group3304_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\widgets\group3362_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\widgets\group8264_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-   info - lib\widgets\group3362_widget.dart:64:2460 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\group3304_widget.dart:64:2702 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\group3304_widget.dart:64:2973 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-3 issues found.
+4 issues found.
 
---- dart analyze (generated) (3/3) @ 2026-07-04T08:34:34.274845+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-07-04T18:05:35.397417+00:00 ---
 exit_code=0
-Analyzing icon_right_widget.dart, icon_right_widget2.dart, food_menu_2_screen_test.dart, element_coordinate_mapper.dart...
+Analyzing group8246_widget.dart, group8264_widget.dart, icon_right_widget.dart, food_menu_2_screen_test.dart, element_coordinate_mapper.dart...
 
+warning - lib\widgets\group8246_widget.dart:15:10 - A value for optional parameter 'visualScale' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\group8246_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\group8264_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\widgets\icon_right_widget.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\widgets\icon_right_widget2.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
    info - test\harness\element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
-3 issues found.
+5 issues found.
 
---- dart format @ 2026-07-04T08:34:37.375442+00:00 ---
+--- dart format @ 2026-07-04T18:05:37.880637+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\features\food_menu_2\food_menu_2_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\generated\food_menu_2_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\lib\widgets\group8264_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\test\golden\food_menu_2_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-skngen8i\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 1.47 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\features\food_menu_2\food_menu_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\generated\food_menu_2_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\widgets\group3304_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\widgets\group8246_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\widgets\group8264_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\lib\widgets\icon_right_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\test\golden\food_menu_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-39wolici\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 16 files (16 changed) in 0.71 seconds.
 
---- dart format @ 2026-07-04T08:34:40.488207+00:00 ---
+--- dart format @ 2026-07-04T18:05:40.154387+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\features\food_menu_2\food_menu_2_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\generated\food_menu_2_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\lib\widgets\group8264_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\test\golden\food_menu_2_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbqr48b0\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 1.68 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\features\food_menu_2\food_menu_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\generated\food_menu_2_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\widgets\group3304_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\widgets\group8246_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\widgets\group8264_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\lib\widgets\icon_right_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\test\golden\food_menu_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7w26hgx9\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 16 files (16 changed) in 0.73 seconds.
 
---- dart format @ 2026-07-04T08:34:43.756134+00:00 ---
+--- dart format @ 2026-07-04T18:05:42.942261+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\features\food_menu_2\food_menu_2_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\generated\food_menu_2_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\widgets\group3362_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\lib\widgets\group8264_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\test\golden\food_menu_2_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-hdcyk2l5\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 14 files (14 changed) in 1.53 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\features\food_menu_2\food_menu_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\generated\food_menu_2_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\widgets\group3304_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\widgets\group3362_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\widgets\group8246_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\widgets\group8264_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\lib\widgets\icon_right_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\test\golden\food_menu_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-21kmu4kc\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 17 files (17 changed) in 0.99 seconds.
 
---- pub get --offline @ 2026-07-04T08:34:46.092207+00:00 ---
+--- pub get --offline @ 2026-07-04T18:05:45.271816+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -150,7 +165,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-07-04T08:34:48.406374+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-07-04T18:05:48.326417+00:00 ---
 exit_code=0
 Analyzing food_menu_2_screen.dart, food_menu_2_layout.dart, main.dart, app_colors.dart, app_elevation.dart, app_layout.dart...
 
@@ -162,32 +177,37 @@ warning - lib\generated\food_menu_2_layout.dart:7:8 - Unused import: 'package:fl
 warning - lib\generated\food_menu_2_layout.dart:10:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\food_menu_2_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\food_menu_2_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\food_menu_2_layout.dart:23:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\food_menu_2_layout.dart:24:10 - A value for optional parameter 'visualScale' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\food_menu_2_layout.dart:25:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\food_menu_2_layout.dart:185:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
-warning - lib\generated\food_menu_2_layout.dart:390:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
-warning - lib\generated\food_menu_2_layout.dart:482:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\generated\food_menu_2_layout.dart:26:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\food_menu_2_layout.dart:27:10 - A value for optional parameter 'visualScale' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\food_menu_2_layout.dart:28:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\food_menu_2_layout.dart:8:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\food_menu_2_layout.dart:77:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\food_menu_2_layout.dart:80:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
 
-17 issues found.
+14 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-07-04T08:34:50.566922+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-07-04T18:05:50.735160+00:00 ---
 exit_code=0
-Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, group3362_widget.dart, group8264_widget.dart...
-No issues found!
+Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, group3304_widget.dart, group3362_widget.dart...
 
---- dart analyze (generated) (3/3) @ 2026-07-04T08:34:52.861533+00:00 ---
+warning - lib\widgets\group3304_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+   info - lib\widgets\group3304_widget.dart:224:69 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\group3304_widget.dart:238:125 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+3 issues found.
+
+--- dart analyze (generated) (3/3) @ 2026-07-04T18:05:53.346510+00:00 ---
 exit_code=0
-Analyzing food_menu_2_screen_test.dart, element_coordinate_mapper.dart...
+Analyzing group8246_widget.dart, group8264_widget.dart, icon_right_widget.dart, food_menu_2_screen_test.dart, element_coordinate_mapper.dart...
 
+warning - lib\widgets\group8246_widget.dart:15:10 - A value for optional parameter 'visualScale' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\group8246_widget.dart:16:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\widgets\icon_right_widget.dart:15:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
    info - test\harness\element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
-1 issue found.
+4 issues found.
 
---- flutter pub get @ 2026-07-04T08:34:55.817012+00:00 ---
+--- flutter pub get @ 2026-07-04T18:05:56.903460+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -200,4 +220,13 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-04T08:34:55.818014+00:00 ---
+--- flutter render errors @ 2026-07-04T18:05:56.904460+00:00 ---
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown while applying parent data.:
+48.0) wants to apply ParentData of type StackParentData to a RenderObject, which has been set up to
+Usually, this means that the Positioned widget has the wrong ancestor RenderObjectWidget. Typically,
+The ownership chain for the RenderObject that received the incompatible parent data was:
+When the exception was thrown, this was the stack:
+package:flutter/src/widgets/framework.dart 6945:7                                 attachRenderObject
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Another exception was thrown: Incorrect use of ParentDataWidget.

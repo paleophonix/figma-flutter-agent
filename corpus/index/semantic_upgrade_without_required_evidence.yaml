@@ -12,3 +12,13 @@ cases:
   observed_at: '2026-07-03'
   summary: LLM-authored native_verified tier could route to native emit without 
     manifest authority or required evidence.
+- case_id: 2026-07-04-control-misclassified-as-text-input
+  case_file: cases/2026-07-04-control-misclassified-as-text-input.yaml
+  title: Painted CTA column must not compile as inline TextFormField
+  project: limbo
+  feature: mobile_sub_plans
+  occurrence_id: mobile-sub-plans-subscribe-textfield
+  status: OPEN
+  observed_at: '2026-07-04'
+  summary: Primary CTA COLUMN rows were coerced into TextFormField by inline input
+    host detection without action-surface veto.

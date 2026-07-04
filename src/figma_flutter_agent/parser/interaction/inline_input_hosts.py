@@ -58,6 +58,43 @@ def layout_fact_flex_painted_input_surface(node: CleanDesignTreeNode) -> bool:
     return input_flex_value_text(node) is not None
 
 
+def flex_painted_action_surface_vetoes_input(node: CleanDesignTreeNode) -> bool:
+    """Painted flex surfaces that host action chrome must not compile as INPUT."""
+    from .forms import stack_action_intent_vetoes_input
+    from .input_fields import input_flex_value_text
+    from .shared import (
+        _MAX_LOCAL_DEPTH,
+        _label_contains_input_hint,
+        _label_matches_action_hint,
+        _local_nodes,
+    )
+
+    if stack_action_intent_vetoes_input(node):
+        return True
+    variant = node.variant
+    if variant is not None and variant.component_name:
+        if "button" in variant.component_name.casefold():
+            return True
+    alignment = node.alignment
+    if node.type in {NodeType.ROW, NodeType.CONTAINER} and alignment is not None:
+        if (alignment.main or "").strip().lower() != "center":
+            return False
+        value = input_flex_value_text(node)
+        if value is None:
+            return False
+        label = value.strip().lower()
+        if _label_matches_action_hint(label):
+            return True
+        text_nodes = [
+            item
+            for item in _local_nodes(node, _MAX_LOCAL_DEPTH)
+            if item.type == NodeType.TEXT and (item.text or "").strip()
+        ]
+        if len(text_nodes) == 1 and not _label_contains_input_hint(label):
+            return True
+    return False
+
+
 def layout_fact_single_surface_input_field_column(node: CleanDesignTreeNode) -> bool:
     """Return True for one painted input-area column (component field without external label)."""
     if node.type != NodeType.COLUMN or len(node.children) != 1:
@@ -65,6 +102,8 @@ def layout_fact_single_surface_input_field_column(node: CleanDesignTreeNode) -> 
     if layout_fact_phone_composite_field_host(node):
         return False
     surface = node.children[0]
+    if flex_painted_action_surface_vetoes_input(surface):
+        return False
     if not layout_fact_flex_painted_input_surface(surface):
         return False
     return input_flex_value_text(node) is not None or input_flex_value_text(surface) is not None
@@ -91,6 +130,8 @@ def layout_fact_inline_labeled_input_field_host(node: CleanDesignTreeNode) -> bo
         return False
     surfaces = [child for child in node.children if layout_fact_flex_painted_input_surface(child)]
     if len(surfaces) != 1:
+        return False
+    if flex_painted_action_surface_vetoes_input(surfaces[0]):
         return False
     labels = [
         child

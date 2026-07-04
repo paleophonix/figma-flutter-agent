@@ -79,22 +79,54 @@ def _translate_hoisted_wallpaper_placement(
     return child.model_copy(update={"stack_placement": placement, "geometry_frame": geometry})
 
 
+_INTERACTIVE_HOST_TYPES = frozenset(
+    {
+        NodeType.BUTTON,
+        NodeType.INPUT,
+        NodeType.CHECKBOX,
+        NodeType.SWITCH,
+        NodeType.RADIO,
+        NodeType.RADIO_GROUP,
+        NodeType.DROPDOWN,
+    }
+)
+
+
+def _blocks_nested_decorative_hoist(node: CleanDesignTreeNode) -> bool:
+    """Component and compact control subtrees keep internal absolutes local."""
+    if node.type in _INTERACTIVE_HOST_TYPES:
+        return True
+    if node.cluster_id is not None:
+        return True
+    if node.component_ref is not None:
+        return True
+    return bool(
+        node.variant is not None
+        and (node.variant.component_id or node.variant.component_name)
+    )
+
+
 def extract_nested_decorative_backgrounds(
     root: CleanDesignTreeNode,
 ) -> tuple[CleanDesignTreeNode, list[CleanDesignTreeNode]]:
     """Hoist nested absolute decorative overlays into wallpaper candidates."""
     extracted: list[CleanDesignTreeNode] = []
 
-    def prune(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+    def prune(
+        node: CleanDesignTreeNode,
+        *,
+        block_child_hoist: bool = False,
+    ) -> CleanDesignTreeNode:
+        next_block = block_child_hoist or _blocks_nested_decorative_hoist(node)
         pruned_children: list[CleanDesignTreeNode] = []
         for child in node.children:
-            if is_decorative_absolute_background_overlay(child):
+            if is_decorative_absolute_background_overlay(child) and not next_block:
                 if in_card_decorative_overlay_should_stay(node, child):
-                    pruned_children.append(prune(child))
+                    pruned_children.append(prune(child, block_child_hoist=next_block))
                     continue
                 extracted.append(_translate_hoisted_wallpaper_placement(child, node))
                 continue
-            pruned_children.append(prune(child))
+            pruned_children.append(prune(child, block_child_hoist=next_block))
         if pruned_children == node.children:
             return node
         return node.model_copy(update={"children": pruned_children})
