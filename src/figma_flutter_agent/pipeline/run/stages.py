@@ -732,8 +732,24 @@ async def run_llm_and_plan_phase(
     from figma_flutter_agent.errors import CachedIrRegenerationRequired
     from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
     from figma_flutter_agent.stages import PlanStageRequest, plan_generation_output
+    from figma_flutter_agent.debug.run_meta import update_run_meta_stage
+    from figma_flutter_agent.compiler.generation_config_fingerprint import (
+        generation_config_fingerprint,
+    )
+    from figma_flutter_agent.pipeline.incremental import design_hashes
 
     ir_cache_policy = ir_cache_policy_at_pipeline_boundary()
+
+    def _record_parsed_stage(outcome: Any) -> None:
+        ctx.cached_ir_verdict = outcome.cached_ir_verdict
+        if ctx.resolved_feature and not dry_run and ctx.pipeline_run_id:
+            update_run_meta_stage(
+                project_dir,
+                ctx.resolved_feature,
+                pipeline_run_id=ctx.pipeline_run_id,
+                status="parsed",
+                cached_ir_verdict=outcome.cached_ir_verdict,
+            )
 
     with log_stage(log, "llm"):
         if use_cached_ir:
@@ -781,6 +797,9 @@ async def run_llm_and_plan_phase(
                     figma_reference_png=ctx.reference_image_png,
                     project_dir=project_dir,
                 )
+                from dataclasses import replace
+
+                llm_outcome = replace(llm_outcome, cached_ir_verdict=exc.verdict)
         else:
             llm_outcome = await execute_llm_stage_fn(
                 log,
@@ -808,6 +827,7 @@ async def run_llm_and_plan_phase(
                 figma_reference_png=ctx.reference_image_png,
                 project_dir=project_dir,
             )
+    _record_parsed_stage(llm_outcome)
     ctx.warnings.extend(llm_outcome.llm_result.warnings)
     ctx.warnings.extend(llm_outcome.fallback_warnings)
 
@@ -842,6 +862,19 @@ async def run_llm_and_plan_phase(
                 ),
             ),
         ).planned_files
+
+    if ctx.resolved_feature and not dry_run and ctx.pipeline_run_id:
+        hashes = design_hashes(clean_tree, tokens)
+        _, cfg_hash = generation_config_fingerprint(settings)
+        update_run_meta_stage(
+            project_dir,
+            ctx.resolved_feature,
+            pipeline_run_id=ctx.pipeline_run_id,
+            status="planned",
+            clean_tree_hash=hashes.tree_hash,
+            generation_config_hash=cfg_hash,
+            cached_ir_verdict=llm_outcome.cached_ir_verdict,
+        )
 
     return llm_outcome, planned_files
 
@@ -992,6 +1025,16 @@ async def run_validate_repair_refine_phase(
             ),
         )
     ctx.warnings.extend(validate_result.warnings)
+    if ctx.resolved_feature and not dry_run and ctx.pipeline_run_id:
+        from figma_flutter_agent.debug.run_meta import update_run_meta_stage
+
+        update_run_meta_stage(
+            project_dir,
+            ctx.resolved_feature,
+            pipeline_run_id=ctx.pipeline_run_id,
+            status="validated",
+            cached_ir_verdict=llm_outcome.cached_ir_verdict,
+        )
     append_llm_skip_warnings(
         ctx.warnings,
         llm_result=llm_outcome.llm_result,

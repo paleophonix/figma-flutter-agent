@@ -96,6 +96,13 @@ def validate_runtime_credentials(
         )
 
 
+def can_regenerate_stale_cached_ir(settings: Settings, *, dry_run: bool) -> bool:
+    """Return whether enforce-mode stale IR can be refreshed via LLM in this run."""
+    if dry_run:
+        return False
+    return bool(settings.llm_api_key())
+
+
 def resolve_feature_name(frame_name: str, configured: str) -> str:
     """Resolve the feature folder name from frame metadata or config."""
     if configured != "auto":

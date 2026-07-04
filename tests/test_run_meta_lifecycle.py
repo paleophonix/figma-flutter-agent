@@ -8,6 +8,7 @@ from pathlib import Path
 from figma_flutter_agent.debug.run_meta import (
     LEGACY_RUN_META_SCHEMA_VERSION,
     RUN_META_SCHEMA_VERSION,
+    begin_run_meta,
     read_run_meta,
     run_meta_path,
     update_run_meta_stage,
@@ -75,3 +76,44 @@ def test_update_run_meta_stage_preserves_unknown_fields(tmp_path: Path) -> None:
     assert payload["customField"] == "keep-me"
     assert payload["status"] == "parsed"
     assert payload["runMetaSchemaVersion"] == RUN_META_SCHEMA_VERSION
+
+
+def test_begin_run_meta_resets_candidate_preserves_committed(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    write_run_meta(
+        project,
+        "home",
+        pipeline_run_id="run-committed",
+        writeback="committed",
+        written_files=["lib/screens/home.dart"],
+    )
+    begin_run_meta(project, "home", pipeline_run_id="run-candidate")
+    payload = json.loads(run_meta_path(project, "home").read_text(encoding="utf-8"))
+    assert payload["candidate_build_run_id"] == "run-candidate"
+    assert payload["committed_build_run_id"] == "run-committed"
+    assert payload["status"] == "started"
+
+
+def test_skipped_writeback_does_not_advance_committed(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    write_run_meta(
+        project,
+        "home",
+        pipeline_run_id="run-committed",
+        writeback="committed",
+        written_files=["lib/screens/home.dart"],
+    )
+    begin_run_meta(project, "home", pipeline_run_id="run-candidate")
+    write_run_meta(
+        project,
+        "home",
+        pipeline_run_id="run-candidate",
+        writeback="skipped",
+        written_files=[],
+    )
+    payload = json.loads(run_meta_path(project, "home").read_text(encoding="utf-8"))
+    assert payload["committed_build_run_id"] == "run-committed"
+    assert payload["candidate_build_run_id"] == "run-candidate"
+    assert payload["writeback"] == "skipped"

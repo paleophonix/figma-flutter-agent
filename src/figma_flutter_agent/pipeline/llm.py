@@ -30,6 +30,7 @@ class LlmPipelineOutcome:
     plan_settings: Settings
     llm_result: LlmStageResult
     fallback_warnings: tuple[str, ...] = ()
+    cached_ir_verdict: str | None = None
 
 
 def load_cached_ir_llm_outcome(
@@ -99,16 +100,21 @@ def load_cached_ir_llm_outcome(
             )
     if policy.enforce_enabled() and verdict in {"incompatible", "legacy_unknown"}:
         from figma_flutter_agent.errors import CachedIrRegenerationRequired, FlutterProjectError
+        from figma_flutter_agent.pipeline.helpers import can_regenerate_stale_cached_ir
 
-        if allow_regenerate:
+        dry_run = not allow_regenerate
+        if can_regenerate_stale_cached_ir(settings, dry_run=dry_run):
             raise CachedIrRegenerationRequired(
                 verdict=verdict,
                 report_name=report_path.name,
             )
+        env_name = settings.llm_api_key_env_name()
+        provider = settings.resolved_llm_provider()
         raise FlutterProjectError(
-            "Cached screen IR is stale and cannot be regenerated in this mode. "
-            f"Verdict={verdict}. Run generate for this screen to refresh IR "
-            f"(see {report_path.name})."
+            f"Cached screen IR is stale (verdict={verdict}) and LLM regeneration is unavailable "
+            f"({env_name} is not set for provider '{provider}'). "
+            "Run full generate (not --from-ir) after configuring the key, or refresh the IR dump. "
+            f"See {report_path.name} under the screen debug folder."
         )
     extracted = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     generation = _normalize_cached_ir_generation(
@@ -138,6 +144,7 @@ def load_cached_ir_llm_outcome(
             generation=generation,
             warnings=(cached_warning,) if cached_warning else (),
         ),
+        cached_ir_verdict=verdict,
     )
 
 

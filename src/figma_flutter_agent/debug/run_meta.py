@@ -135,6 +135,45 @@ def _write_run_meta_dict(path: Path, payload: dict[str, Any]) -> None:
     atomic_write_text(path, json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
 
 
+def _resolve_committed_build_run_id(
+    existing: dict[str, Any],
+    *,
+    pipeline_run_id: str,
+    writeback: WritebackOutcome,
+    explicit_committed: str | None = None,
+) -> str | None:
+    """Resolve committed run id from writeback outcome and prior artifact."""
+    if writeback == "committed":
+        return explicit_committed or pipeline_run_id
+    raw = existing.get("committed_build_run_id")
+    return str(raw) if raw else None
+
+
+def begin_run_meta(
+    project_dir: Path,
+    feature_name: str,
+    *,
+    pipeline_run_id: str,
+) -> Path:
+    """Start a new pipeline run: candidate = current run, committed = previous commit."""
+    path = run_meta_path(project_dir, feature_name)
+    existing = _read_run_meta_dict(path)
+    payload = dict(existing)
+    prev_committed = existing.get("committed_build_run_id")
+    payload["feature"] = feature_name
+    payload["pipeline_run_id"] = pipeline_run_id
+    payload["candidate_build_run_id"] = pipeline_run_id
+    payload["status"] = "started"
+    payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
+    payload["captured_at"] = datetime.now(tz=UTC).isoformat()
+    if prev_committed is not None:
+        payload["committed_build_run_id"] = prev_committed
+    else:
+        payload.pop("committed_build_run_id", None)
+    _write_run_meta_dict(path, payload)
+    return path
+
+
 def update_run_meta_stage(
     project_dir: Path,
     feature_name: str,
@@ -152,10 +191,28 @@ def update_run_meta_stage(
     payload["status"] = status
     payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
     payload["captured_at"] = datetime.now(tz=UTC).isoformat()
-    if "candidate_build_run_id" not in payload:
-        payload["candidate_build_run_id"] = pipeline_run_id
     _write_run_meta_dict(path, payload)
     return path
+
+
+def mark_run_meta_failed(
+    project_dir: Path,
+    feature_name: str,
+    *,
+    pipeline_run_id: str,
+    error: str | None = None,
+) -> Path:
+    """Record pipeline failure without mutating candidate/committed build ids."""
+    fields: dict[str, Any] = {}
+    if error:
+        fields["last_error"] = error[:500]
+    return update_run_meta_stage(
+        project_dir,
+        feature_name,
+        pipeline_run_id=pipeline_run_id,
+        status="failed",
+        **fields,
+    )
 
 
 def write_run_meta(
@@ -176,11 +233,17 @@ def write_run_meta(
     """Persist final run.meta.json after a generate pipeline run."""
     path = run_meta_path(project_dir, feature_name)
     existing = _read_run_meta_dict(path)
+    resolved_committed = _resolve_committed_build_run_id(
+        existing,
+        pipeline_run_id=pipeline_run_id,
+        writeback=writeback,
+        explicit_committed=committed_build_run_id,
+    )
     record = RunMetaRecord(
         feature=feature_name,
         pipeline_run_id=pipeline_run_id,
-        candidate_build_run_id=str(existing.get("candidate_build_run_id") or pipeline_run_id),
-        committed_build_run_id=committed_build_run_id or pipeline_run_id,
+        candidate_build_run_id=pipeline_run_id,
+        committed_build_run_id=resolved_committed,
         writeback=writeback,
         written_files=tuple(written_files or []),
         analyze_passed=analyze_passed,
