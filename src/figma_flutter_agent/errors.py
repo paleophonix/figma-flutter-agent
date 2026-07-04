@@ -99,6 +99,10 @@ class PipelineError(FigmaFlutterError):
     """Raised when an internal pipeline stage invariant is violated."""
 
 
+class RunMetaStaleWriterError(PipelineError):
+    """Raised when a run.meta lifecycle write targets superseded ownership."""
+
+
 class LlmError(FigmaFlutterError):
     """Raised when LLM generation or validation fails."""
 

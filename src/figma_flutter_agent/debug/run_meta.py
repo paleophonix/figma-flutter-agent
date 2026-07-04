@@ -9,7 +9,11 @@ from pathlib import Path
 from typing import Any, Literal
 
 from figma_flutter_agent.debug.paths import RUN_META_JSON, screen_root
-from figma_flutter_agent.generator.writing.io import atomic_write_text
+from figma_flutter_agent.debug.run_meta_lock import (
+    atomic_write_run_meta_dict,
+    run_meta_lifecycle_lock,
+)
+from figma_flutter_agent.errors import RunMetaStaleWriterError
 
 WritebackOutcome = Literal["committed", "rollback", "skipped", "failed"]
 RunMetaStatus = Literal[
@@ -175,8 +179,18 @@ def _read_run_meta_dict(path: Path) -> dict[str, Any]:
 
 
 def _write_run_meta_dict(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    atomic_write_text(path, json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+    atomic_write_run_meta_dict(path, payload)
+
+
+def _assert_run_meta_ownership(existing: dict[str, Any], *, pipeline_run_id: str) -> None:
+    """Reject lifecycle writes when the on-disk artifact belongs to another run."""
+    current = str(existing.get("pipeline_run_id") or "").strip()
+    if current and current != pipeline_run_id:
+        msg = (
+            f"run.meta ownership mismatch: writer={pipeline_run_id!r} "
+            f"artifact={current!r}"
+        )
+        raise RunMetaStaleWriterError(msg)
 
 
 def _resolve_committed_build_run_id(
@@ -235,19 +249,59 @@ def begin_run_meta(
 ) -> Path:
     """Start a new pipeline run: candidate = current run, committed = previous commit."""
     path = run_meta_path(project_dir, feature_name)
-    existing = _read_run_meta_dict(path)
-    prev_committed = existing.get("committed_build_run_id")
-    payload = _extension_fields(existing)
-    payload["feature"] = feature_name
-    payload["pipeline_run_id"] = pipeline_run_id
-    payload["candidate_build_run_id"] = pipeline_run_id
-    payload["status"] = "started"
-    payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
-    payload["captured_at"] = datetime.now(tz=UTC).isoformat()
-    if prev_committed is not None:
-        payload["committed_build_run_id"] = prev_committed
-    _write_run_meta_dict(path, payload)
+    with run_meta_lifecycle_lock(path):
+        existing = _read_run_meta_dict(path)
+        prev_committed = existing.get("committed_build_run_id")
+        payload = _extension_fields(existing)
+        payload["feature"] = feature_name
+        payload["pipeline_run_id"] = pipeline_run_id
+        payload["candidate_build_run_id"] = pipeline_run_id
+        payload["status"] = "started"
+        payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
+        payload["captured_at"] = datetime.now(tz=UTC).isoformat()
+        if prev_committed is not None:
+            payload["committed_build_run_id"] = prev_committed
+        _write_run_meta_dict(path, payload)
     return path
+
+
+def abandon_superseded_run_meta(
+    project_dir: Path,
+    feature_name: str,
+    *,
+    pipeline_run_id: str,
+    superseded_by: str,
+) -> None:
+    """Remove a stale early-feature artifact superseded by canonical resolved feature."""
+    path = run_meta_path(project_dir, feature_name)
+    if not path.is_file():
+        return
+    with run_meta_lifecycle_lock(path):
+        existing = _read_run_meta_dict(path)
+        if str(existing.get("pipeline_run_id") or "") != pipeline_run_id:
+            return
+        path.unlink(missing_ok=True)
+
+
+def reconcile_run_meta_feature_identity(
+    project_dir: Path,
+    *,
+    pipeline_run_id: str,
+    early_feature: str | None,
+    resolved_feature: str,
+) -> str:
+    """Return canonical lifecycle feature slug; migrate when early != resolved."""
+    if early_feature == resolved_feature:
+        return resolved_feature
+    if early_feature is not None:
+        abandon_superseded_run_meta(
+            project_dir,
+            early_feature,
+            pipeline_run_id=pipeline_run_id,
+            superseded_by=resolved_feature,
+        )
+    begin_run_meta(project_dir, resolved_feature, pipeline_run_id=pipeline_run_id)
+    return resolved_feature
 
 
 def update_run_meta_stage(
@@ -260,14 +314,16 @@ def update_run_meta_stage(
 ) -> Path:
     """Read-modify-write run.meta with atomic replace; preserves unknown keys."""
     path = run_meta_path(project_dir, feature_name)
-    payload = _read_run_meta_dict(path)
-    payload.update(fields)
-    payload["feature"] = feature_name
-    payload["pipeline_run_id"] = pipeline_run_id
-    payload["status"] = status
-    payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
-    payload["captured_at"] = datetime.now(tz=UTC).isoformat()
-    _write_run_meta_dict(path, payload)
+    with run_meta_lifecycle_lock(path):
+        payload = _read_run_meta_dict(path)
+        _assert_run_meta_ownership(payload, pipeline_run_id=pipeline_run_id)
+        payload.update(fields)
+        payload["feature"] = feature_name
+        payload["pipeline_run_id"] = pipeline_run_id
+        payload["status"] = status
+        payload["runMetaSchemaVersion"] = RUN_META_SCHEMA_VERSION
+        payload["captured_at"] = datetime.now(tz=UTC).isoformat()
+        _write_run_meta_dict(path, payload)
     return path
 
 
@@ -280,28 +336,30 @@ def mark_run_meta_failed(
 ) -> Path:
     """Record pipeline failure with forensic writeback and cleared candidate evidence."""
     path = run_meta_path(project_dir, feature_name)
-    existing = _read_run_meta_dict(path)
-    prev_committed = existing.get("committed_build_run_id")
-    payload = _extension_fields(existing)
-    payload.update(
-        {
-            "feature": feature_name,
-            "pipeline_run_id": pipeline_run_id,
-            "candidate_build_run_id": pipeline_run_id,
-            "status": "failed",
-            "writeback": "failed",
-            "written_files": [],
-            "analyze_passed": None,
-            "runMetaSchemaVersion": RUN_META_SCHEMA_VERSION,
-            "captured_at": datetime.now(tz=UTC).isoformat(),
-        }
-    )
-    payload.update(_current_run_evidence(existing, pipeline_run_id))
-    if prev_committed is not None:
-        payload["committed_build_run_id"] = prev_committed
-    if error:
-        payload["last_error"] = error[:500]
-    _write_run_meta_dict(path, payload)
+    with run_meta_lifecycle_lock(path):
+        existing = _read_run_meta_dict(path)
+        _assert_run_meta_ownership(existing, pipeline_run_id=pipeline_run_id)
+        prev_committed = existing.get("committed_build_run_id")
+        payload = _extension_fields(existing)
+        payload.update(
+            {
+                "feature": feature_name,
+                "pipeline_run_id": pipeline_run_id,
+                "candidate_build_run_id": pipeline_run_id,
+                "status": "failed",
+                "writeback": "failed",
+                "written_files": [],
+                "analyze_passed": None,
+                "runMetaSchemaVersion": RUN_META_SCHEMA_VERSION,
+                "captured_at": datetime.now(tz=UTC).isoformat(),
+            }
+        )
+        payload.update(_current_run_evidence(existing, pipeline_run_id))
+        if prev_committed is not None:
+            payload["committed_build_run_id"] = prev_committed
+        if error:
+            payload["last_error"] = error[:500]
+        _write_run_meta_dict(path, payload)
     return path
 
 
@@ -322,34 +380,36 @@ def write_run_meta(
 ) -> Path:
     """Persist final run.meta.json after a generate pipeline run."""
     path = run_meta_path(project_dir, feature_name)
-    existing = _read_run_meta_dict(path)
-    resolved_committed = _resolve_committed_build_run_id(
-        existing,
-        pipeline_run_id=pipeline_run_id,
-        writeback=writeback,
-        explicit_committed=committed_build_run_id,
-    )
-    record = RunMetaRecord(
-        feature=feature_name,
-        pipeline_run_id=pipeline_run_id,
-        candidate_build_run_id=pipeline_run_id,
-        committed_build_run_id=resolved_committed,
-        writeback=writeback,
-        written_files=tuple(written_files or []),
-        analyze_passed=analyze_passed,
-        captured_at=datetime.now(tz=UTC).isoformat(),
-        run_meta_schema_version=RUN_META_SCHEMA_VERSION,
-        status=status,
-        cached_ir_verdict=cached_ir_verdict,
-        clean_tree_hash=clean_tree_hash,
-        generation_config_hash=generation_config_hash,
-        timed_out_stage=timed_out_stage,
-    )
-    payload = record.to_dict()
-    for key, value in _extension_fields(existing).items():
-        if key not in payload:
-            payload[key] = value
-    _write_run_meta_dict(path, payload)
+    with run_meta_lifecycle_lock(path):
+        existing = _read_run_meta_dict(path)
+        _assert_run_meta_ownership(existing, pipeline_run_id=pipeline_run_id)
+        resolved_committed = _resolve_committed_build_run_id(
+            existing,
+            pipeline_run_id=pipeline_run_id,
+            writeback=writeback,
+            explicit_committed=committed_build_run_id,
+        )
+        record = RunMetaRecord(
+            feature=feature_name,
+            pipeline_run_id=pipeline_run_id,
+            candidate_build_run_id=pipeline_run_id,
+            committed_build_run_id=resolved_committed,
+            writeback=writeback,
+            written_files=tuple(written_files or []),
+            analyze_passed=analyze_passed,
+            captured_at=datetime.now(tz=UTC).isoformat(),
+            run_meta_schema_version=RUN_META_SCHEMA_VERSION,
+            status=status,
+            cached_ir_verdict=cached_ir_verdict,
+            clean_tree_hash=clean_tree_hash,
+            generation_config_hash=generation_config_hash,
+            timed_out_stage=timed_out_stage,
+        )
+        payload = record.to_dict()
+        for key, value in _extension_fields(existing).items():
+            if key not in payload:
+                payload[key] = value
+        _write_run_meta_dict(path, payload)
     return path
 
 

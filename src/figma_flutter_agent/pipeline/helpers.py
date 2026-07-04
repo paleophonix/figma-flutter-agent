@@ -126,7 +126,20 @@ def resolve_early_feature_slug(
             if meta.feature_name:
                 return meta.feature_name
         except FlutterProjectError:
-            return None
+            pass
+        inferred = _feature_name_from_dump_filename(from_dump)
+        if inferred:
+            return to_snake_case(inferred)
+    return None
+
+
+def _feature_name_from_dump_filename(dump_path: Path) -> str | None:
+    name = dump_path.name
+    if name == "raw.json":
+        return dump_path.parent.name if dump_path.parent.name != "primary" else None
+    suffix = "_layout.json"
+    if name.endswith(suffix) and len(name) > len(suffix):
+        return name[: -len(suffix)]
     return None
 
 

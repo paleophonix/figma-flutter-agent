@@ -5,16 +5,20 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from figma_flutter_agent.debug.run_meta import (
     LEGACY_RUN_META_SCHEMA_VERSION,
     RUN_META_SCHEMA_VERSION,
     begin_run_meta,
     mark_run_meta_failed,
     read_run_meta,
+    reconcile_run_meta_feature_identity,
     run_meta_path,
     update_run_meta_stage,
     write_run_meta,
 )
+from figma_flutter_agent.errors import RunMetaStaleWriterError
 
 
 def test_run_meta_roundtrip_with_extended_fields(tmp_path: Path) -> None:
@@ -63,7 +67,7 @@ def test_update_run_meta_stage_preserves_unknown_fields(tmp_path: Path) -> None:
     path = run_meta_path(project, "home")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        json.dumps({"customField": "keep-me", "pipeline_run_id": "old"}),
+        json.dumps({"customField": "keep-me", "pipeline_run_id": "run-2"}),
         encoding="utf-8",
     )
     update_run_meta_stage(
@@ -162,13 +166,12 @@ def test_begin_run_meta_clears_candidate_evidence(tmp_path: Path) -> None:
 def test_mark_run_meta_failed_sets_forensic_writeback(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
-    write_run_meta(
+    begin_run_meta(project, "home", pipeline_run_id="run-failed")
+    update_run_meta_stage(
         project,
         "home",
-        pipeline_run_id="run-committed",
-        writeback="committed",
-        written_files=["lib/screens/home.dart"],
-        committed_build_run_id="run-committed",
+        pipeline_run_id="run-failed",
+        status="planned",
     )
     mark_run_meta_failed(
         project,
@@ -180,7 +183,6 @@ def test_mark_run_meta_failed_sets_forensic_writeback(tmp_path: Path) -> None:
     assert payload["status"] == "failed"
     assert payload["writeback"] == "failed"
     assert payload["candidate_build_run_id"] == "run-failed"
-    assert payload["committed_build_run_id"] == "run-committed"
     assert payload["written_files"] == []
     assert payload["last_error"] == "boom"
 
@@ -205,3 +207,75 @@ def test_mark_run_meta_failed_preserves_current_run_evidence(tmp_path: Path) -> 
     assert payload["clean_tree_hash"] == "tree-1"
     assert payload["generation_config_hash"] == "cfg-1"
     assert payload["cached_ir_verdict"] == "incompatible"
+
+
+def test_stale_pipeline_run_id_cannot_update_run_meta(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    begin_run_meta(project, "home", pipeline_run_id="run-new")
+    with pytest.raises(RunMetaStaleWriterError, match="ownership mismatch"):
+        update_run_meta_stage(
+            project,
+            "home",
+            pipeline_run_id="run-old",
+            status="parsed",
+        )
+
+
+def test_stale_pipeline_run_id_cannot_finalize_run_meta(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    begin_run_meta(project, "home", pipeline_run_id="run-new")
+    with pytest.raises(RunMetaStaleWriterError, match="ownership mismatch"):
+        write_run_meta(
+            project,
+            "home",
+            pipeline_run_id="run-old",
+            writeback="skipped",
+        )
+
+
+def test_reconcile_run_meta_feature_identity_migrates_to_resolved(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    begin_run_meta(project, "checkout", pipeline_run_id="run-1")
+    canonical = reconcile_run_meta_feature_identity(
+        project,
+        pipeline_run_id="run-1",
+        early_feature="checkout",
+        resolved_feature="payment_screen",
+    )
+    assert canonical == "payment_screen"
+    assert not run_meta_path(project, "checkout").is_file()
+    record = read_run_meta(project, "payment_screen")
+    assert record is not None
+    assert record.pipeline_run_id == "run-1"
+    assert record.candidate_build_run_id == "run-1"
+    assert record.status == "started"
+
+
+def test_overlapping_runs_stale_writer_cannot_corrupt_newer(tmp_path: Path) -> None:
+    """Run A began, run B claimed the screen; A must not overwrite B's metadata."""
+    project = tmp_path / "demo"
+    project.mkdir()
+    begin_run_meta(project, "home", pipeline_run_id="run-a")
+    begin_run_meta(project, "home", pipeline_run_id="run-b")
+    with pytest.raises(RunMetaStaleWriterError, match="ownership mismatch"):
+        update_run_meta_stage(
+            project,
+            "home",
+            pipeline_run_id="run-a",
+            status="parsed",
+        )
+    with pytest.raises(RunMetaStaleWriterError, match="ownership mismatch"):
+        write_run_meta(
+            project,
+            "home",
+            pipeline_run_id="run-a",
+            writeback="committed",
+        )
+    record = read_run_meta(project, "home")
+    assert record is not None
+    assert record.pipeline_run_id == "run-b"
+    assert record.candidate_build_run_id == "run-b"
+    assert record.status == "started"

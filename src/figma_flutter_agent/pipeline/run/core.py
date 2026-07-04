@@ -214,14 +214,15 @@ async def run_pipeline(
         from_dump=from_dump,
         project_dir=project_dir,
     )
-    run_meta_active = bool(early_feature and not dry_run)
-    if run_meta_active and early_feature is not None:
+    active_run_meta_feature: str | None = None
+    if early_feature and not dry_run:
         from figma_flutter_agent.debug.run_meta import begin_run_meta
 
         begin_run_meta(project_dir, early_feature, pipeline_run_id=run_id)
+        active_run_meta_feature = early_feature
 
     async def _complete_run() -> PipelineResult:
-        nonlocal run_meta_active
+        nonlocal active_run_meta_feature
         run_log = log
 
         if from_dump is not None:
@@ -278,15 +279,21 @@ async def run_pipeline(
         )
         resolved_feature = ctx.resolved_feature
         if not dry_run and resolved_feature:
-            from figma_flutter_agent.debug.run_meta import begin_run_meta, update_run_meta_stage
+            from figma_flutter_agent.debug.run_meta import (
+                reconcile_run_meta_feature_identity,
+                update_run_meta_stage,
+            )
 
-            if not run_meta_active:
-                begin_run_meta(project_dir, resolved_feature, pipeline_run_id=run_id)
-                run_meta_active = True
+            active_run_meta_feature = reconcile_run_meta_feature_identity(
+                project_dir,
+                pipeline_run_id=run_id,
+                early_feature=active_run_meta_feature,
+                resolved_feature=resolved_feature,
+            )
             parse_hashes = design_hashes(clean_tree, tokens)
             update_run_meta_stage(
                 project_dir,
-                resolved_feature,
+                active_run_meta_feature,
                 pipeline_run_id=run_id,
                 status="parsed",
                 clean_tree_hash=parse_hashes.tree_hash,
@@ -562,13 +569,13 @@ async def run_pipeline(
     try:
         return await _complete_run()
     except Exception as exc:
-        fail_feature = ctx.resolved_feature or early_feature
-        if run_meta_active and fail_feature:
+        fail_feature = ctx.resolved_feature or active_run_meta_feature or early_feature
+        if active_run_meta_feature and fail_feature:
             from figma_flutter_agent.debug.run_meta import mark_run_meta_failed
 
             mark_run_meta_failed(
                 project_dir,
-                fail_feature,
+                active_run_meta_feature,
                 pipeline_run_id=run_id,
                 error=str(exc),
             )
