@@ -599,6 +599,7 @@ def render_stack(
     from figma_flutter_agent.parser.interaction.absolute_fields import (
         find_field_shell_external_label,
         find_field_shell_value_text,
+        field_shell_external_label_gap,
         layout_fact_labeled_absolute_field_stack,
         layout_fact_painted_field_shell_container,
     )
@@ -640,6 +641,11 @@ def render_stack(
                 dart_weight_overrides_by_family=dart_weight_overrides_by_family,
                 text_theme_slot_by_style_name=text_theme_slot_by_style_name,
                 text_theme_size_slots=text_theme_size_slots,
+                label_field_gap=field_shell_external_label_gap(
+                    shell,
+                    node.children,
+                    host_height=node.sizing.height,
+                ),
             )
             return _finalize_widget(
                 node,

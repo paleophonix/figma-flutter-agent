@@ -185,13 +185,13 @@ def find_field_shell_value_text(
     return best
 
 
-def find_field_shell_external_label(
+def _resolve_field_shell_external_label(
     shell: CleanDesignTreeNode,
     siblings: list[CleanDesignTreeNode],
     *,
     host_height: float | None = None,
-) -> CleanDesignTreeNode | None:
-    """Resolve label text placed above a painted field shell (outside the shell span)."""
+) -> tuple[CleanDesignTreeNode, float] | None:
+    """Resolve external label text and the geometry gap down to the painted shell."""
     span = field_shell_vertical_span(shell)
     if span is None:
         return None
@@ -216,7 +216,46 @@ def find_field_shell_external_label(
         if gap < best_gap:
             best = sibling
             best_gap = gap
-    return best
+    if best is None or best_gap == float("inf"):
+        return None
+    return best, best_gap
+
+
+def find_field_shell_external_label(
+    shell: CleanDesignTreeNode,
+    siblings: list[CleanDesignTreeNode],
+    *,
+    host_height: float | None = None,
+) -> CleanDesignTreeNode | None:
+    """Resolve label text placed above a painted field shell (outside the shell span)."""
+    resolved = _resolve_field_shell_external_label(
+        shell,
+        siblings,
+        host_height=host_height,
+    )
+    if resolved is None:
+        return None
+    return resolved[0]
+
+
+def field_shell_external_label_gap(
+    shell: CleanDesignTreeNode,
+    siblings: list[CleanDesignTreeNode],
+    *,
+    host_height: float | None = None,
+) -> float | None:
+    """Derive label-to-field spacing from absolute placements when present."""
+    resolved = _resolve_field_shell_external_label(
+        shell,
+        siblings,
+        host_height=host_height,
+    )
+    if resolved is None:
+        return None
+    gap = resolved[1]
+    if gap <= 0.0:
+        return None
+    return gap
 
 
 def layout_fact_labeled_absolute_field_stack(node: CleanDesignTreeNode) -> bool:

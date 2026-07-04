@@ -531,6 +531,10 @@ def test_painted_surface_overlay_button_emits_centered_stack() -> None:
                 type=NodeType.VECTOR,
                 vector_asset_key="assets/icons/cta_bg.svg",
                 sizing=Sizing(width=327.0, height=62.0),
+                style=NodeStyle(
+                    background_color="0xFFFF7622",
+                    border_radius=10.0,
+                ),
             ),
             CleanDesignTreeNode(
                 id="1:label",
@@ -545,7 +549,8 @@ def test_painted_surface_overlay_button_emits_centered_stack() -> None:
     assert not button_has_icon_label_inline_affordance(button)
     emitted = render_node_body(button, uses_svg=True, parent_type=NodeType.STACK)
     compact = emitted.replace("\n", "")
-    assert "Stack(fit: StackFit.expand" in compact
+    assert "Ink(decoration: BoxDecoration(" in compact
+    assert "cta_bg.svg" not in compact
     assert "Center(child:" in compact
     assert "Row(mainAxisAlignment: MainAxisAlignment.start" not in compact
 
@@ -637,6 +642,7 @@ def test_labeled_absolute_field_stack_emits_external_label() -> None:
     emitted = render_node_body(field_stack, uses_svg=True, parent_type=NodeType.COLUMN)
     compact = emitted.replace("\n", "")
     assert "Text('ITEM NAME'" in compact
+    assert "spacing: 8.0" in compact
     assert compact.index("ITEM NAME") < compact.index("Mazalichiken Halim")
     assert "Column(" in compact
     col_children = compact.split("Column(", 1)[1].split("children: [", 1)[1]
@@ -673,6 +679,9 @@ def test_food_replay_item_name_field_no_positioned_in_column() -> None:
                 end = index
                 break
     assert "Positioned(" not in col_children[:end]
+    assert "spacing: 8.0" in compact
+    assert "isDense: true" in compact
+    assert "contentPadding: EdgeInsets.fromLTRB(" in compact
 
 
 def test_checkbox_theme_uses_border_color_and_white_fill() -> None:
@@ -711,6 +720,46 @@ def test_checkbox_theme_uses_border_color_and_white_fill() -> None:
     assert "side: BorderSide(color: Color(0xFFE8EAED)" in theme
     assert "fillColor: MaterialStateProperty.resolveWith" in theme
     assert "Color(0xFFFDFDFD)" in theme
+    assert "states.contains(MaterialState.selected) ? AppColors.primary" in theme
+    assert "const Color(0xFFFFFFFF)" in theme
+
+
+def test_filled_neutral_checkbox_selected_uses_primary_fill() -> None:
+    """Law: CheckboxLayerPreservationLaw — filled outline checkbox keeps visible selected chrome."""
+    stack = CleanDesignTreeNode(
+        id="1:option",
+        name="Delivery",
+        type=NodeType.STACK,
+        sizing=Sizing(width=81.0, height=19.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:box",
+                name="Rectangle",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=18.0, height=18.0),
+                style=NodeStyle(
+                    background_color="0xFFFDFDFD",
+                    border_color="0xFFE8EAED",
+                    border_width=1.0,
+                    border_radius=3.0,
+                    has_stroke=True,
+                ),
+            ),
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Delivery",
+                type=NodeType.TEXT,
+                text="Delivery",
+                sizing=Sizing(width=53.0, height=16.0),
+            ),
+        ],
+    )
+    emitted = render_node_body(stack, uses_svg=True, parent_type=NodeType.COLUMN)
+    compact = emitted.replace("\n", "")
+    theme = compact.split("checkboxTheme:")[1].split("child:")[0]
+    assert "side: BorderSide(color: Color(0xFFE8EAED)" in theme
+    assert "states.contains(MaterialState.selected) ? AppColors.primary" in theme
+    assert "states.contains(MaterialState.selected) ? Color(0xFFE8EAED)" not in theme
 
 
 def test_checked_checkbox_uses_contrasting_tick_color() -> None:

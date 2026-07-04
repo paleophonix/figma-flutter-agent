@@ -254,8 +254,14 @@ def _button_painted_surface_overlay_body(
             break
     if background_index is None:
         return ", ".join(child_widgets)
+    background_child = node.children[background_index]
     background_widget = strip_stack_parent_data_wrappers(child_widgets[background_index])
     label_widget = strip_stack_parent_data_wrappers(child_widgets[text_index])
+    if (
+        background_child.style.background_color is not None
+        and background_child.style.gradient is None
+    ):
+        return f"Center(child: {label_widget})"
     return (
         "Stack("
         "fit: StackFit.expand, "

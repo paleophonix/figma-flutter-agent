@@ -100,6 +100,7 @@ def _compose_external_label_input(
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
     text_theme_slot_by_style_name: dict[str, str] | None,
     text_theme_size_slots: list[tuple[float, str]] | None,
+    label_field_gap: float | None = None,
 ) -> str:
     """Stack a field label above the control when Figma places it outside the surface."""
     label_text = escape_figma_text_literal(label_node)
@@ -113,7 +114,9 @@ def _compose_external_label_input(
     )
     trailing = text_widget_trailing_params(label_node.style, soft_wrap=False)
     label_widget = f"Text('{label_text}', style: {style_expr}, {trailing})"
-    spacing = node.spacing or 0.0
+    spacing = float(node.spacing or 0.0)
+    if spacing <= 0.0 and label_field_gap is not None and label_field_gap > 0.0:
+        spacing = float(label_field_gap)
     spacing_field = f"spacing: {format_geometry_literal(spacing)}, " if spacing > 0 else ""
     return (
         f"Column(mainAxisSize: MainAxisSize.min, "

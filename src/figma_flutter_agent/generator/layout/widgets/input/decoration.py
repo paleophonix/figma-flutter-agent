@@ -154,6 +154,49 @@ def _input_content_padding(
     return f"contentPadding: EdgeInsets.fromLTRB({left}, {top}, {right}, {bottom})"
 
 
+def _shell_relative_input_content_padding(
+    shell: CleanDesignTreeNode,
+    value_node: CleanDesignTreeNode,
+    field_height: float,
+) -> str | None:
+    """Derive vertical padding from value placement relative to the painted shell."""
+    shell_rect = shell.stack_placement
+    value_placement = value_node.stack_placement
+    shell_top = shell_rect.top if shell_rect is not None and shell_rect.top is not None else None
+    if shell_top is not None and value_placement is not None and value_placement.top is not None:
+        relative_top = float(value_placement.top) - float(shell_top)
+        relative_value = value_node.model_copy(
+            update={
+                "stack_placement": value_placement.model_copy(update={"top": relative_top}),
+            }
+        )
+        padding = _input_content_padding(shell, relative_value, field_height)
+        if padding is not None:
+            return padding
+    return _optical_single_line_input_content_padding(shell, value_node, field_height)
+
+
+def decomposed_absolute_field_decoration(
+    shell: CleanDesignTreeNode,
+    value_node: CleanDesignTreeNode,
+    *,
+    field_height: float,
+) -> str:
+    """Build ``InputDecoration`` for a decomposed painted shell plus value text."""
+    padding = _shell_relative_input_content_padding(shell, value_node, field_height)
+    if padding is None:
+        left = _resolve_input_horizontal_inset(shell, value_node)
+        left_lit = format_geometry_literal(left)
+        padding = f"contentPadding: EdgeInsets.symmetric(horizontal: {left_lit})"
+    return (
+        "InputDecoration("
+        f"{padding}, "
+        "border: InputBorder.none, "
+        "isDense: true"
+        ")"
+    )
+
+
 def _multiline_input_content_padding(
     host_node: CleanDesignTreeNode | None,
     hint_node: CleanDesignTreeNode | None,

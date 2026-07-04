@@ -13,6 +13,7 @@ from figma_flutter_agent.parser.interaction.absolute_fields import (
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..finalize import _finalize_widget
+from .decoration import decomposed_absolute_field_decoration
 from .fields import _compose_fixed_height_input_surface, _prefilled_input_field_expr
 
 
@@ -74,17 +75,16 @@ def render_decomposed_absolute_field(
             f"decoration: {decoration})"
         )
     else:
-        decoration = (
-            "InputDecoration("
-            "border: InputBorder.none, "
-            "contentPadding: EdgeInsets.symmetric(horizontal: 12.0)"
-            ")"
+        padding_expr = decomposed_absolute_field_decoration(
+            shell,
+            value_node,
+            field_height=float(height),
         )
         field = _prefilled_input_field_expr(
             escaped_value=escaped_value,
             obscure="false",
             input_style=input_style,
-            decoration=decoration,
+            decoration=padding_expr,
             keyboard_type=keyboard_type,
             vertical_center=True,
         )

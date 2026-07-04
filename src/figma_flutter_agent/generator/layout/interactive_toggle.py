@@ -71,8 +71,8 @@ def _checkbox_theme_wrapper(
         selected_fill = unchecked_fill
         selected_check = color_expr
     else:
-        selected_fill = unchecked_fill
-        selected_check = color_expr
+        selected_fill = "AppColors.primary"
+        selected_check = "const Color(0xFFFFFFFF)"
     fill_fields = (
         "fillColor: MaterialStateProperty.resolveWith((states) => "
         f"states.contains(MaterialState.selected) ? {selected_fill} : {unchecked_fill}), "
