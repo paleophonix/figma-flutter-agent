@@ -143,6 +143,58 @@ def layout_fact_compact_icon_glyph_host(stack: CleanDesignTreeNode) -> bool:
     return _stack_has_vector_icon(local_nodes)
 
 
+def compact_icon_host_layers(
+    host: CleanDesignTreeNode,
+) -> tuple[CleanDesignTreeNode | None, CleanDesignTreeNode | None]:
+    """Return full-size plate vector and inset foreground glyph for a compact icon host."""
+    host_width = float(host.sizing.width or 0.0)
+    host_height = float(host.sizing.height or 0.0)
+    if host_width <= 0 or host_height <= 0:
+        return None, None
+    plate: CleanDesignTreeNode | None = None
+    foreground: CleanDesignTreeNode | None = None
+    for child in host.children:
+        if child.type not in {NodeType.VECTOR, NodeType.STACK}:
+            continue
+        child_width = float(child.sizing.width or 0.0)
+        child_height = float(child.sizing.height or 0.0)
+        if child_width <= 0 or child_height <= 0:
+            continue
+        covers_host = (
+            abs(child_width - host_width) <= _ICON_FRAME_COVERAGE_TOLERANCE
+            and abs(child_height - host_height) <= _ICON_FRAME_COVERAGE_TOLERANCE
+        )
+        if covers_host and child.vector_asset_key:
+            plate = child
+            continue
+        if (
+            child_width <= host_width * 0.75
+            and child_height <= host_height * 0.75
+            and (child.vector_asset_key or _stack_has_vector_icon(_descendant_nodes(child, 2)))
+        ):
+            foreground = child
+    return plate, foreground
+
+
+def compact_icon_host_tap_role(
+    host: CleanDesignTreeNode,
+    *,
+    foreground: CleanDesignTreeNode | None,
+) -> str:
+    """Resolve tap role when descendant glyph facts outrank host naming."""
+    if foreground is not None:
+        labels = [
+            (foreground.name or "").lower(),
+            (foreground.accessibility_label or "").lower(),
+        ]
+        combined = " ".join(labels)
+        if combined and not any(hint in combined for hint in _ICON_ACTION_NAME_HINTS):
+            return "button-action"
+    if _has_icon_action_name(host) and foreground is None:
+        return "back-nav"
+    return "button-action"
+
+
 def layout_fact_icon_glyph_frame_placeholder(
     node: CleanDesignTreeNode,
     *,
@@ -218,7 +270,7 @@ def _stroke_icon_vectors(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]
 
 _CHEVRON_GLYPH_MAX_WIDTH = 12.0
 _CHEVRON_GLYPH_MIN_HEIGHT = 6.0
-_CHEVRON_ACTION_SLOT_MAX = 28.0
+_CHEVRON_ACTION_SLOT_MAX = 32.0
 
 
 def layout_fact_stroke_chevron_vector(node: CleanDesignTreeNode) -> bool:
@@ -651,9 +703,7 @@ def layout_fact_upload_placeholder_tile(node: CleanDesignTreeNode) -> bool:
         if child.type == NodeType.TEXT:
             continue
         child_placement = child.stack_placement
-        child_top = (
-            float(child_placement.top or 0.0) if child_placement is not None else 0.0
-        )
+        child_top = float(child_placement.top or 0.0) if child_placement is not None else 0.0
         if child_top <= float(height) * 0.45:
             return True
     return False

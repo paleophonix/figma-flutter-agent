@@ -99,7 +99,7 @@ def primary_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | Non
     surfaces = [
         candidate
         for candidate in _local_nodes(node, _MAX_LOCAL_DEPTH)
-        if candidate.type in {NodeType.CONTAINER, NodeType.INPUT, NodeType.VECTOR}
+        if candidate.type in {NodeType.CONTAINER, NodeType.INPUT}
         and candidate.sizing.width
         and candidate.sizing.height
         and (candidate.style.background_color or candidate.style.border_color)

@@ -92,6 +92,42 @@ def positioned_text_width_with_metric_slack(figma_width: float) -> float:
     return round(slack_width, 1)
 
 
+def placement_is_right_edge_pinned(
+    placement: StackPlacement,
+    *,
+    parent_width: float | None,
+    figma_width: float,
+) -> bool:
+    """Return True when text ends flush with the parent right edge."""
+    if parent_width is None or placement.left is None:
+        return False
+    right_edge = float(placement.left) + float(figma_width)
+    return abs(right_edge - float(parent_width)) <= 2.0
+
+
+def positioned_text_preserves_right_edge(
+    node: CleanDesignTreeNode,
+    placement: StackPlacement,
+    *,
+    parent_width: float | None,
+    figma_width: float,
+) -> bool:
+    """Return True when metric slack must preserve the original right anchor."""
+    if node.type != NodeType.TEXT:
+        return False
+    if (node.style.text_align or "").upper() == "RIGHT":
+        return placement_is_right_edge_pinned(
+            placement,
+            parent_width=parent_width,
+            figma_width=figma_width,
+        )
+    return placement_is_right_edge_pinned(
+        placement,
+        parent_width=parent_width,
+        figma_width=figma_width,
+    )
+
+
 def predict_typography_slack(node: CleanDesignTreeNode) -> float:
     """Conservative extra vertical slack for Flutter strut vs Figma bbox drift."""
     metrics = node.text_metrics_frame

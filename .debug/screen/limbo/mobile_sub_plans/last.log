@@ -1,23 +1,22 @@
 
---- dart format @ 2026-07-04T02:41:45.135744+00:00 ---
+--- dart format @ 2026-07-04T11:06:53.272652+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\generated\mobile_sub_plans_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\lib\widgets\radio_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ltn07s6g\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 14 files (14 changed) in 0.46 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\lib\widgets\radio_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3fxl3ykw\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 13 files (13 changed) in 0.03 seconds.
 
---- pub get --offline @ 2026-07-04T02:41:47.702502+00:00 ---
+--- pub get --offline @ 2026-07-04T11:06:56.101006+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -30,7 +29,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-07-04T02:41:49.874214+00:00 ---
+--- dart analyze (generated) @ 2026-07-04T11:06:58.555138+00:00 ---
 exit_code=0
 Analyzing ios_status_bar_widget.dart, radio_button_widget.dart...
 
@@ -40,7 +39,7 @@ warning - lib\widgets\radio_button_widget.dart:10:8 - Unused import: 'package:in
 
 3 issues found.
 
---- dart analyze (generated) (1/3) @ 2026-07-04T02:41:52.218095+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-07-04T11:07:01.143798+00:00 ---
 exit_code=0
 Analyzing mobile_sub_plans_screen.dart, mobile_sub_plans_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -54,15 +53,19 @@ warning - lib\generated\mobile_sub_plans_layout.dart:13:8 - Unused import: 'pack
 warning - lib\generated\mobile_sub_plans_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\mobile_sub_plans_layout.dart:31:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\mobile_sub_plans_layout.dart:49:1780 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\mobile_sub_plans_layout.dart:50:1120 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\mobile_sub_plans_layout.dart:50:4424 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\mobile_sub_plans_layout.dart:50:10147 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-10 issues found.
+14 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-07-04T02:41:54.208536+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-07-04T11:07:03.270071+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, ios_status_bar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-07-04T02:41:56.522730+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-07-04T11:07:05.737379+00:00 ---
 exit_code=0
 Analyzing radio_button_widget.dart, mobile_sub_plans_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -73,62 +76,59 @@ warning - lib\widgets\radio_button_widget.dart:10:8 - Unused import: 'package:in
 
 4 issues found.
 
---- dart format @ 2026-07-04T02:41:58.697096+00:00 ---
+--- dart format @ 2026-07-04T11:07:07.545018+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\generated\mobile_sub_plans_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\lib\widgets\radio_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4lloqu15\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 14 files (14 changed) in 0.52 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\lib\widgets\radio_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h9gpb8pb\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 13 files (13 changed) in 0.02 seconds.
 
---- dart format @ 2026-07-04T02:42:00.836663+00:00 ---
+--- dart format @ 2026-07-04T11:07:09.233447+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\generated\mobile_sub_plans_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\lib\widgets\radio_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9t2eezrd\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 14 files (14 changed) in 0.46 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\lib\widgets\radio_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h43isuom\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 13 files (13 changed) in 0.02 seconds.
 
---- dart format @ 2026-07-04T02:42:03.334784+00:00 ---
+--- dart format @ 2026-07-04T11:07:11.365164+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\generated\mobile_sub_plans_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\widgets\ios_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\lib\widgets\radio_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\test\golden\mobile_sub_plans_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-g2vd49st\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 15 files (15 changed) in 0.74 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\widgets\ios_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\lib\widgets\radio_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\test\golden\mobile_sub_plans_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-bsmzu6eh\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 14 files (14 changed) in 0.33 seconds.
 
---- pub get --offline @ 2026-07-04T02:42:05.633278+00:00 ---
+--- pub get --offline @ 2026-07-04T11:07:13.812885+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -141,7 +141,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-07-04T02:42:07.953384+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-07-04T11:07:16.520545+00:00 ---
 exit_code=0
 Analyzing mobile_sub_plans_screen.dart, mobile_sub_plans_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -149,21 +149,25 @@ warning - lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart:6:8 - Unuse
 warning - lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\mobile_sub_plans_layout.dart:7:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\mobile_sub_plans_layout.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\mobile_sub_plans_layout.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\mobile_sub_plans_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\mobile_sub_plans_layout.dart:10:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\mobile_sub_plans_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\mobile_sub_plans_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\mobile_sub_plans_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
-   info - lib\generated\mobile_sub_plans_layout.dart:28:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\mobile_sub_plans_layout.dart:31:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\mobile_sub_plans_layout.dart:49:1780 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\mobile_sub_plans_layout.dart:50:1120 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\mobile_sub_plans_layout.dart:50:4424 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\mobile_sub_plans_layout.dart:50:10147 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-10 issues found.
+14 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-07-04T02:42:10.053449+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-07-04T11:07:18.807152+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, ios_status_bar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-07-04T02:42:12.383610+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-07-04T11:07:21.376551+00:00 ---
 exit_code=0
 Analyzing radio_button_widget.dart, mobile_sub_plans_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -174,7 +178,7 @@ warning - lib\widgets\radio_button_widget.dart:8:8 - Unused import: 'package:inb
 
 4 issues found.
 
---- flutter pub get @ 2026-07-04T02:42:16.259151+00:00 ---
+--- flutter pub get @ 2026-07-04T11:07:25.111048+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -187,4 +191,17 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-04T02:42:16.260194+00:00 ---
+--- flutter render errors @ 2026-07-04T11:07:25.113048+00:00 ---
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 8.0 pixels on the right.
+The relevant error-causing widget was:
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+The specific RenderFlex in question is: RenderFlex#69958 OVERFLOWING:
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Another exception was thrown: A RenderFlex overflowed by 8.0 pixels on the right.
+Another exception was thrown: A RenderFlex overflowed by 8.0 pixels on the right.

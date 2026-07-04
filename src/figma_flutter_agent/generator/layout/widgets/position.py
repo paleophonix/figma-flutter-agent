@@ -5,6 +5,7 @@ from __future__ import annotations
 from figma_flutter_agent.generator.geometry.text_metrics import (
     placement_is_center_pinned_horizontal,
     positioned_text_allows_metric_slack,
+    positioned_text_preserves_right_edge,
     positioned_text_width_with_metric_slack,
 )
 from figma_flutter_agent.generator.layout.cupertino import wrap_scroll_viewport
@@ -346,13 +347,28 @@ def _ensure_positioned_stack_bounds(
     )
 
     width, height = figma_positioned_dimensions(node, placement)
+    figma_width_before_slack: float | None = None
     if positioned_text_allows_metric_slack(node, placement) and width is not None and width > 0:
+        figma_width_before_slack = float(width)
         width = positioned_text_width_with_metric_slack(float(width))
     left, top = _resolved_positioned_left_top(
         node,
         placement,
         parent_width=parent_width,
     )
+    if (
+        figma_width_before_slack is not None
+        and width is not None
+        and left is not None
+        and parent_width is not None
+        and positioned_text_preserves_right_edge(
+            node,
+            placement,
+            parent_width=parent_width,
+            figma_width=figma_width_before_slack,
+        )
+    ):
+        left = float(parent_width) - float(width)
     pin_bottom = _should_pin_bottom(
         placement,
         parent_height=parent_height,

@@ -267,6 +267,24 @@ def layout_fact_media_controls_stack(node: CleanDesignTreeNode) -> bool:
     return has_timestamps and has_play
 
 
+def button_has_absolute_slot_children(node: CleanDesignTreeNode) -> bool:
+    """Return True when a tappable host preserves absolutely placed row chrome."""
+    if node.type != NodeType.BUTTON:
+        return False
+    if float(node.spacing or 0.0) > 0.0:
+        return False
+    if len(node.children) < 2:
+        return False
+    positioned = 0
+    for child in node.children:
+        placement = child.stack_placement
+        if placement is None:
+            continue
+        if placement.left is not None or placement.right is not None:
+            positioned += 1
+    return positioned >= 2
+
+
 def button_has_list_tile_row_body(node: CleanDesignTreeNode) -> bool:
     """Return True when a tappable frame is a horizontal icon + text + chevron row.
 
@@ -639,6 +657,33 @@ def button_has_painted_surface_overlay_label(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def button_painted_overlay_surface(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return a full-bleed painted surface child that can back a Material ``Ink`` decoration."""
+    from figma_flutter_agent.parser.interaction.input_fields import surface_covers_node
+
+    if node.type != NodeType.BUTTON:
+        return None
+    candidates: list[CleanDesignTreeNode] = []
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            continue
+        if not surface_covers_node(node, child):
+            continue
+        if child.type not in {NodeType.CONTAINER, NodeType.VECTOR}:
+            continue
+        if child.style.background_color is None or child.style.gradient is not None:
+            continue
+        if not child.sizing.width or not child.sizing.height:
+            continue
+        candidates.append(child)
+    if not candidates:
+        return None
+    return max(
+        candidates,
+        key=lambda item: float(item.sizing.width or 0) * float(item.sizing.height or 0),
+    )
+
+
 def button_has_icon_label_inline_affordance(node: CleanDesignTreeNode) -> bool:
     """Return True when a compact button should emit icon + label as inline Row.
 
@@ -657,6 +702,8 @@ def button_has_icon_label_inline_affordance(node: CleanDesignTreeNode) -> bool:
     if button_has_social_auth_icon_label_body(node):
         return False
     if button_has_list_tile_row_body(node):
+        return False
+    if button_has_absolute_slot_children(node):
         return False
     if button_has_composite_row_body(node):
         return False

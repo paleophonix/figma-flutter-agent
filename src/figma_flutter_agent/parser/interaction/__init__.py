@@ -6,6 +6,7 @@ from .buttons import (
     button_has_composite_row_body,
     button_has_icon_label_inline_affordance,
     button_has_painted_surface_overlay_label,
+    button_has_absolute_slot_children,
     button_has_list_tile_row_body,
     button_has_social_auth_icon_label_body,
     button_hosts_top_navigation_bar,
@@ -77,6 +78,7 @@ from .forms import (
     row_hosts_checkbox_label_pair,
     stack_hosts_checkbox_label_pair,
     layout_fact_row_bounded_inline_control_row,
+    stack_action_intent_vetoes_input,
 )
 from .icons import (
     _has_circular_container,
@@ -89,6 +91,8 @@ from .icons import (
     layout_fact_compact_icon_action_button,
     layout_fact_compact_icon_action_stack,
     layout_fact_compact_icon_glyph_host,
+    compact_icon_host_layers,
+    compact_icon_host_tap_role,
     layout_fact_favorite_glyph_vector,
     layout_fact_favorite_overlay_stack,
     layout_fact_info_icon_button,
@@ -195,6 +199,7 @@ __all__ = [
     "button_compiles_body_as_flex_row",
     "button_has_icon_label_inline_affordance",
     "button_has_painted_surface_overlay_label",
+    "button_has_absolute_slot_children",
     "button_has_list_tile_row_body",
     "button_has_social_auth_icon_label_body",
     "button_hosts_top_navigation_bar",

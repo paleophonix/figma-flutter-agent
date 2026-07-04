@@ -216,12 +216,13 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
         _looks_like_form_field_stack,
         _stack_spans_primary_button_and_footer_link,
         layout_fact_password_field_stack,
+        stack_action_intent_vetoes_input,
     )
     from .shared import (
-        _INPUT_HINTS,
         _MAX_CONTROL_CHILDREN,
         _MAX_CONTROL_HEIGHT,
         _MAX_LOCAL_DEPTH,
+        _label_contains_input_hint,
         _label_matches_action_hint,
         _local_nodes,
     )
@@ -317,7 +318,7 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
 
     for text_node in text_nodes:
         label = (text_node.text or text_node.name or "").strip().lower()
-        if any(hint in label for hint in _INPUT_HINTS) and len(label) < 48:
+        if _label_contains_input_hint(label) and len(label) < 48:
             return "input"
 
     for text_node in text_nodes:
@@ -326,6 +327,9 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
             if _stack_spans_primary_button_and_footer_link(node, text_nodes=text_nodes):
                 return None
             return "button"
+
+    if stack_action_intent_vetoes_input(node):
+        return "button"
 
     if _looks_like_form_field_stack(
         host_node=node,

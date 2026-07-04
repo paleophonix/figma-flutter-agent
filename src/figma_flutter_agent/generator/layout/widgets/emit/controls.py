@@ -25,8 +25,10 @@ from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..button import _wrap_button_stack
+from ..button.core import render_compact_icon_host_stack_body
 from ..finalize import _finalize_widget
 from ..flex_sizing import (
+    _button_absolute_slot_stack_body,
     _button_icon_label_inline_row_body,
     _button_list_tile_row_body,
     _button_painted_surface_overlay_body,
@@ -107,6 +109,38 @@ def render_button_node(
         or layout_fact_info_icon_button(node)
     )
     if layout_fact_compact_icon_button:
+        layered_stack = render_compact_icon_host_stack_body(node, uses_svg=uses_svg)
+        if layered_stack is not None:
+            from figma_flutter_agent.parser.interaction.icons import (
+                compact_icon_host_layers,
+                compact_icon_host_tap_role,
+            )
+
+            _, foreground = compact_icon_host_layers(node)
+            tap_role = compact_icon_host_tap_role(node, foreground=foreground)
+            width = node.sizing.width
+            height = node.sizing.height
+            if width is not None and height is not None and width > 0 and height > 0:
+                layered_stack = (
+                    f"SizedBox("
+                    f"width: {format_geometry_literal(width)}, "
+                    f"height: {format_geometry_literal(height)}, "
+                    f"child: {layered_stack})"
+                )
+            widget = _wrap_button_stack(
+                layered_stack,
+                node,
+                theme_variant=theme_variant,
+                tap_role=tap_role,
+            )
+            label = escape_dart_string(node.accessibility_label or node.name or "Button")
+            return _finalize_widget(
+                node,
+                f"Semantics(label: '{label}', child: {widget})",
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
         if uses_svg and node.vector_asset_key:
             from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
@@ -199,6 +233,7 @@ def render_button_node(
             social_auth_row_confidence,
         )
         from figma_flutter_agent.parser.interaction import (
+            button_has_absolute_slot_children,
             button_has_composite_row_body,
             button_has_icon_label_inline_affordance,
             button_has_list_tile_row_body,
@@ -219,12 +254,18 @@ def render_button_node(
         )
         if payment_card_body is not None:
             stack_body = payment_card_body
+        elif button_has_absolute_slot_children(node):
+            stack_body = _button_absolute_slot_stack_body(node, child_widgets)
         elif button_has_list_tile_row_body(node):
             stack_body = _button_list_tile_row_body(node, child_widgets)
         elif button_has_social_auth_icon_label_body(node):
             stack_body = _button_social_auth_icon_label_row_body(node, child_widgets)
         elif button_has_painted_surface_overlay_label(node):
-            stack_body = _button_painted_surface_overlay_body(node, child_widgets)
+            stack_body = _button_painted_surface_overlay_body(
+                node,
+                child_widgets,
+                emitted_pairs=flow.get("emitted_pairs"),
+            )
         elif button_has_icon_label_inline_affordance(node):
             stack_body = _button_icon_label_inline_row_body(node, child_widgets)
         elif button_should_flow_as_column(node) or button_hosts_multiple_auth_rows(node):

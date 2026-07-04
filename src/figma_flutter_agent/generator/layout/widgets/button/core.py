@@ -253,7 +253,9 @@ def _wrap_button_stack(
     from figma_flutter_agent.generator.layout.style.decoration import _resolved_border_radius
 
     stack_widget = strip_flex_parent_data_deep(stack_widget)
-    surface = interaction_surface_node(node)
+    from figma_flutter_agent.parser.interaction.buttons import button_painted_overlay_surface
+
+    surface = button_painted_overlay_surface(node) or interaction_surface_node(node)
     frame_height = band_height if band_height is not None else node.sizing.height
     radius = (
         surface.style.border_radius
@@ -363,9 +365,51 @@ def _wrap_button_stack(
     return wrapped
 
 
+def render_compact_icon_host_stack_body(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+) -> str | None:
+    """Emit plate + inset foreground glyph layers for compact icon hosts."""
+    from figma_flutter_agent.generator.layout.common import escape_dart_string
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+    from figma_flutter_agent.parser.interaction.icons import compact_icon_host_layers
+
+    plate, foreground = compact_icon_host_layers(node)
+    if foreground is None:
+        return None
+    parts: list[str] = []
+    if plate is not None and plate.vector_asset_key and uses_svg:
+        parts.append(_render_svg_picture(plate, escape_dart_string(plate.vector_asset_key)))
+    if foreground.vector_asset_key and uses_svg:
+        glyph_width = float(foreground.sizing.width or 24.0)
+        glyph_height = float(foreground.sizing.height or 24.0)
+        glyph = _render_svg_picture(
+            foreground,
+            escape_dart_string(foreground.vector_asset_key),
+        )
+        parts.append(
+            "Center("
+            f"child: SizedBox("
+            f"width: {format_geometry_literal(glyph_width)}, "
+            f"height: {format_geometry_literal(glyph_height)}, "
+            f"child: {glyph}))"
+        )
+    if not parts:
+        return None
+    return (
+        "Stack("
+        "clipBehavior: Clip.none, "
+        "alignment: Alignment.center, "
+        f"children: [{', '.join(parts)}]"
+        ")"
+    )
+
+
 __all__ = [
     "_button_ink_surface_params",
     "_stack_uses_circular_ink",
     "_wrap_passive_button_surface",
     "_wrap_button_stack",
+    "render_compact_icon_host_stack_body",
 ]

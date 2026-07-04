@@ -597,9 +597,9 @@ def render_stack(
             scroll_content_root=scroll_content_root,
         )
     from figma_flutter_agent.parser.interaction.absolute_fields import (
+        field_shell_external_label_gap,
         find_field_shell_external_label,
         find_field_shell_value_text,
-        field_shell_external_label_gap,
         layout_fact_labeled_absolute_field_stack,
         layout_fact_painted_field_shell_container,
     )
@@ -665,6 +665,33 @@ def render_stack(
             node
         ) or layout_fact_checkout_sticky_footer_host(node):
             interaction = None
+    if interaction == "input":
+        from figma_flutter_agent.parser.interaction.forms import stack_action_intent_vetoes_input
+        from figma_flutter_agent.schemas.ir import WidgetIrKind
+
+        ir_by_id = ctx["ir_by_id"] if isinstance(ctx, dict) else ctx.ir_by_id
+        ir_veto = False
+        if ir_by_id is not None:
+            ir_node = ir_by_id.get(node.id)
+            if ir_node is not None:
+                button_kinds = {
+                    WidgetIrKind.BUTTON,
+                    WidgetIrKind.BUTTON_OUTLINED,
+                    WidgetIrKind.BUTTON_FILLED,
+                    WidgetIrKind.BUTTON_TEXT,
+                    WidgetIrKind.BUTTON_FAB,
+                    WidgetIrKind.BUTTON_ICON,
+                    WidgetIrKind.CONTAINER_LIST_TILE,
+                }
+                if ir_node.kind in button_kinds:
+                    ir_veto = True
+                hint = ir_node.classification_hint
+                if hint is not None and hint.suggested_kind in {
+                    kind.value for kind in button_kinds
+                }:
+                    ir_veto = True
+        if stack_action_intent_vetoes_input(node) or ir_veto:
+            interaction = "button"
     if interaction == "input":
         return _render_stack_input(
             node,

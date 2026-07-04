@@ -142,7 +142,9 @@ def prepare_layout_children(
                 if not layout_fact_icon_badge_stack(node):
                     omit_child_ids.add(surface.id)
     if node.type == NodeType.BUTTON:
-        surface = primary_surface_node(node)
+        from figma_flutter_agent.parser.interaction.buttons import button_painted_overlay_surface
+
+        surface = button_painted_overlay_surface(node) or primary_surface_node(node)
         if surface is not None and surface_covers_node(node, surface):
             omit_child_ids.add(surface.id)
     if node.type == NodeType.STACK:

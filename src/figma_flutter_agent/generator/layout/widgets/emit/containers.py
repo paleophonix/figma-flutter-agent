@@ -605,7 +605,14 @@ class render_misc:
             else "Theme.of(context).colorScheme.surfaceContainerHighest"
         )
         radius = node.style.border_radius or 18.0
-        if icon_asset is not None and uses_svg:
+        from figma_flutter_agent.generator.layout.widgets.button.core import (
+            render_compact_icon_host_stack_body,
+        )
+
+        layered_stack = render_compact_icon_host_stack_body(node, uses_svg=uses_svg)
+        if layered_stack is not None:
+            glyph = layered_stack
+        elif icon_asset is not None and uses_svg:
             glyph = _render_svg_picture(node, escape_dart_string(icon_asset))
         elif node.type == NodeType.BUTTON and layout_fact_compact_icon_action_button(node):
             glyph = _find_icon_glyph_expr(node) or "const SizedBox.shrink()"

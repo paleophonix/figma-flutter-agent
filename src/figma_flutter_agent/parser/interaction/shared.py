@@ -66,6 +66,15 @@ def _label_matches_action_hint(label: str) -> bool:
     return any(hint in normalized for hint in _ACTION_HINTS)
 
 
+def _label_contains_input_hint(label: str) -> bool:
+    """Match input placeholder hints on word tokens, not arbitrary substrings."""
+    normalized = label.strip().lower()
+    if not normalized:
+        return False
+    tokens = normalized.replace("/", " ").replace("-", " ").split()
+    return any(hint in tokens for hint in _INPUT_HINTS)
+
+
 def _local_nodes(node: CleanDesignTreeNode, max_depth: int) -> list[CleanDesignTreeNode]:
     """Collect descendants up to ``max_depth`` without crossing other stack groups."""
     nodes: list[CleanDesignTreeNode] = []

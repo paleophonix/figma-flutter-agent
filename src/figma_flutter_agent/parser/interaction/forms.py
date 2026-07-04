@@ -9,9 +9,9 @@ from .icons import (
     layout_fact_input_trailing_icon_button,
 )
 from .shared import (
-    _INPUT_HINTS,
     _MAX_CONTROL_HEIGHT,
     _MAX_LOCAL_DEPTH,
+    _label_contains_input_hint,
     _label_matches_action_hint,
     _local_nodes,
 )
@@ -164,9 +164,7 @@ def _stack_hosts_direction_badge_glyph(node: CleanDesignTreeNode) -> bool:
         and (child.style.border_width or 0.0) > 0.0
     ]
     vectors = [
-        child
-        for child in node.children
-        if child.type == NodeType.VECTOR and child.style.has_stroke
+        child for child in node.children if child.type == NodeType.VECTOR and child.style.has_stroke
     ]
     if len(containers) == 1 and vectors:
         plate = containers[0]
@@ -717,6 +715,51 @@ def _is_footer_link_text_node(text_node: CleanDesignTreeNode) -> bool:
     return is_link_text(text_node.text) and len(label) > 12
 
 
+def _text_is_centered_action_label(
+    text_node: CleanDesignTreeNode,
+    host_node: CleanDesignTreeNode,
+) -> bool:
+    """Single centered caption inside a compact host is action chrome, not field value."""
+    if (text_node.style.text_align or "").upper() == "CENTER":
+        return True
+    placement = text_node.stack_placement
+    host_width = host_node.sizing.width
+    if placement is None or host_width is None:
+        return False
+    text_width = float(text_node.sizing.width or 0.0)
+    if text_width <= 0:
+        return False
+    if placement.left is not None and placement.right is not None:
+        return abs(float(placement.left) - float(placement.right)) <= 4.0
+    if placement.left is not None:
+        trailing = float(host_width) - float(placement.left) - text_width
+        return abs(float(placement.left) - trailing) <= 4.0
+    return False
+
+
+def stack_action_intent_vetoes_input(host_node: CleanDesignTreeNode) -> bool:
+    """Disclosure rows and centered action labels must not compile as INPUT."""
+    from .icons import layout_fact_trailing_chevron_action_slot
+    from .shared import (
+        _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
+        _MAX_LOCAL_DEPTH,
+        _descendant_nodes,
+        _local_nodes,
+    )
+
+    for item in _descendant_nodes(host_node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH):
+        if layout_fact_trailing_chevron_action_slot(item):
+            return True
+    text_nodes = [
+        item
+        for item in _local_nodes(host_node, _MAX_LOCAL_DEPTH)
+        if item.type == NodeType.TEXT and item.text
+    ]
+    if len(text_nodes) == 1 and _text_is_centered_action_label(text_nodes[0], host_node):
+        return True
+    return False
+
+
 def _looks_like_form_field_stack(
     *,
     host_node: CleanDesignTreeNode | None = None,
@@ -740,18 +783,28 @@ def _looks_like_form_field_stack(
     label = (text_node.text or text_node.name or "").strip().lower()
     if _label_matches_action_hint(label):
         return False
-    if any(hint in label for hint in _INPUT_HINTS):
+    if _label_contains_input_hint(label):
         return True
     placement = text_node.stack_placement
     if placement is None or placement.left is None or placement.left < 8:
         return False
     if host_node is not None and _caption_label_below_icon_band(host_node, text_node):
         return False
+    if host_node is not None and _text_is_centered_action_label(text_node, host_node):
+        return False
+    if host_node is not None and stack_action_intent_vetoes_input(host_node):
+        return False
     surface = max(
         surfaces,
         key=lambda item: float(item.sizing.width or 0) * float(item.sizing.height or 0),
     )
-    return surface.style.background_color is not None or surface.style.border_radius is not None
+    if surface.style.background_color is not None:
+        return True
+    return (
+        surface.style.border_radius is not None
+        and surface.style.border_color is not None
+        and surface.style.has_stroke
+    )
 
 
 def _caption_label_below_icon_band(

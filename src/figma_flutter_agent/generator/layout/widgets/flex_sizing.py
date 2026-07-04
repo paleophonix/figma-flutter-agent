@@ -235,33 +235,40 @@ def _button_icon_label_inline_row_body(node: CleanDesignTreeNode, child_widgets:
 def _button_painted_surface_overlay_body(
     node: CleanDesignTreeNode,
     child_widgets: list[str],
+    *,
+    emitted_pairs: list[tuple[CleanDesignTreeNode, str]] | None = None,
 ) -> str:
     """Compose a full-bleed painted surface with centered overlaid label text."""
     from figma_flutter_agent.generator.layout.widget_roots import strip_stack_parent_data_wrappers
+    from figma_flutter_agent.parser.interaction.buttons import button_painted_overlay_surface
     from figma_flutter_agent.parser.interaction.input_fields import surface_covers_node
 
-    text_index = next(
-        index
-        for index, child in enumerate(node.children)
-        if child.type == NodeType.TEXT and (child.text or "").strip()
+    pairs = emitted_pairs or list(zip(node.children, child_widgets, strict=False))
+    label_pair = next(
+        (
+            (child, widget)
+            for child, widget in pairs
+            if child.type == NodeType.TEXT and (child.text or "").strip()
+        ),
+        None,
     )
-    background_index: int | None = None
-    for index, child in enumerate(node.children):
-        if child.type == NodeType.TEXT:
-            continue
-        if surface_covers_node(node, child):
-            background_index = index
-            break
-    if background_index is None:
+    if label_pair is None:
         return ", ".join(child_widgets)
-    background_child = node.children[background_index]
-    background_widget = strip_stack_parent_data_wrappers(child_widgets[background_index])
-    label_widget = strip_stack_parent_data_wrappers(child_widgets[text_index])
-    if (
-        background_child.style.background_color is not None
-        and background_child.style.gradient is None
-    ):
+    label_widget = strip_stack_parent_data_wrappers(label_pair[1])
+    ink_surface = button_painted_overlay_surface(node)
+    if ink_surface is not None:
         return f"Center(child: {label_widget})"
+    background_pair = next(
+        (
+            (child, widget)
+            for child, widget in pairs
+            if child.type != NodeType.TEXT and surface_covers_node(node, child)
+        ),
+        None,
+    )
+    if background_pair is None:
+        return ", ".join(child_widgets)
+    background_widget = strip_stack_parent_data_wrappers(background_pair[1])
     return (
         "Stack("
         "fit: StackFit.expand, "
@@ -270,6 +277,15 @@ def _button_painted_surface_overlay_body(
         f"Center(child: {label_widget})]"
         ")"
     )
+
+
+def _button_absolute_slot_stack_body(
+    node: CleanDesignTreeNode,
+    child_widgets: list[str],
+) -> str:
+    """Preserve absolutely positioned row chrome inside a tappable stack host."""
+    body = ", ".join(child_widgets)
+    return f"Stack(clipBehavior: Clip.none, fit: StackFit.expand, children: [{body}])"
 
 
 def _button_list_tile_row_body(node: CleanDesignTreeNode, child_widgets: list[str]) -> str:
