@@ -354,6 +354,22 @@ async def run_pipeline(
                     pipeline_deps=pipeline_deps,
                 )
             ctx.warnings.extend(compare_result.warnings)
+            if not dry_run and ctx.resolved_feature:
+                from figma_flutter_agent.compiler.generation_config_fingerprint import (
+                    generation_config_fingerprint,
+                )
+                from figma_flutter_agent.debug.run_meta import write_run_meta
+
+                _, cfg_hash = generation_config_fingerprint(settings)
+                write_run_meta(
+                    project_dir,
+                    ctx.resolved_feature,
+                    pipeline_run_id=run_id,
+                    writeback="skipped",
+                    written_files=[],
+                    clean_tree_hash=hashes.tree_hash,
+                    generation_config_hash=cfg_hash,
+                )
             return PipelineResult(
                 clean_tree=clean_tree,
                 tokens=tokens,
@@ -492,7 +508,7 @@ async def run_pipeline(
                     summary = "; ".join(capture_outcome.warnings[:2]) or "flutter render capture failed"
                     result.warnings.append(f"Flutter capture blocked: {summary}")
     
-        if not dry_run and ctx.resolved_feature and pipeline_invocation != "repair_regenerate":
+        if not dry_run and ctx.resolved_feature:
             from figma_flutter_agent.compiler.generation_config_fingerprint import (
                 generation_config_fingerprint,
             )
@@ -511,9 +527,10 @@ async def run_pipeline(
                 clean_tree_hash=hashes.tree_hash,
                 generation_config_hash=cfg_hash,
             )
-            from figma_flutter_agent.dev.opencode.run_gate import evaluate_run_gate
+            if pipeline_invocation != "repair_regenerate":
+                from figma_flutter_agent.dev.opencode.run_gate import evaluate_run_gate
 
-            evaluate_run_gate(project_dir, ctx.resolved_feature)
+                evaluate_run_gate(project_dir, ctx.resolved_feature)
 
         return result
 

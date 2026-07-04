@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 
 from figma_flutter_agent.debug.paths import screen_root
-from figma_flutter_agent.debug.run_meta import write_run_meta
+from figma_flutter_agent.debug.run_meta import mark_run_meta_failed, write_run_meta
 from figma_flutter_agent.dev.opencode.failure_class import FailureClass
 from figma_flutter_agent.dev.opencode.run_gate import evaluate_run_gate
 
@@ -165,3 +165,43 @@ def test_run_gate_committed_without_capture_is_pending_screen(tmp_path) -> None:
     assert result.verdict == FailureClass.CAPTURE_PENDING
     assert result.case_mode == "SCREEN"
     assert result.agent_board == "screen"
+
+
+def test_run_gate_failed_status_overrides_stale_committed_writeback(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    feature = "login"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// candidate\n", encoding="utf-8")
+    write_run_meta(
+        project,
+        feature,
+        pipeline_run_id="run_prev",
+        writeback="committed",
+        written_files=["lib/generated/login.dart"],
+        committed_build_run_id="run_prev",
+    )
+    mark_run_meta_failed(project, feature, pipeline_run_id="run_fail", error="boom")
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.ROLLED_BACK
+    assert result.case_mode == "FORENSIC"
+    assert result.writeback == "failed"
+
+
+def test_run_gate_incomplete_validated_is_candidate_only(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    feature = "login"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// candidate\n", encoding="utf-8")
+    write_run_meta(
+        project,
+        feature,
+        pipeline_run_id="run_mid",
+        writeback="skipped",
+        written_files=[],
+        status="validated",
+    )
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.CANDIDATE_ONLY
+    assert result.case_mode == "FORENSIC"

@@ -9,6 +9,7 @@ from figma_flutter_agent.debug.run_meta import (
     LEGACY_RUN_META_SCHEMA_VERSION,
     RUN_META_SCHEMA_VERSION,
     begin_run_meta,
+    mark_run_meta_failed,
     read_run_meta,
     run_meta_path,
     update_run_meta_stage,
@@ -117,3 +118,68 @@ def test_skipped_writeback_does_not_advance_committed(tmp_path: Path) -> None:
     assert payload["committed_build_run_id"] == "run-committed"
     assert payload["candidate_build_run_id"] == "run-candidate"
     assert payload["writeback"] == "skipped"
+
+
+def test_begin_run_meta_clears_candidate_evidence(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    write_run_meta(
+        project,
+        "home",
+        pipeline_run_id="run-old",
+        writeback="committed",
+        written_files=["lib/screens/home.dart"],
+        committed_build_run_id="run-old",
+        analyze_passed=True,
+        cached_ir_verdict="compatible",
+        clean_tree_hash="tree-old",
+        generation_config_hash="cfg-old",
+    )
+    path = run_meta_path(project, "home")
+    path.write_text(
+        path.read_text(encoding="utf-8").replace(
+            "}",
+            ', "last_error": "boom", "customField": "keep-me"}',
+            1,
+        ),
+        encoding="utf-8",
+    )
+    begin_run_meta(project, "home", pipeline_run_id="run-new")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    assert payload["candidate_build_run_id"] == "run-new"
+    assert payload["committed_build_run_id"] == "run-old"
+    assert payload["status"] == "started"
+    assert "writeback" not in payload
+    assert "written_files" not in payload
+    assert "analyze_passed" not in payload
+    assert "cached_ir_verdict" not in payload
+    assert "clean_tree_hash" not in payload
+    assert "generation_config_hash" not in payload
+    assert "last_error" not in payload
+    assert payload["customField"] == "keep-me"
+
+
+def test_mark_run_meta_failed_sets_forensic_writeback(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    write_run_meta(
+        project,
+        "home",
+        pipeline_run_id="run-committed",
+        writeback="committed",
+        written_files=["lib/screens/home.dart"],
+        committed_build_run_id="run-committed",
+    )
+    mark_run_meta_failed(
+        project,
+        "home",
+        pipeline_run_id="run-failed",
+        error="boom",
+    )
+    payload = json.loads(run_meta_path(project, "home").read_text(encoding="utf-8"))
+    assert payload["status"] == "failed"
+    assert payload["writeback"] == "failed"
+    assert payload["candidate_build_run_id"] == "run-failed"
+    assert payload["committed_build_run_id"] == "run-committed"
+    assert payload["written_files"] == []
+    assert payload["last_error"] == "boom"

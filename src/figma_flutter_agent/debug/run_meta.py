@@ -27,6 +27,32 @@ RunMetaStatus = Literal[
 RUN_META_SCHEMA_VERSION = "2"
 LEGACY_RUN_META_SCHEMA_VERSION = "legacy"
 
+# Candidate-scoped keys cleared on each new run; only committed + extension keys survive.
+_STAMPED_RUN_META_KEYS = frozenset(
+    {
+        "feature",
+        "pipeline_run_id",
+        "candidate_build_run_id",
+        "committed_build_run_id",
+        "writeback",
+        "written_files",
+        "analyze_passed",
+        "captured_at",
+        "runMetaSchemaVersion",
+        "status",
+        "cached_ir_verdict",
+        "clean_tree_hash",
+        "generation_config_hash",
+        "timed_out_stage",
+        "last_error",
+    }
+)
+
+_INCOMPLETE_RUN_STATUSES = frozenset({"started", "parsed", "planned", "validated"})
+_TERMINAL_FAILURE_STATUSES = frozenset({"failed", "timed_out"})
+INCOMPLETE_RUN_STATUSES = _INCOMPLETE_RUN_STATUSES
+TERMINAL_FAILURE_RUN_STATUSES = _TERMINAL_FAILURE_STATUSES
+
 
 @dataclass(frozen=True)
 class RunMetaRecord:
@@ -149,6 +175,11 @@ def _resolve_committed_build_run_id(
     return str(raw) if raw else None
 
 
+def _extension_fields(existing: dict[str, Any]) -> dict[str, Any]:
+    """Return unknown/extension keys preserved across run boundaries."""
+    return {key: value for key, value in existing.items() if key not in _STAMPED_RUN_META_KEYS}
+
+
 def begin_run_meta(
     project_dir: Path,
     feature_name: str,
@@ -158,8 +189,8 @@ def begin_run_meta(
     """Start a new pipeline run: candidate = current run, committed = previous commit."""
     path = run_meta_path(project_dir, feature_name)
     existing = _read_run_meta_dict(path)
-    payload = dict(existing)
     prev_committed = existing.get("committed_build_run_id")
+    payload = _extension_fields(existing)
     payload["feature"] = feature_name
     payload["pipeline_run_id"] = pipeline_run_id
     payload["candidate_build_run_id"] = pipeline_run_id
@@ -168,8 +199,6 @@ def begin_run_meta(
     payload["captured_at"] = datetime.now(tz=UTC).isoformat()
     if prev_committed is not None:
         payload["committed_build_run_id"] = prev_committed
-    else:
-        payload.pop("committed_build_run_id", None)
     _write_run_meta_dict(path, payload)
     return path
 
@@ -202,17 +231,30 @@ def mark_run_meta_failed(
     pipeline_run_id: str,
     error: str | None = None,
 ) -> Path:
-    """Record pipeline failure without mutating candidate/committed build ids."""
-    fields: dict[str, Any] = {}
-    if error:
-        fields["last_error"] = error[:500]
-    return update_run_meta_stage(
-        project_dir,
-        feature_name,
-        pipeline_run_id=pipeline_run_id,
-        status="failed",
-        **fields,
+    """Record pipeline failure with forensic writeback and cleared candidate evidence."""
+    path = run_meta_path(project_dir, feature_name)
+    existing = _read_run_meta_dict(path)
+    prev_committed = existing.get("committed_build_run_id")
+    payload = _extension_fields(existing)
+    payload.update(
+        {
+            "feature": feature_name,
+            "pipeline_run_id": pipeline_run_id,
+            "candidate_build_run_id": pipeline_run_id,
+            "status": "failed",
+            "writeback": "failed",
+            "written_files": [],
+            "analyze_passed": None,
+            "runMetaSchemaVersion": RUN_META_SCHEMA_VERSION,
+            "captured_at": datetime.now(tz=UTC).isoformat(),
+        }
     )
+    if prev_committed is not None:
+        payload["committed_build_run_id"] = prev_committed
+    if error:
+        payload["last_error"] = error[:500]
+    _write_run_meta_dict(path, payload)
+    return path
 
 
 def write_run_meta(
@@ -256,7 +298,7 @@ def write_run_meta(
         timed_out_stage=timed_out_stage,
     )
     payload = record.to_dict()
-    for key, value in existing.items():
+    for key, value in _extension_fields(existing).items():
         if key not in payload:
             payload[key] = value
     _write_run_meta_dict(path, payload)

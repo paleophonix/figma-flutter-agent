@@ -13,7 +13,11 @@ from figma_flutter_agent.debug.paths import (
     DART_ERRORS_JSON,
     screen_root,
 )
-from figma_flutter_agent.debug.run_meta import read_run_meta
+from figma_flutter_agent.debug.run_meta import (
+    INCOMPLETE_RUN_STATUSES,
+    TERMINAL_FAILURE_RUN_STATUSES,
+    read_run_meta,
+)
 from figma_flutter_agent.dev.opencode.capture_passport import (
     CaptureRunState,
     capture_passport_summary,
@@ -168,6 +172,7 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
         else (pipeline_run_id or "unknown")
     )
     writeback = meta.writeback if meta else "skipped"
+    status = meta.status if meta else "legacy"
     served_probe = probe_served_run_id(project_dir, feature_name)
     served_id = served_probe or "unknown"
 
@@ -178,6 +183,42 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
         # RepairForensicEntryLaw: failed generate may skip run.meta.json while still
         # emitting screen.dart + dart-errors.json — route to forensic repair, not NO_SERVE.
         verdict = FailureClass.CANDIDATE_ONLY if candidate_available else FailureClass.NO_SERVE
+    elif status in TERMINAL_FAILURE_RUN_STATUSES:
+        verdict = FailureClass.ROLLED_BACK
+    elif status in INCOMPLETE_RUN_STATUSES:
+        verdict = FailureClass.CANDIDATE_ONLY if candidate_available else FailureClass.UNKNOWN_BLOCKED
+    elif status == "completed":
+        if writeback == "rollback" or writeback == "failed":
+            verdict = FailureClass.ROLLED_BACK
+        elif writeback == "committed" and pipeline_run_id == committed_id:
+            capture = _load_capture_manifest(screen_dir)
+            captured_run = str(capture.get("captured_run_id") or capture.get("runId") or "")
+            run_state = capture_run_state(capture)
+            if run_state == CaptureRunState.RAN_FAIL:
+                verdict = FailureClass.CAPTURE_FAILED
+            elif run_state == CaptureRunState.RAN_OK:
+                if captured_run and captured_run not in ("", served_id, committed_id):
+                    verdict = FailureClass.STALE_CAPTURE
+                elif _has_analyze_errors(screen_dir):
+                    verdict = FailureClass.CANDIDATE_ONLY
+                elif served_probe is None:
+                    verdict = FailureClass.NO_SERVE
+                elif served_probe != committed_id:
+                    verdict = FailureClass.CANDIDATE_ONLY
+                else:
+                    verdict = FailureClass.FRESH_OK
+            elif _has_analyze_errors(screen_dir):
+                verdict = FailureClass.CANDIDATE_ONLY
+            elif served_probe is None:
+                verdict = FailureClass.NO_SERVE
+            elif served_probe != committed_id:
+                verdict = FailureClass.CANDIDATE_ONLY
+            else:
+                verdict = FailureClass.CAPTURE_PENDING
+        elif candidate_available and writeback != "committed":
+            verdict = FailureClass.CANDIDATE_ONLY
+        else:
+            verdict = FailureClass.UNKNOWN_BLOCKED
     elif writeback == "rollback" or writeback == "failed":
         verdict = FailureClass.ROLLED_BACK
     elif writeback == "committed" and pipeline_run_id == committed_id:
