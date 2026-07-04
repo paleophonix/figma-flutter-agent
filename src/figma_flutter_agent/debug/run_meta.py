@@ -316,7 +316,7 @@ def _assert_reconcile_target_writable(
             f"for {target_owner!r}, writer={pipeline_run_id!r}"
         )
         raise RunMetaStaleWriterError(msg)
-    if target_started > source_started:
+    if target_started >= source_started:
         msg = (
             f"run.meta reconcile blocked: canonical target superseded writer "
             f"(target={target_owner!r}, writer={pipeline_run_id!r})"

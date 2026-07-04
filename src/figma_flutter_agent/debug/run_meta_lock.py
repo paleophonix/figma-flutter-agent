@@ -15,7 +15,14 @@ from figma_flutter_agent.errors import RunMetaStaleWriterError
 
 _DEFAULT_LOCK_TIMEOUT_SEC = 600.0
 _UTF8_ENCODING = "utf-8"
-_WINDOWS_LOCK_CONTENTION_ERRNOS = frozenset({33, 36})
+_WINDOWS_LOCK_CONTENTION_ERRNOS = frozenset(
+    {
+        errno.EACCES,
+        errno.EDEADLK,
+        33,
+        36,
+    }
+)
 _UNIX_LOCK_CONTENTION_ERRNOS = frozenset({errno.EAGAIN, errno.EACCES, errno.EDEADLK})
 
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import os
 import sys
 from pathlib import Path
@@ -13,14 +14,24 @@ from figma_flutter_agent.debug.run_meta_lock import run_meta_lifecycle_lock
 from figma_flutter_agent.errors import RunMetaStaleWriterError
 
 
-def test_lock_timeout_does_not_attempt_unlock_when_never_acquired(tmp_path: Path) -> None:
-    meta_path = tmp_path / "screen" / "run.meta.json"
-    meta_path.parent.mkdir(parents=True)
-
+def _windows_lock_timeout_setup(
+    *,
+    contention_errno: int,
+    contention_message: str,
+) -> tuple[Path, MagicMock]:
+    meta_path = Path("/tmp/screen/run.meta.json")
     fake_msvcrt = MagicMock()
     fake_msvcrt.LK_NBLCK = 8
     fake_msvcrt.LK_UNLCK = 9
-    fake_msvcrt.locking.side_effect = OSError(36, "resource deadlock would occur")
+    fake_msvcrt.locking.side_effect = OSError(contention_errno, contention_message)
+    return meta_path, fake_msvcrt
+
+
+def test_lock_timeout_does_not_attempt_unlock_when_never_acquired() -> None:
+    meta_path, fake_msvcrt = _windows_lock_timeout_setup(
+        contention_errno=errno.EACCES,
+        contention_message="permission denied",
+    )
 
     with (
         patch.object(os, "name", "nt"),
@@ -32,6 +43,7 @@ def test_lock_timeout_does_not_attempt_unlock_when_never_acquired(tmp_path: Path
             return_value=99,
         ),
         patch("figma_flutter_agent.debug.run_meta_lock.os.close") as close_mock,
+        patch.object(Path, "mkdir"),
     ):
         with pytest.raises(RunMetaStaleWriterError, match="lock timeout"):
             with run_meta_lifecycle_lock(meta_path, timeout_sec=0.01):
@@ -46,13 +58,33 @@ def test_lock_timeout_does_not_attempt_unlock_when_never_acquired(tmp_path: Path
     close_mock.assert_called_once_with(99)
 
 
-def test_non_contention_oserror_is_not_swallowed(tmp_path: Path) -> None:
-    meta_path = tmp_path / "screen" / "run.meta.json"
-    meta_path.parent.mkdir(parents=True)
+def test_lock_timeout_treats_edeadlk_as_contention() -> None:
+    meta_path, fake_msvcrt = _windows_lock_timeout_setup(
+        contention_errno=errno.EDEADLK,
+        contention_message="resource deadlock would occur",
+    )
 
-    fake_msvcrt = MagicMock()
-    fake_msvcrt.LK_NBLCK = 8
-    fake_msvcrt.locking.side_effect = OSError(13, "permission denied")
+    with (
+        patch.object(os, "name", "nt"),
+        patch("figma_flutter_agent.debug.run_meta_lock.time.monotonic", side_effect=[0.0, 1.0]),
+        patch.dict("sys.modules", {"msvcrt": fake_msvcrt}),
+        patch(
+            "figma_flutter_agent.debug.run_meta_lock.os.open",
+            return_value=99,
+        ),
+        patch("figma_flutter_agent.debug.run_meta_lock.os.close"),
+        patch.object(Path, "mkdir"),
+    ):
+        with pytest.raises(RunMetaStaleWriterError, match="lock timeout"):
+            with run_meta_lifecycle_lock(meta_path, timeout_sec=0.01):
+                pass
+
+
+def test_non_contention_oserror_is_not_swallowed() -> None:
+    meta_path, fake_msvcrt = _windows_lock_timeout_setup(
+        contention_errno=errno.EINVAL,
+        contention_message="invalid argument",
+    )
 
     with (
         patch.object(os, "name", "nt"),
@@ -62,7 +94,8 @@ def test_non_contention_oserror_is_not_swallowed(tmp_path: Path) -> None:
             return_value=99,
         ),
         patch("figma_flutter_agent.debug.run_meta_lock.os.close"),
+        patch.object(Path, "mkdir"),
     ):
-        with pytest.raises(OSError, match="permission denied"):
+        with pytest.raises(OSError, match="invalid argument"):
             with run_meta_lifecycle_lock(meta_path, timeout_sec=1.0):
                 pass
