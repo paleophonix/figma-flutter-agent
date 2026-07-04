@@ -15,6 +15,7 @@ WritebackOutcome = Literal["committed", "rollback", "skipped", "failed"]
 RunMetaStatus = Literal[
     "started",
     "parsed",
+    "ir_ready",
     "planned",
     "validated",
     "completed",
@@ -48,10 +49,27 @@ _STAMPED_RUN_META_KEYS = frozenset(
     }
 )
 
-_INCOMPLETE_RUN_STATUSES = frozenset({"started", "parsed", "planned", "validated"})
+_INCOMPLETE_RUN_STATUSES = frozenset(
+    {"started", "parsed", "ir_ready", "planned", "validated"}
+)
 _TERMINAL_FAILURE_STATUSES = frozenset({"failed", "timed_out"})
 INCOMPLETE_RUN_STATUSES = _INCOMPLETE_RUN_STATUSES
 TERMINAL_FAILURE_RUN_STATUSES = _TERMINAL_FAILURE_STATUSES
+KNOWN_RUN_META_SCHEMA_VERSIONS = frozenset({RUN_META_SCHEMA_VERSION})
+KNOWN_RUN_META_STATUSES = frozenset(
+    {
+        "started",
+        "parsed",
+        "ir_ready",
+        "planned",
+        "validated",
+        "completed",
+        "failed",
+        "timed_out",
+        "legacy",
+    }
+)
+KNOWN_WRITEBACK_OUTCOMES = frozenset({"committed", "rollback", "skipped", "failed"})
 
 
 @dataclass(frozen=True)
@@ -180,6 +198,35 @@ def _extension_fields(existing: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in existing.items() if key not in _STAMPED_RUN_META_KEYS}
 
 
+def _current_run_evidence(existing: dict[str, Any], pipeline_run_id: str) -> dict[str, Any]:
+    """Return forensic fields from the in-flight run when ids still match."""
+    if str(existing.get("pipeline_run_id") or "") != pipeline_run_id:
+        return {}
+    preserved: dict[str, Any] = {}
+    for key in (
+        "cached_ir_verdict",
+        "clean_tree_hash",
+        "generation_config_hash",
+        "timed_out_stage",
+    ):
+        if key in existing:
+            preserved[key] = existing[key]
+    return preserved
+
+
+def is_run_meta_gate_trusted(meta: RunMetaRecord) -> bool:
+    """Return whether Run Gate may trust schema status and writeback fields."""
+    if meta.run_meta_schema_version == LEGACY_RUN_META_SCHEMA_VERSION:
+        return meta.status == "legacy"
+    if meta.run_meta_schema_version not in KNOWN_RUN_META_SCHEMA_VERSIONS:
+        return False
+    if meta.status not in KNOWN_RUN_META_STATUSES:
+        return False
+    if meta.writeback not in KNOWN_WRITEBACK_OUTCOMES:
+        return False
+    return True
+
+
 def begin_run_meta(
     project_dir: Path,
     feature_name: str,
@@ -249,6 +296,7 @@ def mark_run_meta_failed(
             "captured_at": datetime.now(tz=UTC).isoformat(),
         }
     )
+    payload.update(_current_run_evidence(existing, pipeline_run_id))
     if prev_committed is not None:
         payload["committed_build_run_id"] = prev_committed
     if error:

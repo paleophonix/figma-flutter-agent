@@ -16,6 +16,7 @@ from figma_flutter_agent.debug.paths import (
 from figma_flutter_agent.debug.run_meta import (
     INCOMPLETE_RUN_STATUSES,
     TERMINAL_FAILURE_RUN_STATUSES,
+    is_run_meta_gate_trusted,
     read_run_meta,
 )
 from figma_flutter_agent.dev.opencode.capture_passport import (
@@ -183,6 +184,8 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
         # RepairForensicEntryLaw: failed generate may skip run.meta.json while still
         # emitting screen.dart + dart-errors.json — route to forensic repair, not NO_SERVE.
         verdict = FailureClass.CANDIDATE_ONLY if candidate_available else FailureClass.NO_SERVE
+    elif not is_run_meta_gate_trusted(meta):
+        verdict = FailureClass.UNKNOWN_BLOCKED
     elif status in TERMINAL_FAILURE_RUN_STATUSES:
         verdict = FailureClass.ROLLED_BACK
     elif status in INCOMPLETE_RUN_STATUSES:

@@ -205,3 +205,91 @@ def test_run_gate_incomplete_validated_is_candidate_only(tmp_path) -> None:
     result = evaluate_run_gate(project, feature)
     assert result.verdict == FailureClass.CANDIDATE_ONLY
     assert result.case_mode == "FORENSIC"
+
+
+def test_run_gate_unknown_status_never_fresh_ok(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    feature = "login"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// FFA_RUN_ID: run_abc\n", encoding="utf-8")
+    path = root / "run.meta.json"
+    path.write_text(
+        json.dumps(
+            {
+                "runMetaSchemaVersion": "2",
+                "status": "future_state",
+                "writeback": "committed",
+                "pipeline_run_id": "run_abc",
+                "candidate_build_run_id": "run_abc",
+                "committed_build_run_id": "run_abc",
+                "written_files": ["lib/generated/login.dart"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (root / "capture.json").write_text(
+        '{"flutterCaptureOk": true, "changedRatio": 0.01}',
+        encoding="utf-8",
+    )
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.UNKNOWN_BLOCKED
+    assert result.verdict != FailureClass.FRESH_OK
+
+
+def test_run_gate_future_schema_never_fresh_ok(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    feature = "login"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// FFA_RUN_ID: run_abc\n", encoding="utf-8")
+    path = root / "run.meta.json"
+    path.write_text(
+        json.dumps(
+            {
+                "runMetaSchemaVersion": "999",
+                "status": "completed",
+                "writeback": "committed",
+                "pipeline_run_id": "run_abc",
+                "candidate_build_run_id": "run_abc",
+                "committed_build_run_id": "run_abc",
+                "written_files": ["lib/generated/login.dart"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (root / "capture.json").write_text(
+        '{"flutterCaptureOk": true, "changedRatio": 0.01}',
+        encoding="utf-8",
+    )
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.UNKNOWN_BLOCKED
+
+
+def test_run_gate_malformed_writeback_never_fresh_ok(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    feature = "login"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// FFA_RUN_ID: run_abc\n", encoding="utf-8")
+    path = root / "run.meta.json"
+    path.write_text(
+        json.dumps(
+            {
+                "runMetaSchemaVersion": "2",
+                "status": "completed",
+                "writeback": "maybe_committed",
+                "pipeline_run_id": "run_abc",
+                "candidate_build_run_id": "run_abc",
+                "committed_build_run_id": "run_abc",
+                "written_files": ["lib/generated/login.dart"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (root / "capture.json").write_text(
+        '{"flutterCaptureOk": true, "changedRatio": 0.01}',
+        encoding="utf-8",
+    )
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.UNKNOWN_BLOCKED

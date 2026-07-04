@@ -442,7 +442,14 @@ def test_refresh_debug_mirror_rejects_run_id_mismatch(tmp_path: Path) -> None:
     fresh = worktree / ".debug" / "screen" / "flutter_project" / "login"
     fresh.mkdir(parents=True)
     (fresh / RUN_META_JSON).write_text(
-        '{"pipeline_run_id":"meta-run","committed_build_run_id":"meta-run"}',
+        json.dumps(
+            {
+                "status": "completed",
+                "writeback": "committed",
+                "pipeline_run_id": "meta-run",
+                "committed_build_run_id": "meta-run",
+            }
+        ),
         encoding="utf-8",
     )
     workspace = RepairWorkspace(
@@ -489,5 +496,48 @@ def test_validate_mirror_run_id_skips_when_meta_absent(tmp_path: Path) -> None:
         sandbox_project_dir=sandbox_dir,
         feature="login",
         regen_run_id="subprocess-run",
+    )
+    assert result.mirror_dir.is_dir()
+
+
+def test_refresh_debug_mirror_accepts_skipped_noop_regenerate(tmp_path: Path) -> None:
+    from figma_flutter_agent.debug.paths import RUN_META_JSON
+    from figma_flutter_agent.dev.opencode.regenerate_mirror import refresh_debug_mirror
+
+    worktree = tmp_path / "wt"
+    worktree.mkdir()
+    project_dir = tmp_path / "limbo"
+    project_dir.mkdir()
+    sandbox_dir = worktree / ".repair" / "candidate" / "flutter_project"
+    sandbox_dir.mkdir(parents=True)
+    fresh = worktree / ".debug" / "screen" / "flutter_project" / "login"
+    fresh.mkdir(parents=True)
+    (fresh / RUN_META_JSON).write_text(
+        json.dumps(
+            {
+                "status": "completed",
+                "writeback": "skipped",
+                "pipeline_run_id": "run-new",
+                "candidate_build_run_id": "run-new",
+                "committed_build_run_id": "run-old",
+                "written_files": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    workspace = RepairWorkspace(
+        case_id="case",
+        worktree=worktree,
+        repair_root=worktree / ".repair",
+        state_dir=worktree / ".repair" / "state",
+        debug_mirror=worktree / ".repair" / "debug" / "limbo" / "login",
+        manifest_path=worktree / ".repair" / "manifest.json",
+    )
+    result = refresh_debug_mirror(
+        workspace=workspace,
+        source_project_dir=project_dir,
+        sandbox_project_dir=sandbox_dir,
+        feature="login",
+        regen_run_id="run-new",
     )
     assert result.mirror_dir.is_dir()

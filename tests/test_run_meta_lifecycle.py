@@ -183,3 +183,25 @@ def test_mark_run_meta_failed_sets_forensic_writeback(tmp_path: Path) -> None:
     assert payload["committed_build_run_id"] == "run-committed"
     assert payload["written_files"] == []
     assert payload["last_error"] == "boom"
+
+
+def test_mark_run_meta_failed_preserves_current_run_evidence(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    begin_run_meta(project, "home", pipeline_run_id="run-fail")
+    update_run_meta_stage(
+        project,
+        "home",
+        pipeline_run_id="run-fail",
+        status="planned",
+        clean_tree_hash="tree-1",
+        generation_config_hash="cfg-1",
+        cached_ir_verdict="incompatible",
+    )
+    mark_run_meta_failed(project, "home", pipeline_run_id="run-fail", error="late fail")
+    payload = json.loads(run_meta_path(project, "home").read_text(encoding="utf-8"))
+    assert payload["status"] == "failed"
+    assert payload["writeback"] == "failed"
+    assert payload["clean_tree_hash"] == "tree-1"
+    assert payload["generation_config_hash"] == "cfg-1"
+    assert payload["cached_ir_verdict"] == "incompatible"

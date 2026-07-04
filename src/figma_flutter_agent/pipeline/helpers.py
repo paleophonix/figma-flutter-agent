@@ -103,6 +103,33 @@ def can_regenerate_stale_cached_ir(settings: Settings, *, dry_run: bool) -> bool
     return bool(settings.llm_api_key())
 
 
+def resolve_early_feature_slug(
+    settings: Settings,
+    *,
+    feature_name: str | None,
+    from_dump: Path | None,
+    project_dir: Path,
+) -> str | None:
+    """Resolve a screen slug before fetch/parse when configuration or dump allows it."""
+    configured = feature_name or settings.agent.naming.feature_name
+    if configured and configured != "auto":
+        return to_snake_case(configured)
+    if from_dump is not None:
+        from figma_flutter_agent.pipeline.dump import resolve_frame_metadata_from_dump
+
+        try:
+            meta = resolve_frame_metadata_from_dump(
+                project_dir,
+                from_dump,
+                feature_name=feature_name,
+            )
+            if meta.feature_name:
+                return meta.feature_name
+        except FlutterProjectError:
+            return None
+    return None
+
+
 def resolve_feature_name(frame_name: str, configured: str) -> str:
     """Resolve the feature folder name from frame metadata or config."""
     if configured != "auto":

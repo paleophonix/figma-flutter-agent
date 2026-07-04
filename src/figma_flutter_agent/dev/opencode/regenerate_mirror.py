@@ -181,7 +181,7 @@ def resolve_regenerate_debug_screen_root(
 
 
 def _validate_mirror_run_id(mirror_dir: Path, regen_run_id: str) -> None:
-    """Ensure ``run.meta.json`` committed id matches the regenerate subprocess run id."""
+    """Ensure ``run.meta.json`` run ids match the regenerate subprocess run id."""
     meta_path = mirror_dir / RUN_META_JSON
     if not meta_path.is_file():
         return
@@ -191,10 +191,40 @@ def _validate_mirror_run_id(mirror_dir: Path, regen_run_id: str) -> None:
         raise FigmaFlutterError(f"RUN_ID_MISMATCH: invalid {RUN_META_JSON}") from exc
     if not isinstance(data, dict):
         raise FigmaFlutterError(f"RUN_ID_MISMATCH: invalid {RUN_META_JSON}")
-    committed = str(data.get("committed_build_run_id") or data.get("pipeline_run_id") or "").strip()
-    if committed != regen_run_id:
-        msg = f"RUN_ID_MISMATCH: expected {regen_run_id!r}, got {committed!r}"
+
+    status = str(data.get("status") or "").strip()
+    writeback = str(data.get("writeback") or "").strip()
+    pipeline_run_id = str(data.get("pipeline_run_id") or "").strip()
+    candidate = str(data.get("candidate_build_run_id") or pipeline_run_id or "").strip()
+
+    if status != "completed":
+        msg = f"RUN_ID_MISMATCH: expected completed status, got {status!r}"
         raise FigmaFlutterError(msg)
+
+    if writeback == "committed":
+        committed = str(data.get("committed_build_run_id") or pipeline_run_id or "").strip()
+        if committed != regen_run_id:
+            msg = f"RUN_ID_MISMATCH: expected {regen_run_id!r}, got {committed!r}"
+            raise FigmaFlutterError(msg)
+        return
+
+    if writeback == "skipped":
+        if pipeline_run_id != regen_run_id:
+            msg = (
+                f"RUN_ID_MISMATCH: expected pipeline_run_id {regen_run_id!r}, "
+                f"got {pipeline_run_id!r}"
+            )
+            raise FigmaFlutterError(msg)
+        if candidate != regen_run_id:
+            msg = (
+                f"RUN_ID_MISMATCH: expected candidate_build_run_id {regen_run_id!r}, "
+                f"got {candidate!r}"
+            )
+            raise FigmaFlutterError(msg)
+        return
+
+    msg = f"RUN_ID_MISMATCH: unsupported writeback {writeback!r} for regenerate proof"
+    raise FigmaFlutterError(msg)
 
 
 @dataclass(frozen=True)

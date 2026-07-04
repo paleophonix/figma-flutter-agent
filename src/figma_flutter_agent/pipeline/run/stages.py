@@ -740,14 +740,14 @@ async def run_llm_and_plan_phase(
 
     ir_cache_policy = ir_cache_policy_at_pipeline_boundary()
 
-    def _record_parsed_stage(outcome: Any) -> None:
+    def _record_ir_ready_stage(outcome: Any) -> None:
         ctx.cached_ir_verdict = outcome.cached_ir_verdict
         if ctx.resolved_feature and not dry_run and ctx.pipeline_run_id:
             update_run_meta_stage(
                 project_dir,
                 ctx.resolved_feature,
                 pipeline_run_id=ctx.pipeline_run_id,
-                status="parsed",
+                status="ir_ready",
                 cached_ir_verdict=outcome.cached_ir_verdict,
             )
 
@@ -827,7 +827,7 @@ async def run_llm_and_plan_phase(
                 figma_reference_png=ctx.reference_image_png,
                 project_dir=project_dir,
             )
-    _record_parsed_stage(llm_outcome)
+    _record_ir_ready_stage(llm_outcome)
     ctx.warnings.extend(llm_outcome.llm_result.warnings)
     ctx.warnings.extend(llm_outcome.fallback_warnings)
 

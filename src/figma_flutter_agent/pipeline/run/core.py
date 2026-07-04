@@ -27,6 +27,7 @@ from figma_flutter_agent.pipeline.dump import (
 )
 from figma_flutter_agent.pipeline.dump_prefetch import ScreenDumpPrefetch
 from figma_flutter_agent.pipeline.helpers import (
+    resolve_early_feature_slug,
     resolve_manifest_cached_dump,
     routing_enabled,
     validate_project_dir,
@@ -207,73 +208,96 @@ async def run_pipeline(
             "Install with: poetry install (Pillow is a default dependency)."
         )
 
-    if from_dump is not None:
-        await run_dump_fetch_parse_phase(
-            ctx,
-            log=log,
-            parsed=parsed,
-            settings=settings,
-            project_dir=project_dir,
-            from_dump=from_dump,
-            dry_run=dry_run,
-            offline_dump_mode=offline_dump_mode,
-            pipeline_deps=pipeline_deps,
-            dev_mode_dump=dev_mode_dump,
-            dev_mode_css_override=dev_mode_css_override,
-            parse_fn=parse_figma_frame,
-            dump_prefetch=dump_prefetch,
-        )
-    else:
-        await run_live_fetch_parse_phase(
-            ctx,
-            log=log,
-            parsed=parsed,
-            settings=settings,
-            project_dir=project_dir,
-            dry_run=dry_run,
-            verbose=verbose,
-            pipeline_deps=pipeline_deps,
-            dev_mode_dump=dev_mode_dump,
-            dev_mode_css_override=dev_mode_css_override,
-            parse_fn=parse_figma_frame,
-            fetch_fn=fetch_figma_frame,
-            export_assets_fn=export_figma_assets,
-        )
-
-    ctx.require_parse_complete()
-    with log_stage(log, "analyze"):
-        ctx.collect_analysis_warnings()
-
-    clean_tree = ctx.clean_tree
-    tokens = ctx.tokens
-    dedup_result = ctx.dedup_result
-    assert clean_tree is not None and tokens is not None and dedup_result is not None
-
-    log = apply_viewport_inset_and_resolve_feature(
-        ctx,
-        log=log,
-        settings=settings,
-        project_dir=project_dir,
+    early_feature = resolve_early_feature_slug(
+        settings,
         feature_name=feature_name,
         from_dump=from_dump,
-        dry_run=dry_run,
-        verbose=verbose,
+        project_dir=project_dir,
     )
-    resolved_feature = ctx.resolved_feature
-    reset_pipeline_run_debug_dirs(project_dir, resolved_feature)
-    run_meta_active = bool(resolved_feature and not dry_run)
-    if run_meta_active:
+    run_meta_active = bool(early_feature and not dry_run)
+    if run_meta_active and early_feature is not None:
         from figma_flutter_agent.debug.run_meta import begin_run_meta
 
-        begin_run_meta(project_dir, resolved_feature, pipeline_run_id=run_id)
-    bind_terminal_log_session(project_dir, resolved_feature)
-    bind_dart_error_session(
-        run_id=run_id,
-        project_dir=project_dir,
-        feature_name=resolved_feature,
-    )
+        begin_run_meta(project_dir, early_feature, pipeline_run_id=run_id)
 
     async def _complete_run() -> PipelineResult:
+        nonlocal run_meta_active
+
+        if from_dump is not None:
+            await run_dump_fetch_parse_phase(
+                ctx,
+                log=log,
+                parsed=parsed,
+                settings=settings,
+                project_dir=project_dir,
+                from_dump=from_dump,
+                dry_run=dry_run,
+                offline_dump_mode=offline_dump_mode,
+                pipeline_deps=pipeline_deps,
+                dev_mode_dump=dev_mode_dump,
+                dev_mode_css_override=dev_mode_css_override,
+                parse_fn=parse_figma_frame,
+                dump_prefetch=dump_prefetch,
+            )
+        else:
+            await run_live_fetch_parse_phase(
+                ctx,
+                log=log,
+                parsed=parsed,
+                settings=settings,
+                project_dir=project_dir,
+                dry_run=dry_run,
+                verbose=verbose,
+                pipeline_deps=pipeline_deps,
+                dev_mode_dump=dev_mode_dump,
+                dev_mode_css_override=dev_mode_css_override,
+                parse_fn=parse_figma_frame,
+                fetch_fn=fetch_figma_frame,
+                export_assets_fn=export_figma_assets,
+            )
+
+        ctx.require_parse_complete()
+        with log_stage(log, "analyze"):
+            ctx.collect_analysis_warnings()
+
+        clean_tree = ctx.clean_tree
+        tokens = ctx.tokens
+        dedup_result = ctx.dedup_result
+        assert clean_tree is not None and tokens is not None and dedup_result is not None
+
+        log = apply_viewport_inset_and_resolve_feature(
+            ctx,
+            log=log,
+            settings=settings,
+            project_dir=project_dir,
+            feature_name=feature_name,
+            from_dump=from_dump,
+            dry_run=dry_run,
+            verbose=verbose,
+        )
+        resolved_feature = ctx.resolved_feature
+        if not dry_run and resolved_feature:
+            from figma_flutter_agent.debug.run_meta import begin_run_meta, update_run_meta_stage
+
+            if not run_meta_active:
+                begin_run_meta(project_dir, resolved_feature, pipeline_run_id=run_id)
+                run_meta_active = True
+            parse_hashes = design_hashes(clean_tree, tokens)
+            update_run_meta_stage(
+                project_dir,
+                resolved_feature,
+                pipeline_run_id=run_id,
+                status="parsed",
+                clean_tree_hash=parse_hashes.tree_hash,
+            )
+        reset_pipeline_run_debug_dirs(project_dir, resolved_feature)
+        bind_terminal_log_session(project_dir, resolved_feature)
+        bind_dart_error_session(
+            run_id=run_id,
+            project_dir=project_dir,
+            feature_name=resolved_feature,
+        )
+
         hashes = design_hashes(clean_tree, tokens)
         incremental, sync_warnings = load_incremental_context(
             project_dir,
@@ -537,12 +561,13 @@ async def run_pipeline(
     try:
         return await _complete_run()
     except Exception as exc:
-        if run_meta_active and resolved_feature:
+        fail_feature = ctx.resolved_feature or early_feature
+        if run_meta_active and fail_feature:
             from figma_flutter_agent.debug.run_meta import mark_run_meta_failed
 
             mark_run_meta_failed(
                 project_dir,
-                resolved_feature,
+                fail_feature,
                 pipeline_run_id=run_id,
                 error=str(exc),
             )
