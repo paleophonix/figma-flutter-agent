@@ -165,10 +165,15 @@ def prepare_layout_children(
             from figma_flutter_agent.generator.layout.flex_policy.stack import (
                 layout_fact_icon_badge_stack,
             )
+            from figma_flutter_agent.parser.interaction.icons import (
+                layout_fact_occluding_icon_fill_plate,
+            )
 
-            if not layout_fact_icon_badge_stack(node):
-                for stack_child in sorted_children:
-                    if layout_fact_icon_glyph_frame_placeholder(stack_child, parent=node):
+            for stack_child in sorted_children:
+                if layout_fact_occluding_icon_fill_plate(stack_child, parent=node):
+                    omit_child_ids.add(stack_child.id)
+                elif layout_fact_icon_glyph_frame_placeholder(stack_child, parent=node):
+                    if not layout_fact_icon_badge_stack(node):
                         omit_child_ids.add(stack_child.id)
     return (
         sorted_children,

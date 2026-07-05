@@ -859,6 +859,21 @@ def test_food_replay_pruned_upload_tile_rehydrates_glyph() -> None:
     assert "SizedBox.shrink()" not in compact
 
 
+def test_save_button_absolute_slot_survives_omitted_surface() -> None:
+    """Law: AbsoluteSlotChildMultisetLaw — omitted painted surfaces stay out of zip pairs."""
+    from figma_flutter_agent.parser.interaction import button_has_absolute_slot_children
+
+    root = _load_food_root()
+    save = _find_node(root, "602:1230")
+    assert save is not None
+    assert button_has_absolute_slot_children(save)
+    emitted = render_node_body(save, uses_svg=True, parent_type=NodeType.STACK)
+    compact = emitted.replace("\n", "")
+    assert "Save Changes" in compact
+    assert "Ink(decoration: BoxDecoration(" in compact
+    assert "0xFFFF7622" in compact
+
+
 def test_button_painted_surface_strips_nested_positioned() -> None:
     """Law: ButtonPaintedSurfaceStackParentDataLaw — overlay stack strips Positioned children."""
     root = _load_food_root()

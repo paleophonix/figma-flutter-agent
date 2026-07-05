@@ -101,8 +101,12 @@ def test_star_cluster_delegates_to_star_widget_not_radio() -> None:
     assert cluster_classes.get("component_211_5913") == "StarFilledWidget"
     assert resolve_cluster_delegate_class(star, cluster_classes) == "StarFilledWidget"
     layout = _render_layout(root)
-    assert "const StarFilledWidget()" in layout
-    assert "const RadioButtonWidget()" not in layout
+    for label in ("Unlimited access", "200GB storage", "Sync all your devices"):
+        idx = layout.find(label)
+        assert idx != -1
+        row = layout[max(0, idx - 320) : idx]
+        assert "StarFilledWidget" in row
+        assert "RadioButtonWidget" not in row
 
 
 def test_selected_radio_inner_vector_stays_out_of_build_background() -> None:
@@ -124,7 +128,46 @@ def test_compact_radio_min_touch_target_does_not_expand_flex_slot() -> None:
         children=[],
     )
     wrapped = _wrap_min_touch_target(radio, "const Icon(Icons.circle_outlined)")
-    assert "width: 16.0, height: 16.0" in wrapped
-    assert "OverflowBox(" in wrapped
-    assert "minWidth: 44.0" in wrapped
-    assert "SizedBox(width: 44.0, height: 44.0, child: Center" not in wrapped
+    assert wrapped == "const Icon(Icons.circle_outlined)"
+    assert "OverflowBox(" not in wrapped
+
+
+def test_subscription_plan_rows_delegate_radios_not_list_tile_icons() -> None:
+    root = _load_root()
+    cluster_classes = _cluster_classes(root)
+    layout = _render_layout(root)
+    assert "const RadioButtonWidget()" in layout
+    assert "Icons.circle_outlined" not in layout
+    monthly_row = _find_node(root, "240:6302")
+    assert monthly_row is not None
+    lead = monthly_row.children[0]
+    assert lead.type == NodeType.RADIO
+    assert resolve_cluster_delegate_class(lead, cluster_classes) == "RadioButtonWidget"
+
+
+def test_star_cluster_widget_omits_occluding_fill_plate() -> None:
+    root = _load_root()
+    counts: Counter[str] = Counter()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if node.cluster_id:
+            counts[node.cluster_id] += 1
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    specs = collect_cluster_widget_specs(
+        root, {cluster_id: count for cluster_id, count in counts.items() if count >= 2}
+    )
+    from figma_flutter_agent.generator.widget_extractor import render_cluster_widgets
+
+    result = render_cluster_widgets(specs, uses_svg=True, clean_trees=[root])
+    star_file = result.files.get("lib/widgets/star_filled_widget.dart", "")
+    assert "211_5908" not in star_file
+    assert star_file.count("0xFF006FFD") <= 1
+
+
+def test_plan_rows_avoid_fixed_width_inside_expanded() -> None:
+    root = _load_root()
+    layout = _render_layout(root)
+    assert "width: 194" not in layout

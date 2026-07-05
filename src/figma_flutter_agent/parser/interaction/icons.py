@@ -246,6 +246,32 @@ def layout_fact_icon_glyph_frame_placeholder(
     return not node.children
 
 
+def layout_fact_occluding_icon_fill_plate(
+    node: CleanDesignTreeNode,
+    *,
+    parent: CleanDesignTreeNode | None = None,
+) -> bool:
+    """Full-bleed fill plate painted above a raster glyph sibling (occludes baked icon)."""
+    if node.type != NodeType.CONTAINER or parent is None or parent.type != NodeType.STACK:
+        return False
+    if node.style.background_color is None:
+        return False
+    if not layout_fact_compact_icon_glyph_host(parent):
+        return False
+    node_index = next(
+        (index for index, child in enumerate(parent.children) if child.id == node.id),
+        -1,
+    )
+    if node_index <= 0:
+        return False
+    for sibling in parent.children[:node_index]:
+        if sibling.type != NodeType.VECTOR:
+            continue
+        if sibling.image_asset_key:
+            return True
+    return False
+
+
 def _vector_paint_span(node: CleanDesignTreeNode) -> tuple[float, float]:
     """Return stroke vector paint width/height, using paint bounds when layout size is zero."""
     width = float(node.sizing.width or 0.0)

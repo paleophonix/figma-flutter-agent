@@ -172,10 +172,16 @@ def list_tile_leading_icon_slot(
 
     if parent_node is None:
         return False
+    if node.type in {NodeType.RADIO, NodeType.RADIO_GROUP}:
+        return False
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_compact_radio_label_row,
+    )
+
     row_host = parent_node
     if parent_type == NodeType.BUTTON and button_has_list_tile_row_body(parent_node):
         row_host = parent_node
-    elif parent_type != NodeType.ROW:
+    elif parent_type != NodeType.ROW or layout_fact_compact_radio_label_row(parent_node):
         return False
     if not row_host.children or row_host.children[0].id != node.id:
         return False

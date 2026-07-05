@@ -282,13 +282,16 @@ def _button_painted_surface_overlay_body(
 def _button_absolute_slot_stack_body(
     node: CleanDesignTreeNode,
     child_widgets: list[str],
+    *,
+    emitted_pairs: list[tuple[CleanDesignTreeNode, str]] | None = None,
 ) -> str:
     """Preserve absolutely positioned row chrome inside a tappable stack host."""
     from figma_flutter_agent.generator.layout.widgets.positioned import _positioned_fields
 
+    pairs = emitted_pairs or list(zip(node.children, child_widgets, strict=False))
     parent_height = float(node.sizing.height or 0.0) or None
     parts: list[str] = []
-    for child, widget in zip(node.children, child_widgets, strict=True):
+    for child, widget in pairs:
         stripped = widget.strip()
         if stripped.startswith("Positioned("):
             parts.append(widget)

@@ -61,30 +61,12 @@ def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
         layout_fact_input_trailing_icon_button,
     )
 
+    if node.type in {NodeType.RADIO, NodeType.RADIO_GROUP}:
+        return widget
     if layout_fact_input_trailing_icon_button(node):
         return widget
     if layout_fact_checkbox_control(node):
         return widget
-    if node.type in {NodeType.RADIO, NodeType.RADIO_GROUP}:
-        width = node.sizing.width
-        height = node.sizing.height
-        target = node.min_touch_target
-        if (
-            width is not None
-            and height is not None
-            and target is not None
-            and float(target) > 0
-            and float(width) <= 20.0
-            and float(height) <= 20.0
-        ):
-            visual_w = format_geometry_literal(float(width))
-            visual_h = format_geometry_literal(float(height))
-            touch = format_geometry_literal(float(target))
-            return (
-                f"SizedBox(width: {visual_w}, height: {visual_h}, child: OverflowBox("
-                f"minWidth: {touch}, minHeight: {touch}, maxWidth: {touch}, maxHeight: {touch}, "
-                f"child: Center(child: {widget})))"
-            )
     if node.type == NodeType.BUTTON and node.children:
         row_host = node.children[0]
         if row_host.type == NodeType.ROW and layout_fact_row_tight_horizontal_pill_label(row_host):

@@ -255,7 +255,11 @@ def render_button_node(
         if payment_card_body is not None:
             stack_body = payment_card_body
         elif button_has_absolute_slot_children(node):
-            stack_body = _button_absolute_slot_stack_body(node, child_widgets)
+            stack_body = _button_absolute_slot_stack_body(
+                node,
+                child_widgets,
+                emitted_pairs=flow.get("emitted_pairs"),
+            )
         elif button_has_list_tile_row_body(node):
             stack_body = _button_list_tile_row_body(node, child_widgets)
         elif button_has_social_auth_icon_label_body(node):
