@@ -10,7 +10,7 @@ disable-model-invocation: false
 
 @.claude/prompts/debug-common.md
 
-**Mandatory corpus:** Read and follow `.claude/skills/corpus/SKILL.md` before finalizing the report.
+**Mandatory corpus:** Read and follow `.claude/skills/corpus/SKILL.md` before finalizing the report. **Write OPEN cases on disk** — see Step 6; chat handoff alone is forbidden.
 
 # Debug Diagnosis Skill
 
@@ -223,37 +223,26 @@ root_cause:
 Rules: do not invent families; unknown mechanism → `unclassified` in report only; find the
 **first arrow** where the fact changed.
 
-Incorporate **user chat notes** into the triage report and into the **corpus handoff**
-block below (for Cursor to apply) — do not write `corpus/` files from this skill.
+Incorporate **user chat notes** into `case.summary` and/or evidence `summary` — never as the sole classifier; still require `family_id` from `families.yaml`.
+
+Rules: do not invent families; unknown mechanism → `corpus_status: unclassified` in report only (**never** write YAML); find the first arrow where the fact changed.
 
 ---
 
-# Step 8 — Corpus handoff (Cursor-owned writes)
+## Step 6 — Record OPEN corpus cases (mandatory gate)
 
-**Do not** create, update, or index `corpus/` YAML from `.claude/` diagnose.
+**CRITICAL:** See `.cursor/skills/diagnose/SKILL.md` — **CRITICAL — Corpus on disk before handoff**. Chat `corpus_handoff:` blocks are **forbidden** as a substitute for file I/O.
 
-When `corpus_status: ready_for_record` and confidence is `high` or `medium`, emit a
-**handoff block** in the triage report so a **Cursor** agent can write the case:
+Follow **`.claude/skills/corpus/SKILL.md`** (or `.cursor/skills/corpus/SKILL.md`) Steps 1–4 before the triage report is final when `corpus_status: ready_for_record`:
 
-```yaml
-corpus_handoff:
-  action: create | update          # if matching OPEN case exists in index
-  case_id: YYYY-MM-DD-<mechanism-slug>   # proposed; Cursor confirms uniqueness
-  family_id: ...
-  project: ...
-  feature: ...
-  status: OPEN                     # diagnose never proposes FIXED
-  summary: ...                     # include user chat notes
-  evidence:
-    - kind: debug_artifact
-      path: .debug/screen/<project>/<feature>/...
-      summary: ...
-```
+1. Write or update `corpus/cases/YYYY-MM-DD-<mechanism-slug>.yaml` (`status: OPEN`)
+2. `poetry run figma-flutter defects index --write` when cases changed
+3. `poetry run figma-flutter defects validate` — exit 0
+4. Report `Corpus recorded:` with **actual paths written**
 
-Skip handoff when `unclassified`, `needs_evidence`, infra-only, or symptom-only.
+**Do not** defer OPEN case YAML to `/repair`. Repair promotes to `FIXED` only after proof.
 
-List proposed handoffs under `Corpus handoff (Cursor):` in the report — paths **not**
-written yet. **Diagnose-only still means no compiler code and no corpus file I/O.**
+Skip YAML when `unclassified`, `needs_evidence`, infra-only, or symptom-only — report `Corpus recorded: none — <reason>`.
 
 ---
 
@@ -482,8 +471,8 @@ Out of scope (only if user narrowed or blocked by missing artifacts):
 Diagnosis summary:
   systemic vs fixture-local per item
 
-Corpus handoff (Cursor):
-  proposed case_id(s) or none — reason
+Corpus recorded:
+  repo paths written + defects validate result, or "none — <reason>"
 
 Regression risk:
 Rollback plan:
@@ -492,6 +481,4 @@ Proceed:
   BATCH REPAIR (default) | DIAGNOSE ONLY | SINGLE ITEM (user-scoped)
 ```
 
-After a **diagnose-only** report, do not change compiler code until repair. Corpus YAML
-writes are **Cursor-owned** — hand off Step 8 blocks when `ready_for_record`. After a
-**batch repair** trigger, do not wait for a separate consilium per queue item.
+After **diagnose-only**: no compiler code. **OPEN corpus YAML on disk is mandatory** when mechanism is classified — not chat handoff, not deferred to `/repair`. After a **batch repair** trigger, do not wait for a separate consilium per queue item.

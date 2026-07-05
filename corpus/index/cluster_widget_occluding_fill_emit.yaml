@@ -1,0 +1,18 @@
+version: 1
+family_id: cluster_widget_occluding_fill_emit
+generated: true
+cases:
+- case_id: 2026-07-05-star-cluster-fill-plate-occludes-glyph
+  case_file: cases/2026-07-05-star-cluster-fill-plate-occludes-glyph.yaml
+  title: Star Filled cluster widget emits occluding fill plate
+  project: limbo
+  feature: mobile_sub_plans
+  occurrence_id: mobile-sub-plans-star-fill-plate-occlusion
+  status: OPEN
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T18:10:00Z'
+  updated_at: '2026-07-05T18:10:00Z'
+  summary: 'Star Filled extracted widget materializes the component Fill plate (211:5908)
+    as a full-bounds blue Container, so list bullets render as blue squares and the
+    badge star disappears into the blue Recommended circle. User observation: no stars
+    in list or badge; assets confirmed o...'

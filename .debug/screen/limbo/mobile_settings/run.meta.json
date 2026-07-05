@@ -1,8 +1,8 @@
 {
   "feature": "mobile_settings",
-  "pipeline_run_id": "34d8ab92210b",
-  "candidate_build_run_id": "34d8ab92210b",
-  "committed_build_run_id": "34d8ab92210b",
+  "pipeline_run_id": "d36184bda263",
+  "candidate_build_run_id": "d36184bda263",
+  "committed_build_run_id": "d36184bda263",
   "writeback": "committed",
   "written_files": [
     "lib/features/mobile_settings/mobile_settings_screen.dart",
@@ -27,11 +27,11 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-05T16:12:24.855976+00:00",
+  "captured_at": "2026-07-05T18:08:33.805323+00:00",
   "runMetaSchemaVersion": "2",
   "status": "completed",
   "cached_ir_verdict": "compatible",
   "clean_tree_hash": "1020e477db93eb425722e045721e02d5ef7903e47846645ff6a2a82befab8794",
   "generation_config_hash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
-  "run_started_at": "2026-07-05T16:11:34.226616+00:00"
+  "run_started_at": "2026-07-05T18:07:39.991930+00:00"
 }

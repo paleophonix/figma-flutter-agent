@@ -320,3 +320,39 @@ families:
       Trailing chevron hosts with component chevron-right exports must size
       SVGs to the action slot instead of nested micro-vector paint bounds.
     status: active
+
+  - id: composite_control_native_double_paint
+    title: Composite Figma control wrapped with native control paint
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/variant/controls.py
+        symbol: render_radio_widget
+    law_ids:
+      - ExactRadioPaintLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Figma-defined radio/checkbox pictograms must not be wrapped with a second
+      native Material/Cupertino control that paints its own selection glyph.
+    status: active
+
+  - id: cluster_widget_occluding_fill_emit
+    title: Cluster widget emits occluding component fill plate
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/widget_extractor.py
+        symbol: render_cluster_widgets
+    law_ids:
+      - CompositeIconSilhouetteLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Extracted component widgets materialize full-bounds Fill/mask layers as
+      rectangular Containers, occluding non-rectangular glyph silhouettes.
+    status: active

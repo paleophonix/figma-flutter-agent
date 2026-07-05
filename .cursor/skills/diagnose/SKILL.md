@@ -1,15 +1,45 @@
 ---
 name: diagnose
 description: >-
-  Diagnosis for screen/compiler pipeline: layout, IR, semantic, contract, emitter,
-  analyzer, golden. Inspects .debug artifacts, builds BATCH PRE-FIX TRIAGE REPORT,
-  records OPEN defect corpus cases when mechanism is known. Pairs with /repair.
-  Use for /diagnose on a specific screen. MUST follow corpus skill for all case YAML.
+  Diagnosis for screen/compiler pipeline. Builds BATCH PRE-FIX TRIAGE REPORT,
+  writes OPEN corpus cases on disk when mechanism is known, runs defects validate
+  before handoff. Pairs with /repair. CRITICAL: chat-only corpus handoff is forbidden.
 ---
 
 @.claude/prompts/debug-common.md
 
 **Mandatory corpus:** Read and follow `.cursor/skills/corpus/SKILL.md` before finalizing the report (Step 6). Consilium or pytest alone does not replace it.
+
+## CRITICAL — Corpus on disk before handoff (non-negotiable)
+
+A `/diagnose` turn is **not done** until corpus Steps 3–4 complete whenever any root cause has `corpus_status: ready_for_record` (confidence `high` or `medium`).
+
+**FORBIDDEN — treating these as corpus-done:**
+
+```text
+Corpus handoff (Cursor): YAML blocks in chat only
+"Cursor will write cases" / "handoff for repair" without file I/O
+Consilium APPROVE without corpus/cases/*.yaml on disk
+BATCH PRE-FIX TRIAGE REPORT delivered before defects validate (when cases apply)
+Deferring OPEN case YAML to /repair — repair writes FIXED only; diagnose owns OPEN
+```
+
+**REQUIRED before the final diagnose reply** (per `.cursor/skills/corpus/SKILL.md`):
+
+```text
+1. Write or update corpus/cases/YYYY-MM-DD-<mechanism-slug>.yaml (status: OPEN)
+2. poetry run figma-flutter defects index --write   # when cases added or changed
+3. poetry run figma-flutter defects validate          # exit 0
+4. Report Corpus recorded: with actual paths written — not proposed case_ids
+```
+
+**Allowed on `/diagnose`:** `corpus/` YAML + `corpus/families.yaml` (new family row when mechanism is clear). **Not allowed:** `src/` compiler code, generated Dart, golden baseline updates.
+
+When `corpus_status` is `unclassified` or `needs_evidence`, report `Corpus recorded: none — <reason>` — do not invent cases.
+
+**Same law as `corpus-law.mdc`:** diagnose without on-disk OPEN case when mechanism is known = incomplete handoff, same class of error as shipping a compiler fix without corpus proof.
+
+---
 
 # Debug Diagnose Skill
 
@@ -149,9 +179,11 @@ only (**never** write YAML); find the first arrow where the fact changed.
 
 ---
 
-## Step 6 — Record OPEN corpus cases
+## Step 6 — Record OPEN corpus cases (mandatory gate)
 
-Follow **`.cursor/skills/corpus/SKILL.md`** Steps 1–4 (OPEN only on diagnose).
+Follow **`.cursor/skills/corpus/SKILL.md`** Steps 1–4. **This step is not optional** when `corpus_status: ready_for_record`.
+
+See **CRITICAL — Corpus on disk before handoff** above. Chat `corpus_handoff:` blocks are planning notes only; they **do not** satisfy this step.
 
 ### `case.summary` (OPEN only)
 
@@ -229,10 +261,11 @@ R1: priority, law, layer, evidence, proposed fix, repair_summary_draft, files al
 
 ## Step 5 — Stop or hand off
 
-**Default (`/diagnose`, triage):** emit report + Step 6 corpus when applicable, **no compiler code**.
+**Default (`/diagnose`, triage):** complete Step 6 corpus gate when applicable, emit report, **no compiler code**.
 
-**Batch repair trigger** (`/repair`, "чиним всё"): hand queue to repair skill. Stay
-`OPEN` until proof; then `FIXED`. Failed rounds stay `OPEN` with attempt notes.
+**Incomplete diagnose** = report sent but Step 6 skipped while `ready_for_record` root causes exist.
+
+**Batch repair trigger** (`/repair`, "чиним всё"): hand queue to repair skill. Cases stay `OPEN` until proof; repair promotes to `FIXED`.
 
 ---
 
@@ -251,8 +284,8 @@ Repair queue: R1, R2, …
 Execution order:
 Blocked / missing evidence:
 Corpus recorded:
-  paths written or "none — <reason>"
+  repo paths written + defects validate result, or "none — <reason>"
 Proceed: DIAGNOSE ONLY | BATCH REPAIR (explicit trigger only)
 ```
 
-After diagnose-only: **no compiler code** (corpus YAML is allowed).
+**Diagnose-only:** no compiler code. **Corpus YAML on disk is required** when mechanism is classified — not deferred to chat handoff or `/repair`.

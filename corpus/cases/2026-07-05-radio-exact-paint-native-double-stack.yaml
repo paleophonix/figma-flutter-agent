@@ -1,0 +1,53 @@
+version: 1
+
+case:
+  id: 2026-07-05-radio-exact-paint-native-double-stack
+  title: Selected radio composite wrapped with native Material Radio paint
+  case_kind: regression
+  project: limbo
+  feature: mobile_sub_plans
+  observed_at: 2026-07-05
+  summary: >
+    Extracted selected radio widget emits a blue Figma circle plus a nested
+    Material Radio, which paints a default black centre dot over the intended
+    white inner ellipse glyph. User observation: top Yearly plan radio centre
+    turned black after radios appeared; asked whether assets exist — ellipse SVG
+    is on disk but not emitted.
+  created_at: '2026-07-05T18:10:00Z'
+  updated_at: '2026-07-05T18:10:00Z'
+
+occurrences:
+  - id: mobile-sub-plans-selected-radio-double-paint
+    family_id: composite_control_native_double_paint
+    pipeline_arrow: A3
+    law_id: ExactRadioPaintLaw
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: OPEN
+    owner:
+      module: src/figma_flutter_agent/generator/variant/controls.py
+      symbol: render_radio_widget
+    contract:
+      field: extractedWidgets[].widgetIr.children
+      field_class: fact
+      category: illegal
+      expected: >
+        Selected radio composite emits blue 16x16 plate plus white 6x6 inner
+        vector (ellipse_2 SVG); interaction semantics without native Radio paint.
+      actual: >
+        SubscriptionPlanRadioButtonWidget stacks Material Radio<String> inside
+        blue Container; inner ellipse child from widgetIr is omitted.
+    authority_boundary: fidelity_emit
+    loss_boundary: control_visual_paint
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_sub_plans/pre_emit.json
+        summary: RadioButtonSmallSelected retains child I240:6294;109:2250 in widgetIr.
+      - kind: debug_artifact
+        path: apps/limbo/lib/widgets/subscription_plan_radio_button_widget.dart
+        summary: Blue circle plus Radio<String>; no ellipse_2 SVG reference.
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_sub_plans/processed.json
+        summary: Node 240:6294 child ellipse has vectorAssetKey ellipse_2 SVG on disk.

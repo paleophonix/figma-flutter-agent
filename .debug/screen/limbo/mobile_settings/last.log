@@ -1,27 +1,27 @@
 
---- dart format @ 2026-07-05T16:11:44.443107+00:00 ---
+--- dart format @ 2026-07-05T18:07:47.658595+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\features\mobile_settings\mobile_settings_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\widgets\avatar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\widgets\chevron_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\widgets\settings_divider_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\widgets\settings_list_item_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\widgets\settings_nav_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\lib\widgets\settings_tab_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\test\golden\mobile_settings_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-28s9_xif\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 18 files (18 changed) in 0.09 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\features\mobile_settings\mobile_settings_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\widgets\avatar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\widgets\chevron_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\widgets\settings_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\widgets\settings_list_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\widgets\settings_nav_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\lib\widgets\settings_tab_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\test\golden\mobile_settings_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2ngizm41\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 18 files (18 changed) in 0.08 seconds.
 
---- pub get --offline @ 2026-07-05T16:11:47.511585+00:00 ---
+--- pub get --offline @ 2026-07-05T18:07:50.660255+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -34,12 +34,12 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/2) @ 2026-07-05T16:11:50.291531+00:00 ---
+--- dart analyze (generated) (1/2) @ 2026-07-05T18:07:53.794330+00:00 ---
 exit_code=0
 Analyzing avatar_widget.dart, chevron_button_widget.dart, ios_status_bar_widget.dart, settings_divider_widget.dart, settings_list_item_widget.dart, settings_nav_bar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (2/2) @ 2026-07-05T16:11:52.725627+00:00 ---
+--- dart analyze (generated) (2/2) @ 2026-07-05T18:07:57.014063+00:00 ---
 exit_code=0
 Analyzing settings_tab_bar_widget.dart...
 
@@ -48,7 +48,7 @@ warning - settings_tab_bar_widget.dart:29:46 - The left operand can't be null, s
 
 2 issues found.
 
---- dart analyze (generated) (1/4) @ 2026-07-05T16:11:55.496333+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-05T18:08:00.014946+00:00 ---
 exit_code=0
 Analyzing mobile_settings_screen.dart, mobile_settings_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -66,12 +66,12 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
 
 11 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-05T16:11:58.255865+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-05T18:08:02.556171+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, avatar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/4) @ 2026-07-05T16:12:01.004475+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-05T18:08:05.160498+00:00 ---
 exit_code=0
 Analyzing chevron_button_widget.dart, ios_status_bar_widget.dart, settings_divider_widget.dart, settings_list_item_widget.dart, settings_nav_bar_widget.dart, settings_tab_bar_widget.dart...
 
@@ -80,7 +80,7 @@ warning - lib\widgets\settings_tab_bar_widget.dart:29:46 - The left operand can'
 
 2 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-05T16:12:03.950719+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-05T18:08:08.382897+00:00 ---
 exit_code=0
 Analyzing mobile_settings_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -88,73 +88,74 @@ Analyzing mobile_settings_screen_test.dart, element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-07-05T16:12:05.956715+00:00 ---
+--- dart format @ 2026-07-05T18:08:11.173618+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\features\mobile_settings\mobile_settings_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\widgets\avatar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\widgets\chevron_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\widgets\settings_divider_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\widgets\settings_list_item_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\lib\widgets\settings_tab_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\test\golden\mobile_settings_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-u_ns3a4d\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 17 files (17 changed) in 0.07 seconds.
-
---- dart format @ 2026-07-05T16:12:07.968361+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\features\mobile_settings\mobile_settings_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\widgets\avatar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\widgets\chevron_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\widgets\settings_divider_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\widgets\settings_list_item_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\widgets\settings_nav_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\lib\widgets\settings_tab_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\test\golden\mobile_settings_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t6xz8u47\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\features\mobile_settings\mobile_settings_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\widgets\avatar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\widgets\chevron_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\widgets\settings_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\widgets\settings_list_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\widgets\settings_nav_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\lib\widgets\settings_tab_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\test\golden\mobile_settings_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xb9ut8yq\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 18 files (18 changed) in 0.09 seconds.
 
---- dart format @ 2026-07-05T16:12:11.151954+00:00 ---
+--- dart format @ 2026-07-05T18:08:13.790476+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\features\mobile_settings\mobile_settings_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\widgets\avatar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\widgets\chevron_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\widgets\ios_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\widgets\settings_divider_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\widgets\settings_list_item_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\widgets\settings_nav_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\lib\widgets\settings_tab_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\test\golden\mobile_settings_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fajiqoai\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 19 files (19 changed) in 1.02 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\features\mobile_settings\mobile_settings_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\widgets\avatar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\widgets\chevron_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\widgets\settings_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\widgets\settings_list_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\widgets\settings_nav_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\lib\widgets\settings_tab_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\test\golden\mobile_settings_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-96on5t2c\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 18 files (18 changed) in 0.09 seconds.
 
---- pub get --offline @ 2026-07-05T16:12:14.035719+00:00 ---
+--- dart format @ 2026-07-05T18:08:18.862475+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\features\mobile_settings\mobile_settings_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\widgets\avatar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\widgets\chevron_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\widgets\ios_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\widgets\settings_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\widgets\settings_list_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\widgets\settings_nav_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\lib\widgets\settings_tab_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\test\golden\mobile_settings_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-n2g7vgbl\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 19 files (19 changed) in 0.82 seconds.
+
+--- pub get --offline @ 2026-07-05T18:08:21.425276+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -167,7 +168,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/4) @ 2026-07-05T16:12:16.812740+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-05T18:08:24.445423+00:00 ---
 exit_code=0
 Analyzing mobile_settings_screen.dart, mobile_settings_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -185,12 +186,12 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
 
 11 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-05T16:12:19.305573+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-05T18:08:26.747679+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, avatar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/4) @ 2026-07-05T16:12:21.969778+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-05T18:08:30.241104+00:00 ---
 exit_code=0
 Analyzing chevron_button_widget.dart, ios_status_bar_widget.dart, settings_divider_widget.dart, settings_list_item_widget.dart, settings_nav_bar_widget.dart, settings_tab_bar_widget.dart...
 
@@ -199,10 +200,62 @@ warning - lib\widgets\settings_tab_bar_widget.dart:30:46 - The left operand can'
 
 2 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-05T16:12:24.778654+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-05T18:08:33.711730+00:00 ---
 exit_code=0
 Analyzing mobile_settings_screen_test.dart, element_coordinate_mapper.dart...
 
    info - test\harness\element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
 1 issue found.
+
+--- flutter pub get @ 2026-07-05T18:08:37.779463+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  matcher 0.12.19 (0.12.20 available)
+  meta 1.18.0 (1.18.3 available)
+  test_api 0.7.11 (0.7.13 available)
+  vector_graphics_compiler 1.2.5 (1.2.6 available)
+  vector_math 2.2.0 (2.4.0 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- flutter render errors @ 2026-07-05T18:08:37.780463+00:00 ---
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during performLayout():
+Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/stack.dart:666:7
+"A Stack requires bounded constraints from its parent. This error commonly occurs when a Stack is
+The relevant error-causing widget was:
+When the exception was thrown, this was the stack:
+The following RenderObject was being processed when the exception was fired: RenderStack#5f517 relayoutBoundary=up8 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE:
+This RenderObject had the following descendants (showing up to depth 5):
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/shifted_box.dart:373:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
