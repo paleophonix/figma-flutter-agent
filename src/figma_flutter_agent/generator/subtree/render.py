@@ -184,6 +184,11 @@ def refresh_subtree_widget_planned_files(
                     use_package_imports=use_package_imports,
                     source_file=preferred,
                 )
+                from figma_flutter_agent.generator.layout.widget_roots import (
+                    ensure_widget_file_no_parent_data_root,
+                )
+
+                ensure_widget_file_no_parent_data_root(fresh, widget_name=spec.class_name)
             _apply_fresh(spec, fresh)
             continue
         body = _render_subtree_widget_body(
@@ -201,6 +206,11 @@ def refresh_subtree_widget_planned_files(
             use_package_imports=use_package_imports,
             source_file=preferred,
         )
+        from figma_flutter_agent.generator.layout.widget_roots import (
+            ensure_widget_file_no_parent_data_root,
+        )
+
+        ensure_widget_file_no_parent_data_root(fresh, widget_name=spec.class_name)
         _apply_fresh(spec, fresh)
 
     return merged
@@ -356,8 +366,10 @@ def _render_subtree_widget_body(
     from figma_flutter_agent.generator.ir.extracted import (
         _preserve_extracted_widget_decoration_shell,
     )
+    from figma_flutter_agent.generator.layout.widget_roots import finalize_extracted_widget_body
 
-    return _preserve_extracted_widget_decoration_shell(representative, body)
+    body = _preserve_extracted_widget_decoration_shell(representative, body)
+    return finalize_extracted_widget_body(body)
 
 
 def render_subtree_widgets(
@@ -371,6 +383,10 @@ def render_subtree_widgets(
     project_dir: Path | None = None,
 ) -> SubtreeWidgetResult:
     """Render deterministic widget files for vector-rich subtrees."""
+    from figma_flutter_agent.generator.layout.widget_roots import (
+        ensure_widget_file_no_parent_data_root,
+    )
+
     files: dict[str, str] = {}
     for spec in specs:
         body = _render_subtree_widget_body(
@@ -382,7 +398,7 @@ def render_subtree_widgets(
             project_dir=project_dir,
         )
         path = f"lib/widgets/{spec.file_name}.dart"
-        files[path] = render_widget_file(
+        widget_source = render_widget_file(
             class_name=spec.class_name,
             body=body,
             uses_svg=uses_svg,
@@ -390,4 +406,6 @@ def render_subtree_widgets(
             use_package_imports=use_package_imports,
             source_file=path,
         )
+        ensure_widget_file_no_parent_data_root(widget_source, widget_name=spec.class_name)
+        files[path] = widget_source
     return SubtreeWidgetResult(files=files, specs=tuple(specs))

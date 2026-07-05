@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 
+from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.subtree.blocks import _find_matching_paren
 
 _WIDGET_BUILD_RETURN_RE = re.compile(
@@ -103,6 +104,38 @@ def strip_stack_parent_data_wrappers(widget: str) -> str:
             break
         result = child.strip()
     return result
+
+
+def finalize_extracted_widget_body(body: str) -> str:
+    """Strip stack parent-data wrappers from a reusable widget body expression.
+
+    Args:
+        body: Dart widget expression for an extracted widget ``build`` return.
+
+    Returns:
+        Sanitized widget expression safe as a standalone widget root.
+    """
+    return strip_stack_parent_data_wrappers(body)
+
+
+def ensure_widget_file_no_parent_data_root(
+    source: str,
+    *,
+    widget_name: str = "",
+) -> None:
+    """Raise when a generated widget file returns illegal parent-data roots.
+
+    Args:
+        source: Full Dart widget file source.
+        widget_name: Optional widget label for error messages.
+
+    Raises:
+        GenerationError: When ``build`` returns ``Positioned`` or similar roots.
+    """
+    violations = validate_widget_build_has_no_parent_data_root(source)
+    if violations:
+        label = widget_name or "widget"
+        raise GenerationError(f"extracted {label!r} violates emit invariant: {violations[0]}")
 
 
 def validate_widget_build_has_no_parent_data_root(source: str) -> list[str]:

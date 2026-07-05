@@ -284,7 +284,25 @@ def _button_absolute_slot_stack_body(
     child_widgets: list[str],
 ) -> str:
     """Preserve absolutely positioned row chrome inside a tappable stack host."""
-    body = ", ".join(child_widgets)
+    from figma_flutter_agent.generator.layout.widgets.positioned import _positioned_fields
+
+    parent_height = float(node.sizing.height or 0.0) or None
+    parts: list[str] = []
+    for child, widget in zip(node.children, child_widgets, strict=True):
+        stripped = widget.strip()
+        if stripped.startswith("Positioned("):
+            parts.append(widget)
+            continue
+        placement = child.stack_placement
+        if placement is None or (placement.left is None and placement.right is None):
+            parts.append(widget)
+            continue
+        fields = _positioned_fields(placement, parent_height=parent_height)
+        if not fields:
+            parts.append(widget)
+            continue
+        parts.append(f"Positioned({', '.join(fields)}, child: {widget})")
+    body = ", ".join(parts)
     return f"Stack(clipBehavior: Clip.none, fit: StackFit.expand, children: [{body}])"
 
 

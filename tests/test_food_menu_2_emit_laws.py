@@ -8,11 +8,18 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.generator.geometry.text_metrics import (
+    placement_is_fill_width_centered_text,
     placement_is_right_edge_pinned,
+    positioned_text_allows_metric_slack,
     positioned_text_preserves_right_edge,
     positioned_text_width_with_metric_slack,
 )
+from figma_flutter_agent.generator.layout.widget_roots import (
+    finalize_extracted_widget_body,
+    validate_widget_build_has_no_parent_data_root,
+)
 from figma_flutter_agent.generator.layout.widgets.button.core import (
+    _button_ink_surface_params,
     render_compact_icon_host_stack_body,
 )
 from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_node_body
@@ -24,6 +31,8 @@ from figma_flutter_agent.parser.interaction import (
     button_has_icon_label_inline_affordance,
     compact_icon_host_layers,
     compact_icon_host_tap_role,
+    layout_fact_checkbox_control,
+    layout_fact_directional_glyph_host,
     stack_action_intent_vetoes_input,
     stack_interaction_kind,
 )
@@ -131,7 +140,85 @@ def test_absolute_slot_row_body_uses_stack() -> None:
     root = _load_menu_root()
     row = _find_node(root, "602:825")
     assert row is not None
-    widgets = ["const Text('Withdrawal History')", "const SizedBox.shrink()"]
+    widgets = ["const Text('x')"] * len(row.children)
     body = _button_absolute_slot_stack_body(row, widgets)
     assert "Stack(" in body
     assert "MainAxisAlignment.center" not in body
+
+
+def test_extracted_widget_body_strips_positioned_root() -> None:
+    wrapped = (
+        "Positioned(left: 15.0, top: 15.0, width: 296.0, height: 48.0, "
+        "child: ClipRect(child: const Text('Log Out')))"
+    )
+    stripped = finalize_extracted_widget_body(wrapped)
+    assert not stripped.startswith("Positioned(")
+    source = (
+        "class Group3304Widget extends StatelessWidget {\n"
+        "  const Group3304Widget({super.key});\n"
+        "  @override\n"
+        "  Widget build(BuildContext context) {\n"
+        f"    return {stripped};\n"
+        "  }\n"
+        "}\n"
+    )
+    assert validate_widget_build_has_no_parent_data_root(source) == []
+
+
+def test_trailing_chevron_hosts_veto_checkbox_classification() -> None:
+    root = _load_menu_root()
+    for node_id in ("602:775", "602:809"):
+        node = _find_node(root, node_id)
+        assert node is not None, node_id
+        assert layout_fact_directional_glyph_host(node), node_id
+        assert not layout_fact_checkbox_control(node), node_id
+
+
+def test_balance_text_fill_width_centered_skips_metric_slack() -> None:
+    root = _load_menu_root()
+    balance = _find_node(root, "602:758")
+    assert balance is not None
+    placement = balance.stack_placement
+    assert placement is not None
+    assert placement_is_fill_width_centered_text(balance, placement)
+    assert not positioned_text_allows_metric_slack(balance, placement)
+    dart = render_node_body(balance, uses_svg=True, theme_variant="material")
+    assert "left: -" not in dart
+
+
+def test_withdraw_outlined_button_has_no_synthetic_fill() -> None:
+    root = _load_menu_root()
+    withdraw = _find_node(root, "602:753")
+    assert withdraw is not None
+    surface = _find_node(root, "602:754")
+    assert surface is not None
+    fill, border, _shadows, _gradient, _inner = _button_ink_surface_params(surface)
+    assert fill is None
+    assert border is not None
+    dart = render_node_body(withdraw, uses_svg=True, theme_variant="material")
+    assert "colorScheme.onPrimary" not in dart
+
+
+def test_compact_icon_host_plate_uses_host_extent() -> None:
+    root = _load_menu_root()
+    icon_button = _find_node(root, "602:768")
+    assert icon_button is not None
+    body = render_compact_icon_host_stack_body(icon_button, uses_svg=True)
+    assert body is not None
+    assert "width: 48.0" in body
+    assert "height: 48.0" in body
+    assert "ellipse_1" in body
+
+
+def test_absolute_slot_row_reconstructs_positioned_children() -> None:
+    root = _load_menu_root()
+    row = _find_node(root, "602:825")
+    assert row is not None
+    assert button_has_absolute_slot_children(row)
+    child_widgets = [
+        "const Text('Withdrawal History')",
+        "SvgPicture.asset('assets/icons/chevron-right.svg')",
+        "SvgPicture.asset('assets/icons/ellipse.svg')",
+    ]
+    body = _button_absolute_slot_stack_body(row, child_widgets[: len(row.children)])
+    assert body.count("Positioned(") >= 2

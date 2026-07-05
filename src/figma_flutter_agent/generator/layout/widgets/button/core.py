@@ -51,9 +51,7 @@ def _button_ink_surface_params(
     fill = None
     if gradient_expr is None:
         fill = (
-            dart_color_expr(surface.style)
-            if surface.style.background_color is not None
-            else "Theme.of(context).colorScheme.onPrimary"
+            dart_color_expr(surface.style) if surface.style.background_color is not None else None
         )
     border = None
     border_width = surface.style.border_width or 0.0
@@ -378,9 +376,21 @@ def render_compact_icon_host_stack_body(
     plate, foreground = compact_icon_host_layers(node)
     if foreground is None:
         return None
+    host_width = float(node.sizing.width or 0.0)
+    host_height = float(node.sizing.height or 0.0)
     parts: list[str] = []
     if plate is not None and plate.vector_asset_key and uses_svg:
-        parts.append(_render_svg_picture(plate, escape_dart_string(plate.vector_asset_key)))
+        plate_svg = _render_svg_picture(plate, escape_dart_string(plate.vector_asset_key))
+        if host_width > 0 and host_height > 0:
+            parts.append(
+                "Center("
+                f"child: SizedBox("
+                f"width: {format_geometry_literal(host_width)}, "
+                f"height: {format_geometry_literal(host_height)}, "
+                f"child: {plate_svg}))"
+            )
+        else:
+            parts.append(plate_svg)
     if foreground.vector_asset_key and uses_svg:
         glyph_width = float(foreground.sizing.width or 24.0)
         glyph_height = float(foreground.sizing.height or 24.0)
@@ -397,6 +407,20 @@ def render_compact_icon_host_stack_body(
         )
     if not parts:
         return None
+    if host_width > 0 and host_height > 0:
+        stack = (
+            "Stack("
+            "clipBehavior: Clip.none, "
+            "alignment: Alignment.center, "
+            f"children: [{', '.join(parts)}]"
+            ")"
+        )
+        return (
+            f"SizedBox("
+            f"width: {format_geometry_literal(host_width)}, "
+            f"height: {format_geometry_literal(host_height)}, "
+            f"child: {stack})"
+        )
     return (
         "Stack("
         "clipBehavior: Clip.none, "

@@ -317,6 +317,10 @@ def layout_fact_interactive_checkbox_control(
 
 def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Small square used as a consent, bonus, or list-tile checkbox control."""
+    from figma_flutter_agent.parser.interaction.icons import layout_fact_directional_glyph_host
+
+    if layout_fact_directional_glyph_host(node):
+        return False
     if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:
         return False
     if _stack_hosts_direction_badge_glyph(node):

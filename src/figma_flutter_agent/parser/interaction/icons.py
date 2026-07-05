@@ -287,6 +287,32 @@ def layout_fact_stroke_chevron_vector(node: CleanDesignTreeNode) -> bool:
     )
 
 
+_DIRECTIONAL_GLYPH_NAME_TOKENS = (
+    "chevron",
+    "arrow",
+    "icon-right",
+    "icon/close",
+    "icon-close",
+    "close",
+)
+
+
+def layout_fact_directional_glyph_host(node: CleanDesignTreeNode) -> bool:
+    """Return True when a compact host is a chevron, arrow, or close affordance."""
+    if layout_fact_trailing_chevron_action_slot(node):
+        return True
+    labels = [
+        (node.name or "").lower().replace(" ", "").replace("_", "-"),
+        (node.accessibility_label or "").lower().replace(" ", "").replace("_", "-"),
+    ]
+    for label in labels:
+        if not label:
+            continue
+        if any(token in label for token in _DIRECTIONAL_GLYPH_NAME_TOKENS):
+            return True
+    return any(layout_fact_stroke_chevron_vector(vector) for vector in _stroke_icon_vectors(node))
+
+
 def layout_fact_trailing_chevron_action_slot(node: CleanDesignTreeNode) -> bool:
     """Compact trailing chevron host in a list-row action slot."""
     if node.type not in {NodeType.STACK, NodeType.CONTAINER, NodeType.ROW}:

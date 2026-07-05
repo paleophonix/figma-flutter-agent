@@ -62,6 +62,21 @@ def leading_above_flutter(
     return max(0.0, (line_box - metric_glyph) * 0.5)
 
 
+def placement_is_fill_width_centered_text(
+    node: CleanDesignTreeNode,
+    placement: StackPlacement,
+) -> bool:
+    """Return True when text fills a dual-inset slot with centered alignment."""
+    if node.type != NodeType.TEXT:
+        return False
+    if (node.style.text_align or "").upper() != "CENTER":
+        return False
+    horizontal = (placement.horizontal or "").upper()
+    if horizontal != "LEFT_RIGHT":
+        return False
+    return placement.left is not None and placement.right is not None
+
+
 def placement_is_center_pinned_horizontal(placement: StackPlacement) -> bool:
     """Return True when a stack child is horizontally centered with dual insets."""
     return (
@@ -79,6 +94,8 @@ def positioned_text_allows_metric_slack(
 ) -> bool:
     """Return True when absolute TEXT may widen its positioned slot for glyph bounds."""
     if node.type != NodeType.TEXT:
+        return False
+    if placement_is_fill_width_centered_text(node, placement):
         return False
     return not placement_is_center_pinned_horizontal(placement)
 

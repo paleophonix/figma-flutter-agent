@@ -529,8 +529,14 @@ def render_cluster_widgets(
             if extra_fields:
                 widget_fields = (widget_fields or "") + extra_fields
             constructor_params = variant_params
+        from figma_flutter_agent.generator.layout.widget_roots import (
+            ensure_widget_file_no_parent_data_root,
+            finalize_extracted_widget_body,
+        )
+
+        body = finalize_extracted_widget_body(body)
         path = f"lib/widgets/{spec.file_name}.dart"
-        files[path] = render_widget_file(
+        widget_source = render_widget_file(
             class_name=spec.class_name,
             body=body,
             uses_svg=uses_svg,
@@ -540,6 +546,8 @@ def render_cluster_widgets(
             widget_fields=widget_fields,
             constructor_params=constructor_params,
         )
+        ensure_widget_file_no_parent_data_root(widget_source, widget_name=spec.class_name)
+        files[path] = widget_source
     return ClusterWidgetResult(files=files, cluster_classes=cluster_classes)
 
 
@@ -797,7 +805,13 @@ def refresh_stale_icon_badge_planned_widget_files(
 
         body = _preserve_extracted_widget_decoration_shell(representative, body)
         body = _bound_cluster_widget_root(representative, body)
-        merged[path] = render_widget_file(
+        from figma_flutter_agent.generator.layout.widget_roots import (
+            ensure_widget_file_no_parent_data_root,
+            finalize_extracted_widget_body,
+        )
+
+        body = finalize_extracted_widget_body(body)
+        widget_source = render_widget_file(
             class_name=class_name,
             body=body,
             uses_svg=uses_svg,
@@ -805,6 +819,8 @@ def refresh_stale_icon_badge_planned_widget_files(
             use_package_imports=use_package_imports,
             source_file=preferred_widget_path_for_class(class_name),
         )
+        ensure_widget_file_no_parent_data_root(widget_source, widget_name=class_name)
+        merged[path] = widget_source
         refreshed += 1
     if refreshed:
         logger.info("Refreshed {} stale icon-badge widget alias(es)", refreshed)

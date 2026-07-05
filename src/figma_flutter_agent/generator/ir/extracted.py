@@ -352,15 +352,14 @@ def emit_extracted_widget_code_from_ir(
         if subtree_has_visible_paint(subtree) and _is_shrink_only_emit_body(body):
             body = _render_extracted_widget_body(merged, widget_name=widget_name, ctx=widget_ctx)
     from figma_flutter_agent.generator.layout.widget_roots import (
-        strip_stack_parent_data_wrappers,
-        validate_widget_build_has_no_parent_data_root,
+        ensure_widget_file_no_parent_data_root,
+        finalize_extracted_widget_body,
     )
-
-    body = strip_stack_parent_data_wrappers(body)
-    body = _preserve_extracted_widget_decoration_shell(subtree, body)
     from figma_flutter_agent.generator.widget_extractor import _bound_cluster_widget_root
 
+    body = _preserve_extracted_widget_decoration_shell(subtree, body)
     body = _bound_cluster_widget_root(subtree, body)
+    body = finalize_extracted_widget_body(body)
     class_name = _canonical_widget_class_name(widget_name)
     file_stem = to_snake_case(widget_name)
     code = render_widget_file(
@@ -369,11 +368,7 @@ def emit_extracted_widget_code_from_ir(
         uses_svg=ctx.uses_svg,
         source_file=f"lib/widgets/{file_stem}.dart",
     )
-    violations = validate_widget_build_has_no_parent_data_root(code)
-    if violations:
-        raise GenerationError(
-            f"extracted widget {widget_name!r} violates emit invariant: {violations[0]}"
-        )
+    ensure_widget_file_no_parent_data_root(code, widget_name=widget_name)
     return code
 
 
