@@ -391,12 +391,18 @@ def render_compact_icon_host_stack_body(
             )
         else:
             parts.append(plate_svg)
-    if foreground.vector_asset_key and uses_svg:
-        glyph_width = float(foreground.sizing.width or 24.0)
-        glyph_height = float(foreground.sizing.height or 24.0)
+    glyph_node = foreground
+    if uses_svg and not glyph_node.vector_asset_key:
+        for item in _descendant_nodes(foreground, _BACK_NAV_DESCENDANT_DEPTH):
+            if item.vector_asset_key:
+                glyph_node = item
+                break
+    if glyph_node.vector_asset_key and uses_svg:
+        glyph_width = float(foreground.sizing.width or glyph_node.sizing.width or 24.0)
+        glyph_height = float(foreground.sizing.height or glyph_node.sizing.height or 24.0)
         glyph = _render_svg_picture(
-            foreground,
-            escape_dart_string(foreground.vector_asset_key),
+            glyph_node,
+            escape_dart_string(glyph_node.vector_asset_key),
         )
         parts.append(
             "Center("

@@ -374,3 +374,57 @@ families:
       Extracted cluster widget roots with zero Figma frame height but stroked
       positioned children emit bare Stack without finite height, crashing in Column.
     status: active
+
+  - id: stroke_only_surface_synthetic_fill
+    title: Stroke-only surface gets synthetic opaque fill
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/style/decoration.py
+        symbol: box_decoration_expr
+    law_ids:
+      - StrokeOnlySurfaceNoSyntheticFillLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Containers with stroke but no backgroundColor receive a synthetic white fill
+      in BoxDecoration, turning outlined controls into solid pills.
+    status: active
+
+  - id: compact_icon_host_foreground_omit
+    title: Compact icon host emits plate without foreground glyph
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/button/core.py
+        symbol: render_compact_icon_host_stack_body
+    law_ids:
+      - CompactIconHostForegroundLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      List-row compact icon hosts materialize the full-size ellipse plate SVG
+      but drop the inset foreground pictogram, leaving empty white circles.
+    status: active
+
+  - id: row_list_glyph_svg_extent_mismatch
+    title: List-row glyph SvgPicture extent diverges from slot bounds
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/svg.py
+        symbol: _intrinsic_glyph_svg_dimensions
+    law_ids:
+      - RowListGlyphIntrinsicBoundsLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Leading row pictograms size to nested micro-vector paint spans or host
+      stack extents instead of the component slot bounds, inflating or shrinking glyphs.
+    status: active

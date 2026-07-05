@@ -18,8 +18,6 @@ from figma_flutter_agent.parser.interaction import (
     layout_fact_favorite_icon_button,
     layout_fact_info_icon_button,
     layout_fact_plus_icon_button,
-    layout_fact_stroke_minus_icon,
-    layout_fact_stroke_plus_icon,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -157,17 +155,13 @@ def render_button_node(
                     f"height: {format_geometry_literal(height)}, "
                     f"child: {stack_body})"
                 )
-            tap_role = (
-                "button-action"
-                if (
-                    layout_fact_stroke_plus_icon(node)
-                    or layout_fact_stroke_minus_icon(node)
-                    or layout_fact_plus_icon_button(node)
-                    or layout_fact_favorite_icon_button(node)
-                    or layout_fact_info_icon_button(node)
-                )
-                else "back-nav"
+            from figma_flutter_agent.parser.interaction.icons import (
+                compact_icon_host_layers,
+                compact_icon_host_tap_role,
             )
+
+            _, foreground = compact_icon_host_layers(node)
+            tap_role = compact_icon_host_tap_role(node, foreground=foreground)
             widget = _wrap_button_stack(
                 stack_body,
                 node,
@@ -183,18 +177,13 @@ def render_button_node(
                 scroll_content_root=scroll_content_root,
             )
         glyph = _find_icon_glyph_expr(node)
-        if (
-            layout_fact_stroke_plus_icon(node)
-            or layout_fact_stroke_minus_icon(node)
-            or (
-                layout_fact_plus_icon_button(node)
-                or layout_fact_favorite_icon_button(node)
-                or layout_fact_info_icon_button(node)
-            )
-        ):
-            tap_role = "button-action"
-        else:
-            tap_role = "back-nav"
+        from figma_flutter_agent.parser.interaction.icons import (
+            compact_icon_host_layers,
+            compact_icon_host_tap_role,
+        )
+
+        _, foreground = compact_icon_host_layers(node)
+        tap_role = compact_icon_host_tap_role(node, foreground=foreground)
         if glyph is not None:
             stack_body = (
                 f"Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [{glyph}])"

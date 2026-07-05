@@ -722,6 +722,18 @@ def _intrinsic_glyph_svg_dimensions(
         return width, height
     if intrinsic_w >= float(width) - 1.0 and intrinsic_h >= float(height) - 1.0:
         return width, height
+    if (
+        node_width is not None
+        and node_height is not None
+        and width is not None
+        and height is not None
+        and abs(float(node_width) - float(width)) <= 0.5
+        and abs(float(node_height) - float(height)) <= 0.5
+        and 20.0 <= float(node_width) <= _ICON_RAIL_FRAME_MAX
+        and intrinsic_w < float(node_width) * 0.85
+        and intrinsic_h < float(node_height) * 0.85
+    ):
+        return float(node_width), float(node_height)
     return float(intrinsic_w), float(intrinsic_h)
 
 

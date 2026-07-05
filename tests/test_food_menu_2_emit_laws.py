@@ -198,6 +198,7 @@ def test_withdraw_outlined_button_has_no_synthetic_fill() -> None:
     assert border is not None
     dart = render_node_body(withdraw, uses_svg=True, theme_variant="material")
     assert "colorScheme.onPrimary" not in dart
+    assert "color: const Color(0xFFFFFFFF)" not in dart
 
 
 def test_compact_icon_host_plate_uses_host_extent() -> None:
@@ -269,3 +270,30 @@ def test_trailing_chevron_component_uses_action_slot_extent() -> None:
     dart = _render_svg_picture(chevron_host, "assets/icons/chevron-right_602_775.svg")
     assert "width: 30.0, height: 30.0" in dart
     assert "width: 5.0, height: 10.0" not in dart
+
+
+def test_log_out_download_glyph_uses_slot_extent() -> None:
+    root = _load_menu_root()
+    row = _find_node(root, "602:788")
+    assert row is not None
+    dart = render_node_body(row, uses_svg=True, theme_variant="material")
+    assert "download_602_802.svg', width: 24.0, height: 24.0" in dart
+    assert "width: 1.6, height: 12.0" not in dart
+
+
+def test_log_out_trailing_icon_slot_uses_button_action_not_back_nav() -> None:
+    root = _load_menu_root()
+    slot = _find_node(root, "602:795")
+    assert slot is not None
+    dart = render_node_body(slot, uses_svg=True, theme_variant="material")
+    assert "back-nav" not in dart
+    assert "button-action" in dart
+
+
+def test_number_of_orders_receipt_glyph_uses_24_extent() -> None:
+    root = _load_menu_root()
+    row = _find_node(root, "602:836")
+    assert row is not None
+    dart = render_node_body(row, uses_svg=True, theme_variant="material")
+    assert "receipt-outline_602_847.svg', width: 24.0, height: 24.0" in dart
+    assert "width: 48.0, height: 48.0" not in dart.split("receipt-outline_602_847")[1][:80]

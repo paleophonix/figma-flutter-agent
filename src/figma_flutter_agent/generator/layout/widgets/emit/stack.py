@@ -360,6 +360,21 @@ def render_stack(
         return _finalize_widget(
             node, play_pause, parent_type=parent_type, scroll_content_root=scroll_content_root
         )
+    from figma_flutter_agent.generator.layout.widgets.button.core import (
+        render_compact_icon_host_stack_body,
+    )
+    from figma_flutter_agent.parser.interaction.icons import layout_fact_compact_icon_glyph_host
+
+    if layout_fact_compact_icon_glyph_host(node):
+        layered_stack = render_compact_icon_host_stack_body(node, uses_svg=uses_svg)
+        if layered_stack is not None:
+            return _finalize_widget(
+                node,
+                layered_stack,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
     photo_stack = try_render_detail_hero_banner_stack(
         node,
         uses_svg=uses_svg,

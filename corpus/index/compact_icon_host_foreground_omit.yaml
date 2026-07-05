@@ -1,0 +1,32 @@
+version: 1
+family_id: compact_icon_host_foreground_omit
+generated: true
+cases:
+- case_id: 2026-07-05-compact-icon-host-foreground-omit
+  case_file: cases/2026-07-05-compact-icon-host-foreground-omit.yaml
+  title: List-row compact icon hosts emit empty white circle plates
+  project: limbo
+  feature: food_menu_2
+  occurrence_id: food-menu-withdrawal-history-empty-circle
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T19:25:00Z'
+  updated_at: '2026-07-05T22:50:00Z'
+  summary: 'CompactIconHostForegroundLaw — multi-row cluster widgets emit full-size
+    ellipse plate SVGs (48x48 white circles) without the inset foreground pictogram.
+    Expected: plate plus wallet/command/receipt glyph centered in the 48x48 host (as
+    Personal Info rows do). Actual: only ellips...'
+- case_id: 2026-07-05-compact-icon-host-foreground-omit
+  case_file: cases/2026-07-05-compact-icon-host-foreground-omit.yaml
+  title: List-row compact icon hosts emit empty white circle plates
+  project: limbo
+  feature: food_menu_2
+  occurrence_id: food-menu-logout-back-host-empty-circle
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T19:25:00Z'
+  updated_at: '2026-07-05T22:50:00Z'
+  summary: 'CompactIconHostForegroundLaw — multi-row cluster widgets emit full-size
+    ellipse plate SVGs (48x48 white circles) without the inset foreground pictogram.
+    Expected: plate plus wallet/command/receipt glyph centered in the 48x48 host (as
+    Personal Info rows do). Actual: only ellips...'

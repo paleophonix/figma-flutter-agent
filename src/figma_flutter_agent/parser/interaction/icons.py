@@ -170,7 +170,10 @@ def compact_icon_host_layers(
         if (
             child_width <= host_width * 0.75
             and child_height <= host_height * 0.75
-            and (child.vector_asset_key or _stack_has_vector_icon(_descendant_nodes(child, 2)))
+            and (
+                child.vector_asset_key
+                or _stack_has_vector_icon(_descendant_nodes(child, _BACK_NAV_DESCENDANT_DEPTH))
+            )
         ):
             foreground = child
     return plate, foreground
@@ -190,8 +193,11 @@ def compact_icon_host_tap_role(
         combined = " ".join(labels)
         if combined and not any(hint in combined for hint in _ICON_ACTION_NAME_HINTS):
             return "button-action"
-    if _has_icon_action_name(host) and foreground is None:
-        return "back-nav"
+    if foreground is None:
+        from figma_flutter_agent.parser.interaction.buttons import layout_fact_back_nav_stack
+
+        if layout_fact_back_nav_stack(host):
+            return "back-nav"
     return "button-action"
 
 
@@ -352,6 +358,9 @@ def layout_fact_trailing_chevron_action_slot(node: CleanDesignTreeNode) -> bool:
     normalized = (node.name or "").lower().replace(" ", "")
     if "chevron" in normalized or normalized in {"icon/right", "iconright"}:
         return True
+    asset_key = (node.vector_asset_key or "").lower().replace("_", "-")
+    if asset_key:
+        return "chevron" in asset_key
     return any(layout_fact_stroke_chevron_vector(vector) for vector in _stroke_icon_vectors(node))
 
 

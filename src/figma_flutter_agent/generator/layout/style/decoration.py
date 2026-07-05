@@ -275,8 +275,6 @@ def box_decoration_expr(
             fields.append(f"gradient: {gradient}")
     elif not omit_fill and (style.background_color or style.css_properties.get("background-color")):
         fields.append(f"color: {dart_color_expr(style)}")
-    elif not omit_fill and style.border_color and style.border_width and style.border_width > 0:
-        fields.append("color: const Color(0xFFFFFFFF)")
     radius = _resolved_border_radius(
         style,
         frame_width=width,

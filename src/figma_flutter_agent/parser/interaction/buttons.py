@@ -135,8 +135,6 @@ def is_back_navigation_icon_stack(node: CleanDesignTreeNode) -> bool:
         return False
     if layout_fact_favorite_icon_button(node):
         return False
-    if layout_fact_compact_icon_action_stack(node):
-        return True
     return any(
         token in combined
         for token in (

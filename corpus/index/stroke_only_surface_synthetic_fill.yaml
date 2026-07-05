@@ -1,0 +1,18 @@
+version: 1
+family_id: stroke_only_surface_synthetic_fill
+generated: true
+cases:
+- case_id: 2026-07-05-stroke-only-surface-synthetic-white-fill
+  case_file: cases/2026-07-05-stroke-only-surface-synthetic-white-fill.yaml
+  title: Outlined Withdraw button gets synthetic white fill
+  project: limbo
+  feature: food_menu_2
+  occurrence_id: food-menu-withdraw-white-fill
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T19:25:00Z'
+  updated_at: '2026-07-05T22:50:00Z'
+  summary: 'StrokeOnlySurfaceNoSyntheticFillLaw — Withdraw surface 602:754 has white
+    stroke only (no backgroundColor in clean tree) but emit adds BoxDecoration(color:
+    0xFFFFFFFF), producing a solid white pill on the orange header and hiding white
+    label text. Expected: stroke-only outlined...'

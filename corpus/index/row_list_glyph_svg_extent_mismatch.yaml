@@ -1,0 +1,32 @@
+version: 1
+family_id: row_list_glyph_svg_extent_mismatch
+generated: true
+cases:
+- case_id: 2026-07-05-row-list-glyph-svg-extent-mismatch
+  case_file: cases/2026-07-05-row-list-glyph-svg-extent-mismatch.yaml
+  title: List-row leading glyphs size to wrong paint or host extents
+  project: limbo
+  feature: food_menu_2
+  occurrence_id: food-menu-orders-receipt-oversized
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T19:25:00Z'
+  updated_at: '2026-07-05T22:50:00Z'
+  summary: 'RowListGlyphIntrinsicBoundsLaw — leading row pictograms must size to the
+    component slot (24x24) not nested micro-vector paint spans nor the 48x48 host
+    stack. Expected: receipt-outline and logout icons fill their 24x24 slots. Actual:
+    Number of Orders receipt SVG inflates to 48x...'
+- case_id: 2026-07-05-row-list-glyph-svg-extent-mismatch
+  case_file: cases/2026-07-05-row-list-glyph-svg-extent-mismatch.yaml
+  title: List-row leading glyphs size to wrong paint or host extents
+  project: limbo
+  feature: food_menu_2
+  occurrence_id: food-menu-logout-glyph-undersized
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T19:25:00Z'
+  updated_at: '2026-07-05T22:50:00Z'
+  summary: 'RowListGlyphIntrinsicBoundsLaw — leading row pictograms must size to the
+    component slot (24x24) not nested micro-vector paint spans nor the 48x48 host
+    stack. Expected: receipt-outline and logout icons fill their 24x24 slots. Actual:
+    Number of Orders receipt SVG inflates to 48x...'
