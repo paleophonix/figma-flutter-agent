@@ -26,6 +26,7 @@ from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_no
 from figma_flutter_agent.generator.layout.widgets.flex_sizing import (
     _button_absolute_slot_stack_body,
 )
+from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 from figma_flutter_agent.parser.interaction import (
     button_has_absolute_slot_children,
     button_has_icon_label_inline_affordance,
@@ -222,3 +223,49 @@ def test_absolute_slot_row_reconstructs_positioned_children() -> None:
     ]
     body = _button_absolute_slot_stack_body(row, child_widgets[: len(row.children)])
     assert body.count("Positioned(") >= 2
+
+
+def test_command_icon_host_vetoes_checkbox_classification() -> None:
+    root = _load_menu_root()
+    command = _find_node(root, "602:821")
+    assert command is not None
+    assert command.vector_asset_key is not None
+    assert not layout_fact_checkbox_control(command)
+
+
+def test_user_reviews_row_emits_command_glyph_not_checkbox() -> None:
+    root = _load_menu_root()
+    row = _find_node(root, "602:806")
+    assert row is not None
+    dart = render_node_body(row, uses_svg=True, theme_variant="material")
+    assert "command_602_821" in dart
+    assert "_GeneratedToggleCheckbox" not in dart
+
+
+def test_log_out_row_preserves_full_cover_surface() -> None:
+    root = _load_menu_root()
+    row = _find_node(root, "602:788")
+    assert row is not None
+    dart = render_node_body(row, uses_svg=True, theme_variant="material")
+    assert "0xFFF6F6F6" in dart
+    assert "width: 327.0" in dart
+    assert "height: 78.0" in dart
+    assert "figma-602_789" in dart
+
+
+def test_withdrawal_history_row_emits_foreground_glyph() -> None:
+    root = _load_menu_root()
+    row = _find_node(root, "602:825")
+    assert row is not None
+    dart = render_node_body(row, uses_svg=True, theme_variant="material")
+    assert "ellipse_1_602_828" in dart
+    assert "vector_602_832" in dart
+
+
+def test_trailing_chevron_component_uses_action_slot_extent() -> None:
+    root = _load_menu_root()
+    chevron_host = _find_node(root, "602:774")
+    assert chevron_host is not None
+    dart = _render_svg_picture(chevron_host, "assets/icons/chevron-right_602_775.svg")
+    assert "width: 30.0, height: 30.0" in dart
+    assert "width: 5.0, height: 10.0" not in dart

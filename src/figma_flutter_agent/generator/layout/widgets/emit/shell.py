@@ -83,6 +83,41 @@ def build_render_ctx(
     )
 
 
+def _button_covering_surface_may_omit(
+    node: CleanDesignTreeNode,
+    surface: CleanDesignTreeNode,
+    sorted_children: list[CleanDesignTreeNode],
+) -> bool:
+    """Return True only when omitting a full-cover button surface is paint-safe.
+
+    A covering background rectangle may be dropped from the child list only when
+    its paint is transferred to the emitted host (Ink decoration) or the sole
+    remaining child already spans the full host extent. When a smaller inner row
+    survives omission, the surface must stay in the tree or be re-wrapped.
+    """
+    remaining = [child for child in sorted_children if child.id != surface.id]
+    if len(remaining) == 1:
+        inner = remaining[0]
+        host_width = float(node.sizing.width or 0.0)
+        host_height = float(node.sizing.height or 0.0)
+        inner_width = float(inner.sizing.width or 0.0)
+        inner_height = float(inner.sizing.height or 0.0)
+        if host_width > 0.0 and inner_width > 0.0 and inner_width < host_width - 0.5:
+            return False
+        if host_height > 0.0 and inner_height > 0.0 and inner_height < host_height - 0.5:
+            return False
+    from figma_flutter_agent.generator.layout.widgets.button.core import (
+        _button_ink_surface_params,
+    )
+    from figma_flutter_agent.parser.interaction.forms import interaction_surface_node
+
+    painted = interaction_surface_node(node)
+    if painted is None:
+        return False
+    fill, border, shadows, gradient, _inner = _button_ink_surface_params(painted)
+    return bool(fill or border or shadows or gradient)
+
+
 def prepare_layout_children(
     node: CleanDesignTreeNode,
     *,
@@ -139,7 +174,11 @@ def prepare_layout_children(
 
             surface = primary_surface_node(node)
             if surface is not None and surface_covers_node(node, surface):
-                if not layout_fact_icon_badge_stack(node):
+                if not layout_fact_icon_badge_stack(node) and _button_covering_surface_may_omit(
+                    node,
+                    surface,
+                    sorted_children,
+                ):
                     omit_child_ids.add(surface.id)
     if node.type == NodeType.BUTTON:
         from figma_flutter_agent.parser.interaction.buttons import button_painted_overlay_surface

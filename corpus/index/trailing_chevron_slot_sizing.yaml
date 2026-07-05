@@ -1,0 +1,18 @@
+version: 1
+family_id: trailing_chevron_slot_sizing
+generated: true
+cases:
+- case_id: 2026-07-05-trailing-chevron-component-slot-sizing
+  case_file: cases/2026-07-05-trailing-chevron-component-slot-sizing.yaml
+  title: Trailing chevron component exports must fill the action slot
+  project: limbo
+  feature: food_menu_2
+  occurrence_id: food-menu-personal-info-chevron-slot
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T16:45:00Z'
+  updated_at: '2026-07-05T16:55:00Z'
+  summary: 'List-row trailing chevron hosts with nested chevron-right component exports
+    sized the inner vector path at 5x10 inside a 30x30 slot, making Personal Info
+    disclosure glyph nearly invisible while Settings used a full 30x30 SVG. User observation:
+    right-side arrows shifted or miss...'

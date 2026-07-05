@@ -1,0 +1,18 @@
+version: 1
+family_id: decorative_glyph_semantic_veto
+generated: true
+cases:
+- case_id: 2026-07-05-vector-asset-checkbox-false-positive
+  case_file: cases/2026-07-05-vector-asset-checkbox-false-positive.yaml
+  title: Exported vector glyph hosts must not classify as checkbox controls
+  project: limbo
+  feature: food_menu_2
+  occurrence_id: food-menu-command-icon-checkbox
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T16:45:00Z'
+  updated_at: '2026-07-05T16:55:00Z'
+  summary: 'Compact square stacks carrying vectorAssetKey pictogram exports (command
+    grid icon on User Reviews row) were classified as stroked-outline checkbox controls
+    and emitted as _GeneratedToggleCheckbox instead of SvgPicture. User observation:
+    missing row icons on food_menu_2 profil...'

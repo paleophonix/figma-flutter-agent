@@ -1,8 +1,8 @@
 {
   "feature": "mobile_sub_plans",
-  "pipeline_run_id": "6f7cc3a8f57a",
-  "candidate_build_run_id": "6f7cc3a8f57a",
-  "committed_build_run_id": "6f7cc3a8f57a",
+  "pipeline_run_id": "70d7c61da03c",
+  "candidate_build_run_id": "70d7c61da03c",
+  "committed_build_run_id": "70d7c61da03c",
   "writeback": "committed",
   "written_files": [
     "lib/features/mobile_sub_plans/mobile_sub_plans_screen.dart",
@@ -17,18 +17,18 @@
     "lib/theme/app_theme.dart",
     "lib/theme/app_typography.dart",
     "lib/widgets/ios_status_bar_widget.dart",
-    "lib/widgets/radio_button_widget.dart",
+    "lib/widgets/star_filled_icon_widget.dart",
     "lib/widgets/subscribe_button_widget.dart",
     "lib/widgets/subscription_plan_radio_button_widget.dart",
     "test/golden/mobile_sub_plans_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-05T15:19:43.897638+00:00",
+  "captured_at": "2026-07-05T16:48:47.827666+00:00",
   "runMetaSchemaVersion": "2",
   "status": "completed",
   "cached_ir_verdict": "compatible",
   "clean_tree_hash": "f03f8f267691ebb6285a996c9aa9fb30889b4694ceeb78b223e0eaeec4bf27b8",
   "generation_config_hash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
-  "run_started_at": "2026-07-05T15:19:08.764361+00:00"
+  "run_started_at": "2026-07-05T16:48:09.554325+00:00"
 }

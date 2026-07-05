@@ -248,3 +248,75 @@ families:
       Cached IR compatibility is hard-rejected before shadow/enforce policy
       can warn or trigger LLM regeneration on cleanTreeHash drift.
     status: active
+
+  - id: semantic_action_veto
+    title: Action surface misclassified as text input
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/parser/interaction/inline_input_hosts.py
+        symbol: flex_painted_action_surface_vetoes_input
+    law_ids:
+      - SemanticActionVetoLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Painted CTA and button rows must not compile as inline TextFormField hosts
+      when structural action affordance is present.
+    status: active
+
+  - id: decorative_glyph_semantic_veto
+    title: Decorative glyph misclassified as interactive control
+    pipeline_arrows:
+      - A4
+    owning_stage: parser
+    owners:
+      - module: src/figma_flutter_agent/parser/interaction/forms.py
+        symbol: layout_fact_checkbox_control
+    law_ids:
+      - DecorativeGlyphSemanticVetoLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Named vector pictogram hosts must not be promoted to checkbox or other
+      interactive controls without required semantic evidence.
+    status: active
+
+  - id: paint_surface_omit_without_transfer
+    title: Button surface omitted without paint transfer
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
+        symbol: _button_covering_surface_may_omit
+    law_ids:
+      - PaintSurfaceTransferCompletenessLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      A full-cover button/card surface child is dropped from emit without
+      transferring its paint to the host Ink decoration or retaining the node.
+    status: active
+
+  - id: trailing_chevron_slot_sizing
+    title: Trailing chevron component slot sizing
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/svg.py
+        symbol: _intrinsic_glyph_svg_dimensions
+    law_ids:
+      - DirectionalGlyphIntrinsicBoundsLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Trailing chevron hosts with component chevron-right exports must size
+      SVGs to the action slot instead of nested micro-vector paint bounds.
+    status: active

@@ -1,0 +1,19 @@
+version: 1
+family_id: paint_surface_omit_without_transfer
+generated: true
+cases:
+- case_id: 2026-07-05-button-surface-omit-without-transfer
+  case_file: cases/2026-07-05-button-surface-omit-without-transfer.yaml
+  title: Button stack must not drop full-cover card surface without paint 
+    transfer
+  project: limbo
+  feature: food_menu_2
+  occurrence_id: food-menu-log-out-card-surface
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T16:45:00Z'
+  updated_at: '2026-07-05T16:55:00Z'
+  summary: 'Menu-row button stacks with a full-cover background rectangle and a smaller
+    inner content row omitted the surface child in prepare_layout_children without
+    transferring #F6F6F6 paint to the host, leaving Log Out on bare white. User observation:
+    Log Out row lost its gray card wh...'

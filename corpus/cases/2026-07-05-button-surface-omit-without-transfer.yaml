@@ -1,0 +1,54 @@
+version: 1
+
+case:
+  id: 2026-07-05-button-surface-omit-without-transfer
+  title: Button stack must not drop full-cover card surface without paint transfer
+  case_kind: regression
+  project: limbo
+  feature: food_menu_2
+  observed_at: 2026-07-05
+  summary: >
+    Menu-row button stacks with a full-cover background rectangle and a smaller
+    inner content row omitted the surface child in prepare_layout_children without
+    transferring #F6F6F6 paint to the host, leaving Log Out on bare white.
+    User observation: Log Out row lost its gray card while sibling rows kept theirs.
+  created_at: '2026-07-05T16:45:00Z'
+  updated_at: '2026-07-05T16:55:00Z'
+occurrences:
+- id: food-menu-log-out-card-surface
+  family_id: paint_surface_omit_without_transfer
+  pipeline_arrow: A3
+  law_id: PaintSurfaceTransferCompletenessLaw
+  stage: emitter
+  origin: COMPILER
+  blast_radius: B2_SILENT_WRONG_BEHAVIOR
+  confidence: high
+  status: FIXED
+  owner:
+    module: src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
+    symbol: _button_covering_surface_may_omit
+  contract:
+    field: children
+    field_class: fact
+    category: illegal
+    expected: Full-cover painted surface retained or paint transferred to host decoration.
+    actual: Surface child omitted while inner row smaller than host; gray card absent.
+  authority_boundary: emit_layout
+  loss_boundary: paint_surface
+  evidence:
+  - kind: debug_artifact
+    path: .debug/screen/limbo/food_menu_2/processed.json
+    summary: Group3304 327x78 hosts Rectangle 602:789 #F6F6F6 plus inner 296x48 row.
+  - kind: test
+    path: tests/test_food_menu_2_emit_laws.py
+    summary: Log Out row retains 327x78 surface with F6F6F6.
+  repair:
+    summary: >
+      Gate surface omission on _button_covering_surface_may_omit so smaller inner
+      rows no longer cause silent drop of the full-cover card background.
+    changed_files:
+    - src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
+    regression_tests:
+    - tests/test_food_menu_2_emit_laws.py::test_log_out_row_preserves_full_cover_surface
+    verification:
+    - poetry run pytest -q tests/test_food_menu_2_emit_laws.py::test_log_out_row_preserves_full_cover_surface

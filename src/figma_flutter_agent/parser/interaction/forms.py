@@ -211,6 +211,8 @@ def _vector_reads_as_checkbox_mark(
 
 def _stack_hosts_stroked_outline_checkbox_glyph(node: CleanDesignTreeNode) -> bool:
     """Square component icon with stroked hollow vectors (checkbox outline + optional mark)."""
+    if node.vector_asset_key:
+        return False
     if node.type not in {NodeType.STACK, NodeType.CONTAINER}:
         return False
     if _stack_hosts_direction_badge_glyph(node):

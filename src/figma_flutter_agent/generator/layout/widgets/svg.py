@@ -248,11 +248,7 @@ def _svg_fit_mode(
         and width / height >= _METRIC_STRIP_MIN_ASPECT
     ):
         return "BoxFit.contain"
-    if (
-        width
-        and height
-        and max(float(width), float(height)) <= 72.0
-    ):
+    if width and height and max(float(width), float(height)) <= 72.0:
         return "BoxFit.contain"
     return "BoxFit.fill" if width and height else "BoxFit.contain"
 
@@ -693,6 +689,12 @@ def _intrinsic_glyph_svg_dimensions(
             return glyph
 
     if layout_fact_trailing_chevron_action_slot(node):
+        from figma_flutter_agent.parser.boundaries.assets import _best_descendant_vector_asset
+
+        component_asset = node.vector_asset_key or _best_descendant_vector_asset(node)
+        if component_asset and "chevron-right" in component_asset.lower().replace("_", "-"):
+            if width is not None and height is not None and width > 0 and height > 0:
+                return width, height
         glyph = trailing_chevron_glyph_paint_span(node)
         if glyph is not None:
             glyph_width, glyph_height = glyph

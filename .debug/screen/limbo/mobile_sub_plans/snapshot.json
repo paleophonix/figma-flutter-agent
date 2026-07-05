@@ -9,6 +9,7 @@
   "file_hashes": {
     "lib/widgets/subscription_plan_radio_button_widget.dart": "6cc6acadb7871f197186c3b2faf7065b515b5eb499677c68513537b8ac64be64",
     "lib/widgets/ios_status_bar_widget.dart": "1681abe7ce549b24528b0b480fbed95081015590b8e84d03f71f256cfcd236b9",
+    "lib/widgets/star_filled_icon_widget.dart": "7e1c750f1ad1ee802d301e4495ccb7927f57bb9a5b2b60f64ba2e07f2b3057da",
     "lib/widgets/subscribe_button_widget.dart": "6a0e72535040bca9efb17eb4ed4baf5d76e80e72b1d0c44c29c7ae5967f91586",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "32c9dedd881e0e387bc13500646bf1deb03b9bdbe518a4f179eeed702d27c9e4",
@@ -18,9 +19,8 @@
     "lib/theme/app_edge_insets.dart": "5e7a4ee012b7ed13e6a5be5180666fe280d194fafc5b23aeb981cdfbdcce0180",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "60ace754bc644c686a6b2d1416960f389f243e4b6518c9b44ad009f77d628e9b",
-    "lib/generated/mobile_sub_plans_layout.dart": "f6add2c4b46cdfe24a11d61364906050dad9229deff5cd43a30f23d3bc5aab64",
+    "lib/generated/mobile_sub_plans_layout.dart": "5cb215ca031602662050e4461954dd835249a6d8116d57cac133aaabc0f2e048",
     "lib/features/mobile_sub_plans/mobile_sub_plans_screen.dart": "152e37865574fb1f782cc9c29bd16fc21c96c6cfd27266d6b1102461175e6a08",
-    "lib/widgets/radio_button_widget.dart": "64c0b4bd2a19d9c02cbca38356e739b18b4543069da7327e45460c59fa84eabf",
     "test/golden/mobile_sub_plans_screen_test.dart": "c6bcf6346e384f085136d10ec18dd24a6a32dd99475f070ca4307496faae271b",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
     "lib/main.dart": "8e84bb5b266adf36b7e1c21964f7f068eb527114429930fe80bb7e03f00a648c"
@@ -32,6 +32,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 6,
-  "updated_at": "2026-07-05T15:19:43.843931+00:00"
+  "version": 7,
+  "updated_at": "2026-07-05T16:48:47.660031+00:00"
 }

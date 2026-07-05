@@ -19,7 +19,7 @@ case:
   updated_at: '2026-07-04T16:55:00Z'
 occurrences:
 - id: mobile-sub-plans-subscribe-textfield
-  family_id: semantic_upgrade_without_required_evidence
+  family_id: semantic_action_veto
   pipeline_arrow: A3
   law_id: SemanticActionVetoLaw
   stage: emitter
