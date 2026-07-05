@@ -14,28 +14,6 @@
       "rejectReason": null
     },
     {
-      "figmaId": "602:1189",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      },
-      "rejectReason": null
-    },
-    {
-      "figmaId": "602:1192",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      },
-      "rejectReason": null
-    },
-    {
       "figmaId": "602:1210",
       "kind": "container_list_tile",
       "confidence": 0.84,
@@ -77,30 +55,6 @@
         "media_avatar": true,
         "child_type_counts": {},
         "child_count": 0
-      },
-      "rejectReason": "below_confidence_threshold"
-    },
-    {
-      "figmaId": "602:1187",
-      "kind": "media_avatar",
-      "confidence": 0.7,
-      "evidence": {
-        "media_avatar": true,
-        "child_type_counts": {},
-        "child_count": 0
-      },
-      "rejectReason": "below_confidence_threshold"
-    },
-    {
-      "figmaId": "602:1188",
-      "kind": "media_badge",
-      "confidence": 0.7,
-      "evidence": {
-        "media_badge": true,
-        "child_type_counts": {
-          "VECTOR": 4
-        },
-        "child_count": 4
       },
       "rejectReason": "below_confidence_threshold"
     }
@@ -172,6 +126,6 @@
     "602:1210"
   ],
   "llmAnnotationUsed": [],
-  "acceptedCount": 5,
-  "totalDecisions": 12
+  "acceptedCount": 3,
+  "totalDecisions": 8
 }

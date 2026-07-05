@@ -27,6 +27,30 @@
       }
     },
     {
+      "id": "602:1204",
+      "parent_id": "602:1183",
+      "depth": 2,
+      "name": "Rectangle 26",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 111.0,
+        "height": 101.0
+      }
+    },
+    {
+      "id": "602:1205",
+      "parent_id": "602:1183",
+      "depth": 2,
+      "name": "Upload photo/video",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 158.0,
+        "height": 16.0
+      }
+    },
+    {
       "id": "602:1184",
       "parent_id": "602:1183",
       "depth": 2,
@@ -191,30 +215,6 @@
       "children_count": 0,
       "size": {
         "width": 25.0,
-        "height": 16.0
-      }
-    },
-    {
-      "id": "602:1204",
-      "parent_id": "602:1183",
-      "depth": 2,
-      "name": "Rectangle 26",
-      "type": "CONTAINER",
-      "children_count": 0,
-      "size": {
-        "width": 111.0,
-        "height": 101.0
-      }
-    },
-    {
-      "id": "602:1205",
-      "parent_id": "602:1183",
-      "depth": 2,
-      "name": "Upload photo/video",
-      "type": "TEXT",
-      "children_count": 0,
-      "size": {
-        "width": 158.0,
         "height": 16.0
       }
     },
@@ -1719,6 +1719,54 @@
       }
     },
     {
+      "id": "602:1178",
+      "parent_id": "602:1125",
+      "depth": 3,
+      "name": "Group 3165",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 58.0,
+        "height": 17.0
+      }
+    },
+    {
+      "id": "602:1179",
+      "parent_id": "602:1178",
+      "depth": 4,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 6.000000035774747,
+        "height": 3.000000071549266
+      }
+    },
+    {
+      "id": "602:1180",
+      "parent_id": "602:1178",
+      "depth": 4,
+      "name": "See All",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 45.0,
+        "height": 17.0
+      }
+    },
+    {
+      "id": "602:1181",
+      "parent_id": "602:1125",
+      "depth": 3,
+      "name": "Basic",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 37.0,
+        "height": 17.0
+      }
+    },
+    {
       "id": "602:1126",
       "parent_id": "602:1125",
       "depth": 3,
@@ -2340,54 +2388,6 @@
       "size": {
         "width": 1.1936900615692139,
         "height": 1.1936900615692139
-      }
-    },
-    {
-      "id": "602:1178",
-      "parent_id": "602:1125",
-      "depth": 3,
-      "name": "Group 3165",
-      "type": "STACK",
-      "children_count": 2,
-      "size": {
-        "width": 58.0,
-        "height": 17.0
-      }
-    },
-    {
-      "id": "602:1179",
-      "parent_id": "602:1178",
-      "depth": 4,
-      "name": "Vector",
-      "type": "VECTOR",
-      "children_count": 0,
-      "size": {
-        "width": 6.000000035774747,
-        "height": 3.000000071549266
-      }
-    },
-    {
-      "id": "602:1180",
-      "parent_id": "602:1178",
-      "depth": 4,
-      "name": "See All",
-      "type": "TEXT",
-      "children_count": 0,
-      "size": {
-        "width": 45.0,
-        "height": 17.0
-      }
-    },
-    {
-      "id": "602:1181",
-      "parent_id": "602:1125",
-      "depth": 3,
-      "name": "Basic",
-      "type": "TEXT",
-      "children_count": 0,
-      "size": {
-        "width": 37.0,
-        "height": 17.0
       }
     },
     {
@@ -3045,8 +3045,54 @@
     {
       "kind": "parent_child",
       "from_node_id": "602:1183",
+      "to_node_id": "602:1204",
+      "relation": "parent_child",
+      "parent_id": "602:1183"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "602:1204",
+      "to_node_id": "602:1205",
+      "relation": "next_sibling",
+      "distance_px": 78.12,
+      "parent_id": "602:1183"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "602:1183",
+      "to_node_id": "602:1205",
+      "relation": "parent_child",
+      "parent_id": "602:1183"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "602:1205",
+      "to_node_id": "602:1204",
+      "relation": "previous_sibling",
+      "distance_px": 78.12,
+      "parent_id": "602:1183"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "602:1205",
+      "to_node_id": "602:1184",
+      "relation": "next_sibling",
+      "distance_px": 257.51,
+      "parent_id": "602:1183"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "602:1183",
       "to_node_id": "602:1184",
       "relation": "parent_child",
+      "parent_id": "602:1183"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "602:1184",
+      "to_node_id": "602:1205",
+      "relation": "previous_sibling",
+      "distance_px": 257.51,
       "parent_id": "602:1183"
     },
     {
@@ -3232,14 +3278,6 @@
       "parent_id": "602:1183"
     },
     {
-      "kind": "next_sibling",
-      "from_node_id": "602:1194",
-      "to_node_id": "602:1204",
-      "relation": "next_sibling",
-      "distance_px": 135.0,
-      "parent_id": "602:1183"
-    },
-    {
       "kind": "parent_child",
       "from_node_id": "602:1194",
       "to_node_id": "602:1195",
@@ -3291,44 +3329,6 @@
       "relation": "previous_sibling",
       "distance_px": 38.83,
       "parent_id": "602:1194"
-    },
-    {
-      "kind": "parent_child",
-      "from_node_id": "602:1183",
-      "to_node_id": "602:1204",
-      "relation": "parent_child",
-      "parent_id": "602:1183"
-    },
-    {
-      "kind": "previous_sibling",
-      "from_node_id": "602:1204",
-      "to_node_id": "602:1194",
-      "relation": "previous_sibling",
-      "distance_px": 135.0,
-      "parent_id": "602:1183"
-    },
-    {
-      "kind": "next_sibling",
-      "from_node_id": "602:1204",
-      "to_node_id": "602:1205",
-      "relation": "next_sibling",
-      "distance_px": 78.12,
-      "parent_id": "602:1183"
-    },
-    {
-      "kind": "parent_child",
-      "from_node_id": "602:1183",
-      "to_node_id": "602:1205",
-      "relation": "parent_child",
-      "parent_id": "602:1183"
-    },
-    {
-      "kind": "previous_sibling",
-      "from_node_id": "602:1205",
-      "to_node_id": "602:1204",
-      "relation": "previous_sibling",
-      "distance_px": 78.12,
-      "parent_id": "602:1183"
     },
     {
       "kind": "parent_child",
@@ -5696,8 +5696,84 @@
     {
       "kind": "parent_child",
       "from_node_id": "602:1125",
+      "to_node_id": "602:1178",
+      "relation": "parent_child",
+      "parent_id": "602:1125"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "602:1178",
+      "to_node_id": "602:1181",
+      "relation": "next_sibling",
+      "distance_px": 279.5,
+      "parent_id": "602:1125"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "602:1178",
+      "to_node_id": "602:1179",
+      "relation": "parent_child",
+      "parent_id": "602:1178"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "602:1179",
+      "to_node_id": "602:1180",
+      "relation": "next_sibling",
+      "distance_px": 32.5,
+      "parent_id": "602:1178"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "602:1178",
+      "to_node_id": "602:1180",
+      "relation": "parent_child",
+      "parent_id": "602:1178"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "602:1180",
+      "to_node_id": "602:1179",
+      "relation": "previous_sibling",
+      "distance_px": 32.5,
+      "parent_id": "602:1178"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "602:1125",
+      "to_node_id": "602:1181",
+      "relation": "parent_child",
+      "parent_id": "602:1125"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "602:1181",
+      "to_node_id": "602:1178",
+      "relation": "previous_sibling",
+      "distance_px": 279.5,
+      "parent_id": "602:1125"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "602:1181",
+      "to_node_id": "602:1126",
+      "relation": "next_sibling",
+      "distance_px": 321.33,
+      "parent_id": "602:1125"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "602:1125",
       "to_node_id": "602:1126",
       "relation": "parent_child",
+      "parent_id": "602:1125"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "602:1126",
+      "to_node_id": "602:1181",
+      "relation": "previous_sibling",
+      "distance_px": 321.33,
       "parent_id": "602:1125"
     },
     {
@@ -6434,14 +6510,6 @@
       "parent_id": "602:1125"
     },
     {
-      "kind": "next_sibling",
-      "from_node_id": "602:1169",
-      "to_node_id": "602:1178",
-      "relation": "next_sibling",
-      "distance_px": 278.58,
-      "parent_id": "602:1125"
-    },
-    {
       "kind": "parent_child",
       "from_node_id": "602:1169",
       "to_node_id": "602:1170",
@@ -6576,74 +6644,6 @@
       "relation": "previous_sibling",
       "distance_px": 2.67,
       "parent_id": "602:1173"
-    },
-    {
-      "kind": "parent_child",
-      "from_node_id": "602:1125",
-      "to_node_id": "602:1178",
-      "relation": "parent_child",
-      "parent_id": "602:1125"
-    },
-    {
-      "kind": "previous_sibling",
-      "from_node_id": "602:1178",
-      "to_node_id": "602:1169",
-      "relation": "previous_sibling",
-      "distance_px": 278.58,
-      "parent_id": "602:1125"
-    },
-    {
-      "kind": "next_sibling",
-      "from_node_id": "602:1178",
-      "to_node_id": "602:1181",
-      "relation": "next_sibling",
-      "distance_px": 279.5,
-      "parent_id": "602:1125"
-    },
-    {
-      "kind": "parent_child",
-      "from_node_id": "602:1178",
-      "to_node_id": "602:1179",
-      "relation": "parent_child",
-      "parent_id": "602:1178"
-    },
-    {
-      "kind": "next_sibling",
-      "from_node_id": "602:1179",
-      "to_node_id": "602:1180",
-      "relation": "next_sibling",
-      "distance_px": 32.5,
-      "parent_id": "602:1178"
-    },
-    {
-      "kind": "parent_child",
-      "from_node_id": "602:1178",
-      "to_node_id": "602:1180",
-      "relation": "parent_child",
-      "parent_id": "602:1178"
-    },
-    {
-      "kind": "previous_sibling",
-      "from_node_id": "602:1180",
-      "to_node_id": "602:1179",
-      "relation": "previous_sibling",
-      "distance_px": 32.5,
-      "parent_id": "602:1178"
-    },
-    {
-      "kind": "parent_child",
-      "from_node_id": "602:1125",
-      "to_node_id": "602:1181",
-      "relation": "parent_child",
-      "parent_id": "602:1125"
-    },
-    {
-      "kind": "previous_sibling",
-      "from_node_id": "602:1181",
-      "to_node_id": "602:1178",
-      "relation": "previous_sibling",
-      "distance_px": 279.5,
-      "parent_id": "602:1125"
     },
     {
       "kind": "parent_child",

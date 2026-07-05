@@ -54,42 +54,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "602:1189",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1189",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1192",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "602:1192",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "602:1210",
       "field": "fidelity_tier",
       "old": null,
@@ -243,26 +207,6 @@
           "STACK": 7
         },
         "child_count": 7
-      }
-    },
-    {
-      "nodeId": "602:1189",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "602:1192",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
       }
     },
     {
