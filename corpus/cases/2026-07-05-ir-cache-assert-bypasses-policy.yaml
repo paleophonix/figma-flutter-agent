@@ -1,0 +1,69 @@
+version: 1
+
+case:
+  id: 2026-07-05-ir-cache-assert-bypasses-policy
+  title: Cached IR load hard-fails before IR cache policy
+  case_kind: regression
+  project: limbo
+  feature: food_menu_2
+  observed_at: 2026-07-05
+  summary: >
+    Wizard launch (ir-offline) aborted with cleanTreeHash mismatch even though
+    default FIGMA_IR_CACHE_POLICY is shadow. assert_cached_screen_ir_compatible
+    ran before write_ir_cache_compatibility_report, so shadow warn and enforce
+    auto-regeneration never executed. User observation: launch option 0 failed
+    after switching to food_menu_2; processed tree drifted from cached
+    llm_validated.json after accessibility auto_fix on re-parse.
+
+  created_at: '2026-07-05T12:00:00Z'
+  updated_at: '2026-07-05T16:20:00Z'
+occurrences:
+- id: ir-cache-assert-before-policy
+  family_id: ir_cache_assert_bypasses_policy
+  pipeline_arrow: NONE
+  law_id: LAW-IR-CACHE-POLICY-ORDER
+  stage: llm
+  origin: COMPILER
+  blast_radius: B3_BLOCKING
+  confidence: high
+  status: FIXED
+  owner:
+    module: src/figma_flutter_agent/pipeline/llm.py
+    symbol: load_cached_ir_llm_outcome
+  contract:
+    field: cleanTreeHash
+    field_class: compiler_owned
+    category: preserved
+    expected: >
+      IR cache policy (shadow warn / enforce regenerate) governs stamp drift;
+      only structural root figmaId mismatch hard-fails.
+    actual: >
+      assert_cached_screen_ir_compatible blocked load before policy ran on
+      cleanTreeHash mismatch.
+  authority_boundary: ir_cache_policy
+  evidence:
+  - kind: debug_artifact
+    path: .debug/screen/limbo/food_menu_2/llm_validated.json
+    summary: cached cleanTreeHash 756feb67… stale vs launch tree ccbf25f4…
+  - kind: debug_artifact
+    path: .debug/screen/limbo/food_menu_2/run.meta.json
+    summary: launch failed at llm stage with cleanTreeHash mismatch
+  - kind: source_code
+    path: src/figma_flutter_agent/pipeline/llm.py
+    summary: assert ran before compatibility report and policy branch
+  repair:
+    summary: >
+      Route cached IR load through ir-cache-compatibility-report and policy
+      only; keep hard fail for missing screenIr and root figmaId mismatch.
+      Shadow continues with warning; enforce raises CachedIrRegenerationRequired
+      when LLM regeneration is available.
+    changed_files:
+    - src/figma_flutter_agent/pipeline/llm.py
+    - corpus/families.yaml
+    - corpus/cases/2026-07-05-ir-cache-assert-bypasses-policy.yaml
+    regression_tests:
+    - tests/test_ir_cache_compatibility_shadow.py::test_shadow_load_continues_on_clean_tree_hash_mismatch
+    - tests/test_ir_cache_compatibility_shadow.py::test_enforce_raises_regeneration_on_clean_tree_hash_mismatch
+    verification:
+    - poetry run pytest -q tests/test_ir_cache_compatibility_shadow.py 
+      tests/test_screen_root_nav_kind_laws.py

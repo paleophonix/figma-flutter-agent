@@ -1,8 +1,8 @@
 {
   "feature": "food_menu_2",
-  "pipeline_run_id": "646498009ad4",
-  "candidate_build_run_id": "646498009ad4",
-  "committed_build_run_id": "646498009ad4",
+  "pipeline_run_id": "96c50ebc7608",
+  "candidate_build_run_id": "96c50ebc7608",
+  "committed_build_run_id": "96c50ebc7608",
   "writeback": "committed",
   "written_files": [
     "lib/features/food_menu_2/food_menu_2_screen.dart",
@@ -19,15 +19,15 @@
     "lib/widgets/group3362_widget.dart",
     "lib/widgets/group8246_widget.dart",
     "lib/widgets/group8264_widget.dart",
-    "lib/widgets/icon_right_widget.dart",
     "test/golden/food_menu_2_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-04T18:05:53.424756+00:00",
+  "captured_at": "2026-07-05T16:23:34.421466+00:00",
   "runMetaSchemaVersion": "2",
   "status": "completed",
-  "clean_tree_hash": "de15262024bce406f91450c97d4e41e8d91b069ab426e192c7b9d2f21d2c4636",
+  "cached_ir_verdict": "incompatible",
+  "clean_tree_hash": "ccbf25f476346290b724fab88ae5a210b0d0e72192564f7510717e6d1cdf0349",
   "generation_config_hash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
-  "run_started_at": "2026-07-04T18:03:08.248493+00:00"
+  "run_started_at": "2026-07-05T16:22:46.142335+00:00"
 }

@@ -467,6 +467,8 @@ def _plan_generation_files_impl(context: GenerationPlanContext) -> dict[str, str
         quiet_expected_fallback=quiet_expected_fallback,
     )
 
+    context.cluster_classes = cluster_classes
+    context.cluster_widget_specs = cluster_specs
     planned_files = run_final_reconcile(
         context,
         planned_files,

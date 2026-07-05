@@ -10,5 +10,7 @@ cases:
   occurrence_id: extracted-subtree-gap
   status: FIXED
   observed_at: '2026-07-03'
+  created_at: '2026-07-03T12:00:00Z'
+  updated_at: '2026-07-03T12:00:00Z'
   summary: Materialize silently skipped extracted widget validation when the 
     clean subtree was pruned without a named conservation outcome.

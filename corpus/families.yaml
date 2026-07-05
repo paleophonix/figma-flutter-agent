@@ -230,3 +230,21 @@ families:
     description: >
       Screen-root IR kind contradicts artboard scope without veto or heal.
     status: active
+
+  - id: ir_cache_assert_bypasses_policy
+    title: IR cache hard assert bypasses policy
+    pipeline_arrows:
+      - NONE
+    owning_stage: llm
+    owners:
+      - module: src/figma_flutter_agent/pipeline/llm.py
+        symbol: load_cached_ir_llm_outcome
+    law_ids:
+      - LAW-IR-CACHE-POLICY-ORDER
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Cached IR compatibility is hard-rejected before shadow/enforce policy
+      can warn or trigger LLM regeneration on cleanTreeHash drift.
+    status: active

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from figma_flutter_agent.defects.enums import (
     BlastRadius,
@@ -120,8 +120,33 @@ class CaseMeta(BaseModel):
     project: str
     feature: str
     observed_at: date
+    created_at: datetime
+    updated_at: datetime
     summary: str
     case_kind: Literal["regression", "screen", "corpus"] | None = None
+
+    @field_validator("created_at", "updated_at", mode="after")
+    @classmethod
+    def _minute_precision_utc(cls, value: datetime) -> datetime:
+        """Require UTC (or naive-as-UTC) timestamps with minute precision."""
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        else:
+            value = value.astimezone(timezone.utc)
+        if value.second or value.microsecond:
+            msg = "timestamps must use minute precision (seconds and microseconds must be 0)"
+            raise ValueError(msg)
+        return value
+
+    @field_validator("updated_at", mode="after")
+    @classmethod
+    def _updated_not_before_created(cls, value: datetime, info) -> datetime:
+        """``updated_at`` must not precede ``created_at``."""
+        created = info.data.get("created_at")
+        if created is not None and value < created:
+            msg = "updated_at must be greater than or equal to created_at"
+            raise ValueError(msg)
+        return value
 
 
 class CaseDocument(BaseModel):

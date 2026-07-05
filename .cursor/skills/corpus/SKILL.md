@@ -71,11 +71,12 @@ Template: `corpus/case-template.yaml`.
 When `corpus_status: ready_for_record` and confidence `high` or `medium`:
 
 1. Create or update `corpus/cases/YYYY-MM-DD-<mechanism-slug>.yaml`.
-2. Each occurrence: `status: OPEN` — **never `FIXED` on diagnose**.
-3. `case.summary`: mechanism + contract expected/actual + first arrow where fact changed. No fix recipe or test names in summary.
-4. `evidence`: repo-relative `.debug/screen/<project>/<feature>/…` paths.
-5. Leave `repair` absent or empty.
-6. Emit `repair_summary_draft` (2–3 sentences) per queue item for `/repair`.
+2. **New case:** set `case.created_at` (UTC minute, e.g. `2026-07-05T16:34:00Z`). **Every edit:** bump `case.updated_at` (≥ `created_at`).
+3. Each occurrence: `status: OPEN` — **never `FIXED` on diagnose**.
+4. `case.summary`: mechanism + contract expected/actual + first arrow where fact changed. No fix recipe or test names in summary.
+5. `evidence`: repo-relative `.debug/screen/<project>/<feature>/…` paths.
+6. Leave `repair` absent or empty.
+7. Emit `repair_summary_draft` (2–3 sentences) per queue item for `/repair`.
 
 **One mechanism → one case file.** Update in place; do not fork per retry.
 
@@ -87,7 +88,7 @@ Before coding on queue item `R?`:
 2. If case documents ≥2 failed repair attempts without fresh `/diagnose` → **STOP** item; ask re-diagnose.
 
 While repairing: status stays `OPEN`. Failed attempt → append one line to `case.summary`:
-`Repair attempt N (YYYY-MM-DD): <tried> → <why failed>`.
+`Repair attempt N (YYYY-MM-DD): <tried> → <why failed>`. **Always bump `case.updated_at`.**
 
 When proof is conclusive (all must hold):
 
@@ -118,7 +119,7 @@ Fix YAML until exit 0. **No handoff without validate passing.**
 
 ```text
 [ ] family_id + law_id + owning layer named
-[ ] corpus/cases/<case_id>.yaml with evidence
+[ ] corpus/cases/<case_id>.yaml with evidence + `created_at` / `updated_at` (UTC minute)
 [ ] generic regression test linked in repair.regression_tests (when FIXED)
 [ ] defects validate passes
 [ ] blocking/oracle promote — only if product + stable baseline (optional, later)

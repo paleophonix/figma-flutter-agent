@@ -6,10 +6,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from figma_flutter_agent.compiler.ir_cache_policy import DEFAULT_IR_CACHE_POLICY, IrCachePolicy
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.config.models import SemanticsSettings
-from figma_flutter_agent.compiler.ir_cache_policy import DEFAULT_IR_CACHE_POLICY, IrCachePolicy
-from figma_flutter_agent.errors import LlmError
+from figma_flutter_agent.errors import CachedIrRegenerationRequired, FlutterProjectError, LlmError
 from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.generator.paths import Architecture, screen_file_path
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
@@ -70,13 +70,16 @@ def load_cached_ir_llm_outcome(
         explicit_path=from_ir_path,
     )
     generation = load_generation_from_ir_dump(ir_path)
-    from figma_flutter_agent.debug.ir_cache import assert_cached_screen_ir_compatible
+    from figma_flutter_agent.debug.ir_cache import CACHED_IR_INCOMPATIBLE_MESSAGE
 
-    assert_cached_screen_ir_compatible(
-        generation,
-        clean_tree,
-        dump_path=ir_path,
-    )
+    if generation.screen_ir is None:
+        raise FlutterProjectError(
+            f"Cached screen IR at {ir_path.name} is missing screenIr."
+        )
+    if generation.screen_ir.root.figma_id != clean_tree.id:
+        raise FlutterProjectError(
+            f"{CACHED_IR_INCOMPATIBLE_MESSAGE} ({ir_path.name}: root figmaId mismatch)."
+        )
     from figma_flutter_agent.debug.ir_cache_report import write_ir_cache_compatibility_report
 
     verdict, report_path = write_ir_cache_compatibility_report(
@@ -99,7 +102,6 @@ def load_cached_ir_llm_outcome(
                 report_path.name,
             )
     if policy.enforce_enabled() and verdict in {"incompatible", "legacy_unknown"}:
-        from figma_flutter_agent.errors import CachedIrRegenerationRequired, FlutterProjectError
         from figma_flutter_agent.pipeline.helpers import can_regenerate_stale_cached_ir
 
         dry_run = not allow_regenerate

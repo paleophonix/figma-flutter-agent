@@ -11,6 +11,8 @@ cases:
   occurrence_id: extracted-radio-semantic-upgrade
   status: FIXED
   observed_at: '2026-07-04'
+  created_at: '2026-07-04T12:00:00Z'
+  updated_at: '2026-07-04T12:00:00Z'
   summary: classify_screen_ir promoted extracted radio hosts to control_radio 
     without clearing widget ref, triggering inv_graph_sync during 
     classify_screen_ir pass.
@@ -22,6 +24,8 @@ cases:
   occurrence_id: graph-sync-child-mismatch
   status: FIXED
   observed_at: '2026-07-03'
+  created_at: '2026-07-03T12:00:00Z'
+  updated_at: '2026-07-03T12:00:00Z'
   summary: Screen IR referenced clean-tree children that no longer exist after a
     pass.
 - case_id: 2026-07-03-cp2-graph-sync-extracted-boundary-synthetic
@@ -32,6 +36,8 @@ cases:
   occurrence_id: cp2-graph-sync-extracted-boundary
   status: FIXED
   observed_at: '2026-07-03'
+  created_at: '2026-07-03T12:00:00Z'
+  updated_at: '2026-07-03T12:00:00Z'
   summary: check_graph_sync required clean-tree child parity on kind=extracted 
     screen IR hosts, blocking CP2 layout passes after ExtractedIrTerminalLaw 
     enforcement.

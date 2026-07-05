@@ -11,6 +11,8 @@ cases:
   occurrence_id: food-add-new-items-cluster-delegate-root-collapse
   status: FIXED
   observed_at: '2026-07-04'
+  created_at: '2026-07-04T12:00:00Z'
+  updated_at: '2026-07-04T12:00:00Z'
   summary: 'Parse, IR validate, layout passes, and pre_emit all conserve the full
     form (root 602:1027 with 7 sections: header, item name, upload, price, ingredients,
     details, save). After sectionize the clean tree is a COLUMN with the same 7 children.
@@ -23,5 +25,7 @@ cases:
   occurrence_id: multiset-loss-cp0
   status: FIXED
   observed_at: '2026-07-03'
+  created_at: '2026-07-03T12:00:00Z'
+  updated_at: '2026-07-03T12:00:00Z'
   summary: Cluster dedup removed node ids from the clean-tree multiset without a
     conservation checkpoint failure.

@@ -2,16 +2,6 @@ version: 1
 family_id: semantic_upgrade_without_required_evidence
 generated: true
 cases:
-- case_id: 2026-07-03-semantic-upgrade-evidence-synthetic
-  case_file: cases/2026-07-03-semantic-upgrade-evidence-synthetic.yaml
-  title: Native emit requires manifest authority and evidence
-  project: synthetic
-  feature: fidelity_authority
-  occurrence_id: upgrade-without-evidence
-  status: FIXED
-  observed_at: '2026-07-03'
-  summary: LLM-authored native_verified tier could route to native emit without 
-    manifest authority or required evidence.
 - case_id: 2026-07-04-control-misclassified-as-text-input
   case_file: cases/2026-07-04-control-misclassified-as-text-input.yaml
   title: Painted CTA column must not compile as inline TextFormField
@@ -20,5 +10,21 @@ cases:
   occurrence_id: mobile-sub-plans-subscribe-textfield
   status: OPEN
   observed_at: '2026-07-04'
-  summary: Primary CTA COLUMN rows were coerced into TextFormField by inline input
-    host detection without action-surface veto.
+  created_at: '2026-07-04T12:00:00Z'
+  updated_at: '2026-07-04T16:55:00Z'
+  summary: Non-input controls (bordered label pills / primary CTA rows inside a 
+    single-child COLUMN) were classified by the inline input host detector and 
+    emitted as TextFormField with initialValue, losing button affordance. 
+    Reproduced on food_add_new_items upload tiles, food_menu_2 With...
+- case_id: 2026-07-03-semantic-upgrade-evidence-synthetic
+  case_file: cases/2026-07-03-semantic-upgrade-evidence-synthetic.yaml
+  title: Native emit requires manifest authority and evidence
+  project: synthetic
+  feature: fidelity_authority
+  occurrence_id: upgrade-without-evidence
+  status: FIXED
+  observed_at: '2026-07-03'
+  created_at: '2026-07-03T12:00:00Z'
+  updated_at: '2026-07-03T12:00:00Z'
+  summary: LLM-authored native_verified tier could route to native emit without 
+    manifest authority or required evidence.

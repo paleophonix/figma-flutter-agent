@@ -10,6 +10,8 @@ cases:
   occurrence_id: fidelity-authority-bypass
   status: FIXED
   observed_at: '2026-07-03'
+  created_at: '2026-07-03T12:00:00Z'
+  updated_at: '2026-07-03T12:00:00Z'
   summary: A semantic IR node with LLM-authored native_verified tier was 
     accepted by the fidelity stamp and could route to native template emit 
     without manifest authority.

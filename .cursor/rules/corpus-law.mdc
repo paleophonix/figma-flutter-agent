@@ -26,7 +26,7 @@ corpus/index/<family_id>.yaml     → scan rows: case_id, project, feature, stat
 corpus/cases/<case_id>.yaml       → open ONE file for the chosen row
 ```
 
-Pick row: same `project`+`feature` first → `OPEN` → `FIXED` with `repair` → `observed_at` desc.
+Pick row: same `project`+`feature` → `OPEN` → `FIXED` with `repair` → **`updated_at` desc** (then `observed_at`).
 
 ## Status (binary)
 
@@ -58,7 +58,7 @@ poetry run figma-flutter defects validate
 ## Done checklist
 
 1. `family_id` + `law_id` + owning layer named
-2. `corpus/cases/<case_id>.yaml` with evidence (template: `corpus/case-template.yaml`)
+2. `corpus/cases/<case_id>.yaml` with evidence (template: `corpus/case-template.yaml`); `created_at` on create, `updated_at` on every edit (UTC, minute precision, e.g. `2026-07-05T16:34:00Z`)
 3. Generic regression test or fixture — not one screen patch
 4. `poetry run figma-flutter defects validate` passes
 

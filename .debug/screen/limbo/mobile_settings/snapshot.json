@@ -7,9 +7,13 @@
   "typography_hash": "ab735a6a0e0c9b3bb0e31cfbeeb47d78803741bf8b6af228fffff203c15e91b7",
   "spacing_hash": "1c6658f99168fbbabd8cfeaad2c897c397ee9877303076da28044e19b5ce7267",
   "file_hashes": {
-    "lib/widgets/settings_list_item_widget.dart": "76ad28c1c244bb8eba7a6679bddd2308a8e7551265b87c2ae8ee0e148a064284",
+    "lib/widgets/settings_tab_bar_widget.dart": "bd636a6d8bc0d59ebd7fe1e293688951a6a3bf4b3816a030156e3da30cf7fb4a",
+    "lib/widgets/settings_list_item_widget.dart": "48b035c102d8507fc6b22c7be38fcca3c56bff6ef8389f757fcb4a537ad3b986",
+    "lib/widgets/settings_divider_widget.dart": "8985897bce9aa0e50a7dc19838eac41aa03ff4684ae96b0455ea9dcf737e7ee6",
     "lib/widgets/ios_status_bar_widget.dart": "080cb7dcf50b0dd5d61504774a9ce97a06d5be43e47d09acb988a00338e31753",
     "lib/widgets/settings_nav_bar_widget.dart": "5c7d19152deaaa746618d4859cccca65ad1f65893a0e5f584b9e072fe49ae0f9",
+    "lib/widgets/chevron_button_widget.dart": "cf5f9ef334c28ff6afae22e2aa4912bb9940f52e09782205619bebddc76094d4",
+    "lib/widgets/avatar_widget.dart": "badbb3c1725c7b4a1b6106b2dfb546cb3227066e4798cbb3e402fff961c499e0",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "ec28d4d356ef31b96ba99ddca1374d028ac235bcc17f4ee5b45b8ae8294232b9",
     "lib/theme/app_spacing.dart": "5886bea5322862a1c4d5b36c325933cbba1dca8714ceda84a80459a2f59bb88d",
@@ -18,9 +22,8 @@
     "lib/theme/app_edge_insets.dart": "29b223e0535be8ca3a24902686bfb3fca2f82326d03185d9e6b38fd084d9b43d",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "e2064faf54f4f3bdcf81fe1d0d8de07252453a8075559fb9c8a1769ac970c89e",
-    "lib/generated/mobile_settings_layout.dart": "414d36e1335dcead9f9b57c1f4ca1176a5767a44d2a2e554558d9ff6edd7274f",
+    "lib/generated/mobile_settings_layout.dart": "12d95ade91e63a93d36f883649634a98afcb5a0731a4f5892e370de0bbb3acff",
     "lib/features/mobile_settings/mobile_settings_screen.dart": "ad78edfa7f27f4f5a1c47e05ebc91e7a2cc2c37d1862c1eadfaf53a2f565d79b",
-    "lib/widgets/divider_widget.dart": "39b19224b9f6e41d997b93e4a44bfe43e12a81be1f7ed4984730bed5e916625a",
     "test/golden/mobile_settings_screen_test.dart": "57e535c7cf3b17aa7edf2cfcf35a381e66ac7ae6dc2fb7f549e3c0f631967b49",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
     "lib/main.dart": "687929f86bbb5d06ac192f3d20f168a792183b7e1f00d3f21dae51f5e76e44c7"
@@ -42,6 +45,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 1,
-  "updated_at": "2026-07-05T15:21:47.253314+00:00"
+  "version": 2,
+  "updated_at": "2026-07-05T16:12:24.809890+00:00"
 }

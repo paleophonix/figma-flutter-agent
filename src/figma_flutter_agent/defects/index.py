@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +19,15 @@ _yaml = YAML()
 _yaml.default_flow_style = False
 
 
+def format_case_timestamp(value: datetime) -> str:
+    """Serialize a case timestamp as UTC ISO-8601 with minute precision."""
+    if value.tzinfo is None:
+        normalized = value.replace(tzinfo=timezone.utc)
+    else:
+        normalized = value.astimezone(timezone.utc)
+    return normalized.replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 @dataclass(frozen=True)
 class IndexCaseRef:
     """One occurrence row in a family index file."""
@@ -30,6 +40,8 @@ class IndexCaseRef:
     occurrence_id: str
     status: str
     observed_at: str
+    created_at: str
+    updated_at: str
     summary: str
 
     def to_dict(self) -> dict[str, str]:
@@ -43,6 +55,8 @@ class IndexCaseRef:
             "occurrence_id": self.occurrence_id,
             "status": self.status,
             "observed_at": self.observed_at,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
             "summary": self.summary,
         }
 
@@ -83,6 +97,8 @@ def _index_entry(
         occurrence_id=occurrence.id,
         status=occurrence.status.value,
         observed_at=meta.observed_at.isoformat(),
+        created_at=format_case_timestamp(meta.created_at),
+        updated_at=format_case_timestamp(meta.updated_at),
         summary=_collapse_summary(meta.summary),
     )
 
@@ -97,7 +113,7 @@ def build_family_indexes(corpus: LoadedCorpus) -> dict[str, list[IndexCaseRef]]:
             )
     for family_id, entries in grouped.items():
         entries.sort(
-            key=lambda item: (item.observed_at, item.case_id, item.occurrence_id),
+            key=lambda item: (item.updated_at, item.case_id, item.occurrence_id),
             reverse=True,
         )
         grouped[family_id] = entries

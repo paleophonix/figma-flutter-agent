@@ -2,14 +2,17 @@ version: 1
 family_id: cluster_delegate_map_reconcile_clobber
 generated: true
 cases:
-  - case_id: 2026-07-05-cluster-delegate-reconcile-clobber
-    case_file: cases/2026-07-05-cluster-delegate-reconcile-clobber.yaml
-    title: Reconcile clobbers planner cluster delegate map
-    project: limbo
-    feature: mobile_settings
-    occurrence_id: mobile-settings-delegate-clobber
-    status: OPEN
-    observed_at: "2026-07-05"
-    summary: >
-      Final reconcile rebuilds cluster_classes from legacy collect_cluster_widget_specs,
-      collapsing enriched cluster delegates into wrong widget bodies on mobile_settings.
+- case_id: 2026-07-05-cluster-delegate-reconcile-clobber
+  case_file: cases/2026-07-05-cluster-delegate-reconcile-clobber.yaml
+  title: Reconcile clobbers planner cluster delegate map
+  project: limbo
+  feature: mobile_settings
+  occurrence_id: mobile-settings-delegate-clobber
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T12:00:00Z'
+  updated_at: '2026-07-05T16:01:00Z'
+  summary: 'User observation: profile avatar renders as icon plus line; list trailing
+    controls render as bottom navigation bars instead of chevrons. Mechanism: plan_generation_files
+    extracts and enriches many cluster widgets, but reconcile_planned_dart_files rebuilds
+    cluster_classes via l...'

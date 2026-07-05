@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+from tests.defect_case_meta import case_timestamps
+
 from figma_flutter_agent.defects.enums import (
     BlastRadius,
     Confidence,
@@ -53,6 +55,8 @@ def _case(
     status: DefectStatus = DefectStatus.OPEN,
     summary: str = "Line one.\n\nLine two.",
 ) -> CaseDocument:
+    observed = date(2026, 7, 4)
+    created_at, updated_at = case_timestamps(observed)
     return CaseDocument(
         version=1,
         case=CaseMeta(
@@ -60,7 +64,9 @@ def _case(
             title="Graph sync on screen",
             project="limbo",
             feature="food_menu",
-            observed_at=date(2026, 7, 4),
+            observed_at=observed,
+            created_at=created_at,
+            updated_at=updated_at,
             summary=summary,
         ),
         occurrences=[
@@ -105,6 +111,8 @@ def test_build_family_indexes_collapses_summary_and_groups_by_family() -> None:
     assert len(grouped["graph_sync_violation"]) == 1
     assert grouped["graph_sync_violation"][0].summary == "Alpha Beta"
     assert grouped["graph_sync_violation"][0].case_file == "cases/a.yaml"
+    assert grouped["graph_sync_violation"][0].created_at == "2026-07-04T12:00:00Z"
+    assert grouped["graph_sync_violation"][0].updated_at == "2026-07-04T12:00:00Z"
     assert len(grouped["node_multiset_loss"]) == 1
 
 

@@ -418,19 +418,7 @@
               {
                 "figmaId": "602:785",
                 "kind": "auto",
-                "children": [
-                  {
-                    "figmaId": "602:786",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "602:787",
-                        "kind": "auto",
-                        "children": []
-                      }
-                    ]
-                  }
-                ]
+                "children": []
               },
               {
                 "figmaId": "602:779",
@@ -488,19 +476,7 @@
               {
                 "figmaId": "602:791",
                 "kind": "auto",
-                "children": [
-                  {
-                    "figmaId": "602:792",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "602:793",
-                        "kind": "auto",
-                        "children": []
-                      }
-                    ]
-                  }
-                ]
+                "children": []
               },
               {
                 "figmaId": "602:794",
@@ -672,19 +648,7 @@
               {
                 "figmaId": "602:833",
                 "kind": "auto",
-                "children": [
-                  {
-                    "figmaId": "602:834",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "602:835",
-                        "kind": "auto",
-                        "children": []
-                      }
-                    ]
-                  }
-                ]
+                "children": []
               }
             ]
           }
@@ -696,17 +660,7 @@
       "widgetIr": {
         "figmaId": "602:809",
         "kind": "auto",
-        "children": [
-          {
-            "figmaId": "602:810",
-            "kind": "extracted",
-            "children": [],
-            "ref": {
-              "widgetName": "ChevronRightWidget",
-              "namedArgs": {}
-            }
-          }
-        ]
+        "children": []
       }
     },
     {

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from datetime import date
 
+from tests.defect_case_meta import case_timestamps
+
 from figma_flutter_agent.defects.enums import (
     BlastRadius,
     Confidence,
@@ -43,6 +45,8 @@ def _family() -> FamilyEntry:
 
 
 def test_unknown_family_reports_field_path() -> None:
+    observed = date(2026, 7, 3)
+    created_at, updated_at = case_timestamps(observed)
     case = CaseDocument(
         version=1,
         case=CaseMeta(
@@ -50,7 +54,9 @@ def test_unknown_family_reports_field_path() -> None:
             title="t",
             project="synthetic",
             feature="f",
-            observed_at=date(2026, 7, 3),
+            observed_at=observed,
+            created_at=created_at,
+            updated_at=updated_at,
             summary="s",
         ),
         occurrences=[
@@ -85,6 +91,8 @@ def test_unknown_family_reports_field_path() -> None:
 
 
 def test_fixed_requires_regression_proof() -> None:
+    observed = date(2026, 7, 3)
+    created_at, updated_at = case_timestamps(observed)
     case = CaseDocument(
         version=1,
         case=CaseMeta(
@@ -92,7 +100,9 @@ def test_fixed_requires_regression_proof() -> None:
             title="t",
             project="synthetic",
             feature="f",
-            observed_at=date(2026, 7, 3),
+            observed_at=observed,
+            created_at=created_at,
+            updated_at=updated_at,
             summary="s",
         ),
         occurrences=[
@@ -134,6 +144,8 @@ def test_validation_error_format() -> None:
 
 
 def test_occurrence_law_must_belong_to_family() -> None:
+    observed = date(2026, 7, 3)
+    created_at, updated_at = case_timestamps(observed)
     case = CaseDocument(
         version=1,
         case=CaseMeta(
@@ -141,7 +153,9 @@ def test_occurrence_law_must_belong_to_family() -> None:
             title="t",
             project="synthetic",
             feature="f",
-            observed_at=date(2026, 7, 3),
+            observed_at=observed,
+            created_at=created_at,
+            updated_at=updated_at,
             summary="s",
         ),
         occurrences=[
@@ -174,6 +188,8 @@ def test_occurrence_law_must_belong_to_family() -> None:
 
 
 def test_windows_drive_path_rejected() -> None:
+    observed = date(2026, 7, 3)
+    created_at, updated_at = case_timestamps(observed)
     case = CaseDocument(
         version=1,
         case=CaseMeta(
@@ -181,7 +197,9 @@ def test_windows_drive_path_rejected() -> None:
             title="t",
             project="synthetic",
             feature="f",
-            observed_at=date(2026, 7, 3),
+            observed_at=observed,
+            created_at=created_at,
+            updated_at=updated_at,
             summary="s",
         ),
         occurrences=[

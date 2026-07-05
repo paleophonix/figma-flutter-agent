@@ -1,18 +1,17 @@
 {
-  "cacheKey": "8fce65e18e70bc3e96a83553261d6dc42d26de51d478a87803b718a8e9b4fa48",
+  "cacheKey": "ad2f1f139c783cbc2b41bfab5a8109a66a5296bf5407618e720cf8352bacfe82",
   "response": {
     "candidates": [
       {
         "nodeId": "602:766",
-        "widgetName": "ProfileMenuRow",
-        "reason": "Repeated menu-row pattern with title, leading icon button, and trailing chevron; appears across the profile/settings section as a shared row family.",
-        "confidence": 0.92,
+        "widgetName": "SettingsMenuItemRow",
+        "reason": "Repeated 5 times as the shared row pattern in the menu list: label text, trailing chevron, and a circular leading icon button vary by item.",
+        "confidence": 0.98,
         "suggestedParams": [
-          "title",
+          "label",
           "leadingIcon",
-          "trailingIcon",
-          "showLeadingIcon",
-          "showTrailingChevron"
+          "showChevron",
+          "onTap"
         ],
         "evidence": {
           "similarNodes": [
@@ -21,71 +20,50 @@
             "602:808",
             "602:825"
           ],
-          "shapeSimilarity": 0.91,
-          "semanticRole": "settings/profile navigation row"
+          "shapeSimilarity": 0.96,
+          "semanticRole": "settings/action list item"
         }
       },
       {
-        "nodeId": "602:808",
-        "widgetName": "MenuLinkRow",
-        "reason": "Compact navigation row variant with a left-aligned label, a right-facing chevron, and a trailing icon; suitable for reuse across menu entries with different icons and titles.",
-        "confidence": 0.88,
+        "nodeId": "602:768",
+        "widgetName": "CircularIconButton",
+        "reason": "Repeated circular icon-button treatment across multiple menu rows; only the icon variant changes while the button shell stays the same.",
+        "confidence": 0.91,
+        "suggestedParams": [
+          "iconVariant",
+          "diameter",
+          "backgroundColor",
+          "onPressed"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "602:779",
+            "602:795",
+            "602:827",
+            "602:840",
+            "602:814"
+          ],
+          "shapeSimilarity": 0.88,
+          "semanticRole": "icon action button"
+        }
+      },
+      {
+        "nodeId": "602:764",
+        "widgetName": "ProfileSummaryCard",
+        "reason": "Two large profile cards share the same container-and-header-card structure, making this a good reusable card shell for the screen's taller sections.",
+        "confidence": 0.86,
         "suggestedParams": [
           "title",
+          "subtitle",
           "trailingIcon",
-          "showChevron"
+          "contentWidget"
         ],
         "evidence": {
           "similarNodes": [
-            "602:766",
-            "602:777",
-            "602:790",
-            "602:825"
+            "602:823"
           ],
-          "shapeSimilarity": 0.87,
-          "semanticRole": "menu link / action row"
-        }
-      },
-      {
-        "nodeId": "602:836",
-        "widgetName": "MetricSummaryCard",
-        "reason": "Stat card pattern combining a numeric value, descriptive label, and icon block inside a bordered container; likely reusable for dashboard-style metrics.",
-        "confidence": 0.81,
-        "suggestedParams": [
-          "valueText",
-          "labelText",
-          "iconWidget"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "602:764",
-            "602:788",
-            "602:806"
-          ],
-          "shapeSimilarity": 0.78,
-          "semanticRole": "summary metric card"
-        }
-      },
-      {
-        "nodeId": "602:825",
-        "widgetName": "ActionMenuRow",
-        "reason": "Action row with label, chevron, and leading icon badge; the structure is close to other menu options and can be parameterized for different actions.",
-        "confidence": 0.84,
-        "suggestedParams": [
-          "title",
-          "leadingIcon",
-          "trailingIcon",
-          "showChevron"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "602:766",
-            "602:777",
-            "602:790",
-            "602:808"
-          ],
-          "shapeSimilarity": 0.85,
-          "semanticRole": "action/navigation row"
+          "shapeSimilarity": 0.9,
+          "semanticRole": "profile/account summary card"
         }
       }
     ]

@@ -1,10 +1,20 @@
 {
-  "cacheKey": "7a7079fdacbae90c7c7944da34b7ba37fd08cb87356357fa54f385ed7ed66b85",
+  "cacheKey": "ad2f1f139c783cbc2b41bfab5a8109a66a5296bf5407618e720cf8352bacfe82",
   "response": {
     "entries": [
       {
+        "clusterId": "cluster_0",
+        "widgetName": "ChevronRightIconWrapperWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "cluster_1",
+        "widgetName": "ChevronRightIconWidget",
+        "paramRenames": {}
+      },
+      {
         "clusterId": "cluster_2",
-        "widgetName": "OrdersCountButtonWidget",
+        "widgetName": "OrdersMetricActionButtonWidget",
         "paramRenames": {}
       }
     ]
