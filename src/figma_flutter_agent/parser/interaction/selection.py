@@ -205,6 +205,11 @@ def _radio_has_bounded_glyph_slot(node: CleanDesignTreeNode) -> bool:
     )
 
 
+def layout_fact_radio_exact_paint(node: CleanDesignTreeNode) -> bool:
+    """Bounded radio glyph slots must emit Figma paint, not Material Radio chrome."""
+    return node.type == NodeType.RADIO and _radio_has_bounded_glyph_slot(node)
+
+
 def _host_has_external_text_label(
     host: CleanDesignTreeNode,
     radio_id: str,

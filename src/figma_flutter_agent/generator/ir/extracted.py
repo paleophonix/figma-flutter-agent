@@ -358,8 +358,8 @@ def emit_extracted_widget_code_from_ir(
     from figma_flutter_agent.generator.widget_extractor import _bound_cluster_widget_root
 
     body = _preserve_extracted_widget_decoration_shell(subtree, body)
-    body = _bound_cluster_widget_root(subtree, body)
     body = finalize_extracted_widget_body(body)
+    body = _bound_cluster_widget_root(subtree, body)
     class_name = _canonical_widget_class_name(widget_name)
     file_stem = to_snake_case(widget_name)
     code = render_widget_file(
@@ -412,6 +412,16 @@ def _preserve_extracted_widget_decoration_shell(
     style_source = subtree
     if not has_box_decoration(subtree.style):
         surface = primary_surface_node(subtree)
+        if surface is not None:
+            from figma_flutter_agent.parser.interaction.icons import (
+                layout_fact_compact_icon_glyph_host,
+                layout_fact_occluding_icon_fill_plate,
+            )
+
+            if layout_fact_compact_icon_glyph_host(
+                subtree
+            ) and layout_fact_occluding_icon_fill_plate(surface, parent=subtree):
+                return body
         if (
             surface is not None
             and layout_fact_icon_badge_stack(subtree)

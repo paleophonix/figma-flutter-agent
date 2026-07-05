@@ -7,10 +7,10 @@
   "typography_hash": "738f65c2fd96f419cd24dab1bf083128ca3a78863fb7540b5981c1ed4cfa9c22",
   "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
   "file_hashes": {
-    "lib/widgets/group3362_widget.dart": "83eec73045ffdcf1111121c99be906f2b85f16a1cff3d998d07a32d936740c93",
-    "lib/widgets/group3304_widget.dart": "5be74518bbf1000d38e6a1c5b4e43661d17563090da6b3f6269611376ffdaaa7",
+    "lib/widgets/group3362_widget.dart": "cc604d2025d821e336368c9373677bb25868e5ae6bdcd5284521d02ef573b817",
+    "lib/widgets/group3304_widget.dart": "5601d30a6b04429b6a2f1746e587f3bf8392214dc4d2dcbadea49c60aa4aca69",
     "lib/widgets/group8264_widget.dart": "e7d128b0660ea56e4e17a7ffad06bce9c21c03fe019508621d8a541fd6e7e33d",
-    "lib/widgets/group8246_widget.dart": "01ffdfa58585ea5a1a7c5157fa0c3db11e022d70c8bb666f83fa56e164cfddd6",
+    "lib/widgets/group8246_widget.dart": "5fce7854c06a474f3135d07bec5e5e72119b1dcde5d8d5ea47a9be59955507cc",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "8480bf4906b6a8c1da48fa419af88c0669894d1ab733d9bfa71c7fe96a0f30a5",
     "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
@@ -18,7 +18,7 @@
     "lib/theme/app_radius.dart": "38d35effdd9d62c318792fdf6a0f1f3c2ed7b7bf550b26c838874c31a134a955",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "b814edf3e1ef1aa2e7800229ce799c1da654fcfc913053240737d61ec11925f2",
-    "lib/generated/food_menu_2_layout.dart": "595f9c66b31d1279e1e6dcf0b5732fe7114f45c302c5a91af15a627fef32a4ff",
+    "lib/generated/food_menu_2_layout.dart": "a889adbb67ce1f31a9eed9da0f9faa94260ec236605f22999e0838d02e641dc5",
     "lib/features/food_menu_2/food_menu_2_screen.dart": "798c41b334c06c48f7ab8c91f227701bd46933285818567e82efbd99e7b07b1b",
     "test/golden/food_menu_2_screen_test.dart": "b988ae509d65b8c0feead34fa16e64773f66083925aa593e813b18899733fa18",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -32,6 +32,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 6,
-  "updated_at": "2026-07-05T16:23:34.376719+00:00"
+  "version": 7,
+  "updated_at": "2026-07-05T18:18:48.071562+00:00"
 }

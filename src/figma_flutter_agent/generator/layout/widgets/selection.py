@@ -27,6 +27,57 @@ def _selected_badge_fill_expr(margin_node: CleanDesignTreeNode) -> str:
     return "Theme.of(context).colorScheme.primary"
 
 
+def render_radio_exact_paint_body(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+) -> str:
+    """Emit a bounded radio host from Figma decoration and inner vector glyphs only."""
+    from figma_flutter_agent.generator.layout.style import box_decoration_expr
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_exported_vector
+
+    width = float(node.sizing.width or 16.0)
+    height = float(node.sizing.height or 16.0)
+    width_lit = format_geometry_literal(width)
+    height_lit = format_geometry_literal(height)
+    decoration = box_decoration_expr(
+        node.style,
+        width=node.sizing.width,
+        height=node.sizing.height,
+    )
+    inner_parts: list[str] = []
+    host_w = float(node.sizing.width or 0.0)
+    host_h = float(node.sizing.height or 0.0)
+    for child in node.children:
+        if child.type != NodeType.VECTOR:
+            continue
+        if not (child.vector_asset_key or child.image_asset_key):
+            continue
+        child_w = float(child.sizing.width or 0.0)
+        child_h = float(child.sizing.height or 0.0)
+        if child_w <= 0 or child_h <= 0:
+            continue
+        if child_w >= host_w and child_h >= host_h:
+            continue
+        glyph = _render_exported_vector(child, uses_svg=uses_svg)
+        if glyph:
+            inner_parts.append(f"Center(child: {glyph})")
+    if inner_parts:
+        child_expr = (
+            inner_parts[0]
+            if len(inner_parts) == 1
+            else f"Stack(alignment: Alignment.center, children: [{', '.join(inner_parts)}])"
+        )
+    else:
+        child_expr = "const SizedBox.shrink()"
+    if decoration is not None:
+        return (
+            f"Container(width: {width_lit}, height: {height_lit}, "
+            f"decoration: {decoration}, child: {child_expr})"
+        )
+    return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {child_expr})"
+
+
 def render_compact_trailing_selection_glyph(
     node: CleanDesignTreeNode,
     *,

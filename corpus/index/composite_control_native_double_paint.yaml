@@ -8,10 +8,10 @@ cases:
   project: limbo
   feature: mobile_sub_plans
   occurrence_id: mobile-sub-plans-selected-radio-double-paint
-  status: OPEN
+  status: FIXED
   observed_at: '2026-07-05'
   created_at: '2026-07-05T18:10:00Z'
-  updated_at: '2026-07-05T18:10:00Z'
+  updated_at: '2026-07-05T18:30:00Z'
   summary: 'Extracted selected radio widget emits a blue Figma circle plus a nested
     Material Radio, which paints a default black centre dot over the intended white
     inner ellipse glyph. User observation: top Yearly plan radio centre turned black

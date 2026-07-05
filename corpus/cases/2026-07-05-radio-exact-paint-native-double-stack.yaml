@@ -14,7 +14,7 @@ case:
     turned black after radios appeared; asked whether assets exist — ellipse SVG
     is on disk but not emitted.
   created_at: '2026-07-05T18:10:00Z'
-  updated_at: '2026-07-05T18:10:00Z'
+  updated_at: '2026-07-05T18:30:00Z'
 
 occurrences:
   - id: mobile-sub-plans-selected-radio-double-paint
@@ -25,7 +25,7 @@ occurrences:
     origin: COMPILER
     blast_radius: B2_SILENT_WRONG_BEHAVIOR
     confidence: high
-    status: OPEN
+    status: FIXED
     owner:
       module: src/figma_flutter_agent/generator/variant/controls.py
       symbol: render_radio_widget
@@ -51,3 +51,18 @@ occurrences:
       - kind: debug_artifact
         path: .debug/screen/limbo/mobile_sub_plans/processed.json
         summary: Node 240:6294 child ellipse has vectorAssetKey ellipse_2 SVG on disk.
+    repair:
+      summary: >
+        Bounded radio glyph slots route through ExactRadioPaintLaw: compact radios
+        emit Figma decoration plus inner vector assets inside RadioGroup without
+        nesting Material Radio paint.
+      changed_files:
+        - src/figma_flutter_agent/parser/interaction/selection.py
+        - src/figma_flutter_agent/generator/layout/widgets/selection.py
+        - src/figma_flutter_agent/generator/variant/controls.py
+        - src/figma_flutter_agent/generator/layout/form.py
+      regression_tests:
+        - tests/test_mobile_sub_plans_emit_laws.py::test_bounded_radio_cluster_widget_uses_exact_paint_not_material_radio
+        - tests/test_mobile_sub_plans_emit_laws.py::test_selected_plan_radio_emits_inner_ellipse_not_material_radio
+      verification:
+        - poetry run pytest -q tests/test_mobile_sub_plans_emit_laws.py -k radio

@@ -80,6 +80,68 @@ def _extract_top_level_named_child(inner: str, name: str) -> str | None:
     return None
 
 
+def _split_top_level_list(inner: str) -> list[str]:
+    """Split a comma-separated list body at bracket/paren depth zero."""
+    items: list[str] = []
+    depth = 0
+    in_string = False
+    string_quote = ""
+    escape = False
+    start = 0
+    for index, ch in enumerate(inner):
+        if in_string:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == string_quote:
+                in_string = False
+            continue
+        if ch in {"'", '"'}:
+            in_string = True
+            string_quote = ch
+        elif ch in {"(", "[", "{"}:
+            depth += 1
+        elif ch in {")", "]", "}"}:
+            depth -= 1
+        elif ch == "," and depth == 0:
+            items.append(inner[start:index].strip())
+            start = index + 1
+    tail = inner[start:].strip()
+    if tail:
+        items.append(tail)
+    return items
+
+
+def _unwrap_single_positioned_child_stack(widget: str) -> str:
+    """Unwrap a ``Stack`` whose only child is a ``Positioned`` to that child.
+
+    A ``Stack`` with just positioned children has no intrinsic size (loose fit),
+    so as an extracted-widget root it fails ``size.isFinite`` under an unbounded
+    parent (``Column``/``ListView``). When the Stack holds a single ``Positioned``
+    the wrapper is spurious — the call-site owns placement — so we drop it and let
+    the ``Positioned`` strip below reduce to the bounded child. Multi-child stacks
+    (overlapping content) are left intact.
+    """
+    result = widget.strip()
+    if not result.startswith("Stack("):
+        return result
+    open_paren = result.index("(")
+    close_paren = _find_matching_paren(result, open_paren)
+    if close_paren is None or close_paren != len(result) - 1:
+        return result
+    children = _extract_top_level_named_child(result[open_paren + 1 : close_paren], "children")
+    if children is None:
+        return result
+    children = children.strip()
+    if not (children.startswith("[") and children.endswith("]")):
+        return result
+    items = _split_top_level_list(children[1:-1])
+    if len(items) == 1 and items[0].startswith("Positioned("):
+        return items[0]
+    return result
+
+
 def strip_stack_parent_data_wrappers(widget: str) -> str:
     """Remove ``Positioned`` wrappers from a widget expression root.
 
@@ -92,7 +154,7 @@ def strip_stack_parent_data_wrappers(widget: str) -> str:
     Returns:
         Widget expression with outer ``Positioned`` wrappers removed.
     """
-    result = widget.strip()
+    result = _unwrap_single_positioned_child_stack(widget.strip())
     while result.startswith("Positioned("):
         open_paren = result.index("(")
         close_paren = _find_matching_paren(result, open_paren)

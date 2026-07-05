@@ -20,6 +20,9 @@ def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
     from figma_flutter_agent.generator.layout.flex_policy import (
         _bound_stack_sized_box,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_layout_bounded_height,
+    )
     from figma_flutter_agent.generator.layout.widgets import _node_layout_size
     from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 
@@ -28,6 +31,10 @@ def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
         if bounded is not None:
             return bounded
     width, height = _node_layout_size(node, node.stack_placement)
+    if (height is None or height <= 0) and node.type == NodeType.STACK:
+        derived = stack_layout_bounded_height(node)
+        if derived is not None and derived > 0:
+            height = derived
     if width is not None and height is not None and width > 0 and height > 0:
         return (
             f"SizedBox(width: {format_geometry_literal(width)}, "
@@ -483,10 +490,6 @@ def render_cluster_widgets(
                 skip_cluster_id=spec.cluster_id,
                 cluster_vector_variant=variant,
             )
-        if chip_cluster:
-            body = _bound_cluster_widget_root_hug_width(spec.representative, body)
-        else:
-            body = _bound_cluster_widget_root(spec.representative, body)
         from figma_flutter_agent.generator.ir.extracted import (
             _preserve_extracted_widget_decoration_shell,
         )
@@ -535,6 +538,10 @@ def render_cluster_widgets(
         )
 
         body = finalize_extracted_widget_body(body)
+        if chip_cluster:
+            body = _bound_cluster_widget_root_hug_width(spec.representative, body)
+        else:
+            body = _bound_cluster_widget_root(spec.representative, body)
         path = f"lib/widgets/{spec.file_name}.dart"
         widget_source = render_widget_file(
             class_name=spec.class_name,
@@ -809,13 +816,13 @@ def refresh_stale_icon_badge_planned_widget_files(
         )
 
         body = _preserve_extracted_widget_decoration_shell(representative, body)
-        body = _bound_cluster_widget_root(representative, body)
         from figma_flutter_agent.generator.layout.widget_roots import (
             ensure_widget_file_no_parent_data_root,
             finalize_extracted_widget_body,
         )
 
         body = finalize_extracted_widget_body(body)
+        body = _bound_cluster_widget_root(representative, body)
         widget_source = render_widget_file(
             class_name=class_name,
             body=body,

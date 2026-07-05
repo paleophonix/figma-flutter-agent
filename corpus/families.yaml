@@ -356,3 +356,21 @@ families:
       Extracted component widgets materialize full-bounds Fill/mask layers as
       rectangular Containers, occluding non-rectangular glyph silhouettes.
     status: active
+
+  - id: cluster_widget_zero_height_stack_unbound
+    title: Cluster widget zero-height stack root unbounded in flex
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/widget_extractor.py
+        symbol: _bound_cluster_widget_root
+    law_ids:
+      - ExtractedWidgetFixedBoundsLaw
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Extracted cluster widget roots with zero Figma frame height but stroked
+      positioned children emit bare Stack without finite height, crashing in Column.
+    status: active

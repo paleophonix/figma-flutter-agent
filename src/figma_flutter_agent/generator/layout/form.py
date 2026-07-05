@@ -74,9 +74,7 @@ def render_segmented_control_host(
 
     _ = theme_variant
     label = escape_dart_string(node.accessibility_label or node.name)
-    option_nodes = [
-        child for child in node.children if layout_fact_segmented_option_host(child)
-    ]
+    option_nodes = [child for child in node.children if layout_fact_segmented_option_host(child)]
     option_labels = [
         escaped
         for child in option_nodes
@@ -135,6 +133,7 @@ def render_radio(
     theme_variant: str,
     parent_node: CleanDesignTreeNode | None = None,
     ancestor_hosts: tuple[CleanDesignTreeNode, ...] | None = None,
+    uses_svg: bool = True,
 ) -> str:
     from figma_flutter_agent.parser.interaction.selection import (
         layout_fact_compact_radio_glyph,
@@ -158,6 +157,7 @@ def render_radio(
         node=node,
         theme_variant=theme_variant,
         compact_glyph=compact_glyph,
+        uses_svg=uses_svg,
     )
     return f"Semantics(label: '{label}', child: {control})"
 

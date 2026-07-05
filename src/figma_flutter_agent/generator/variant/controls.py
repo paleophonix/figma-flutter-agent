@@ -135,12 +135,20 @@ def render_radio_widget(
     node: CleanDesignTreeNode,
     theme_variant: str = "material_3",
     compact_glyph: bool = False,
+    uses_svg: bool = True,
 ) -> str:
     """Render a single radio control."""
+    from figma_flutter_agent.generator.layout.widgets.selection import (
+        render_radio_exact_paint_body,
+    )
+    from figma_flutter_agent.parser.interaction.selection import layout_fact_radio_exact_paint
+
     on_changed = toggle_on_changed_expr(node)
     group_value = "'selected'" if variant_is_checked(node) else "'unselected'"
     if theme_variant == "cupertino":
         inner = f"Row(children: [CupertinoRadio<String>(value: 'selected'), Text('{label}')])"
+    elif compact_glyph and layout_fact_radio_exact_paint(node):
+        inner = render_radio_exact_paint_body(node, uses_svg=uses_svg)
     elif compact_glyph:
         inner = "Radio<String>(value: 'selected')"
     else:

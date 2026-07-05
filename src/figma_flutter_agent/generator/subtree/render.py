@@ -367,9 +367,12 @@ def _render_subtree_widget_body(
         _preserve_extracted_widget_decoration_shell,
     )
     from figma_flutter_agent.generator.layout.widget_roots import finalize_extracted_widget_body
+    from figma_flutter_agent.generator.widget_extractor import _bound_cluster_widget_root
 
     body = _preserve_extracted_widget_decoration_shell(representative, body)
-    return finalize_extracted_widget_body(body)
+    body = finalize_extracted_widget_body(body)
+    body = _bound_cluster_widget_root(representative, body)
+    return body
 
 
 def render_subtree_widgets(

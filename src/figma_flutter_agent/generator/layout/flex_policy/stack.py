@@ -314,6 +314,43 @@ def stack_flow_child_known_height(child: CleanDesignTreeNode) -> float | None:
     return height
 
 
+def stack_layout_bounded_height(node: CleanDesignTreeNode) -> float | None:
+    """Return finite stack height for flex bound wrappers when the frame height is zero.
+
+    Figma hairline dividers and stroked vectors often report ``height: 0`` on the stack
+    while positioned children still paint a non-zero span (LAW-GEO-STROKE-EXTENT). Cluster
+    widget roots and column flow slots need that derived extent before emit.
+    """
+    known = stack_flow_child_known_height(node)
+    if known is not None and known > 0:
+        return known
+    if node.type != NodeType.STACK or not node.children:
+        return None
+    if not stack_child_is_positioned_only_stack(node):
+        return None
+    from figma_flutter_agent.generator.layout.widgets.shared import (
+        figma_positioned_dimensions,
+    )
+
+    max_extent = 0.0
+    for child in node.children:
+        placement = child.stack_placement
+        if placement is None:
+            continue
+        _, child_height = figma_positioned_dimensions(child, placement)
+        if child_height is None or child_height <= 0:
+            continue
+        top = placement.top
+        bottom = placement.bottom
+        if top is not None:
+            max_extent = max(max_extent, float(top) + float(child_height))
+        elif bottom is not None:
+            max_extent = max(max_extent, float(bottom) + float(child_height))
+        else:
+            max_extent = max(max_extent, float(child_height))
+    return max_extent if max_extent > 0 else None
+
+
 def stack_flow_child_needs_vertical_extent_bind(
     child: CleanDesignTreeNode,
     *,
@@ -1398,7 +1435,10 @@ def _bound_stack_sized_box(
             side = max(float(width), 48.0)
             width = height = side
         else:
-            return None
+            derived = stack_layout_bounded_height(node)
+            if derived is None or derived <= 0:
+                return None
+            height = derived
     from figma_flutter_agent.generator.layout.responsive import (
         responsive_host_width_literal,
     )

@@ -8,10 +8,10 @@ cases:
   project: limbo
   feature: mobile_sub_plans
   occurrence_id: mobile-sub-plans-star-fill-plate-occlusion
-  status: OPEN
+  status: FIXED
   observed_at: '2026-07-05'
   created_at: '2026-07-05T18:10:00Z'
-  updated_at: '2026-07-05T18:10:00Z'
+  updated_at: '2026-07-05T18:30:00Z'
   summary: 'Star Filled extracted widget materializes the component Fill plate (211:5908)
     as a full-bounds blue Container, so list bullets render as blue squares and the
     badge star disappears into the blue Recommended circle. User observation: no stars

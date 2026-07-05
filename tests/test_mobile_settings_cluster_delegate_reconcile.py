@@ -56,7 +56,9 @@ def _collect_enriched_specs(root: CleanDesignTreeNode):
     return apply_widget_enrich_response(specs, enrich, widget_suffix="Widget")
 
 
-def _planned_mobile_settings_bundle(root: CleanDesignTreeNode) -> tuple[dict[str, str], dict[str, str], list]:
+def _planned_mobile_settings_bundle(
+    root: CleanDesignTreeNode,
+) -> tuple[dict[str, str], dict[str, str], list]:
     specs = _collect_enriched_specs(root)
     cluster_result = render_cluster_widgets(specs, uses_svg=True, clean_trees=[root])
     layout_files = render_layout_file(
@@ -69,6 +71,27 @@ def _planned_mobile_settings_bundle(root: CleanDesignTreeNode) -> tuple[dict[str
     planned = dict(cluster_result.files)
     planned.update(layout_files)
     return planned, cluster_result.cluster_classes, specs
+
+
+def _find_node(root: CleanDesignTreeNode, node_id: str) -> CleanDesignTreeNode | None:
+    if root.id == node_id:
+        return root
+    for child in root.children:
+        found = _find_node(child, node_id)
+        if found is not None:
+            return found
+    return None
+
+
+def test_settings_divider_cluster_root_gets_finite_bounds() -> None:
+    """Law: ExtractedWidgetFixedBoundsLaw — zero-height hairline stacks get finite height."""
+    from figma_flutter_agent.generator.widget_extractor import _bound_cluster_widget_root
+
+    root = _load_root()
+    divider = _find_node(root, "272:9316")
+    assert divider is not None
+    bounded = _bound_cluster_widget_root(divider, "const Inner()")
+    assert "SizedBox(width: 343.0, height: 0.5" in bounded
 
 
 def test_mobile_settings_list_item_uses_chevron_delegate_after_reconcile() -> None:

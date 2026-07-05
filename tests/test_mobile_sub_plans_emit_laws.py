@@ -90,7 +90,10 @@ def test_layout_subscribe_is_button_not_textfield() -> None:
     root = _load_root()
     layout = _render_layout(root)
     assert "initialValue: 'Subscribe'" not in layout
-    assert "TextFormField" not in layout or "Subscribe" not in layout.split("TextFormField", 1)[-1][:200]
+    assert (
+        "TextFormField" not in layout
+        or "Subscribe" not in layout.split("TextFormField", 1)[-1][:200]
+    )
 
 
 def test_star_cluster_delegates_to_star_widget_not_radio() -> None:
@@ -164,7 +167,40 @@ def test_star_cluster_widget_omits_occluding_fill_plate() -> None:
     result = render_cluster_widgets(specs, uses_svg=True, clean_trees=[root])
     star_file = result.files.get("lib/widgets/star_filled_widget.dart", "")
     assert "211_5908" not in star_file
-    assert star_file.count("0xFF006FFD") <= 1
+    assert "0xFF006FFD" not in star_file
+    assert "Image.asset" in star_file
+
+
+def test_bounded_radio_cluster_widget_uses_exact_paint_not_material_radio() -> None:
+    root = _load_root()
+    counts: Counter[str] = Counter()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if node.cluster_id:
+            counts[node.cluster_id] += 1
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    specs = collect_cluster_widget_specs(
+        root, {cluster_id: count for cluster_id, count in counts.items() if count >= 2}
+    )
+    from figma_flutter_agent.generator.widget_extractor import render_cluster_widgets
+
+    result = render_cluster_widgets(specs, uses_svg=True, clean_trees=[root])
+    radio_file = result.files.get("lib/widgets/radio_button_widget.dart", "")
+    assert "Radio<String>" not in radio_file
+    assert "0xFFC5C6CC" in radio_file
+
+
+def test_selected_plan_radio_emits_inner_ellipse_not_material_radio() -> None:
+    root = _load_root()
+    radio = _find_node(root, "240:6294")
+    assert radio is not None
+    dart = render_node_body(radio, uses_svg=True)
+    assert "Radio<String>" not in dart
+    assert "ellipse_2_I240_6294" in dart
+    assert "0xFF006FFD" in dart
 
 
 def test_plan_rows_avoid_fixed_width_inside_expanded() -> None:
