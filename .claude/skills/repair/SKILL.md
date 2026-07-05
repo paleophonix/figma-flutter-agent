@@ -4,11 +4,13 @@ description: >-
   Batch repair after /diagnose: implement the full prioritized queue from
   BATCH PRE-FIX TRIAGE REPORT. Pairs with /diagnose only — screen/compiler
   layout, IR, emitter, golden. Use for /repair, "чиним всё", failed generate
-  on a specific screen.
+  on a specific screen. MUST follow corpus skill before compiler code.
 disable-model-invocation: false
 ---
 
 @.claude/prompts/debug-common.md
+
+**Mandatory corpus:** Read and follow `.claude/skills/corpus/SKILL.md` before any `src/` change. Emit-law pytest ≠ corpus done.
 
 # Debug Repair Skill
 

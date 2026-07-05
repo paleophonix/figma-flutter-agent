@@ -472,6 +472,8 @@ def _plan_generation_files_impl(context: GenerationPlanContext) -> dict[str, str
         planned_files,
         uses_svg=uses_svg,
         use_package_imports=use_package_imports,
+        cluster_classes=cluster_classes,
+        cluster_widget_specs=cluster_specs,
     )
     planned_files = render_state_and_bootstrap_files(
         context,

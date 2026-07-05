@@ -1,0 +1,956 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "mobile_settings",
+  "screenIr": {
+    "root": {
+      "figmaId": "272:9101",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "272:9240",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "272:9638",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "AvatarWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "272:9241",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "272:9238",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "272:9239",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "272:9112",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I272:9112;126:7890",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9112;126:7891",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "figmaId": "I272:9112;126:7892",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9112;126:7893",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I272:9112;126:7899",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I272:9112;126:7894",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9112;126:7895",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I272:9112;126:7896",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I272:9112;126:7897",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I272:9112;126:7898",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "272:9113",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I272:9113;126:2469",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "272:9114",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I272:9114;126:836",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "272:9320",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "272:9260",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9260;126:1364",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9260;126:1365",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9260;126:1367",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "RightChevronButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "272:9316",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "DividerWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "272:9272",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9272;126:1364",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9272;126:1365",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9272;126:1367",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "RightChevronButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "272:9318",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "DividerWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "272:9279",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9279;126:1364",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9279;126:1365",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9279;126:1367",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "RightChevronButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "272:9364",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "DividerWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "272:9321",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9321;126:1364",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9321;126:1365",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9321;126:1367",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "RightChevronButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "272:9346",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "DividerWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "272:9347",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9347;126:1364",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9347;126:1365",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9347;126:1367",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "RightChevronButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "272:9355",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "DividerWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "272:9356",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9356;126:1364",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9356;126:1365",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9356;126:1367",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "RightChevronButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "272:9322",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "DividerWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "272:9323",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9323;126:1364",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9323;126:1365",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9323;126:1367",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "RightChevronButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "272:9324",
+              "kind": "extracted",
+              "children": [],
+              "ref": {
+                "widgetName": "DividerWidget",
+                "namedArgs": {}
+              }
+            },
+            {
+              "figmaId": "272:9325",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9325;126:1364",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9325;126:1365",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9325;126:1367",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "RightChevronButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "272:9115",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I272:9115;109:2336",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9115;109:2336;109:2326",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9115;109:2336;109:2326;269:8081",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I272:9115;109:2336;109:2326;269:8082",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9115;109:2336;109:2327",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "figmaId": "I272:9115;109:2341",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9115;109:2341;109:2326",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9115;109:2341;109:2326;109:764",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I272:9115;109:2341;109:2326;109:1923",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9115;109:2341;109:2327",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "figmaId": "I272:9115;109:2346",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I272:9115;109:2346;109:2323",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I272:9115;109:2346;109:2323;269:8089",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I272:9115;109:2346;109:2323;269:8087",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I272:9115;109:2346;109:2324",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "layoutHints": {}
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "272:9240",
+      "272:9320",
+      "272:9114",
+      "272:9112",
+      "272:9115",
+      "272:9113"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "settings",
+      "confidence": 0.99,
+      "explanation": "Mobile settings screen with a profile header, tappable settings rows, and a bottom navigation bar with the Settings tab selected.",
+      "warnings": [
+        "Several list rows appear to navigate to detail screens.",
+        "The bottom tab bar indicates the current tab is Settings."
+      ]
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "272:9624",
+        "role": "button",
+        "subtype": "icon_button",
+        "controlNodeId": "272:9624",
+        "boundaryNodeId": "272:9624",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "272:9625"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "edit_profile"
+        },
+        "proposedLayoutLaws": [
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.96,
+        "proposedEffects": [
+          "open_profile_edit_flow"
+        ],
+        "explanation": "Small avatar overlay button used to edit the profile picture."
+      },
+      {
+        "nodeId": "272:9260",
+        "role": "button",
+        "subtype": "settings_row",
+        "controlNodeId": "272:9260",
+        "boundaryNodeId": "272:9260",
+        "labelNodeIds": [
+          "I272:9260;126:1365"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9260;126:1367"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate"
+        },
+        "proposedLayoutLaws": [
+          "row_label_left_chevron_right",
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_to_saved_messages"
+        ],
+        "explanation": "Tappable settings row with title and trailing chevron."
+      },
+      {
+        "nodeId": "272:9272",
+        "role": "button",
+        "subtype": "settings_row",
+        "controlNodeId": "272:9272",
+        "boundaryNodeId": "272:9272",
+        "labelNodeIds": [
+          "I272:9272;126:1365"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9272;126:1367"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate"
+        },
+        "proposedLayoutLaws": [
+          "row_label_left_chevron_right",
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_to_recent_calls"
+        ],
+        "explanation": "Tappable settings row with title and trailing chevron."
+      },
+      {
+        "nodeId": "272:9279",
+        "role": "button",
+        "subtype": "settings_row",
+        "controlNodeId": "272:9279",
+        "boundaryNodeId": "272:9279",
+        "labelNodeIds": [
+          "I272:9279;126:1365"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9279;126:1367"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate"
+        },
+        "proposedLayoutLaws": [
+          "row_label_left_chevron_right",
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_to_devices"
+        ],
+        "explanation": "Tappable settings row with title and trailing chevron."
+      },
+      {
+        "nodeId": "272:9321",
+        "role": "button",
+        "subtype": "settings_row",
+        "controlNodeId": "272:9321",
+        "boundaryNodeId": "272:9321",
+        "labelNodeIds": [
+          "I272:9321;126:1365"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9321;126:1367"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate"
+        },
+        "proposedLayoutLaws": [
+          "row_label_left_chevron_right",
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_to_notifications"
+        ],
+        "explanation": "Tappable settings row with title and trailing chevron."
+      },
+      {
+        "nodeId": "272:9347",
+        "role": "button",
+        "subtype": "settings_row",
+        "controlNodeId": "272:9347",
+        "boundaryNodeId": "272:9347",
+        "labelNodeIds": [
+          "I272:9347;126:1365"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9347;126:1367"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate"
+        },
+        "proposedLayoutLaws": [
+          "row_label_left_chevron_right",
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_to_appearance"
+        ],
+        "explanation": "Tappable settings row with title and trailing chevron."
+      },
+      {
+        "nodeId": "272:9356",
+        "role": "button",
+        "subtype": "settings_row",
+        "controlNodeId": "272:9356",
+        "boundaryNodeId": "272:9356",
+        "labelNodeIds": [
+          "I272:9356;126:1365"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9356;126:1367"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate"
+        },
+        "proposedLayoutLaws": [
+          "row_label_left_chevron_right",
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_to_language"
+        ],
+        "explanation": "Tappable settings row with title and trailing chevron."
+      },
+      {
+        "nodeId": "272:9323",
+        "role": "button",
+        "subtype": "settings_row",
+        "controlNodeId": "272:9323",
+        "boundaryNodeId": "272:9323",
+        "labelNodeIds": [
+          "I272:9323;126:1365"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9323;126:1367"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate"
+        },
+        "proposedLayoutLaws": [
+          "row_label_left_chevron_right",
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_to_privacy_and_security"
+        ],
+        "explanation": "Tappable settings row with title and trailing chevron."
+      },
+      {
+        "nodeId": "272:9325",
+        "role": "button",
+        "subtype": "settings_row",
+        "controlNodeId": "272:9325",
+        "boundaryNodeId": "272:9325",
+        "labelNodeIds": [
+          "I272:9325;126:1365"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9325;126:1367"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate"
+        },
+        "proposedLayoutLaws": [
+          "row_label_left_chevron_right",
+          "minimum_touch_target_44x44"
+        ],
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "navigate_to_storage"
+        ],
+        "explanation": "Tappable settings row with title and trailing chevron."
+      },
+      {
+        "nodeId": "272:9115",
+        "role": "navigation",
+        "subtype": "bottom_tabs",
+        "controlNodeId": "272:9115",
+        "boundaryNodeId": "272:9115",
+        "labelNodeIds": [
+          "I272:9115;109:2336;109:2327",
+          "I272:9115;109:2341;109:2327",
+          "I272:9115;109:2346;109:2324"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I272:9115;109:2336;109:2336;109:2326",
+          "I272:9115;109:2341;109:2326",
+          "I272:9115;109:2346;109:2323"
+        ],
+        "optionNodeIds": [
+          "I272:9115;109:2336",
+          "I272:9115;109:2341",
+          "I272:9115;109:2346"
+        ],
+        "stateNodeIds": [
+          "I272:9115;109:2346"
+        ],
+        "contractKind": "navigation_bar",
+        "contractTraits": {
+          "currentValue": "Settings",
+          "selectedOptions": [
+            "Settings"
+          ],
+          "actionKind": "navigate",
+          "visualState": "selected"
+        },
+        "proposedLayoutLaws": [
+          "selected_tab_state_preserved",
+          "icon_above_label_vertical_tabs"
+        ],
+        "value": "Settings",
+        "options": [
+          {
+            "nodeId": "I272:9115;109:2336",
+            "label": "Chats",
+            "selected": false,
+            "value": "Chats",
+            "confidence": 0.95
+          },
+          {
+            "nodeId": "I272:9115;109:2341",
+            "label": "Friends",
+            "selected": false,
+            "value": "Friends",
+            "confidence": 0.95
+          },
+          {
+            "nodeId": "I272:9115;109:2346",
+            "label": "Settings",
+            "selected": true,
+            "value": "Settings",
+            "confidence": 0.99
+          }
+        ],
+        "confidence": 0.99,
+        "proposedEffects": [
+          "switch_tab_to_chats",
+          "switch_tab_to_friends",
+          "switch_tab_to_settings"
+        ],
+        "explanation": "Bottom navigation with three tabs and the Settings tab visually selected."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "AvatarWidget",
+      "widgetIr": {
+        "figmaId": "272:9638",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "272:9231",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I272:9231;6:1256",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I272:9231;101:232",
+                    "kind": "auto",
+                    "children": []
+                  },
+                  {
+                    "figmaId": "I272:9231;6:1258",
+                    "kind": "auto",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "figmaId": "272:9624",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "272:9625",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I272:9625;269:8040",
+                    "kind": "auto",
+                    "children": []
+                  },
+                  {
+                    "figmaId": "I272:9625;269:8041",
+                    "kind": "auto",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "RightChevronButtonWidget",
+      "widgetIr": {
+        "figmaId": "I272:9260;126:1367",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I272:9260;126:1367;126:901",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I272:9260;126:1367;126:902",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "DividerWidget",
+      "widgetIr": {
+        "figmaId": "272:9316",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I272:9316;126:1617",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ],
+  "irCacheFingerprintVersion": "1",
+  "cleanTreeHash": "9e5692176c4eb82d410beb69b3ccbb0cde4cde5c80c4a42ef798b4169317c0be",
+  "cleanRootFigmaId": "272:9101",
+  "cleanRootType": "STACK",
+  "cleanRootWidth": 375.0,
+  "cleanRootHeight": 812.0,
+  "parserVersion": "2026.06.1",
+  "irSchemaVersion": "1",
+  "generationConfigFingerprintVersion": "1",
+  "generationConfigHash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06"
+}

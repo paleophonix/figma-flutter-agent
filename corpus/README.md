@@ -40,6 +40,8 @@ for family in doc.families:
 
 ## LLM Context
 
+**Procedure:** `.cursor/skills/corpus/SKILL.md` (mandatory on `/diagnose`, `/repair`). **Law:** `.cursor/rules/corpus-law.mdc` (always-on).
+
 Diagnose/repair skills map root causes to `family_id` from this file. Cases reference families and must pass `figma-flutter defects validate`.
 
 - **`/diagnose`:** write or update cases with `status: OPEN` when mechanism is classified.

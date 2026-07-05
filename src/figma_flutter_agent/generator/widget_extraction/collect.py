@@ -120,11 +120,27 @@ def collect_widget_specs(
         for spec in repetition_specs:
             if spec.cluster_id in shape_cluster_ids:
                 continue
-            if spec.class_name in existing_class_names:
+            class_name = spec.class_name
+            file_name = spec.file_name
+            if class_name in existing_class_names and spec.cluster_id.startswith("component_"):
+                from figma_flutter_agent.generator.layout.common import to_snake_case
+                from figma_flutter_agent.generator.widget_extractor import _widget_class_name
+
+                class_name = _widget_class_name(
+                    spec.representative,
+                    spec.cluster_id,
+                    widget_suffix,
+                )
+                file_name = to_snake_case(class_name)
+            if class_name in existing_class_names:
                 continue
             component_id = _component_id_for_node(spec.representative)
             if component_id and component_id in claimed_component_ids:
                 continue
+            if class_name != spec.class_name or file_name != spec.file_name:
+                from dataclasses import replace
+
+                spec = replace(spec, class_name=class_name, file_name=file_name)
             specs.append(spec)
             existing_cluster_ids.add(spec.cluster_id)
             existing_class_names.add(spec.class_name)

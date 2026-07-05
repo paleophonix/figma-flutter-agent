@@ -66,6 +66,40 @@ def layout_fact_payment_option_shell_column(node: CleanDesignTreeNode) -> bool:
     return any(layout_fact_compact_radio_label_row(child) for child in node.children)
 
 
+def layout_fact_payment_plan_primary_copy_column(node: CleanDesignTreeNode) -> bool:
+    """Title/subtitle column beside a compact subscription-plan radio row."""
+    if node.type != NodeType.COLUMN:
+        return False
+    text_children = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if not (1 <= len(text_children) <= 2):
+        return False
+    width = node.sizing.width
+    if width is None:
+        return False
+    return 150.0 <= float(width) <= 260.0
+
+
+def layout_fact_published_star_component_host(node: CleanDesignTreeNode) -> bool:
+    """Published Figma component instance whose family is a star glyph."""
+    if node.variant and node.variant.component_name:
+        return "star" in node.variant.component_name.lower()
+    return False
+
+
+def layout_fact_payment_plan_row_label_text(node: CleanDesignTreeNode) -> bool:
+    """Primary plan label copy that must flex inside an ``Expanded`` slot."""
+    if node.type != NodeType.TEXT:
+        return False
+    width = node.sizing.width
+    if width is None:
+        return False
+    return 150.0 <= float(width) <= 260.0
+
+
 def layout_fact_hosts_payment_selection_indicator(node: CleanDesignTreeNode) -> bool:
     """True when a compact trailing margin hosts a circular payment radio badge."""
     if node.type != NodeType.COLUMN:

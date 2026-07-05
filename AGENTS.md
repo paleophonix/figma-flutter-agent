@@ -6,6 +6,24 @@ Product feature map: [README.md — Features](README.md#features). Stakeholder o
 
 **Prompt source of truth:** `.cursor/rules/*.mdc` (mirrored in `.claude/prompts/*.md`, `CLAUDE.md`). This file compiles them for agents that read only `AGENTS.md`. On conflict, prefer the newer `.mdc` file.
 
+## CRITICAL — Defect corpus law
+
+**No compiler fix is done without corpus proof.** `.debug/` is triage only.
+
+```text
+symptom → family_id → corpus/index/<family_id>.yaml → one case YAML → OPEN/FIXED → defects validate
+```
+
+| Step | Rule |
+|------|------|
+| Classify | `family_id` from `corpus/families.yaml` — mechanism, **not** visual symptom |
+| Lookup | `corpus/index/<family_id>.yaml` → open **one** `corpus/cases/<case_id>.yaml` — **never glob** all cases |
+| Diagnose | write/update case `status: OPEN` |
+| Repair | stay `OPEN` until `repair` block + proof → then `FIXED` |
+| Close loop | `poetry run figma-flutter defects index --write` then `defects validate` |
+
+`/repair` alone closes nothing. Max 2 repair tries without fresh `/diagnose`. Template: `corpus/case-template.yaml`. Full law: `corpus-law.mdc`. **Procedure:** `.cursor/skills/corpus/SKILL.md` (mandatory on `/diagnose`, `/repair`).
+
 ## Purpose
 
 Python CLI (`figma-flutter`) that fetches a Figma frame and generates Material 3 Flutter UI into an **existing** Flutter project (`--project-dir`).
@@ -105,9 +123,10 @@ Optional package in `src/control_panel` — FastAPI host + optional disnake UI +
 
 ## Before finishing a change
 
-1. After `tools/dart_ast_sidecar/` edits: `.\tools\build_sidecars.ps1`
-2. `.\scripts\signoff.ps1` (or individual ruff/mypy/pytest commands)
-3. If touching validation, golden PNGs, or `screens.yaml`: refresh via `scripts/generate_fixture_goldens.py` (agent builds docker image if needed), then `poetry run figma-flutter demo-signoff --strict --signoff-gates`
+1. **Corpus:** if diagnose/repair/compiler work — `defects index --write` + `defects validate` (`corpus-law.mdc`)
+2. After `tools/dart_ast_sidecar/` edits: `.\tools\build_sidecars.ps1`
+3. `.\scripts\signoff.ps1` (or individual ruff/mypy/pytest commands)
+4. If touching validation, golden PNGs, or `screens.yaml`: refresh via `scripts/generate_fixture_goldens.py` (agent builds docker image if needed), then `poetry run figma-flutter demo-signoff --strict --signoff-gates`
 
 ---
 
@@ -119,6 +138,7 @@ Optional package in `src/control_panel` — FastAPI host + optional disnake UI +
 
 | Rule file | Apply when | Always |
 |-----------|------------|--------|
+| `corpus-law.mdc` | **CRITICAL** — every `/diagnose`, `/repair`, compiler fix, before PR; corpus proof mandatory | yes |
 | `caveman.mdc` | Every chat reply until `stop caveman`; compress filler, keep code/terms | yes |
 | `prompt.mdc` | Talking to Kolya; RU chat/planning, EN coding; bro tone | yes |
 | `project-bible.mdc` | Parser/IR/emitter/fidelity/corpus/semantic work; any `src/` compiler change | yes |
@@ -128,6 +148,68 @@ Optional package in `src/control_panel` — FastAPI host + optional disnake UI +
 | `pipeline-contracts.mdc` | IR arrows A1–A4, merge/reconcile, naming LAW-* before fix | on demand |
 | `universal-codegen.mdc` | Emitter, AST sidecar, postprocess, `SYSTEMIC_BUG_RULES`, goldens | on demand |
 | `docs-layout.mdc` | Creating, moving, or naming files under `docs/` | on demand |
+
+### CRITICAL — Defect corpus law
+
+**No compiler fix is done without corpus proof.** `.debug/` is triage only — not a substitute for cases, fixtures, or named laws.
+
+#### Applies to
+
+`/diagnose`, `/repair`, failed `generate`, any layout/IR/emitter bug, any `src/` compiler change, before PR or handoff.
+
+#### Mandatory chain
+
+```text
+symptom → family_id (mechanism) → corpus lookup → law_id + layer → generic fix → case proof → defects validate
+```
+
+Classify **mechanism**, not symptom. `family_id` from `corpus/families.yaml` — never `overflow`, `wrong_checkbox`, or screen name.
+
+#### Lookup (never glob `corpus/cases/`)
+
+```text
+corpus/families.yaml              → family_id
+corpus/index/<family_id>.yaml     → scan rows: case_id, project, feature, status, summary
+corpus/cases/<case_id>.yaml       → open ONE file for the chosen row
+```
+
+Pick row: same `project`+`feature` first → `OPEN` → `FIXED` with `repair` → `observed_at` desc.
+
+#### Status (binary)
+
+| When | status |
+|------|--------|
+| `/diagnose` classifies mechanism | `OPEN` (write or update case) |
+| `/repair` without proof | stay `OPEN` |
+| `/repair` with proof + `repair` block | `FIXED` |
+
+`/repair` alone closes nothing. Max **2** repair attempts per item without fresh `/diagnose`.
+
+#### After every case edit
+
+```bash
+poetry run figma-flutter defects index --write
+poetry run figma-flutter defects validate
+```
+
+`corpus/index/` is **generated** — never hand-edit.
+
+#### Forbidden
+
+- Ship a fix from `.debug/` or golden diff alone — no `family_id`, no case YAML
+- `FIXED` without `repair` block and regression proof
+- Glob `corpus/cases/*.yaml` to browse
+- Skip `defects validate` before handoff
+- Use visual symptom as `family_id`
+
+#### Done checklist
+
+1. `family_id` + `law_id` + owning layer named
+2. `corpus/cases/<case_id>.yaml` with evidence (template: `corpus/case-template.yaml`)
+3. Generic regression test or fixture — not one screen patch
+4. `poetry run figma-flutter defects validate` passes
+
+Promotion funnel: `inbox → corpus → fixtures → blocking`. Details: `corpus/README.md`, arrow routing: `pipeline-contracts.mdc`.
 
 ### Caveman Lite
 
@@ -179,11 +261,21 @@ Code, commits, PRs: write normal. No self-reference or mode announcements. No "C
 
 ### Project bible
 
+---
+
+## Corpus law
+
+**CRITICAL — full rules in `corpus-law.mdc` (always-on).** Summary: classify `family_id` → lookup `corpus/index/<family_id>.yaml` → one case YAML → `OPEN`/`FIXED` → `defects index --write` → `defects validate`. No fix without corpus proof.
+
+Fix flow: failure → **family** → generic fixture → correct layer → invariants → **corpus proof**.
+
+---
+
 ## Anti-Patching (non-negotiable)
 
 Never branch on: screen/feature name, `figmaId`, marketing text, customer path, golden file, asset filename, one-screen coordinates, regex fixing one Dart shape.
 
-Fix flow: failure → family → generic fixture → correct layer → invariants → corpus proof. Must work on current + similar + dirty + random Figma trees.
+Must work on current + similar + dirty + random Figma trees.
 
 Local patch → compiler veto, reconcile failure, output rejected, halt.
 
@@ -261,14 +353,6 @@ Repair loop: identical repeated analyzer errors → stop repair, capture capsule
 Classification ≠ emit permission. Tiers: `native_verified` | `native_unverified` | `styled_primitive` | `svg_baked` | `png_baked` | `unsupported`.
 
 `report_only=true` → report only, production Dart unchanged. Outer `report_only` gate AND inner fidelity router — do not collapse.
-
----
-
-## Corpus
-
-`inbox → corpus → fixtures → blocking`. Include clean + dirty + stress + regressions + semantic-only + text-heavy + bad names + nested groups.
-
-Manifest per screen (purpose, quality_profile, tier, checks). Promote to blocking only when purpose clear, baseline stable, oracle useful — not because convenient.
 
 ---
 
@@ -472,7 +556,9 @@ Every `generate` writes screen artifacts under:
 
 Use `.debug/screen/<project>/<feature>/` at the agent repo root unless the command explicitly uses another `--project-dir`. `<project>` is the Flutter project **folder name** (e.g. `limbo`, `ataev`).
 
-Debug artifacts are for **observation and triage**. They are not a substitute for fixtures, corpus tests, or named layout laws.
+Debug artifacts are for **observation and triage**. They are not a substitute for fixtures, corpus cases, or named layout laws.
+
+**Corpus is mandatory:** see `corpus-law.mdc` (always-on) + `.cursor/skills/corpus/SKILL.md`. `/diagnose` → OPEN case + `defects validate`. `/repair` → `FIXED` only with proof.
 
 ---
 
@@ -922,7 +1008,7 @@ Do not leave recurring bugs only in sanitizer comments.
 
 Headless repair jobs: `src/control_panel/repair/` (ARQ `run_repair_job`, REST `POST /v1/repair-jobs`). Enable via `repair.enabled` in `.control-panel.yml`.
 
-**Compiler skills:** `.cursor/skills/diagnose/`, `.cursor/skills/repair/` — screen pipeline.
+**Compiler skills:** `.cursor/skills/corpus/` (mandatory handoff), `.cursor/skills/diagnose/`, `.cursor/skills/repair/` — screen pipeline.
 
 **Infra skills:** `.cursor/skills/debug/`, `.cursor/skills/fix/` — Discord, worker, Redis/Postgres.
 

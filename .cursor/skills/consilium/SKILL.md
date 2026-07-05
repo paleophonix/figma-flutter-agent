@@ -45,6 +45,18 @@ test) — never approve speculative screen patches.
 
 Do not write code in this skill.
 
+## Corpus (consilium cannot skip)
+
+Consilium verdicts may say **corpus handoff: none strong** — that means **defer blocking/oracle promotion only**.
+
+When `/diagnose` or `/repair` runs in the same batch:
+
+```text
+OPEN case YAML + defects validate remain mandatory (.cursor/skills/corpus/SKILL.md)
+emit-law / fixture pytest alone is not corpus signoff
+consilium does not override corpus-law.mdc
+```
+
 ## Anti-patching (mandatory)
 
 Every consilium verdict must explicitly audit anti-patching. **REVERT REQUIRED** or **REQUEST CHANGES** if any item fails.

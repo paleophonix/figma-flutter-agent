@@ -31,6 +31,10 @@ Goal: one clear call for the **whole batch** (or one blocked item), not N micro-
 
 Do not write code in this skill.
 
+## Corpus (consilium cannot skip)
+
+**corpus handoff: none strong** = defer blocking/oracle only. `/diagnose` and `/repair` still require OPEN case + `defects validate` (`.claude/skills/corpus/SKILL.md`). Fixture pytest alone is not corpus signoff.
+
 ---
 
 # Inputs to inspect

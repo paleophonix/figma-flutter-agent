@@ -665,7 +665,12 @@ def apply_flex_wrap_to_widget(
     if kind == FlexWrapKind.SIZED_BOX_WIDTH:
         if node.type == NodeType.STACK and _planner_slot_handles_stack_bounds(node):
             return widget
-        return wrap_column_child_width_fill(widget, node)
+        return wrap_column_child_width_fill(
+            widget,
+            node,
+            parent_node=parent_node,
+            parent_type=parent_type,
+        )
     return widget
 
 

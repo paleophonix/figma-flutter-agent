@@ -1,0 +1,82 @@
+---
+name: corpus
+description: >-
+  Mandatory defect corpus handoff for /diagnose, /repair, and compiler fixes.
+  Classify family_id, lookup corpus/index (never glob cases), write OPEN/FIXED
+  case YAML, run defects validate. Consilium and pytest alone do not replace this.
+---
+
+@.claude/prompts/corpus-law.md
+
+# Corpus handoff skill
+
+**Law:** `corpus-law.md` / `.cursor/rules/corpus-law.mdc` (always-on). **This skill:** step-by-step procedure — not optional.
+
+## When mandatory (read this skill first)
+
+```text
+/diagnose          → before triage report is final
+/repair            → before any src/ compiler code change
+failed generate    → when mechanism is known or classifiable
+compiler fix PR    → before handoff or "done"
+```
+
+**Pairs with:** `/diagnose` → `/repair`. Do not mix with `/debug` → `/fix` (infra).
+
+## What is NOT corpus-done
+
+| Partial proof | Corpus status |
+|---------------|---------------|
+| `.debug/` triage only | not done |
+| Screen fixture / emit-law pytest only | supporting proof only |
+| Consilium: "corpus handoff: none strong" | **blocking deferred** — inbox OPEN case still required |
+| `FIXED` without `repair` block | invalid |
+| Skipped `defects validate` | not done |
+
+Promotion funnel: `inbox → corpus → fixtures → blocking`. **This skill covers inbox through validate.** Blocking/oracle waits for stable baseline + product OK.
+
+---
+
+## Step 1 — Classify mechanism
+
+1. Read `corpus/families.yaml`.
+2. Pick `family_id` by **mechanism** — never visual symptom.
+3. If no row exists but mechanism is clear → add minimal family row, then case.
+4. If mechanism unknown → report `unclassified` only — no case YAML.
+
+---
+
+## Step 2 — Lookup (never glob)
+
+```text
+corpus/families.yaml              → family_id
+corpus/index/<family_id>.yaml     → scan rows
+corpus/cases/<case_id>.yaml       → open ONE file for chosen row
+```
+
+Pick row: same `project`+`feature` → `OPEN` → `FIXED` with `repair` → `observed_at` desc.
+
+---
+
+## Step 3 — Write or update case YAML
+
+Template: `corpus/case-template.yaml`. Diagnose → `OPEN` only. Repair → `FIXED` only with `repair` block + proof.
+
+One mechanism → one case file. Max 2 repair attempts without fresh `/diagnose`.
+
+---
+
+## Step 4 — Index + validate (every edit)
+
+```bash
+poetry run figma-flutter defects index --write
+poetry run figma-flutter defects validate
+```
+
+No handoff without validate passing.
+
+---
+
+## Forbidden
+
+- Fix from `.debug/` alone; glob all cases; `FIXED` without proof; consilium skips Steps 3–4 on diagnose/repair; hand-edit `corpus/index/`.

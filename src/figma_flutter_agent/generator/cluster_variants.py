@@ -246,11 +246,17 @@ def resolve_cluster_delegate_class(
         for cluster_id in blocked_cluster_ids
         if cluster_id in cluster_classes
     }
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_published_star_component_host,
+    )
+
     for key in _cluster_delegate_lookup_keys(node):
         if key in blocked_cluster_ids:
             continue
         class_name = cluster_classes.get(key)
         if class_name and class_name not in blocked_class_names:
+            if layout_fact_published_star_component_host(node) and "radio" in class_name.lower():
+                continue
             return class_name
     return None
 

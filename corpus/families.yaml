@@ -122,6 +122,24 @@ families:
       Extracted widget IR validation is skipped or silent without a named outcome.
     status: active
 
+  - id: cluster_delegate_map_reconcile_clobber
+    title: Planner cluster delegate map clobbered in reconcile
+    pipeline_arrows:
+      - A3
+    owning_stage: planned_reconcile
+    owners:
+      - module: src/figma_flutter_agent/generator/planned/reconcile/__init__.py
+        symbol: reconcile_planned_dart_files
+    law_ids:
+      - LAW-CLUSTER-DELEGATE-BIJECTION
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Final planned-Dart reconcile rebuilds cluster_classes from legacy repetition
+      extraction instead of preserving the planner enriched cluster widget map.
+    status: active
+
   - id: semantic_upgrade_without_required_evidence
     title: Semantic upgrade without required evidence
     pipeline_arrows:

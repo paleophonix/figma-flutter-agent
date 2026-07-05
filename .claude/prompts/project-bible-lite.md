@@ -15,11 +15,17 @@ General-purpose **Figma → Flutter compiler**, not a demo generator. Every modu
 
 ---
 
+## Corpus law
+
+**CRITICAL — see `corpus-law.md` / `corpus-law.mdc` (always-on).** Classify `family_id` → `corpus/index/<family_id>.yaml` → one case YAML → `OPEN`/`FIXED` → `defects validate`. No fix without corpus proof.
+
+---
+
 ## Anti-Patching (non-negotiable)
 
 Never branch on: screen/feature name, `figmaId`, marketing text, customer path, golden file, asset filename, one-screen coordinates, regex fixing one Dart shape.
 
-Fix flow: failure → family → generic fixture → correct layer → invariants → corpus proof. Must work on current + similar + dirty + random Figma trees.
+Must work on current + similar + dirty + random Figma trees.
 
 Local patch → compiler veto, reconcile failure, output rejected, halt.
 

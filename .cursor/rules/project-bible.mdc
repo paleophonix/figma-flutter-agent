@@ -2,11 +2,19 @@
 description: "Always-on compiler constitution. Apply to any parser/IR/emitter/fidelity/corpus/semantic work, layout bugs, or src/ changes: anti-patching, dual graph, fix routing, forbidden shortcuts."
 alwaysApply: true
 ---
+## Corpus law
+
+**CRITICAL — full rules in `corpus-law.mdc` (always-on).** Summary: classify `family_id` → lookup `corpus/index/<family_id>.yaml` → one case YAML → `OPEN`/`FIXED` → `defects index --write` → `defects validate`. No fix without corpus proof.
+
+Fix flow: failure → **family** → generic fixture → correct layer → invariants → **corpus proof**.
+
+---
+
 ## Anti-Patching (non-negotiable)
 
 Never branch on: screen/feature name, `figmaId`, marketing text, customer path, golden file, asset filename, one-screen coordinates, regex fixing one Dart shape.
 
-Fix flow: failure → family → generic fixture → correct layer → invariants → corpus proof. Must work on current + similar + dirty + random Figma trees.
+Must work on current + similar + dirty + random Figma trees.
 
 Local patch → compiler veto, reconcile failure, output rejected, halt.
 
@@ -86,12 +94,6 @@ Classification ≠ emit permission. Tiers: `native_verified` | `native_unverifie
 `report_only=true` → report only, production Dart unchanged. Outer `report_only` gate AND inner fidelity router — do not collapse.
 
 ---
-
-## Corpus
-
-`inbox → corpus → fixtures → blocking`. Include clean + dirty + stress + regressions + semantic-only + text-heavy + bad names + nested groups.
-
-Manifest per screen (purpose, quality_profile, tier, checks). Promote to blocking only when purpose clear, baseline stable, oracle useful — not because convenient.
 
 ---
 

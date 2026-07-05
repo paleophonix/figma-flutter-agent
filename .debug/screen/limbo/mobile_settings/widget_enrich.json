@@ -1,0 +1,67 @@
+{
+  "cacheKey": "92dd94de146474a893e92b017414643d3033d4b9fbbbe48b14ccb8bfd2bf08ed",
+  "response": {
+    "entries": [
+      {
+        "clusterId": "component_109_2332_cdb6cf11",
+        "widgetName": "SettingsTabWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_109_2333_f0ad1807",
+        "widgetName": "ChatsTabWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_109_2380_1725bdd9",
+        "widgetName": "SettingsTabBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_126_1361_3ee94297",
+        "widgetName": "SettingsListItemWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_126_1618",
+        "widgetName": "SettingsDividerWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_126_7902_a5dd2618",
+        "widgetName": "IosStatusBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_126_834_cdb6cf11",
+        "widgetName": "SettingsNavBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_126_919",
+        "widgetName": "ChevronButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_269_8036",
+        "widgetName": "EditIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_269_8083",
+        "widgetName": "TabBarIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_6_1263",
+        "widgetName": "ProfileAvatarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_0",
+        "widgetName": "ListItemContentWidget",
+        "paramRenames": {}
+      }
+    ]
+  }
+}

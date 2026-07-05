@@ -195,6 +195,8 @@ def run_final_reconcile(
     *,
     uses_svg: bool,
     use_package_imports: bool,
+    cluster_classes: dict[str, str] | None = None,
+    cluster_widget_specs: list | None = None,
 ) -> dict[str, str]:
     """Run the final planned-Dart reconcile pass and geometry soft-checks.
 
@@ -232,6 +234,8 @@ def run_final_reconcile(
         destination_trees=context.destination_trees,
         reconcile_metadata=reconcile_metadata,
         responsive_enabled=settings.agent.responsive.enabled,
+        cluster_classes=cluster_classes or context.cluster_classes,
+        cluster_widget_specs=cluster_widget_specs or context.cluster_widget_specs or None,
     )
     skipped_paths = reconcile_metadata.get("sidecar_skipped_paths", frozenset())
     if isinstance(skipped_paths, frozenset) and skipped_paths:

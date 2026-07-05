@@ -570,16 +570,40 @@ def _column_uses_loose_row_cross_axis_pin(
     return False
 
 
-def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
+def wrap_column_child_width_fill(
+    widget: str,
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+    parent_type: NodeType | None = None,
+) -> str:
     """Wrap a COLUMN width-FILL child without leaving a ``Row`` height unbounded."""
     from figma_flutter_agent.generator.layout.flex_policy.alignment import (
         _flex_child_should_bind_fixed_height,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import (
-        layout_fact_row_icon_stepper_control_row,
-    )
     from figma_flutter_agent.generator.layout.flex_policy.wrap import (
         relax_row_cross_stretch_when_unbounded,
+    )
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_payment_plan_primary_copy_column,
+        layout_fact_payment_plan_row_label_text,
+    )
+
+    if node.type == NodeType.TEXT and (
+        layout_fact_payment_plan_row_label_text(node)
+        or (
+            parent_node is not None
+            and parent_type == NodeType.COLUMN
+            and layout_fact_payment_plan_primary_copy_column(parent_node)
+        )
+    ):
+        relaxed = relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
+        return (
+            "SizedBox(width: double.infinity, "
+            f"child: Align(alignment: Alignment.centerLeft, child: {relaxed}))"
+        )
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_icon_stepper_control_row,
     )
     from figma_flutter_agent.generator.layout.responsive import responsive_host_width_literal
 

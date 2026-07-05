@@ -4,10 +4,12 @@ description: >-
   Diagnosis for screen/compiler pipeline: layout, IR, semantic, contract, emitter,
   analyzer, golden. Inspects .debug artifacts, builds BATCH PRE-FIX TRIAGE REPORT,
   records OPEN defect corpus cases when mechanism is known. Pairs with /repair.
-  Use for /diagnose on a specific screen.
+  Use for /diagnose on a specific screen. MUST follow corpus skill for all case YAML.
 ---
 
 @.claude/prompts/debug-common.md
+
+**Mandatory corpus:** Read and follow `.cursor/skills/corpus/SKILL.md` before finalizing the report (Step 6). Consilium or pytest alone does not replace it.
 
 # Debug Diagnose Skill
 
@@ -147,14 +149,11 @@ only (**never** write YAML); find the first arrow where the fact changed.
 
 ---
 
-## Step 6 — Record OPEN corpus cases (agent-owned)
+## Step 6 — Record OPEN corpus cases
 
-**Product owner does not maintain `corpus/` manually.** After triage, the agent writes
-cases when `corpus_status: ready_for_record` and `confidence` is `high` or `medium`.
+Follow **`.cursor/skills/corpus/SKILL.md`** Steps 1–4 (OPEN only on diagnose).
 
 ### `case.summary` (OPEN only)
-
-One short paragraph. Write mechanism, not pixels:
 
 ```text
 - family + law_id in plain language (what invariant failed)

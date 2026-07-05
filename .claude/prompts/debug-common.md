@@ -8,13 +8,11 @@ Every `generate` writes screen artifacts under:
 
 Use `.debug/screen/<project>/<feature>/` at the agent repo root unless the command explicitly uses another `--project-dir`. `<project>` is the Flutter project **folder name** (e.g. `limbo`, `ataev`).
 
-Debug artifacts are for **observation and triage**. They are not a substitute for fixtures, corpus tests, or named layout laws.
+Debug artifacts are for **observation and triage**. They are not a substitute for fixtures, corpus cases, or named layout laws.
 
-**Defect corpus (read-only in `.claude/`):** classify against `families.yaml` and existing
-cases; understand `OPEN` / `FIXED` lifecycle when reading. **Do not** create, update, or
-index corpus YAML from Claude prompts or skills — **Cursor** (`.cursor/`) owns all writes.
+**Corpus is mandatory in Cursor:** see `corpus-law.mdc` (always-on). `/diagnose` → `OPEN` case + `defects validate`. `/repair` → `FIXED` only with proof.
 
-**Corpus lookup (do not glob `corpus/cases/`):**
+**Claude prompts (read-only):** classify via lookup below; corpus YAML writes happen in Cursor, not `.claude/`.
 
 ```text
 corpus/families.yaml              → family_id (mechanism, not symptom)

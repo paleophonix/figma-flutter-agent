@@ -171,3 +171,45 @@ def test_plan_rows_avoid_fixed_width_inside_expanded() -> None:
     root = _load_root()
     layout = _render_layout(root)
     assert "width: 194" not in layout
+    assert "width: 196" not in layout
+
+
+def test_published_star_cluster_vetoes_radio_delegate_name() -> None:
+    root = _load_root()
+    star = _find_node(root, "240:6321")
+    assert star is not None
+    cluster_classes = {
+        "component_211_5913": "RadioButtonWidget",
+        "component_109_2239": "RadioButtonWidget",
+    }
+    assert resolve_cluster_delegate_class(star, cluster_classes) is None
+
+
+def test_pipeline_widget_specs_keep_star_component_family_name() -> None:
+    from collections import Counter
+
+    from figma_flutter_agent.config.settings import load_settings
+    from figma_flutter_agent.generator.widget_extraction import collect_widget_specs
+
+    root = _load_root()
+    counts: Counter[str] = Counter()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if node.cluster_id:
+            counts[node.cluster_id] += 1
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    settings = load_settings()
+    specs = collect_widget_specs(
+        root,
+        dict(counts),
+        config=settings.agent.generation.widget_extraction,
+        widget_suffix=settings.agent.naming.widget_suffix,
+        legacy_enforce=settings.agent.generation.enforce_cluster_widgets,
+        legacy_min_count=settings.agent.generation.cluster_min_count,
+    )
+    by_cluster = {spec.cluster_id: spec.class_name for spec in specs}
+    assert "Star" in by_cluster["component_211_5913"]
+    assert "radio" not in by_cluster["component_211_5913"].lower()

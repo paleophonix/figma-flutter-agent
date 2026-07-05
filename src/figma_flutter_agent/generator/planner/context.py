@@ -65,3 +65,5 @@ class GenerationPlanContext:
     reusable_candidates: list[Any] = field(default_factory=list)
     llm_client_factory: Any | None = None
     m3_policy: M3Policy = field(default_factory=lambda: DEFAULT_M3_POLICY)
+    cluster_classes: dict[str, str] | None = None
+    cluster_widget_specs: list[Any] = field(default_factory=list)

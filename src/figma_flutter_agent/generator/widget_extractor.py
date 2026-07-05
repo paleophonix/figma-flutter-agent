@@ -645,6 +645,7 @@ def refresh_cluster_widget_planned_files(
     use_package_imports: bool = True,
     destination_trees: dict[str, CleanDesignTreeNode] | None = None,
     project_dir: Path | None = None,
+    cluster_specs: list[ClusterWidgetSpec] | None = None,
 ) -> dict[str, str]:
     """Re-render cluster widgets whose planned bodies are stubs or foreign delegates."""
     from figma_flutter_agent.generator.planned.reconcile import (
@@ -654,11 +655,15 @@ def refresh_cluster_widget_planned_files(
         preferred_widget_path_for_class,
     )
 
-    specs = collect_cluster_widget_specs(
-        clean_tree,
-        cluster_summary,
-        min_count=min_count,
-        widget_suffix=widget_suffix,
+    specs = (
+        cluster_specs
+        if cluster_specs is not None
+        else collect_cluster_widget_specs(
+            clean_tree,
+            cluster_summary,
+            min_count=min_count,
+            widget_suffix=widget_suffix,
+        )
     )
     if not specs:
         return planned

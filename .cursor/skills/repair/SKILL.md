@@ -4,10 +4,12 @@ description: >-
   Batch repair after /diagnose: implement the full prioritized queue from
   BATCH PRE-FIX TRIAGE REPORT. Pairs with /diagnose only — screen/compiler
   layout, IR, emitter, golden. Use for /repair, "чиним всё", failed generate
-  on a specific screen.
+  on a specific screen. MUST follow corpus skill before compiler code.
 ---
 
 @.claude/prompts/debug-common.md
+
+**Mandatory corpus:** Read and follow `.cursor/skills/corpus/SKILL.md` before any `src/` change. Emit-law pytest ≠ corpus done. Consilium "none strong" defers blocking only.
 
 # Debug Repair Skill
 
@@ -71,6 +73,8 @@ If only a local workaround exists: stop — report forbidden shortcut, do not im
 Agents often retry the same wrong fix many times. **Do not spin.**
 
 Before coding on queue item `R?`:
+
+Follow **`.cursor/skills/corpus/SKILL.md`** Step 3 (lookup + anti-loop) first.
 
 ```text
 1. Resolve family_id → read corpus/index/<family_id>.yaml (not a glob of corpus/cases/).
@@ -178,48 +182,15 @@ the current repair, include it in the queue and fix it when causally connected.
 
 ### Step 4 — Corpus: OPEN or FIXED (binary)
 
-```text
-OPEN   — not proven fixed (diagnosed, in progress, or failed attempts)
-FIXED  — regression proof + repair block; original law violation addressed
-```
-
-Optional explicit closure without a fix (rare, user/agent decision):
+Follow **`.cursor/skills/corpus/SKILL.md`** Steps 3–4 for every compiler-law queue item with a matching case.
 
 ```text
-WONT_FIX            — mechanism accepted / out of scope
-DEFERRED_BY_POLICY  — intentional defer; requires defer_reason
+OPEN   — not proven fixed
+FIXED  — regression proof + repair block + defects validate
+WONT_FIX | DEFERRED_BY_POLICY — rare; explicit only
 ```
 
-For each **compiler-law** queue item with a matching case:
-
-**When R? is actually done** — all must hold:
-
-```text
-targeted regression test passes
-fix is at the owning compiler layer (not a screen patch)
-original symptom class would not recur on the same law (test encodes that)
-```
-
-Then: `status: FIXED`, fill `repair.*`, run:
-
-```yaml
-repair:
-  summary: >   # refine diagnose repair_summary_draft; mechanism not screen patch
-    …
-  changed_files: [...]
-  regression_tests: [...]
-  verification: [...]
-```
-
-```bash
-poetry run figma-flutter defects index --write
-poetry run figma-flutter defects validate
-```
-
-**When R? is not done:** stay `OPEN`, note attempt in `case.summary`. **Do not mark FIXED.**
-
-If diagnose was skipped: write `OPEN` first, then `FIXED` only if proof lands in the
-same session — never skip straight to `FIXED`.
+Then: `status: FIXED`, fill `repair.*` when proof is conclusive (see corpus skill).
 
 ### Step 5 — Continue Until Done Or Blocked
 

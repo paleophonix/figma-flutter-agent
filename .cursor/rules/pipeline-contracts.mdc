@@ -6,6 +6,8 @@ alwaysApply: false
 
 Master invariant: every stage must **preserve a Figma fact**, **create a named deviation with provenance**, or **downgrade fidelity**. Most "emitter bugs" are information loss on arrows before emit.
 
+**Corpus:** mandatory flow in `corpus-law.mdc`. Steps 2–6 below must produce or update a case YAML.
+
 ## Diagnose / repair routing
 
 1. Symptom → **first arrow** where a fact changed (not where it became visible).

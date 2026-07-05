@@ -1,0 +1,90 @@
+{
+  "cacheKey": "7a1360353f5c8f4800f0de7da8360a64e5f81a2a89af421d16400f1209390f8f",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "272:9260",
+        "widgetName": "SettingsListItem",
+        "reason": "Repeated 8 times as the main settings row pattern with a title and trailing chevron; strong candidate for a reusable list item widget.",
+        "confidence": 0.99,
+        "suggestedParams": [
+          "title",
+          "onTap"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "272:9272",
+            "272:9279",
+            "272:9321",
+            "272:9347",
+            "272:9356",
+            "272:9323",
+            "272:9325"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "settings menu row"
+        }
+      },
+      {
+        "nodeId": "I272:9115;109:2336",
+        "widgetName": "SettingsTabItem",
+        "reason": "Tab item family is repeated across the bottom navigation, with shared structure and variant title/icon/selected state.",
+        "confidence": 0.96,
+        "suggestedParams": [
+          "title",
+          "icon",
+          "selected"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I272:9115;109:2341",
+            "I272:9115;109:2346"
+          ],
+          "shapeSimilarity": 0.95,
+          "semanticRole": "bottom navigation tab"
+        }
+      },
+      {
+        "nodeId": "I272:9260;126:1367",
+        "widgetName": "TrailingChevronButton",
+        "reason": "The same trailing action button appears in every settings row, making it a good reusable subcomponent.",
+        "confidence": 0.87,
+        "suggestedParams": [
+          "onPressed"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I272:9272;126:1367",
+            "I272:9279;126:1367",
+            "I272:9321;126:1367",
+            "I272:9347;126:1367",
+            "I272:9356;126:1367",
+            "I272:9323;126:1367",
+            "I272:9325;126:1367"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "row trailing action icon"
+        }
+      },
+      {
+        "nodeId": "272:9316",
+        "widgetName": "SettingsDivider",
+        "reason": "Divider is repeated between most list items and can be extracted for consistency and easier reuse.",
+        "confidence": 0.8,
+        "suggestedParams": [],
+        "evidence": {
+          "similarNodes": [
+            "272:9318",
+            "272:9364",
+            "272:9346",
+            "272:9355",
+            "272:9322",
+            "272:9324"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "section separator"
+        }
+      }
+    ]
+  }
+}

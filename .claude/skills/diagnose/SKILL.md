@@ -4,10 +4,13 @@ description: >-
   Diagnosis-only for screen/compiler pipeline: layout, IR, semantic, contract,
   emitter, analyzer, golden. Inspects .debug artifacts, builds BATCH PRE-FIX
   TRIAGE REPORT. Pairs with /repair only. Use for /diagnose on a specific screen.
+  MUST follow corpus skill for all case YAML.
 disable-model-invocation: false
 ---
 
 @.claude/prompts/debug-common.md
+
+**Mandatory corpus:** Read and follow `.claude/skills/corpus/SKILL.md` before finalizing the report.
 
 # Debug Diagnosis Skill
 

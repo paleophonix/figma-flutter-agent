@@ -1,0 +1,59 @@
+version: 1
+
+case:
+  id: 2026-07-05-cluster-delegate-reconcile-clobber
+  title: Reconcile clobbers planner cluster delegate map
+  case_kind: regression
+  project: limbo
+  feature: mobile_settings
+  observed_at: 2026-07-05
+  summary: >
+    User observation: profile avatar renders as icon plus line; list trailing
+  controls render as bottom navigation bars instead of chevrons. Mechanism:
+  ``plan_generation_files`` extracts and enriches many cluster widgets, but
+  ``reconcile_planned_dart_files`` rebuilds ``cluster_classes`` via legacy
+  ``collect_cluster_widget_specs`` (min-count repetition only). Subtree refresh
+  and component-family collapse then resolve delegates against the impoverished
+  map, so unrelated clusters share one widget body (e.g. bottom nav inside
+  ``DividerWidget``).
+
+occurrences:
+  - id: mobile-settings-delegate-clobber
+    family_id: cluster_delegate_map_reconcile_clobber
+    pipeline_arrow: A3
+    law_id: LAW-CLUSTER-DELEGATE-BIJECTION
+    stage: planned_reconcile
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: OPEN
+    owner:
+      module: src/figma_flutter_agent/generator/planned/reconcile/__init__.py
+      symbol: reconcile_planned_dart_files
+    contract:
+      field: cluster_classes
+      field_class: compiler_owned
+      category: illegal
+      expected: >
+        Final reconcile must preserve the planner cluster id to widget class map
+        produced by collect_widget_specs and enrich.
+      actual: >
+        Reconcile rebuilds cluster_classes from legacy collect_cluster_widget_specs
+        and refreshes widgets against that subset.
+    authority_boundary: cluster_extraction
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_settings/screen.dart
+        summary: >
+          DividerWidget build method contains BottomNavigationBar; avatar and row
+          trailing slots reference const DividerWidget().
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_settings/widget_enrich.json
+        summary: >
+          Enrich maps component_126_919 to ChevronButtonWidget and component_6_1263
+          to ProfileAvatarWidget, but writeback emitted divider_widget.dart only.
+    repair:
+      summary: ""
+      changed_files: []
+      regression_tests: []
+      verification: []
