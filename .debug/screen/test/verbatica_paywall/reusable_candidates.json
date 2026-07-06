@@ -1,98 +1,115 @@
 {
-  "cacheKey": "c49ccc3df888b9f22320495dbb4cf850cbe7d0bf07d554b4f738fd992fca7d78",
+  "cacheKey": "92d5cb58986e7f8f295c46786e4baf36e22b102de024a8450ad4870b1457e274",
   "response": {
     "candidates": [
       {
-        "nodeId": "2399:42788",
-        "widgetName": "PlanOptionCard",
-        "reason": "This plan tile is repeated as a shared structure across the three pricing options: duration, monthly price, total price, and optional savings badge/check state.",
+        "nodeId": "2399:42789",
+        "widgetName": "PricingPlanOption",
+        "reason": "Shared pricing-row structure repeated for the 12, 3, and 1 month plan choices with the same title/price/check layout.",
         "confidence": 0.98,
         "suggestedParams": [
-          "planLengthLabel",
+          "durationLabel",
+          "priceLabel",
           "monthlyPriceLabel",
-          "totalPriceLabel",
-          "badgeLabel",
-          "isSelected"
+          "showSelectionIcon"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42801",
-            "2399:42812"
+            "2399:42789",
+            "2399:42802",
+            "2399:42813"
           ],
-          "shapeSimilarity": 0.97,
-          "semanticRole": "subscription plan selection option"
+          "shapeSimilarity": 0.99,
+          "semanticRole": "subscription plan option row"
+        }
+      },
+      {
+        "nodeId": "2399:42837",
+        "widgetName": "PrimarySubscriptionButton",
+        "reason": "Primary CTA button combines a main label with a supporting subtitle, making it a reusable subscription action pattern.",
+        "confidence": 0.97,
+        "suggestedParams": [
+          "title",
+          "subtitle"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2399:42837"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "primary purchase action button"
         }
       },
       {
         "nodeId": "2399:42838",
-        "widgetName": "TertiaryActionButton",
-        "reason": "Same button component is reused for two different paywall actions, with only the label and compactness changing.",
-        "confidence": 0.97,
+        "widgetName": "SecondaryActionButton",
+        "reason": "The same tertiary Button component is reused for two secondary actions with different labels and compactness.",
+        "confidence": 0.94,
         "suggestedParams": [
           "label",
           "isCompact"
         ],
         "evidence": {
           "similarNodes": [
+            "2399:42838",
             "2399:42839"
           ],
-          "shapeSimilarity": 0.99,
-          "semanticRole": "secondary paywall action button"
-        }
-      },
-      {
-        "nodeId": "2399:42837",
-        "widgetName": "PrimarySubscriptionButton",
-        "reason": "The primary CTA is a structured button component with a title and supporting subtitle, suitable for reuse across subscription flows.",
-        "confidence": 0.95,
-        "suggestedParams": [
-          "title",
-          "subtitle"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "primary subscription call to action"
-        }
-      },
-      {
-        "nodeId": "2399:42786",
-        "widgetName": "CloseIconButton",
-        "reason": "A standard trailing close button component that can be reused anywhere a dismiss action is needed.",
-        "confidence": 0.93,
-        "suggestedParams": [],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "dismiss/close control"
-        }
-      },
-      {
-        "nodeId": "2399:42843",
-        "widgetName": "HomeIndicatorBar",
-        "reason": "System home indicator is a reusable device chrome element, though it is not paywall-specific.",
-        "confidence": 0.88,
-        "suggestedParams": [],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "iPhone home indicator"
+          "shapeSimilarity": 0.96,
+          "semanticRole": "secondary action button"
         }
       },
       {
         "nodeId": "2399:42783",
-        "widgetName": "StatusBar",
-        "reason": "The status bar is a reusable OS chrome component and already appears as a distinct Figma component on this screen.",
-        "confidence": 0.86,
+        "widgetName": "DeviceStatusBar",
+        "reason": "Standard phone status bar component with time and system indicators, reusable across screens.",
+        "confidence": 0.9,
         "suggestedParams": [
-          "timeText",
+          "time",
+          "showDate",
           "showCamera",
           "showBatteryTime"
         ],
         "evidence": {
-          "similarNodes": [],
+          "similarNodes": [
+            "2399:42783"
+          ],
           "shapeSimilarity": 1.0,
-          "semanticRole": "mobile status bar"
+          "semanticRole": "device status bar"
+        }
+      },
+      {
+        "nodeId": "2399:42843",
+        "widgetName": "HomeIndicator",
+        "reason": "Standard iPhone home indicator component that can be reused on other mobile screens.",
+        "confidence": 0.89,
+        "suggestedParams": [
+          "device",
+          "orientation",
+          "mode"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2399:42843"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "home indicator"
+        }
+      },
+      {
+        "nodeId": "2399:42786",
+        "widgetName": "CloseButton",
+        "reason": "Reusable trailing dismiss control shown as a compact close icon button.",
+        "confidence": 0.88,
+        "suggestedParams": [
+          "iconLabel",
+          "mode"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2399:42786"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "dismiss button"
         }
       }
     ]

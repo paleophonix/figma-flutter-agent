@@ -1,10 +1,10 @@
 {
-  "cacheKey": "88ef83951df5811eaf5bcfdd953faf11cc63b2febd2491f609f3210ec8e274ff",
+  "cacheKey": "9e0ef66572afbed1d4e58822938ef0deaaa515c71990b70a8bc1c489547ef076",
   "response": {
     "entries": [
       {
         "clusterId": "component_111_16846_ed645bd8",
-        "widgetName": "SubscribeButtonWidget",
+        "widgetName": "StartFreeTrialButtonWidget",
         "paramRenames": {}
       },
       {
@@ -19,22 +19,22 @@
       },
       {
         "clusterId": "component_282_23327",
-        "widgetName": "CellularSignalWidget",
+        "widgetName": "CellularSignalIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23343",
-        "widgetName": "WifiStatusWidget",
+        "widgetName": "WifiIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23346",
-        "widgetName": "BatteryStatusWidget",
+        "widgetName": "BatteryStatusIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23393_de98d704",
-        "widgetName": "StatusAreaWidget",
+        "widgetName": "StatusBarContentWidget",
         "paramRenames": {}
       },
       {

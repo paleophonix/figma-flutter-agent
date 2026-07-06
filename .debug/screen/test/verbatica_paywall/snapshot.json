@@ -7,11 +7,15 @@
   "typography_hash": "ad9f51209fc04bc9013662319d1577e3a1fcce96c25d707a1cd717d4a4b2b4e3",
   "spacing_hash": "c2c90039e4f805ca8edcb8fdc4fea75b7b34fd5f3f8a84abc1b04697a4f1dc68",
   "file_hashes": {
-    "lib/widgets/subscribe_button_widget.dart": "05f0dd7fe1f6f04edbecc976f98770678af1e682035651777026f1a64f59e6c0",
-    "lib/widgets/paywall_home_indicator_widget.dart": "5d0fd15e446e843ae3c7a7873d9e4d10e789e09804db24f63a68957fd99617ef",
-    "lib/widgets/free_trial_button_widget.dart": "43eb5e14d4abc7a93e87b35f3063b8459d67538d13e401289c074532049a6f8c",
-    "lib/widgets/paywall_status_bar_widget.dart": "c5cc6ec383bacb46ac86232e790913bc6023f333835d2358cb95d88dd8baa139",
-    "lib/widgets/close_button_widget.dart": "2a6cfe559d0936767fabf74afabe57b870168d5183f09694ed05b882fe8826af",
+    "lib/widgets/start_free_trial_button_widget.dart": "a21232eefe62153f3da577fd4accb7fc8f216491eb77be50555e2362cdf3e349",
+    "lib/widgets/home_indicator_widget.dart": "81f93078236ae67201432f46ac7dccee3a087bae344bfed343df7e43373236c1",
+    "lib/widgets/tertiary_action_button_widget.dart": "1f6178ab3b71844199102a4121205c21bef4170349c55150a69c11755657e433",
+    "lib/widgets/cellular_signal_icon_widget.dart": "e5ae4af6a4ea49a7f1a88daa12d714780c180c96650997f2a73baafe88180f5a",
+    "lib/widgets/wifi_icon_widget.dart": "a9cd6e6e046ebd6c95df5bc5c70ada13505cfe777e5352bd695280622db09e6c",
+    "lib/widgets/battery_status_icon_widget.dart": "3f0b71c7a691da3a68f0d243f7f7c0c54bb0c6415309e875ec72dabe1a4b2159",
+    "lib/widgets/status_bar_content_widget.dart": "622dbf998575e4187ff34fd5bae7c1463ba0722c0957d9b51179ffbe84589851",
+    "lib/widgets/paywall_status_bar_widget.dart": "79c263a419e57c3c26c64034d0f5da177785ced4825570cd056605909cb97fc2",
+    "lib/widgets/close_button_widget.dart": "3d7b2bffcd7ad0842afc94a71532112c197564750aca112a940b24d82484f4de",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "bccf10c9ee887275b22eed1cc4de102c4df21423f4e0a130c892479293112645",
     "lib/theme/app_spacing.dart": "0517071e3da4d991f950070f0795470658b64a6f9be996c089ced7f9f4cf05c6",
@@ -20,7 +24,7 @@
     "lib/theme/app_edge_insets.dart": "aaeb9146daa5e498a875990e15314d2ec895873c600f367b9269fa16950f2ece",
     "lib/theme/app_elevation.dart": "45b0cdd0a1240245407bdaab9b3527436cb24d4eb34315cec6ca701be4c95896",
     "lib/theme/app_theme.dart": "08707d7adf00e0166921c73866ee527b28160225f8c8c0a67f949e30881ef7f5",
-    "lib/generated/verbatica_paywall_layout.dart": "8ed16e6fd8d5bf991881d52f892589a32f2aad3f2727c36ca6d55ccd8d887e12",
+    "lib/generated/verbatica_paywall_layout.dart": "a2fa17b3b48094da20872205e118afdac339dfcc3fb21fb11cc47edcd185b7f4",
     "lib/features/verbatica_paywall/verbatica_paywall_screen.dart": "42d15a0bc4ca28199ac8ba19fcd7fe2d3cb573a74d5cefb1cf0febcbe56a75bd",
     "test/golden/verbatica_paywall_screen_test.dart": "2d2c1f5e40865d3eb3d87ae4a30329baaef6c5936e7b5a322772ef7822bfdda2",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -34,6 +38,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 3,
-  "updated_at": "2026-07-06T17:31:43.991500+00:00"
+  "version": 4,
+  "updated_at": "2026-07-06T20:30:27.864805+00:00"
 }

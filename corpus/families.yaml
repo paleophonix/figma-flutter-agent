@@ -694,3 +694,87 @@ families:
       the content, leaving only the footer visible in the running app while the
       artboard-capture branch renders correctly.
     status: active
+
+  - id: bottom_chrome_viewport_bottom_crop
+    title: Live viewport bottom-aligns artboard and crops content
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/common.py
+        symbol: bottom_chrome_pinned_live_viewport
+      - module: src/figma_flutter_agent/generator/layout/stack_chrome.py
+        symbol: partition_viewport_pinned_stack_layers
+      - module: src/figma_flutter_agent/generator/layout/file_methods.py
+        symbol: compose_decomposed_root_widget
+    law_ids:
+      - LAW-VIEWPORT-BOTTOM-CHROME-PARTITION
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Bottom-chrome shells with responsive_enabled=false used Align(bottomCenter) to
+      pin the whole artboard, clipping everything above the viewport bottom. Docked
+      footer chrome must partition into viewport-pinned layers outside a scroll host
+      instead of bottom-cropping the full artboard.
+    status: active
+
+  - id: render_boundary_image_paint_without_transfer
+    title: Render-boundary flatten drops image paint without drawable asset
+    pipeline_arrows:
+      - A4
+      - A3
+    owning_stage: parser
+    owners:
+      - module: src/figma_flutter_agent/generator/background/render.py
+        symbol: render_ambient_decorative_node
+    law_ids:
+      - LAW-RENDER-BOUNDARY-IMAGE-PAINT-CONSERVATION
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      IMAGE or flattened render-boundary nodes lose drawable asset keys during parse
+      or export but still emit empty shrink shells instead of preserving paint or
+      failing loudly; wallpaper helpers may be omitted from the root stack.
+    status: active
+
+  - id: negative_flex_gap_dropped
+    title: Negative Figma flex gap dropped to zero spacing
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py
+        symbol: _flex_spacing_field
+    law_ids:
+      - LAW-NEGATIVE-GAP-CONSERVATION
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Row and Column emitters skip spacing when Figma itemSpacing is zero or negative,
+      but negative gaps are overlap contracts. Dropping them inflates rigid child sums
+      and causes RenderFlex overflow in tight icon clusters.
+    status: active
+
+  - id: dart_string_unescaped_line_separator
+    title: Dart string escape misses U+2028/U+2029 line terminators
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/common.py
+        symbol: escape_dart_string
+    law_ids:
+      - DartStringLineTerminatorEscapeLaw
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      escape_dart_string escapes backslash, dollar, newline and single quote but not
+      U+2028 LINE SEPARATOR or U+2029 PARAGRAPH SEPARATOR, which Dart treats as line
+      terminators inside string literals. A Figma text value containing U+2028 breaks
+      the single-line Dart string literal, yielding an unterminated_string_literal and
+      illegal_character analyzer errors and aborting codegen before writeback.
+    status: active

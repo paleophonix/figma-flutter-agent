@@ -1,0 +1,19 @@
+version: 1
+family_id: dart_string_unescaped_line_separator
+generated: true
+cases:
+- case_id: 2026-07-06-dart-string-unescaped-u2028
+  case_file: cases/2026-07-06-dart-string-unescaped-u2028.yaml
+  title: Figma text with U+2028 breaks emitted Dart string literal on 
+    niyama_order
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-u2028-string-break
+  status: FIXED
+  observed_at: '2026-07-06'
+  created_at: '2026-07-06T18:15:00Z'
+  updated_at: '2026-07-06T19:06:00Z'
+  summary: A niyama_order multiline text value contains a U+2028 LINE SEPARATOR.
+    escape_dart_string escapes backslash, dollar, newline and single quote but 
+    not U+2028 or U+2029, so the raw separator is emitted into a single-quoted 
+    Dart string in lib/generated/niyama_order_chunk_00f13e69....

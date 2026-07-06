@@ -1,0 +1,48 @@
+version: 1
+
+case:
+  id: 2026-07-06-verbatica-render-boundary-hero-image
+  title: Hero wallpaper render boundary emits empty shrink shell
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-06
+  created_at: '2026-07-06T18:35:00Z'
+  updated_at: '2026-07-06T18:35:00Z'
+  summary: >
+    Paywall hero Img 2399:42779 is flattened to a render boundary without
+    imageAssetKey; ambient wallpaper emit produced SizedBox.shrink and the
+    decomposed stack path omitted Positioned.fill wallpaper lead.
+
+occurrences:
+  - id: verbatica-paywall-hero-render-boundary-empty
+    family_id: render_boundary_image_paint_without_transfer
+    pipeline_arrow: A4
+    law_id: LAW-RENDER-BOUNDARY-IMAGE-PAINT-CONSERVATION
+    stage: parser
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: OPEN
+    owner:
+      module: src/figma_flutter_agent/generator/background/render.py
+      symbol: render_ambient_decorative_node
+    contract:
+      field: render boundary image paint
+      field_class: fact
+      category: lossy
+      expected: >
+        Flattened IMAGE render boundaries either bind imageAssetKey for emit or block
+        with a named asset error; wallpaper leads compose into the root stack.
+      actual: >
+        render_ambient_decorative_node called render_node_body on asset-less flatten
+        shells; _buildBackground emitted SizedBox.shrink and was not stacked behind
+        foreground layers.
+    authority_boundary: asset_manifest
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/processed.json
+        summary: node 42779 renderBoundary true, children empty, no imageAssetKey.
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/screen.dart
+        summary: _buildBackground Stack contains SizedBox.shrink only.

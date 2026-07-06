@@ -1,0 +1,70 @@
+version: 1
+
+case:
+  id: 2026-07-06-dart-string-unescaped-u2028
+  title: Figma text with U+2028 breaks emitted Dart string literal on niyama_order
+  case_kind: regression
+  project: test
+  feature: niyama_order
+  observed_at: 2026-07-06
+  created_at: '2026-07-06T18:15:00Z'
+  updated_at: '2026-07-06T19:06:00Z'
+  summary: >
+    A niyama_order multiline text value contains a U+2028 LINE SEPARATOR.
+    escape_dart_string escapes backslash, dollar, newline and single quote but not
+    U+2028 or U+2029, so the raw separator is emitted into a single-quoted Dart string
+    in lib/generated/niyama_order_chunk_00f13e69.dart. Dart treats U+2028 as a line
+    terminator, so the string literal is unterminated and the following Cyrillic text
+    spills as illegal characters (unterminated_string_literal at 27:6026,
+    illegal_character 1058 = Cyrillic T at 28:3). The AST balance-delimiters gate could
+    not reparse it and kept the pre-AST source, and the LLM repair loop could not help
+    (the 21KB minified chunk exceeds the repair model context window and the repair was
+    scoped to screen.dart, not the broken chunk), so generation aborts before writeback.
+    User observation: niyama_order launch aborts with an unterminated string literal.
+
+occurrences:
+  - id: niyama-order-u2028-string-break
+    family_id: dart_string_unescaped_line_separator
+    pipeline_arrow: A3
+    law_id: DartStringLineTerminatorEscapeLaw
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/common.py
+      symbol: escape_dart_string
+    contract:
+      field: Dart single-quoted string literal escaping
+      field_class: compiler_owned
+      category: illegal
+      expected: >
+        escape_dart_string escapes all Dart string-literal line terminators, including
+        U+2028 LINE SEPARATOR and U+2029 PARAGRAPH SEPARATOR, so any Figma text value
+        emits as a valid single-line Dart string.
+      actual: >
+        U+2028 is passed through raw; the emitted literal is unterminated and the
+        following text becomes illegal Dart characters.
+    authority_boundary: planned_dart_graph
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/niyama_order/processed.json
+        summary: two multiline text values carry a raw U+2028 LINE SEPARATOR alongside newlines.
+      - kind: source_code
+        path: src/figma_flutter_agent/generator/layout/common.py
+        summary: escape_dart_string replaces backslash, dollar, newline and quote but not U+2028 or U+2029.
+      - kind: log
+        path: logs/figma_flutter_agent.log
+        summary: niyama_order_chunk_00f13e69.dart 27:6026 unterminated_string_literal and 28:3 illegal_character 1058.
+    repair:
+      summary: >
+        DartStringLineTerminatorEscapeLaw — escape_dart_string now emits \\u2028 and
+        \\u2029 for Unicode line terminators so single-quoted Dart literals stay
+        lexer-valid for any Figma text value.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/common.py
+      regression_tests:
+        - tests/test_layout_common.py::test_escape_dart_string_handles_unicode_line_terminators
+      verification:
+        - poetry run pytest tests/test_layout_common.py::test_escape_dart_string_handles_unicode_line_terminators -q
