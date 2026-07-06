@@ -155,6 +155,42 @@ def lookup_asset_path_for_node(
     return lookup_asset_path_for_component_vector_family(asset_index, node_id)
 
 
+def _asset_stem_matches_node_id(asset_path: str, safe_id: str) -> bool:
+    """Return True when ``asset_path`` was exported for ``safe_id`` (not a family alias)."""
+    stem = Path(asset_path).stem.lower()
+    token = safe_id.lower()
+    return stem == token or stem.endswith(f"_{token}")
+
+
+def _lookup_exact_node_asset(asset_index: dict[str, str], node_id: str) -> str | None:
+    """Resolve only exports whose filename stem matches the requested node id."""
+    for safe_id in _asset_lookup_safe_ids(node_id):
+        resolved = asset_index.get(safe_id)
+        if resolved is not None and _asset_stem_matches_node_id(resolved, safe_id):
+            return resolved
+    return None
+
+
+def _discover_exact_node_asset(project_dir: Path, node_id: str) -> str | None:
+    """Scan on-disk assets for exports tied to ``node_id`` without family fallback."""
+    best: tuple[tuple[int, str], str] | None = None
+    for safe_id in _asset_lookup_safe_ids(node_id):
+        for folder in _ASSET_SCAN_FOLDERS:
+            asset_dir = project_dir / "assets" / folder
+            if not asset_dir.is_dir():
+                continue
+            for ext in (".png", ".jpg", ".jpeg", ".webp", ".svg"):
+                pattern = f"*_{safe_id}{ext}"
+                for match in asset_dir.glob(pattern):
+                    rel = f"assets/{folder}/{match.name}".replace("\\", "/")
+                    if not _asset_stem_matches_node_id(rel, safe_id):
+                        continue
+                    rank = _vector_asset_discovery_rank(rel)
+                    if best is None or rank < best[0]:
+                        best = (rank, rel)
+    return best[1] if best is not None else None
+
+
 def discover_asset_path_for_node(
     project_dir: Path,
     node_id: str,
@@ -163,7 +199,13 @@ def discover_asset_path_for_node(
 ) -> str | None:
     """Find an on-disk SVG/PNG export for a Figma node id (any filename suffix)."""
     if asset_index is not None:
+        exact = _lookup_exact_node_asset(asset_index, node_id)
+        if exact is not None:
+            return exact
         return lookup_asset_path_for_node(asset_index, node_id)
+    exact = _discover_exact_node_asset(project_dir, node_id)
+    if exact is not None:
+        return exact
     best: tuple[tuple[int, str], str] | None = None
     for suffix in _asset_lookup_safe_ids(node_id):
         for folder in _ASSET_SCAN_FOLDERS:
@@ -278,13 +320,14 @@ def _product_photo_stack_signature(
     node: CleanDesignTreeNode,
     *,
     parent_card: CleanDesignTreeNode | None,
-) -> tuple[tuple[float, float, float, float], str] | None:
+) -> tuple[tuple[float, float, float, float], str, str] | None:
     """Return geometry plus tile identity so unlike catalog cards do not share rasters."""
     geometry = _product_photo_stack_geometry(node)
     if geometry is None:
         return None
+    photo = node.children[0]
     identity = _product_card_tile_identity(parent_card) if parent_card is not None else ""
-    return geometry, identity
+    return geometry, identity, photo.id
 
 
 def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None:
@@ -292,7 +335,7 @@ def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None
     from figma_flutter_agent.parser.tree_walk import walk_clean_tree_with_carry
     from figma_flutter_agent.schemas import NodeType
 
-    signature_to_key: dict[tuple[tuple[float, float, float, float], str], str] = {}
+    signature_to_key: dict[tuple[tuple[float, float, float, float], str, str], str] = {}
 
     def carry_card(node: CleanDesignTreeNode, parent_card: CleanDesignTreeNode | None):
         return node if node.type == NodeType.CARD else parent_card

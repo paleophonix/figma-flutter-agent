@@ -8,7 +8,7 @@ case:
   feature: niyama_order
   observed_at: 2026-07-07
   created_at: '2026-07-07T00:30:00Z'
-  updated_at: '2026-07-07T01:10:00Z'
+  updated_at: '2026-07-07T03:30:00Z'
   summary: >
     In OrderProductItemWidget the product thumbnail is emitted as
     Image.asset(width: 76, height: 76, fit: BoxFit.cover) as a direct child of a
@@ -61,8 +61,10 @@ occurrences:
       changed_files:
         - src/figma_flutter_agent/generator/layout/flex_policy/row.py
         - src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
+        - src/figma_flutter_agent/generator/layout/flex_policy/extents.py
       regression_tests:
         - tests/test_rep_edit_profile_batch_repair.py::test_column_stretch_wraps_fixed_image_with_align
         - tests/test_rep_edit_profile_batch_repair.py::test_column_stretch_wraps_fixed_chip_with_align
+        - tests/test_niyama_order_emit_laws.py
       verification:
         - poetry run pytest tests/test_rep_edit_profile_batch_repair.py -q

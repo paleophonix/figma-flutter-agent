@@ -931,3 +931,28 @@ families:
       height (40px) and Flutter throws a bottom RenderFlex overflow. System-chrome icon
       slots must clamp to the bar height or the inner icon intrinsic.
     status: active
+
+  - id: flex_child_under_unbounded_width_crash
+    title: Expanded flex child under OverflowBox unbounded width crashes layout
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py
+        symbol: flex_children_body
+    law_ids:
+      - LAW-FLEX-CHILD-BOUNDED-WIDTH
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      An extracted positioned subtree is wrapped in Align/OverflowBox (which pass
+      unbounded width during measurement) but a nested Row keeps an Expanded/flex child.
+      Flutter throws "RenderFlex children have non-zero flex but incoming width
+      constraints are unbounded", leaving the RenderFlex sizeless so hit-testing fails
+      ("Cannot hit test a render box with no size"), buttons are unclickable and
+      carousels collapse. Flex children must not sit under an unbounded-width host: emit
+      Flexible(loose) inside a width-bounded host or drop the flex. The existing
+      row_flex_child_must_not_force_infinite_width gate only catches literal
+      width: double.infinity, not Expanded under OverflowBox.
+    status: active

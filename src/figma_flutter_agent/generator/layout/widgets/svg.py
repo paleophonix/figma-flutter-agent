@@ -364,6 +364,36 @@ def _is_raster_asset_path(asset: str) -> bool:
     return asset.lower().endswith(_RASTER_ASSET_SUFFIXES)
 
 
+def _layout_slot_raster_emit_dimensions(
+    node: CleanDesignTreeNode,
+    layout_width: float | None,
+    layout_height: float | None,
+) -> tuple[float | None, float | None]:
+    """Keep raster emit inside a bounded stack slot instead of paint-expanded bounds."""
+    from figma_flutter_agent.parser.render_bounds import expanded_layout_dimensions
+
+    expanded_width, expanded_height = expanded_layout_dimensions(node, layout_width, layout_height)
+    placement = node.stack_placement
+    if placement is None:
+        return expanded_width, expanded_height
+    slot_width = placement.width
+    slot_height = placement.height
+    if (
+        slot_width is None
+        or slot_height is None
+        or float(slot_width) <= 0
+        or float(slot_height) <= 0
+        or expanded_width is None
+        or expanded_height is None
+    ):
+        return expanded_width, expanded_height
+    if float(expanded_width) > float(slot_width) + 0.5 or float(
+        expanded_height
+    ) > float(slot_height) + 0.5:
+        return layout_width, layout_height
+    return expanded_width, expanded_height
+
+
 def _render_raster_asset_picture(node: CleanDesignTreeNode, asset: str) -> str:
     """Render a raster asset with explicit bounds when Figma provides them."""
     from figma_flutter_agent.parser.render_bounds import (
@@ -372,14 +402,21 @@ def _render_raster_asset_picture(node: CleanDesignTreeNode, asset: str) -> str:
     )
 
     width, height = _node_layout_size(node, node.stack_placement)
+    layout_width, layout_height = width, height
     width, height = _effective_svg_dimensions(node, width, height)
+    layout_width, layout_height = width, height
     width, height = expanded_layout_dimensions(node, width, height)
     image_fit = "BoxFit.contain" if node_needs_render_bounds_expansion(node) else "BoxFit.cover"
+    emit_width, emit_height = _layout_slot_raster_emit_dimensions(
+        node,
+        layout_width,
+        layout_height,
+    )
     params = [f"'{asset}'"]
-    if width is not None and width > 0:
-        params.append(f"width: {width}")
-    if height is not None and height > 0:
-        params.append(f"height: {height}")
+    if emit_width is not None and emit_width > 0:
+        params.append(f"width: {emit_width}")
+    if emit_height is not None and emit_height > 0:
+        params.append(f"height: {emit_height}")
     params.append(f"fit: {image_fit}")
     widget = f"Image.asset({', '.join(params)})"
     return _apply_node_transform(node, widget)
@@ -397,19 +434,29 @@ def _render_exported_vector(
     )
 
     width, height = _node_layout_size(node, node.stack_placement)
+    layout_width, layout_height = width, height
     width, height = _effective_svg_dimensions(node, width, height)
+    layout_width, layout_height = width, height
     width, height = expanded_layout_dimensions(node, width, height)
     image_fit = "BoxFit.contain" if node_needs_render_bounds_expansion(node) else "BoxFit.cover"
 
     if node.image_asset_key:
         asset = escape_dart_string(node.image_asset_key)
-        params = [f"'{asset}'"]
-        if width is not None and width > 0:
-            params.append(f"width: {width}")
-        if height is not None and height > 0:
-            params.append(f"height: {height}")
-        params.append(f"fit: {image_fit}")
-        asset_widget = f"Image.asset({', '.join(params)})"
+        if node.image_asset_key.lower().endswith(".svg"):
+            asset_widget = _render_svg_picture(node, asset)
+        else:
+            emit_width, emit_height = _layout_slot_raster_emit_dimensions(
+                node,
+                layout_width,
+                layout_height,
+            )
+            params = [f"'{asset}'"]
+            if emit_width is not None and emit_width > 0:
+                params.append(f"width: {emit_width}")
+            if emit_height is not None and emit_height > 0:
+                params.append(f"height: {emit_height}")
+            params.append(f"fit: {image_fit}")
+            asset_widget = f"Image.asset({', '.join(params)})"
         if node.style.layer_blur and float(node.style.layer_blur) > 0:
             asset_widget = _wrap_raster_layer_blur(node, asset_widget)
         return _wrap_paint_overflow_export(

@@ -151,6 +151,9 @@ def _wrap_bounded_positioned_slot_child(
         f"alignment: {align}, {loosen}"
         f"child: {widget}))"
     )
+    if node.type == NodeType.ROW and width is not None and width > 0:
+        width_lit = format_geometry_literal(width)
+        inner = f"SizedBox(width: {width_lit}, child: {inner})"
     if child_has_outward_paint(node):
         return inner
     return f"ClipRect(child: {inner})"

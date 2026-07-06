@@ -454,19 +454,112 @@ def repair_nested_flex_parent_data_in_source(source: str) -> str:
         illegal_host_spans = collect_illegal_flex_parent_data_host_spans(updated)
         spans = sorted(set(nested_spans + illegal_host_spans))
         if not spans:
-            return updated
+            return repair_overflowbox_unbounded_row_flex_in_source(updated)
         start = spans[0]
         open_paren = updated.find("(", start)
         if open_paren < 0:
-            return updated
+            return repair_overflowbox_unbounded_row_flex_in_source(updated)
         end = _find_matching_paren(updated, open_paren)
         if end is None:
-            return updated
+            return repair_overflowbox_unbounded_row_flex_in_source(updated)
         expr = updated[start : end + 1]
         repaired = repair_flex_parent_data_order(expr.strip())
         if repaired == expr.strip():
-            return updated
+            return repair_overflowbox_unbounded_row_flex_in_source(updated)
         updated = updated[:start] + repaired + updated[end + 1 :]
+
+
+_OVERFLOWBOX_MARKER = "OverflowBox("
+
+
+def _extract_overflowbox_finite_max_width(expr: str) -> str | None:
+    """Return a finite ``maxWidth`` literal from an ``OverflowBox`` expression."""
+    marker = "maxWidth:"
+    idx = expr.find(marker)
+    if idx < 0:
+        return None
+    tail = expr[idx + len(marker) :].lstrip()
+    end = 0
+    depth = 0
+    for index, char in enumerate(tail):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            if depth == 0:
+                end = index
+                break
+            depth -= 1
+        elif char == "," and depth == 0:
+            end = index
+            break
+    else:
+        end = len(tail)
+    value = tail[:end].strip()
+    if not value or value == "double.infinity":
+        return None
+    return value
+
+
+def _pin_height_only_sizedbox_width_in_subtree(expr: str, width_lit: str) -> str:
+    """Add ``width`` to height-only ``SizedBox`` hosts that wrap ``Expanded``."""
+    marker = "SizedBox("
+    updated = expr
+    pos = 0
+    changed = False
+    while True:
+        idx = updated.find(marker, pos)
+        if idx < 0:
+            break
+        open_paren = updated.find("(", idx)
+        from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
+            _find_matching_paren,
+        )
+
+        end = _find_matching_paren(updated, open_paren)
+        if end is None:
+            break
+        box = updated[idx : end + 1]
+        child_marker = ", child: "
+        child_idx = box.find(child_marker)
+        if child_idx < 0:
+            pos = end + 1
+            continue
+        head = box[:child_idx]
+        if "height:" in head and "width:" not in head and "Expanded(" in box:
+            new_box = f"{head}, width: {width_lit}{box[child_idx:]}"
+            updated = updated[:idx] + new_box + updated[end + 1 :]
+            changed = True
+            pos = idx + len(new_box)
+            continue
+        pos = end + 1
+    return updated if changed else expr
+
+
+def repair_overflowbox_unbounded_row_flex_in_source(source: str) -> str:
+    """Bound width for ``Expanded`` rows hosted under finite ``OverflowBox`` slots."""
+    from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
+        _find_matching_paren,
+    )
+
+    updated = source
+    pos = 0
+    while True:
+        idx = updated.find(_OVERFLOWBOX_MARKER, pos)
+        if idx < 0:
+            return updated
+        open_paren = updated.find("(", idx)
+        end = _find_matching_paren(updated, open_paren)
+        if end is None:
+            return updated
+        expr = updated[idx : end + 1]
+        max_width = _extract_overflowbox_finite_max_width(expr)
+        if max_width is not None and "Expanded(" in expr:
+            repaired = _pin_height_only_sizedbox_width_in_subtree(expr, max_width)
+            if repaired != expr:
+                updated = updated[:idx] + repaired + updated[end + 1 :]
+                pos = idx + len(repaired)
+                continue
+        pos = end + 1
 
 
 def _repair_flex_parent_data_descend(widget: str) -> str:

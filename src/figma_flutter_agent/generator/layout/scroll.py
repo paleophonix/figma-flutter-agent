@@ -325,7 +325,7 @@ def wrap_flex_auto_layout_padding(
 
 def horizontal_scroll_item_carrier(stack: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return the overflow flex child that carries items for a horizontal scroll host."""
-    if stack.scroll_axis != "horizontal":
+    if not _stack_supports_horizontal_item_scroll(stack):
         return None
     host_w = stack.sizing.width
     if (host_w is None or float(host_w) <= 0) and stack.stack_placement is not None:
@@ -346,6 +346,32 @@ def horizontal_scroll_item_carrier(stack: CleanDesignTreeNode) -> CleanDesignTre
         if best is None or span > best[0]:
             best = (span, child)
     return best[1] if best else None
+
+
+def _stack_supports_horizontal_item_scroll(stack: CleanDesignTreeNode) -> bool:
+    """Return True when a stack should emit a horizontal item carrier."""
+    if stack.scroll_axis == "horizontal":
+        return True
+    if stack.scroll_axis not in {"none", "vertical"}:
+        return False
+    host_w = stack.sizing.width
+    if (host_w is None or float(host_w) <= 0) and stack.stack_placement is not None:
+        host_w = stack.stack_placement.width
+    if host_w is None or float(host_w) <= 0:
+        return False
+    host_w = float(host_w)
+    from figma_flutter_agent.parser.interaction.product import horizontal_scroll_product_tile
+
+    for child in stack.children:
+        if child.type not in {NodeType.ROW, NodeType.COLUMN}:
+            continue
+        child_w = child.sizing.width
+        if child_w is None or float(child_w) <= host_w + 0.5:
+            continue
+        product_like = sum(1 for item in child.children if horizontal_scroll_product_tile(item))
+        if product_like >= 2:
+            return True
+    return False
 
 
 def scroll_axis_for_list(node: CleanDesignTreeNode) -> ScrollAxis | None:

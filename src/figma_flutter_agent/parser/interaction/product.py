@@ -249,6 +249,47 @@ _DETAIL_HERO_BANNER_MIN_ASPECT = 1.2
 _DETAIL_HERO_BANNER_MAX_ASPECT = 3.0
 
 
+def _stack_hosts_horizontal_product_carrier_row(node: CleanDesignTreeNode) -> bool:
+    """Return True when a stack hosts a wide multi-tile product row (carousel body)."""
+    from figma_flutter_agent.schemas import NodeType
+
+    if node.type != NodeType.STACK:
+        return False
+    host_w = node.sizing.width
+    if (host_w is None or float(host_w) <= 0) and node.stack_placement is not None:
+        host_w = node.stack_placement.width
+    if host_w is None or float(host_w) <= 0:
+        return False
+    host_w = float(host_w)
+    for child in node.children:
+        if child.type not in {NodeType.ROW, NodeType.COLUMN}:
+            continue
+        child_w = child.sizing.width
+        if child_w is None or float(child_w) <= host_w + 0.5:
+            continue
+        product_like = sum(1 for item in child.children if horizontal_scroll_product_tile(item))
+        if product_like >= 2:
+            return True
+    return False
+
+
+def horizontal_scroll_product_tile(node: CleanDesignTreeNode) -> bool:
+    """Return True when a flex child looks like a catalog/product tile."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        card_has_edge_to_edge_hero_stack,
+    )
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_stack_category_component_tile,
+    )
+    from figma_flutter_agent.schemas import NodeType
+
+    if node.type == NodeType.CARD:
+        return True
+    if layout_fact_stack_category_component_tile(node):
+        return True
+    return card_has_edge_to_edge_hero_stack(node)
+
+
 def layout_fact_stack_detail_hero_banner_host(node: CleanDesignTreeNode) -> bool:
     """Wide product-detail hero hosts (raster or vector background)."""
     from .icons import layout_fact_stack_category_component_tile
@@ -256,6 +297,8 @@ def layout_fact_stack_detail_hero_banner_host(node: CleanDesignTreeNode) -> bool
     if layout_fact_stack_product_purchase_footer_panel(node):
         return False
     if node.scroll_axis == "horizontal":
+        return False
+    if _stack_hosts_horizontal_product_carrier_row(node):
         return False
     if node.type != NodeType.STACK:
         return False

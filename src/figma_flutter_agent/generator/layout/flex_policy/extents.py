@@ -113,6 +113,7 @@ def post_flex_layout_slot_extents(
         column_hosts_product_card_stepper,
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
+        _column_child_keeps_intrinsic_width,
         layout_fact_row_product_card_price_footer_row,
     )
     from figma_flutter_agent.generator.layout.flex_policy.stack import _bound_stack_sized_box
@@ -159,6 +160,13 @@ def post_flex_layout_slot_extents(
         working = column_center_hug_child_wrap(parent_node, node, working)
     if parent_type == NodeType.COLUMN and button_hosts_status_pill(node):
         working = f"Align(alignment: Alignment.center, child: {working})"
+    if (
+        parent_type == NodeType.COLUMN
+        and parent_node is not None
+        and _column_child_keeps_intrinsic_width(node, parent_node)
+        and not working.lstrip().startswith("Align(")
+    ):
+        working = f"Align(alignment: Alignment.centerLeft, child: {working})"
     if parent_type == NodeType.WRAP and horizontal_chip_button_should_hug_width(node):
         working = f"IntrinsicWidth(child: {working})"
     from figma_flutter_agent.generator.layout.navigation.items import (

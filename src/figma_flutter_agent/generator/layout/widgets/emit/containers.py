@@ -495,9 +495,15 @@ def render_card(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, 
         elif decoration is not None and node.style.effects:
             widget = f"Container(decoration: {decoration}, child: {body})"
         else:
+            card_surface = (
+                f"color: Color({node.style.background_color}), "
+                if node.style.background_color
+                else "color: Colors.transparent, "
+            )
             widget = (
                 f"Card("
                 f"elevation: {elevation}, "
+                f"{card_surface}"
                 f"shape: RoundedRectangleBorder(borderRadius: {radius}), "
                 f"child: Padding("
                 f"padding: const EdgeInsets.all(AppSpacing.md), "
