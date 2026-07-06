@@ -1,0 +1,47 @@
+{
+  "cacheKey": "973f3ff7a2104ae231f09327988b0a62ede1a38b08188dbaec5bea2c29cc711c",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "2399:42788",
+        "widgetName": "subscriptionPlanOption",
+        "reason": "Three stacked plan rows share the same card-like structure with duration, total price, per-month price, and a badge/check indicator; only the labels and prices change.",
+        "confidence": 0.98,
+        "suggestedParams": [
+          "durationLabel",
+          "totalPriceLabel",
+          "monthlyPriceLabel",
+          "badgeLabel",
+          "isSelected"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2399:42801",
+            "2399:42812"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "paywall subscription plan selector item"
+        }
+      },
+      {
+        "nodeId": "2399:42838",
+        "widgetName": "paywallActionButton",
+        "reason": "This button family is repeated in the bottom action area with the same component reference and similar layout, differing mainly by label and height; it can be normalized into one reusable CTA widget.",
+        "confidence": 0.86,
+        "suggestedParams": [
+          "label",
+          "subLabel",
+          "buttonHeight",
+          "styleVariant"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2399:42839"
+          ],
+          "shapeSimilarity": 0.93,
+          "semanticRole": "secondary/tertiary paywall action button"
+        }
+      }
+    ]
+  }
+}

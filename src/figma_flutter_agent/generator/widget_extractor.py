@@ -9,10 +9,15 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.compiler.m3_policy import M3Policy
-from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
+from figma_flutter_agent.generator.cluster_variants import (
+    collect_cluster_vector_variants,
+)
 from figma_flutter_agent.generator.layout import render_node_body, render_widget_file
 from figma_flutter_agent.generator.layout.common import to_pascal_case, to_snake_case
-from figma_flutter_agent.generator.widget_models import ClusterWidgetResult, ClusterWidgetSpec
+from figma_flutter_agent.generator.widget_models import (
+    ClusterWidgetResult,
+    ClusterWidgetSpec,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
@@ -82,7 +87,9 @@ _GENERIC_CLUSTER_LABELS = frozenset(
 )
 
 
-def _widget_class_name(node: CleanDesignTreeNode, cluster_id: str, widget_suffix: str) -> str:
+def _widget_class_name(
+    node: CleanDesignTreeNode, cluster_id: str, widget_suffix: str
+) -> str:
     label = _cluster_label(node)
     normalized = (to_pascal_case(label) or "").lower()
     stem = normalized.removesuffix("widget")
@@ -113,7 +120,9 @@ def _representative_score(node: CleanDesignTreeNode) -> int:
     return 50
 
 
-def cluster_has_top_level_usage(trees: list[CleanDesignTreeNode], cluster_id: str) -> bool:
+def cluster_has_top_level_usage(
+    trees: list[CleanDesignTreeNode], cluster_id: str
+) -> bool:
     """Return True when a cluster member is a direct child of a screen root node."""
     for tree in trees:
         for child in tree.children:
@@ -192,7 +201,9 @@ def collect_cluster_widget_specs(
     specs: list[ClusterWidgetSpec] = []
     from figma_flutter_agent.generator.variant_topology import compare_variant_topology
 
-    def _topology_groups(nodes: list[CleanDesignTreeNode]) -> list[list[CleanDesignTreeNode]]:
+    def _topology_groups(
+        nodes: list[CleanDesignTreeNode],
+    ) -> list[list[CleanDesignTreeNode]]:
         groups: list[list[CleanDesignTreeNode]] = []
         for node in nodes:
             matched = False
@@ -298,7 +309,9 @@ def _collect_component_family_widget_specs(
             continue
         if cluster_key in existing_cluster_ids:
             continue
-        if component_id and _component_family_already_extracted(component_id, existing_cluster_ids):
+        if component_id and _component_family_already_extracted(
+            component_id, existing_cluster_ids
+        ):
             continue
         from figma_flutter_agent.parser.interaction import (
             layout_fact_hosts_compact_checkbox_control,
@@ -427,7 +440,9 @@ def render_cluster_widgets(
         compare_definition_key_shadow,
     )
 
-    policy: M3Policy = m3_policy if isinstance(m3_policy, M3Policy) else DEFAULT_M3_POLICY
+    policy: M3Policy = (
+        m3_policy if isinstance(m3_policy, M3Policy) else DEFAULT_M3_POLICY
+    )
     plan = ClusterExtractionPlan.from_specs_and_trees(specs, clean_trees or [])
 
     if policy.shadow_enabled("definition_key"):
@@ -513,13 +528,13 @@ def render_cluster_widgets(
         widget_fields = ""
         constructor_params = "{super.key}"
         if chip_cluster:
-            default_label, _default_selected = chip_label_widget_defaults(representative)
+            default_label, _default_selected = chip_label_widget_defaults(
+                representative
+            )
             body = parameterize_chip_label_widget_body(body, default_label)
             body = parameterize_chip_hug_width_widget_body(body)
             widget_fields = "  final String label;\n  final bool isSelected;\n\n"
-            constructor_params = (
-                f"{{super.key, this.label = '{default_label}', this.isSelected = false}}"
-            )
+            constructor_params = f"{{super.key, this.label = '{default_label}', this.isSelected = false}}"
         elif variant is not None:
             widget_fields = f"  final bool {variant.param_name};\n\n"
             constructor_params = f"{{super.key, this.{variant.param_name} = true}}"
@@ -568,7 +583,9 @@ def render_cluster_widgets(
             widget_fields=widget_fields,
             constructor_params=constructor_params,
         )
-        ensure_widget_file_no_parent_data_root(widget_source, widget_name=spec.class_name)
+        ensure_widget_file_no_parent_data_root(
+            widget_source, widget_name=spec.class_name
+        )
         files[path] = widget_source
     return ClusterWidgetResult(files=files, cluster_classes=cluster_classes)
 
@@ -704,7 +721,9 @@ def refresh_cluster_widget_planned_files(
             _is_shrink_only_widget_source(existing)
             or _is_self_referential_widget_build(existing, spec.class_name)
             or _is_foreign_delegate_widget_build(existing, spec.class_name)
-            or icon_badge_planned_widget_needs_rematerialization(spec.representative, existing)
+            or icon_badge_planned_widget_needs_rematerialization(
+                spec.representative, existing
+            )
         ):
             to_render.append(spec)
 
@@ -741,7 +760,9 @@ def refresh_cluster_widget_planned_files(
     return merged
 
 
-def _collect_icon_badge_stack_nodes(root: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+def _collect_icon_badge_stack_nodes(
+    root: CleanDesignTreeNode,
+) -> list[CleanDesignTreeNode]:
     """Return every icon-badge stack subtree under ``root``."""
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         layout_fact_icon_badge_stack,
@@ -805,7 +826,9 @@ def refresh_stale_icon_badge_planned_widget_files(
     refreshed = 0
     for path, existing in planned.items():
         normalized = path.replace("\\", "/")
-        if not normalized.startswith("lib/widgets/") or not normalized.endswith(".dart"):
+        if not normalized.startswith("lib/widgets/") or not normalized.endswith(
+            ".dart"
+        ):
             continue
         content = (existing or "").strip()
         if not content:

@@ -2,6 +2,22 @@ version: 1
 family_id: paint_surface_omit_without_transfer
 generated: true
 cases:
+- case_id: 2026-07-06-button-surface-paint-not-transferred-ink-occluded
+  case_file: 
+    cases/2026-07-06-button-surface-paint-not-transferred-ink-occluded.yaml
+  title: Button surface paint kept on opaque inner child, occluding InkWell and 
+    radius
+  project: test
+  feature: rep_edit_profile
+  occurrence_id: rep-edit-profile-save-button-paint-transfer
+  status: OPEN
+  observed_at: '2026-07-06'
+  created_at: '2026-07-06T14:05:00Z'
+  updated_at: '2026-07-06T14:05:00Z'
+  summary: 'The primary action button (node 2112:20299) emits a double surface: the
+    outer host Container/Material has borderRadius 25 and no fill and wraps the InkWell,
+    while a nested SaveButtonContentWidget paints an opaque white fill with borderRadius
+    12 at width 350 inside the 345 host...'
 - case_id: 2026-07-05-button-surface-omit-without-transfer
   case_file: cases/2026-07-05-button-surface-omit-without-transfer.yaml
   title: Button stack must not drop full-cover card surface without paint 
