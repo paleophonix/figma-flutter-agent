@@ -1,19 +1,18 @@
 {
-  "cacheKey": "469996dc3fcb80a1a5eba16b9e0ec1b3cf7a6243834c411e78f7d756d1416cc8",
+  "cacheKey": "25185174fc01bda9b7e28af4a604d881b32ae1890e7b3315699f106432965a42",
   "response": {
     "candidates": [
       {
         "nodeId": "4408:44896",
-        "widgetName": "OrderProductCard",
-        "reason": "Repeated order-item card pattern with image, title, optional details, and quantity controls across multiple instances.",
-        "confidence": 0.98,
+        "widgetName": "OrderProductItem",
+        "reason": "Repeated order-item card with image, title/price area, optional description, quantity controls, and divider; appears as a shared component across multiple product rows.",
+        "confidence": 0.97,
         "suggestedParams": [
           "title",
-          "price",
-          "description",
-          "imageUrl",
+          "priceText",
+          "descriptionText",
           "quantity",
-          "showStepper"
+          "showDivider"
         ],
         "evidence": {
           "similarNodes": [
@@ -22,21 +21,18 @@
             "4408:44901",
             "4408:44902"
           ],
-          "shapeSimilarity": 0.97,
-          "semanticRole": "order item card"
+          "shapeSimilarity": 0.96,
+          "semanticRole": "Order product list item"
         }
       },
       {
         "nodeId": "I4408:44896;1154:7849",
         "widgetName": "QuantityStepper",
-        "reason": "Repeated plus/minus quantity control inside order product cards, with only the count changing between instances.",
-        "confidence": 0.97,
+        "reason": "The minus/plus/count control is repeated across order items and the cutlery row, making it a clear reusable input-style widget.",
+        "confidence": 0.95,
         "suggestedParams": [
-          "count",
-          "minCount",
-          "maxCount",
-          "allowIncrement",
-          "allowDecrement"
+          "quantity",
+          "isDarkVariant"
         ],
         "evidence": {
           "similarNodes": [
@@ -44,22 +40,21 @@
             "I4408:44898;1154:7849",
             "I4408:44904;1154:8077"
           ],
-          "shapeSimilarity": 0.99,
-          "semanticRole": "quantity selector"
+          "shapeSimilarity": 0.98,
+          "semanticRole": "Quantity adjustment control"
         }
       },
       {
         "nodeId": "4408:44914",
         "widgetName": "ProductSmallCard",
-        "reason": "Horizontal product tile repeats as a small card family with title, image/illustration, price or promo price, and add action variants.",
+        "reason": "Small product card family repeats with multiple variants (add, default, promo) but the same underlying layout: title, image/illustration, gradient strip, and action/price area.",
         "confidence": 0.96,
         "suggestedParams": [
           "title",
-          "price",
-          "oldPrice",
-          "ctaLabel",
-          "showPrice",
-          "showCta"
+          "priceText",
+          "oldPriceText",
+          "actionLabel",
+          "variant"
         ],
         "evidence": {
           "similarNodes": [
@@ -67,33 +62,38 @@
             "4408:44916"
           ],
           "shapeSimilarity": 0.94,
-          "semanticRole": "swipeable product tile"
+          "semanticRole": "Compact product carousel card"
+        }
+      },
+      {
+        "nodeId": "4408:44917",
+        "widgetName": "BottomActionBar",
+        "reason": "Bottom-sheet action area with a primary button and home indicator, structurally reusable as a bottom CTA bar.",
+        "confidence": 0.88,
+        "suggestedParams": [
+          "buttonText"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 0.82,
+          "semanticRole": "Primary bottom action footer"
         }
       },
       {
         "nodeId": "4408:44903",
         "widgetName": "ActionCard",
-        "reason": "Icon + title + trailing arrow CTA card is a reusable action entry pattern, even though only one instance is present here.",
-        "confidence": 0.69,
+        "reason": "Navigation/action card with leading icon, title text, trailing arrow, and divider; matches a reusable settings-style action row/card pattern.",
+        "confidence": 0.86,
         "suggestedParams": [
-          "icon",
           "title",
-          "trailingIcon",
-          "isActive"
+          "iconName",
+          "showDivider"
         ],
-        "evidence": null
-      },
-      {
-        "nodeId": "4408:44917",
-        "widgetName": "BottomAddBar",
-        "reason": "Modal footer CTA bar combines a primary button with the home indicator, suitable as a reusable bottom action bar.",
-        "confidence": 0.66,
-        "suggestedParams": [
-          "buttonLabel",
-          "isEnabled",
-          "showHomeIndicator"
-        ],
-        "evidence": null
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 0.85,
+          "semanticRole": "Tap-through action card"
+        }
       }
     ]
   }

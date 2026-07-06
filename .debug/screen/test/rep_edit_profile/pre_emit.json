@@ -172,7 +172,26 @@
                     {
                       "figmaId": "I2007:14637;574:31016;8:2208",
                       "kind": "row",
-                      "children": []
+                      "children": [
+                        {
+                          "figmaId": "I2007:14637;574:31016;8:2208;8:2205",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "I2007:14637;574:31016;8:2208;8:1929",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "I2007:14637;574:31016;8:2208;8:1929;8:1912",
+                                  "kind": "text",
+                                  "children": [],
+                                  "wrap": "flexibleLoose"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "isMultiline": false,
@@ -206,7 +225,7 @@
                 },
                 {
                   "figmaId": "I2007:14824;574:31032",
-                  "kind": "input_text_field",
+                  "kind": "input_dropdown",
                   "children": [
                     {
                       "figmaId": "I2007:14824;574:31032;8:2208",
@@ -244,13 +263,11 @@
                       ]
                     }
                   ],
-                  "isMultiline": false,
                   "payload": {
-                    "payloadKind": "input_text_field",
-                    "isMultiline": false
+                    "payloadKind": "input_dropdown"
                   },
                   "fidelityTier": "native_unverified",
-                  "tierSource": "manifest"
+                  "tierSource": "policy_fallback"
                 }
               ]
             },
@@ -324,7 +341,7 @@
                 },
                 {
                   "figmaId": "I2007:14854;574:31032",
-                  "kind": "input_text_field",
+                  "kind": "input_dropdown",
                   "children": [
                     {
                       "figmaId": "I2007:14854;574:31032;8:2208",
@@ -351,18 +368,22 @@
                         {
                           "figmaId": "I2007:14854;574:31032;8:2208;8:2200",
                           "kind": "stack",
-                          "children": []
+                          "children": [
+                            {
+                              "figmaId": "I2007:14854;574:31032;8:2208;8:2200;1270:26161",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
                         }
                       ]
                     }
                   ],
-                  "isMultiline": false,
                   "payload": {
-                    "payloadKind": "input_text_field",
-                    "isMultiline": false
+                    "payloadKind": "input_dropdown"
                   },
                   "fidelityTier": "native_unverified",
-                  "tierSource": "manifest"
+                  "tierSource": "policy_fallback"
                 }
               ]
             },
@@ -398,7 +419,13 @@
                     {
                       "figmaId": "2007:14898",
                       "kind": "stack",
-                      "children": []
+                      "children": [
+                        {
+                          "figmaId": "I2007:14898;1270:26327",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
                     }
                   ],
                   "payload": {
@@ -430,7 +457,7 @@
                 },
                 {
                   "figmaId": "I2007:14945;574:31032",
-                  "kind": "input_text_field",
+                  "kind": "input_dropdown",
                   "children": [
                     {
                       "figmaId": "I2007:14945;574:31032;8:2208",
@@ -457,18 +484,22 @@
                         {
                           "figmaId": "I2007:14945;574:31032;8:2208;8:2200",
                           "kind": "stack",
-                          "children": []
+                          "children": [
+                            {
+                              "figmaId": "I2007:14945;574:31032;8:2208;8:2200;1270:26161",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
                         }
                       ]
                     }
                   ],
-                  "isMultiline": false,
                   "payload": {
-                    "payloadKind": "input_text_field",
-                    "isMultiline": false
+                    "payloadKind": "input_dropdown"
                   },
                   "fidelityTier": "native_unverified",
-                  "tierSource": "manifest"
+                  "tierSource": "policy_fallback"
                 }
               ]
             },
@@ -504,7 +535,13 @@
                     {
                       "figmaId": "2007:14952",
                       "kind": "stack",
-                      "children": []
+                      "children": [
+                        {
+                          "figmaId": "I2007:14952;1270:26327",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
                     }
                   ],
                   "payload": {
@@ -722,8 +759,25 @@
                                         },
                                         {
                                           "figmaId": "I2237:17339;53:4482;8:2231;8:2208;8:2196",
-                                          "kind": "row",
-                                          "children": []
+                                          "kind": "control_segmented",
+                                          "children": [
+                                            {
+                                              "figmaId": "I2237:17339;53:4482;8:2231;8:2208;8:2196;8:1973",
+                                              "kind": "container",
+                                              "children": []
+                                            },
+                                            {
+                                              "figmaId": "I2237:17339;53:4482;8:2231;8:2208;8:2196;8:1955",
+                                              "kind": "text",
+                                              "children": [],
+                                              "wrap": "flexibleLoose"
+                                            }
+                                          ],
+                                          "payload": {
+                                            "payloadKind": "control_segmented"
+                                          },
+                                          "fidelityTier": "native_unverified",
+                                          "tierSource": "policy_fallback"
                                         }
                                       ]
                                     }
@@ -792,7 +846,13 @@
                             {
                               "figmaId": "I2237:17331;119:6106",
                               "kind": "stack",
-                              "children": []
+                              "children": [
+                                {
+                                  "figmaId": "I2237:17331;119:6106;119:6112",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
                             }
                           ],
                           "payload": {
@@ -833,7 +893,7 @@
                 },
                 {
                   "figmaId": "I2236:16524;574:31032",
-                  "kind": "input_text_field",
+                  "kind": "input_dropdown",
                   "children": [
                     {
                       "figmaId": "I2236:16524;574:31032;8:2208",
@@ -860,18 +920,22 @@
                         {
                           "figmaId": "I2236:16524;574:31032;8:2208;8:2200",
                           "kind": "stack",
-                          "children": []
+                          "children": [
+                            {
+                              "figmaId": "I2236:16524;574:31032;8:2208;8:2200;1270:26161",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
                         }
                       ]
                     }
                   ],
-                  "isMultiline": false,
                   "payload": {
-                    "payloadKind": "input_text_field",
-                    "isMultiline": false
+                    "payloadKind": "input_dropdown"
                   },
                   "fidelityTier": "native_unverified",
-                  "tierSource": "manifest"
+                  "tierSource": "policy_fallback"
                 }
               ]
             },
@@ -907,7 +971,13 @@
                     {
                       "figmaId": "2310:16312",
                       "kind": "stack",
-                      "children": []
+                      "children": [
+                        {
+                          "figmaId": "I2310:16312;1270:26327",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
                     }
                   ],
                   "payload": {
@@ -1087,7 +1157,9 @@
       "I2007:14924;574:31016": "default",
       "I2007:14924;574:31016;8:2208": "default",
       "I2007:14924;574:31016;8:2208;8:1929": "default",
-      "2310:16386": "default"
+      "2310:16386": "default",
+      "I2007:14637;574:31016;8:2208;8:1929": "default",
+      "I2237:17339;53:4482;8:2231;8:2208;8:2196;8:1973": "default"
     },
     "adaptiveRules": [],
     "semanticSummary": {

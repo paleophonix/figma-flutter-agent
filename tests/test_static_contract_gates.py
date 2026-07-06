@@ -87,6 +87,33 @@ class HeaderWidget extends StatelessWidget {
         run_static_contract_gates(planned)
 
 
+def test_nested_flex_parent_data_gate_flags_flexible_inside_expanded() -> None:
+    from figma_flutter_agent.generator.dart.static_contract_gates import (
+        find_nested_flex_parent_data_wrappers,
+    )
+
+    planned = {
+        "lib/widgets/paywall_status_bar_widget.dart": """
+class PaywallStatusBarWidget extends StatelessWidget {
+  const PaywallStatusBarWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Expanded(child: SizedBox(child: Stack(children: [
+        Row(children: [
+          Flexible(fit: FlexFit.loose, flex: 0, child: Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(child: Text('9:30')))),
+        ]),
+      ]))),
+    ]);
+  }
+}
+""",
+    }
+    violations = find_nested_flex_parent_data_wrappers(planned)
+    assert violations
+    assert "paywall_status_bar_widget.dart" in violations[0]
+
+
 def test_reconcile_repairs_nested_flex_before_static_gate() -> None:
     planned = {
         "lib/widgets/header_widget.dart": """

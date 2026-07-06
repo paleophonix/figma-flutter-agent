@@ -1,109 +1,99 @@
 {
-  "cacheKey": "e27d6c441df4838c3eb4f35842274092707350de6a97bf40ee1ac1ea2e74949e",
+  "cacheKey": "7aa3d921c67f9ce8920af3ddb10b08706b14a5f60be88269ce1d07a00ca0fe9d",
   "response": {
     "candidates": [
       {
         "nodeId": "2007:14635",
-        "widgetName": "ProfileFormField",
-        "reason": "Repeated label-plus-input form field pattern appears across multiple profile rows, with consistent spacing and optional trailing dropdown icon.",
+        "widgetName": "ProfileTextField",
+        "reason": "Repeated label+input form field used for plain text entries; the same structure appears multiple times with only label/value changes.",
         "confidence": 0.98,
         "suggestedParams": [
           "labelText",
-          "valueText",
-          "showTrailingIcon"
+          "valueText"
         ],
         "evidence": {
           "similarNodes": [
             "2007:14635",
             "2007:14637",
-            "2007:14824",
-            "2007:14854",
             "2007:14903",
-            "2007:14924",
-            "2236:16524"
+            "2007:14924"
           ],
           "shapeSimilarity": 0.99,
-          "semanticRole": "profile form field"
+          "semanticRole": "profile form text input"
         }
       },
       {
-        "nodeId": "2237:17339",
-        "widgetName": "CommissionRangeSelector",
-        "reason": "Composite control combines a label, paired value inputs, unit suffix, and a range slider, making it a good reusable selection widget.",
-        "confidence": 0.9,
+        "nodeId": "2007:14824",
+        "widgetName": "ProfileDropdownField",
+        "reason": "Repeated select-style field with label, value, and trailing dropdown icon; same pattern is reused across several profile settings rows.",
+        "confidence": 0.95,
         "suggestedParams": [
           "labelText",
-          "leftValueText",
-          "rightValueText",
-          "unitLabel"
+          "valueText"
         ],
         "evidence": {
           "similarNodes": [
-            "2237:17339",
-            "I2237:17339;53:4467",
-            "I2237:17339;53:4482",
-            "2237:17331"
+            "2007:14824",
+            "2007:14854",
+            "2236:16524"
           ],
-          "shapeSimilarity": 0.93,
-          "semanticRole": "labeled range selection control"
-        }
-      },
-      {
-        "nodeId": "2237:17331",
-        "widgetName": "RangeSliderControl",
-        "reason": "Standalone dual-thumb slider control is repeated as a named component and can be reused wherever a bounded range is needed.",
-        "confidence": 0.94,
-        "suggestedParams": [
-          "minValue",
-          "maxValue",
-          "leftThumbValue",
-          "rightThumbValue"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "2237:17331",
-            "I2237:17331;119:6105",
-            "I2237:17331;119:6106"
-          ],
-          "shapeSimilarity": 0.99,
-          "semanticRole": "range slider"
+          "shapeSimilarity": 0.96,
+          "semanticRole": "profile dropdown selector"
         }
       },
       {
         "nodeId": "2007:14883",
-        "widgetName": "SelectedValueChip",
-        "reason": "The removable value chip pattern repeats for selected countries/cities/languages, with the same text-plus-close layout.",
-        "confidence": 0.89,
+        "widgetName": "RemovableValueChip",
+        "reason": "Compact selected-value chip with text and a close icon repeated for different chosen items; text changes but layout stays the same.",
+        "confidence": 0.94,
         "suggestedParams": [
-          "labelText",
-          "onRemove"
+          "labelText"
         ],
         "evidence": {
           "similarNodes": [
             "2007:14883",
             "2007:14894",
+            "2007:14947",
             "2310:16307"
           ],
-          "shapeSimilarity": 0.97,
-          "semanticRole": "selected tag chip"
+          "shapeSimilarity": 0.92,
+          "semanticRole": "selected value chip"
+        }
+      },
+      {
+        "nodeId": "2237:17339",
+        "widgetName": "CommissionRangeSelector",
+        "reason": "Compound range control combining two numeric inputs and a slider; it is a cohesive reusable control rather than a simple layout wrapper.",
+        "confidence": 0.84,
+        "suggestedParams": [
+          "labelText",
+          "minValue",
+          "maxValue",
+          "unitText"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2237:17339",
+            "2237:17331"
+          ],
+          "shapeSimilarity": 0.88,
+          "semanticRole": "range selection form control"
         }
       },
       {
         "nodeId": "2112:20299",
         "widgetName": "PrimaryActionButton",
-        "reason": "Full-width primary action button is a reusable CTA pattern and is already defined as a component instance on the screen.",
-        "confidence": 0.97,
+        "reason": "Prominent primary action button at the bottom of the form; useful as a shared CTA component even though it appears once on this screen.",
+        "confidence": 0.7,
         "suggestedParams": [
-          "label",
-          "isEnabled",
-          "onPressed"
+          "buttonText"
         ],
         "evidence": {
           "similarNodes": [
             "2112:20299"
           ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "primary screen action button"
+          "shapeSimilarity": 0.9,
+          "semanticRole": "primary form submission button"
         }
       }
     ]

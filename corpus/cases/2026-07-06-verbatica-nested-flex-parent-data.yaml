@@ -1,0 +1,68 @@
+version: 1
+
+case:
+  id: 2026-07-06-verbatica-nested-flex-parent-data
+  title: Status bar time text double-wrapped in nested Flexible parent data
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-06
+  created_at: '2026-07-06T19:45:00Z'
+  updated_at: '2026-07-06T19:45:00Z'
+  summary: >
+    LAW-FLEX-PARENT-DATA-IDEMPOTENT — compiler flex policy and LLM IR flexibleLoose
+    wrap both applied to status-bar time TEXT, emitting Flexible(Flexible(...)) inside
+    PaywallStatusBarWidget; static gate scan skipped nested wrappers inside Expanded.
+
+occurrences:
+  - id: verbatica-paywall-status-bar-double-flexible
+    family_id: nested_flex_parent_data_wrapper
+    pipeline_arrow: A3
+    law_id: LAW-FLEX-PARENT-DATA-IDEMPOTENT
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/ir/expression.py
+      symbol: apply_ir_wrap
+    contract:
+      field: flex_parent_data_wrapper
+      field_class: intent
+      category: illegal
+      expected: >
+        At most one Expanded/Flexible parent-data wrapper per emitted flex child;
+        IR wrap must not duplicate compiler flex policy; gate and repair must detect
+        nested flex inside outer Expanded/Stack subtrees.
+      actual: >
+        apply_ir_wrap added Flexible over compiler-wrapped Flexible for I2399:42783
+        time TEXT; find_nested_flex_parent_data_wrappers scanned only top-level flex
+        spans and missed Flexible(Flexible) inside Expanded.
+    authority_boundary: emitter
+    evidence:
+      - kind: debug_artifact
+        path: apps/test/lib/widgets/paywall_status_bar_widget.dart
+        summary: >
+          Flexible(fit: FlexFit.loose, flex: 0, child: Flexible(... Text('9:30')))
+          causes ParentDataWidget runtime assert and blank preview.
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/llm_validated.json
+        summary: >
+          widgetIr wrap flexibleLoose on I2399:42783;266:1499;266:1641 while flex
+          policy also resolves FLEXIBLE_LOOSE for ROW TEXT child.
+    repair:
+      summary: >
+        Dedup flex wraps in apply_ir_wrap when child already carries Expanded/Flexible;
+        recurse flex-wrapper bodies in collect_nested_flex_parent_data_spans so gate
+        and repair_nested_flex_parent_data_in_source catch nested pairs.
+      changed_files:
+        - src/figma_flutter_agent/generator/ir/expression.py
+        - src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
+        - src/figma_flutter_agent/generator/dart/static_contract_gates.py
+      regression_tests:
+        - tests/test_layout_flex_policy.py::test_apply_ir_wrap_skips_duplicate_flexible_loose
+        - tests/test_static_contract_gates.py::test_nested_flex_parent_data_gate_flags_flexible_inside_expanded
+        - tests/test_flex_padding_emit.py::test_repair_nested_flex_parent_data_in_source_repairs_paywall_status_bar_pattern
+      verification:
+        - poetry run pytest tests/test_layout_flex_policy.py::test_apply_ir_wrap_skips_duplicate_flexible_loose tests/test_static_contract_gates.py::test_nested_flex_parent_data_gate_flags_flexible_inside_expanded tests/test_flex_padding_emit.py::test_repair_nested_flex_parent_data_in_source_repairs_paywall_status_bar_pattern tests/test_static_contract_gates.py::test_nested_flex_parent_data_gate_flags_flexible_expanded tests/test_flex_padding_emit.py::test_repair_nested_flex_parent_data_in_source_repairs_row_child -q

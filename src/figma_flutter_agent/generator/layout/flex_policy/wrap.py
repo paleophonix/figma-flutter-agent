@@ -329,6 +329,54 @@ def _collapse_adjacent_flex_parent_data(widget: str) -> str:
 _FLEX_PARENT_DATA_START_RE = re.compile(r"\b(?:const\s+)?(?:Expanded|Flexible)\s*\(")
 
 
+def collect_nested_flex_parent_data_spans(
+    segment: str,
+    *,
+    base_offset: int = 0,
+) -> list[int]:
+    """Collect start offsets of flex wrappers whose direct child is also flex.
+
+    Walks into flex-wrapper bodies so nested ``Expanded``/``Flexible`` pairs buried
+    under ``SizedBox``/``Stack``/``Row`` are detected (not only file-top wrappers).
+    """
+    from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
+        _find_matching_paren,
+    )
+
+    violations: list[int] = []
+    pos = 0
+    while pos < len(segment):
+        match = _FLEX_PARENT_DATA_START_RE.search(segment, pos)
+        if match is None:
+            break
+        start = match.start()
+        expr_start = start - 6 if start >= 6 and segment[start - 6 : start] == "const " else start
+        open_paren = segment.find("(", expr_start)
+        if open_paren < 0:
+            pos = start + 1
+            continue
+        end = _find_matching_paren(segment, open_paren)
+        if end is None:
+            pos = start + 1
+            continue
+        expr = segment[expr_start : end + 1]
+        outer = _unwrap_flex_parent_data_wrapper(expr.strip())
+        if outer is not None:
+            _marker, inner = outer
+            if _unwrap_flex_parent_data_wrapper(inner.strip()) is not None:
+                violations.append(base_offset + expr_start)
+            inner_offset = expr.find(inner)
+            if inner_offset >= 0:
+                violations.extend(
+                    collect_nested_flex_parent_data_spans(
+                        inner,
+                        base_offset=base_offset + expr_start + inner_offset,
+                    )
+                )
+        pos = start + 1
+    return violations
+
+
 def repair_nested_flex_parent_data_in_source(source: str) -> str:
     """Strip nested ``Expanded``/``Flexible`` wrappers anywhere in a Dart source."""
     from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
@@ -336,31 +384,22 @@ def repair_nested_flex_parent_data_in_source(source: str) -> str:
     )
 
     updated = source
-    pos = 0
-    while pos < len(updated):
-        match = _FLEX_PARENT_DATA_START_RE.search(updated, pos)
-        if match is None:
-            break
-        start = match.start()
-        if start >= 6 and updated[start - 6 : start] == "const ":
-            start -= 6
+    while True:
+        spans = collect_nested_flex_parent_data_spans(updated)
+        if not spans:
+            return updated
+        start = spans[0]
         open_paren = updated.find("(", start)
         if open_paren < 0:
-            pos = match.end()
-            continue
+            return updated
         end = _find_matching_paren(updated, open_paren)
         if end is None:
-            pos = match.end()
-            continue
+            return updated
         expr = updated[start : end + 1]
-        outer = _unwrap_flex_parent_data_wrapper(expr.strip())
-        if outer is not None and _unwrap_flex_parent_data_wrapper(outer[1].strip()) is not None:
-            repaired = repair_flex_parent_data_order(expr.strip())
-            updated = updated[:start] + repaired + updated[end + 1 :]
-            pos = start + len(repaired)
-            continue
-        pos = end + 1
-    return updated
+        repaired = repair_flex_parent_data_order(expr.strip())
+        if repaired == expr.strip():
+            return updated
+        updated = updated[:start] + repaired + updated[end + 1 :]
 
 
 def _repair_flex_parent_data_descend(widget: str) -> str:

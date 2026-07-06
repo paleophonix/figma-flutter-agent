@@ -431,6 +431,32 @@ class HeaderWidget extends StatelessWidget {
     assert "Expanded(child: Flexible(" not in repaired
 
 
+def test_repair_nested_flex_parent_data_in_source_repairs_paywall_status_bar_pattern() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        repair_nested_flex_parent_data_in_source,
+    )
+
+    nested = (
+        "Flexible(fit: FlexFit.loose, flex: 0, child: Flexible(fit: FlexFit.loose, flex: 0, "
+        "child: SizedBox(height: 20.0, child: Text('9:30'))))"
+    )
+    source = f"""
+class PaywallStatusBarWidget extends StatelessWidget {{
+  @override
+  Widget build(BuildContext context) {{
+    return Row(children: [
+      Expanded(child: SizedBox(child: Stack(children: [
+        Row(children: [{nested}]),
+      ]))),
+    ]);
+  }}
+}}
+"""
+    repaired = repair_nested_flex_parent_data_in_source(source)
+    assert repaired.count("Flexible(fit: FlexFit.loose, flex: 0, child: Flexible") == 0
+    assert repaired.count("Flexible(") == 1
+
+
 def test_layout_slot_repaint_boundary_keeps_expanded_outside() -> None:
     from figma_flutter_agent.generator.layout.widgets import _apply_layout_slot_wraps
     from figma_flutter_agent.schemas import LayoutSlotIr, WrapKind

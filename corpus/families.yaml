@@ -579,3 +579,26 @@ families:
       descendants lack drawable assets and hydration keys mismatch leaf vs structure,
       yielding empty extracted cluster widgets and shrink-shell plan failures.
     status: active
+
+  - id: nested_flex_parent_data_wrapper
+    title: Nested Expanded or Flexible parent-data wrappers in emitted Dart
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/expression.py
+        symbol: apply_ir_wrap
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
+        symbol: collect_nested_flex_parent_data_spans
+      - module: src/figma_flutter_agent/generator/dart/static_contract_gates.py
+        symbol: find_nested_flex_parent_data_wrappers
+    law_ids:
+      - LAW-FLEX-PARENT-DATA-IDEMPOTENT
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Compiler flex policy and LLM IR wrap both apply Expanded/Flexible to the same
+      child, or nested flex wrappers survive reconcile; Flutter aborts mount with
+      competing FlexParentData at runtime.
+    status: active

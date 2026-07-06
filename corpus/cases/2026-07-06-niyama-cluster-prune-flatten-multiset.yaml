@@ -17,7 +17,7 @@ case:
 
 occurrences:
   - id: niyama-order-prune-flatten-multiset-regression
-    family_id: node_multiset_loss
+    family_id: cluster_prune_visible_paint_without_transfer
     pipeline_arrow: A4
     law_id: LAW-CLUSTER-PRUNE-PAINT-CONSERVATION
     stage: parser_dedup

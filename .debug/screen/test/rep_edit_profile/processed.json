@@ -5456,7 +5456,6 @@
                           "strokeAlign": "INSIDE",
                           "clipsContent": true
                         },
-                        "vectorAssetKey": "assets/icons/vector_I2007_14854;574_31032;8_2208;8_2200;1270_26161.svg",
                         "componentRef": "1270:26160",
                         "clusterId": "component_1270_26160",
                         "variant": {
@@ -5466,9 +5465,6 @@
                             "Style": "Outlined"
                           }
                         },
-                        "flattenFigmaNodeIds": [
-                          "I2007:14854;574:31032;8:2208;8:2200;1270:26161"
-                        ],
                         "geometryFrame": {
                           "localTransform": {
                             "tx": 228.0
@@ -5937,7 +5933,6 @@
                       "strokeAlign": "INSIDE",
                       "clipsContent": true
                     },
-                    "vectorAssetKey": "assets/icons/vector_I2007_14898;1270_26327.svg",
                     "componentRef": "1270:26326",
                     "clusterId": "component_1270_26326",
                     "variant": {
@@ -5947,9 +5942,6 @@
                         "Style": "Outlined"
                       }
                     },
-                    "flattenFigmaNodeIds": [
-                      "I2007:14898;1270:26327"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 82.0,
@@ -6536,7 +6528,6 @@
                           "strokeAlign": "INSIDE",
                           "clipsContent": true
                         },
-                        "vectorAssetKey": "assets/icons/vector_I2007_14945;574_31032;8_2208;8_2200;1270_26161.svg",
                         "componentRef": "1270:26160",
                         "clusterId": "component_1270_26160",
                         "variant": {
@@ -6546,9 +6537,6 @@
                             "Style": "Outlined"
                           }
                         },
-                        "flattenFigmaNodeIds": [
-                          "I2007:14945;574:31032;8:2208;8:2200;1270:26161"
-                        ],
                         "geometryFrame": {
                           "localTransform": {
                             "tx": 228.0
@@ -7017,7 +7005,6 @@
                       "strokeAlign": "INSIDE",
                       "clipsContent": true
                     },
-                    "vectorAssetKey": "assets/icons/vector_I2007_14952;1270_26327.svg",
                     "componentRef": "1270:26326",
                     "clusterId": "component_1270_26326",
                     "variant": {
@@ -7027,9 +7014,6 @@
                         "Style": "Outlined"
                       }
                     },
-                    "flattenFigmaNodeIds": [
-                      "I2007:14952;1270:26327"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 36.0,
@@ -8902,10 +8886,6 @@
                                           "componentId": "8:1952",
                                           "componentName": "master s_uffix"
                                         },
-                                        "flattenFigmaNodeIds": [
-                                          "I2237:17339;53:4482;8:2231;8:2208;8:2196;8:1973",
-                                          "I2237:17339;53:4482;8:2231;8:2208;8:2196;8:1955"
-                                        ],
                                         "geometryFrame": {
                                           "localTransform": {
                                             "tx": 91.0
@@ -9471,7 +9451,6 @@
                             "style": {
                               "strokeAlign": "INSIDE"
                             },
-                            "vectorAssetKey": "assets/icons/ellipse_I2237_17331;119_6106;119_6112.svg",
                             "rotation": 3.14,
                             "rotationRad": 0.05,
                             "componentRef": "119:6111",
@@ -9480,9 +9459,6 @@
                               "componentId": "119:6111",
                               "componentName": "Right-Thumb"
                             },
-                            "flattenFigmaNodeIds": [
-                              "I2237:17331;119:6106;119:6112"
-                            ],
                             "geometryFrame": {
                               "localTransform": {
                                 "tx": 79.0,
@@ -10137,7 +10113,6 @@
                           "strokeAlign": "INSIDE",
                           "clipsContent": true
                         },
-                        "vectorAssetKey": "assets/icons/vector_I2236_16524;574_31032;8_2208;8_2200;1270_26161.svg",
                         "componentRef": "1270:26160",
                         "clusterId": "component_1270_26160",
                         "variant": {
@@ -10147,9 +10122,6 @@
                             "Style": "Outlined"
                           }
                         },
-                        "flattenFigmaNodeIds": [
-                          "I2236:16524;574:31032;8:2208;8:2200;1270:26161"
-                        ],
                         "geometryFrame": {
                           "localTransform": {
                             "tx": 228.0
@@ -10618,7 +10590,6 @@
                       "strokeAlign": "INSIDE",
                       "clipsContent": true
                     },
-                    "vectorAssetKey": "assets/icons/vector_I2310_16312;1270_26327.svg",
                     "componentRef": "1270:26326",
                     "clusterId": "component_1270_26326",
                     "variant": {
@@ -10628,9 +10599,6 @@
                         "Style": "Outlined"
                       }
                     },
-                    "flattenFigmaNodeIds": [
-                      "I2310:16312;1270:26327"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 110.0,

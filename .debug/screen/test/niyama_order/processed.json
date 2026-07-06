@@ -1311,8 +1311,79 @@
                                   "componentId": "910:3249",
                                   "componentName": "Icons/28/Plus"
                                 },
-                                "flattenFigmaNodeIds": [
-                                  "I4408:44915;1356:10712;910:3253;910:3248"
+                                "children": [
+                                  {
+                                    "id": "I4408:44915;1356:10712;910:3253;910:3248",
+                                    "name": "Vector",
+                                    "type": "VECTOR",
+                                    "sizing": {
+                                      "width": 18.7,
+                                      "height": 18.7
+                                    },
+                                    "alignment": {
+                                      "cross": "stretch"
+                                    },
+                                    "style": {
+                                      "backgroundColor": "0xFF000000",
+                                      "strokeAlign": "INSIDE"
+                                    },
+                                    "accessibilityLabel": "Vector",
+                                    "layoutPositioning": "ABSOLUTE",
+                                    "stackPlacement": {
+                                      "horizontal": "SCALE",
+                                      "vertical": "SCALE",
+                                      "left": 4.7,
+                                      "top": 4.7,
+                                      "right": 4.7,
+                                      "bottom": 4.7,
+                                      "width": 18.7,
+                                      "height": 18.7
+                                    },
+                                    "geometryFrame": {
+                                      "localTransform": {
+                                        "tx": 4.66650390625,
+                                        "ty": 4.6666717529296875
+                                      },
+                                      "layoutRect": {
+                                        "x": 4.66650390625,
+                                        "y": 4.6666717529296875,
+                                        "width": 18.666664123535156,
+                                        "height": 18.666664123535156
+                                      },
+                                      "intrinsicSize": {
+                                        "width": 18.666664123535156,
+                                        "height": 18.666664123535156
+                                      },
+                                      "placementOrigin": {
+                                        "x": 4.7,
+                                        "y": 4.7
+                                      },
+                                      "placementAabb": {
+                                        "x": 4.7,
+                                        "y": 4.7,
+                                        "width": 18.7,
+                                        "height": 18.7
+                                      },
+                                      "parsedWorldAabb": {
+                                        "x": -6910.33349609375,
+                                        "y": -242.3333282470703,
+                                        "width": 18.666664123535156,
+                                        "height": 18.666664123535156
+                                      },
+                                      "worldAabb": {
+                                        "x": -6910.33349609375,
+                                        "y": -242.3333282470703,
+                                        "width": 18.666664123535156,
+                                        "height": 18.666664123535156
+                                      },
+                                      "paintRect": {
+                                        "x": -6910.33349609375,
+                                        "y": -242.3333282470703,
+                                        "width": 18.666664123535156,
+                                        "height": 18.666664123535156
+                                      }
+                                    }
+                                  }
                                 ],
                                 "geometryFrame": {
                                   "localTransform": {
@@ -1656,10 +1727,10 @@
                             "stackPlacement": {
                               "horizontal": "RIGHT",
                               "left": 58.0,
-                              "bottom": 128.0,
                               "width": 84.0,
                               "height": 111.0
                             },
+                            "renderBoundary": true,
                             "flattenFigmaNodeIds": [
                               "I4408:44916;1356:10668;913:8936",
                               "I4408:44916;1356:10668;913:8937",
@@ -5680,9 +5751,6 @@
                         "Type": "Line border"
                       }
                     },
-                    "flattenFigmaNodeIds": [
-                      "I4408:44897;1154:7850;933:4776"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 14.0,
@@ -6343,15 +6411,6 @@
                                 "Add product": "Add Dark"
                               }
                             },
-                            "flattenFigmaNodeIds": [
-                              "I4408:44898;1154:7849;1149:9856",
-                              "I4408:44898;1154:7849;1149:9856;1149:9479",
-                              "I4408:44898;1154:7849;1149:9856;1149:9479;910:3261",
-                              "I4408:44898;1154:7849;1149:9469",
-                              "I4408:44898;1154:7849;1149:9855",
-                              "I4408:44898;1154:7849;1149:9855;1149:9481",
-                              "I4408:44898;1154:7849;1149:9855;1149:9481;910:3248"
-                            ],
                             "geometryFrame": {
                               "localTransform": {
                                 "ty": 58.0
@@ -6493,9 +6552,6 @@
                         "Type": "Line border"
                       }
                     },
-                    "flattenFigmaNodeIds": [
-                      "I4408:44898;1154:7850;933:4776"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 14.0,
@@ -7287,9 +7343,6 @@
                         "Type": "Line border"
                       }
                     },
-                    "flattenFigmaNodeIds": [
-                      "I4408:44901;1154:7850;933:4776"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 14.0,
@@ -7655,9 +7708,6 @@
                                       }
                                     },
                                     "clusterId": "cluster_6",
-                                    "flattenFigmaNodeIds": [
-                                      "I4408:44902;1154:7847"
-                                    ],
                                     "geometryFrame": {
                                       "localTransform": {
                                         "tx": 207.0
@@ -7859,9 +7909,6 @@
                         "Type": "Line border"
                       }
                     },
-                    "flattenFigmaNodeIds": [
-                      "I4408:44902;1154:7850;933:4776"
-                    ],
                     "geometryFrame": {
                       "localTransform": {
                         "tx": 14.0,
@@ -8505,9 +8552,6 @@
                             "Type": "Line border"
                           }
                         },
-                        "flattenFigmaNodeIds": [
-                          "I4408:44903;1159:8160;933:4776"
-                        ],
                         "geometryFrame": {
                           "localTransform": {
                             "ty": 48.0
@@ -9011,15 +9055,6 @@
                           "width": 146.0,
                           "height": 36.0
                         },
-                        "flattenFigmaNodeIds": [
-                          "I4408:44904;1154:8077;1149:9856",
-                          "I4408:44904;1154:8077;1149:9856;1149:9479",
-                          "I4408:44904;1154:8077;1149:9856;1149:9479;910:3261",
-                          "I4408:44904;1154:8077;1149:9469",
-                          "I4408:44904;1154:8077;1149:9855",
-                          "I4408:44904;1154:8077;1149:9855;1149:9481",
-                          "I4408:44904;1154:8077;1149:9855;1149:9481;910:3248"
-                        ],
                         "geometryFrame": {
                           "localTransform": {
                             "tx": 201.0

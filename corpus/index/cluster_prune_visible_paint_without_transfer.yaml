@@ -16,3 +16,18 @@ cases:
     component instances (component_910_3249) are pruned to empty STACK children 
     while a visible VECTOR descendant lacks vectorAssetKey; hydration fails 
     because pruned instances key as leaf while templates key by struc...
+- case_id: 2026-07-06-niyama-cluster-prune-flatten-multiset
+  case_file: cases/2026-07-06-niyama-cluster-prune-flatten-multiset.yaml
+  title: Cluster prune paint guard leaves flatten metadata and double-counts 
+    multiset
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-prune-flatten-multiset-regression
+  status: FIXED
+  observed_at: '2026-07-06'
+  created_at: '2026-07-06T19:30:00Z'
+  updated_at: '2026-07-06T19:30:00Z'
+  summary: Regression from LAW-CLUSTER-PRUNE-PAINT-CONSERVATION — when paint 
+    guard blocks cluster prune for unbound visible VECTOR duplicates, 
+    flatten_figma_node_ids was assigned before the early return while children 
+    remained, so CP0_parse multiset counted each descendant id twice (tree...

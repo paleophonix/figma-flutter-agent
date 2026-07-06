@@ -105,6 +105,7 @@ def _emit_policy_semantic_widget(
         return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
     return None
 
+
 _FLEX_WRAP_IR_TO_KIND: dict[FlexWrapIr, FlexWrapKind] = {
     FlexWrapIr.NONE: FlexWrapKind.NONE,
     FlexWrapIr.EXPANDED: FlexWrapKind.EXPANDED,
@@ -157,13 +158,10 @@ def emit_widget_expression(
         )
 
         chip_decision = resolve_policy_decision(ir, ctx=ctx)
-        if (
-            chip_special_emit_allowed(chip_decision)
-            and (
-                not _should_ir_walk_children(clean)
-                or layout_fact_stack_circular_option_glyph_host(clean)
-                or is_tag_component_chip_row(clean)
-            )
+        if chip_special_emit_allowed(chip_decision) and (
+            not _should_ir_walk_children(clean)
+            or layout_fact_stack_circular_option_glyph_host(clean)
+            or is_tag_component_chip_row(clean)
         ):
             from figma_flutter_agent.generator.layout.widgets.option_chip import (
                 emit_chip_choice_layout,
@@ -192,9 +190,7 @@ def emit_widget_expression(
     effective_walk = walk
     effective_extracted = extracted_class_by_widget_name
     if effective_walk is not None:
-        effective_extracted = (
-            effective_extracted or effective_walk.extracted_class_by_widget_name
-        )
+        effective_extracted = effective_extracted or effective_walk.extracted_class_by_widget_name
 
     if effective_walk is not None and _should_ir_walk_children(clean):
         widget = _emit_ir_layout_container(
@@ -399,9 +395,7 @@ def emit_extracted_ref(
         class_name = extracted_class_by_widget_name.get(widget_name, class_name)
     else:
         class_name = _canonical_widget_class_name(class_name)
-    args = ", ".join(
-        f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items()
-    )
+    args = ", ".join(f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items())
     if args:
         return f"{class_name}({args})"
     return f"{class_name}()"
@@ -427,13 +421,21 @@ def apply_ir_wrap(
     parent_type: NodeType | None,
     clean: CleanDesignTreeNode,
 ) -> str:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        _unwrap_flex_parent_data_wrapper,
+    )
+
     if ir.wrap is not None:
         kind = _FLEX_WRAP_IR_TO_KIND.get(ir.wrap, FlexWrapKind.NONE)
         if kind == FlexWrapKind.NONE:
             return widget
         if kind == FlexWrapKind.EXPANDED:
+            if _unwrap_flex_parent_data_wrapper(widget.lstrip()) is not None:
+                return widget
             return f"Expanded(child: {widget})"
         if kind == FlexWrapKind.FLEXIBLE_LOOSE:
+            if _unwrap_flex_parent_data_wrapper(widget.lstrip()) is not None:
+                return widget
             return emit_flexible_loose(widget)
         if kind == FlexWrapKind.SIZED_BOX_WIDTH:
             from figma_flutter_agent.generator.layout.flex_policy import (

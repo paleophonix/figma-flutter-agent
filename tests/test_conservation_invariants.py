@@ -14,6 +14,7 @@ from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
 )
 from figma_flutter_agent.generator.geometry.invariants.conservation import (
     check_graph_sync,
+    check_node_multiset_preserved,
     check_stack_paint_order_preserved,
     check_style_truth,
     conservation_node_multiset,
@@ -85,6 +86,27 @@ def test_cp0_parse_dedup_fails_when_node_dropped() -> None:
 
     with pytest.raises(GenerationError, match="inv_node_multiset"):
         run_cp0_parse_dedup(root, prune_fn=bad_prune)
+
+
+def test_multiset_count_mismatch_reports_count_detail() -> None:
+    baseline = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(
+                id="vec-1",
+                name="Vector",
+                type=NodeType.VECTOR,
+            ),
+        ],
+    )
+    doubled = deep_copy_clean_tree(baseline)
+    doubled.children[0].flatten_figma_node_ids = ["vec-1"]
+    violations = check_node_multiset_preserved(baseline, doubled)
+    assert len(violations) == 1
+    assert violations[0].node_id == "vec-1"
+    assert "count_mismatch=['vec-1: 1 -> 2']" in violations[0].detail
 
 
 def test_stack_paint_order_violation_detected() -> None:

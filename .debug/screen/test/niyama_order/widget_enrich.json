@@ -1,45 +1,40 @@
 {
-  "cacheKey": "47b79dfe636967bd8ec490641f264e1c1b841df3edd0674fdb93b54a24eb87b5",
+  "cacheKey": "2a09f6986b0157274b5a05a48200db8ceda127467508708c78f9ac2dabb23a07",
   "response": {
     "entries": [
       {
-        "clusterId": "cluster_6",
-        "widgetName": "OrderProductPriceWidget",
-        "paramRenames": {}
-      },
-      {
         "clusterId": "component_1007_7119_e1043bbb",
-        "widgetName": "CheckoutBarWidget",
+        "widgetName": "AddOrderBarWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_7859_6271d11b",
-        "widgetName": "OrderProductCardWidget",
+        "widgetName": "OrderProductItemWidget",
         "paramRenames": {}
       },
       {
-        "clusterId": "component_1154_8066_5cdcb24a",
-        "widgetName": "GuestsInfoWidget",
+        "clusterId": "component_1154_8066_faf0fa44",
+        "widgetName": "GuestsControlWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_8374_89112a74",
-        "widgetName": "PromoCodeCardWidget",
+        "widgetName": "PromoCodeActionCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_8697_9095f282",
-        "widgetName": "BonusCountWidget",
+        "widgetName": "QuantityBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10366_754647f7",
-        "widgetName": "ProductActionRowWidget",
+        "widgetName": "AddToCartButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10701_1aa13d53",
-        "widgetName": "AddOnProductCardWidget",
+        "widgetName": "CompactProductCardWidget",
         "paramRenames": {}
       },
       {
@@ -49,7 +44,7 @@
       },
       {
         "clusterId": "component_908_4711",
-        "widgetName": "BottomHomeIndicatorWidget",
+        "widgetName": "HomeIndicatorWidget",
         "paramRenames": {}
       },
       {
@@ -84,7 +79,12 @@
       },
       {
         "clusterId": "component_933_4777",
-        "widgetName": "SectionDividerWidget",
+        "widgetName": "DividerLineWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_8",
+        "widgetName": "AddToOrderLabelWidget",
         "paramRenames": {}
       }
     ]

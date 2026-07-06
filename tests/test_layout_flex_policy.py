@@ -107,6 +107,30 @@ def test_apply_flex_wrap_expanded_expression() -> None:
     assert wrapped == "Expanded(child: Text('A'))"
 
 
+def test_apply_ir_wrap_skips_duplicate_flexible_loose() -> None:
+    from figma_flutter_agent.generator.ir.expression import apply_ir_wrap
+    from figma_flutter_agent.schemas import FlexWrapIr, WidgetIrNode
+
+    node = CleanDesignTreeNode(
+        id="time",
+        name="9:30",
+        type=NodeType.TEXT,
+        text="9:30",
+        sizing=Sizing(width=29.0, height=20.0),
+    )
+    already_wrapped = (
+        "Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(height: 20.0, child: Text('9:30')))"
+    )
+    ir = WidgetIrNode(figma_id="time", wrap=FlexWrapIr.FLEXIBLE_LOOSE)
+    result = apply_ir_wrap(
+        already_wrapped,
+        ir=ir,
+        parent_type=NodeType.ROW,
+        clean=node,
+    )
+    assert result.count("Flexible(") == 1
+
+
 def test_bottom_anchored_fixed_height_stack_under_column_uses_sized_box_not_expanded() -> None:
     """BottomAnchoredStackColumnBoundLaw: finite logo stacks must not flex-expand."""
     logo = CleanDesignTreeNode(

@@ -1,14 +1,16 @@
 {
   "feature": "rep_edit_profile",
-  "pipeline_run_id": "2bf8ee0a7a7e",
-  "candidate_build_run_id": "2bf8ee0a7a7e",
+  "pipeline_run_id": "512b86dab06e",
+  "candidate_build_run_id": "512b86dab06e",
   "status": "failed",
   "writeback": "failed",
   "written_files": [],
   "analyze_passed": null,
   "runMetaSchemaVersion": "2",
-  "captured_at": "2026-07-06T16:10:03.053827+00:00",
-  "run_started_at": "2026-07-06T16:10:02.930450+00:00",
+  "captured_at": "2026-07-06T16:33:32.906508+00:00",
+  "run_started_at": "2026-07-06T16:32:46.882745+00:00",
+  "cached_ir_verdict": "incompatible",
+  "clean_tree_hash": "a1de00ad780c84953ff82de254c37fe8ed038e1df24745531208d5a82cbfc658",
   "committed_build_run_id": "1d2763ba3c4a",
-  "last_error": "Geometry invariant violations (CP0_parse): inv_node_multiset@1966:14409"
+  "last_error": "cannot import name 'collect_nested_flex_parent_data_spans' from 'figma_flutter_agent.generator.layout.flex_policy.wrap' (E:\\@dev\\figma-flutter-agent\\src\\figma_flutter_agent\\generator\\layout\\flex_policy\\wrap.py)"
 }
