@@ -2,6 +2,22 @@ version: 1
 family_id: compact_component_leaf_vector_export_gap
 generated: true
 cases:
+- case_id: 2026-07-06-niyama-nested-compact-icon-export-root
+  case_file: cases/2026-07-06-niyama-nested-compact-icon-export-root.yaml
+  title: Quantity stepper defers compact drawable export to nested Icons 
+    component
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-nested-stepper-icon-export-root
+  status: FIXED
+  observed_at: '2026-07-06'
+  created_at: '2026-07-06T17:00:00Z'
+  updated_at: '2026-07-06T17:00:00Z'
+  summary: Order-product quantity stepper uses painted 36x36 Add product 
+    component instances wrapping 28x28 Icons/28/Plus and Icons/28/Minus 
+    component instances. Compact drawable export captured the outer control 
+    shell, skipped inner icon hosts and leaf vectors, and Figma Images API 
+    skip...
 - case_id: 2026-07-06-verbatica-compact-component-export-gap
   case_file: cases/2026-07-06-verbatica-compact-component-export-gap.yaml
   title: Status bar component icons export nested vector instead of instance 

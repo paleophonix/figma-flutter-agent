@@ -168,6 +168,13 @@ async def export_figma_assets(
 
     flatten_excludes = set(flatten_exclude_node_ids or ())
     boundary_exports = set(render_boundary_node_ids or ())
+    from figma_flutter_agent.assets.eligibility import collect_raster_fallback_node_ids
+
+    raster_fallback_node_ids = collect_raster_fallback_node_ids(
+        request.figma_root,
+        exclude_node_ids=exclude_node_ids,
+        flatten_exclude_node_ids=flatten_excludes,
+    )
     primary_outcome = await exporter.export_assets(
         request.file_key,
         request.figma_root,
@@ -182,6 +189,7 @@ async def export_figma_assets(
         exclude_node_ids=exclude_node_ids,
         flatten_exclude_node_ids=flatten_excludes,
         render_boundary_node_ids=boundary_exports,
+        raster_fallback_node_ids=raster_fallback_node_ids,
     )
     manifest = primary_outcome.manifest
 
@@ -205,6 +213,11 @@ async def export_figma_assets(
             exclude_node_ids=exclude_node_ids,
             flatten_exclude_node_ids=flatten_excludes,
             render_boundary_node_ids=boundary_exports,
+            raster_fallback_node_ids=collect_raster_fallback_node_ids(
+                destination_frame,
+                exclude_node_ids=exclude_node_ids,
+                flatten_exclude_node_ids=flatten_excludes,
+            ),
         )
         merge_asset_manifests(manifest, extra_outcome.manifest)
 

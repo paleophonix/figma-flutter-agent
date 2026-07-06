@@ -57,6 +57,34 @@ def _figma_subtree_has_visible_text(node: dict[str, Any]) -> bool:
     return any(_figma_subtree_has_visible_text(child) for child in node.get("children") or [])
 
 
+def _nested_compact_icon_component_child(node: dict[str, Any]) -> dict[str, Any] | None:
+    """Return a smaller nested icon component when a control shell wraps the real glyph."""
+    visible_children = [
+        child for child in node.get("children") or [] if child.get("visible") is not False
+    ]
+    if len(visible_children) != 1:
+        return None
+    child = visible_children[0]
+    if child.get("type") not in {"INSTANCE", "COMPONENT"}:
+        return None
+    if not is_figma_compact_component_drawable_node(child):
+        return None
+    parent_width, parent_height = _figma_bbox_size(node)
+    child_width, child_height = _figma_bbox_size(child)
+    if parent_width is None or parent_height is None:
+        return None
+    if child_width is None or child_height is None:
+        return None
+    if child_width >= parent_width and child_height >= parent_height:
+        return None
+    return child
+
+
+def _should_defer_compact_drawable_to_nested_icon(node: dict[str, Any]) -> bool:
+    """True when export should target a nested icon component, not the painted control shell."""
+    return _nested_compact_icon_component_child(node) is not None
+
+
 def is_figma_compact_component_drawable_node(node: dict[str, Any]) -> bool:
     """True when a published compact component instance should export as one drawable."""
     node_type = node.get("type")
@@ -198,6 +226,10 @@ def collect_figma_composite_icon_groups(
                     collect_descendants(child)
             return
         if is_figma_compact_component_drawable_node(node):
+            if _should_defer_compact_drawable_to_nested_icon(node):
+                for child in node.get("children") or []:
+                    walk(child)
+                return
             node_id = node.get("id")
             if isinstance(node_id, str):
                 parents.add(node_id)

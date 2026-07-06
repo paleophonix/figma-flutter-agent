@@ -163,6 +163,116 @@ def test_cluster_widget_parent_asset_materializes_without_child_key() -> None:
     assert "SizedBox.shrink()" not in source
 
 
+def _quantity_stepper_control(
+    *,
+    control_id: str,
+    icon_id: str,
+    vector_id: str,
+    control_component_id: str,
+    icon_component_id: str,
+    icon_name: str,
+) -> dict:
+    return {
+        "id": control_id,
+        "type": "INSTANCE",
+        "visible": True,
+        "name": "Add product",
+        "componentId": control_component_id,
+        "absoluteBoundingBox": {"width": 36.0, "height": 36.0},
+        "fills": [
+            {
+                "type": "SOLID",
+                "visible": True,
+                "color": {"r": 0.23, "g": 0.23, "b": 0.24, "a": 1.0},
+            }
+        ],
+        "children": [
+            {
+                "id": icon_id,
+                "type": "INSTANCE",
+                "visible": True,
+                "name": icon_name,
+                "componentId": icon_component_id,
+                "absoluteBoundingBox": {"width": 28.0, "height": 28.0},
+                "children": [
+                    {
+                        "id": vector_id,
+                        "type": "VECTOR",
+                        "visible": True,
+                        "name": "Vector",
+                        "absoluteBoundingBox": {"width": 18.7, "height": 18.7},
+                        "fills": [
+                            {
+                                "type": "SOLID",
+                                "visible": True,
+                                "color": {"r": 1.0, "g": 1.0, "b": 1.0, "a": 1.0},
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+
+def test_nested_quantity_stepper_exports_icon_hosts_not_control_wrappers() -> None:
+    """Law: nested compact control defers export root to inner Icons/* component hosts."""
+    minus = _quantity_stepper_control(
+        control_id="I_test;stepper;minus_control",
+        icon_id="I_test;stepper;minus_icon",
+        vector_id="I_test;stepper;minus_icon;vector",
+        control_component_id="1149:9478",
+        icon_component_id="910:3262",
+        icon_name="Icons/28/Minus",
+    )
+    plus = _quantity_stepper_control(
+        control_id="I_test;stepper;plus_control",
+        icon_id="I_test;stepper;plus_icon",
+        vector_id="I_test;stepper;plus_icon;vector",
+        control_component_id="1149:9480",
+        icon_component_id="910:3249",
+        icon_name="Icons/28/Plus",
+    )
+    root = {
+        "id": "0:1",
+        "type": "FRAME",
+        "visible": True,
+        "name": "Stepper",
+        "children": [minus, plus],
+    }
+    parents, skip = collect_figma_composite_icon_groups(root)
+    assert parents == frozenset(
+        {
+            "I_test;stepper;minus_icon",
+            "I_test;stepper;plus_icon",
+        }
+    )
+    assert "I_test;stepper;minus_control" not in parents
+    assert "I_test;stepper;plus_control" not in parents
+    assert skip == frozenset(
+        {
+            "I_test;stepper;minus_icon;vector",
+            "I_test;stepper;plus_icon;vector",
+        }
+    )
+    items = collect_exportable_nodes(root, exclude_node_ids={"0:1"})
+    icon_ids = {node_id for node_id, _name, kind in items if kind == "icon"}
+    assert icon_ids == set(parents)
+    assert skip.isdisjoint(icon_ids)
+    from figma_flutter_agent.assets.eligibility import figma_images_api_skip_export
+
+    assert not figma_images_api_skip_export(
+        minus["children"][0],
+        node_id=minus["children"][0]["id"],
+        composite_parent_ids=parents,
+    )
+    assert not figma_images_api_skip_export(
+        plus["children"][0],
+        node_id=plus["children"][0]["id"],
+        composite_parent_ids=parents,
+    )
+
+
 def test_cluster_widget_without_any_asset_still_raises() -> None:
     host = CleanDesignTreeNode(
         id="I_test;signal",

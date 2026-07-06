@@ -10,7 +10,7 @@
     "lib/widgets/start_free_trial_button_widget.dart": "a21232eefe62153f3da577fd4accb7fc8f216491eb77be50555e2362cdf3e349",
     "lib/widgets/home_indicator_widget.dart": "6705377a149ed37daabd09392157f4b9602a3ef6949e92c1760972db92bd7eb9",
     "lib/widgets/free_trial_text_button_widget.dart": "b4d8311aef1dce5eef57ebc2ef2c5a1b4da98528639e59e4fa0c7bc7f2e4b15b",
-    "lib/widgets/paywall_status_bar_widget.dart": "8a85d740e64144d0d58730ea807a2ed67a02e3e4286501b7dd05b2006ce87469",
+    "lib/widgets/paywall_status_bar_widget.dart": "c5cc6ec383bacb46ac86232e790913bc6023f333835d2358cb95d88dd8baa139",
     "lib/widgets/close_button_widget.dart": "2a6cfe559d0936767fabf74afabe57b870168d5183f09694ed05b882fe8826af",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "bccf10c9ee887275b22eed1cc4de102c4df21423f4e0a130c892479293112645",
@@ -34,6 +34,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 1,
-  "updated_at": "2026-07-06T16:16:28.849492+00:00"
+  "version": 2,
+  "updated_at": "2026-07-06T16:52:46.233639+00:00"
 }

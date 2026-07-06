@@ -430,6 +430,8 @@ families:
     owners:
       - module: src/figma_flutter_agent/assets/composite_icons.py
         symbol: is_figma_compact_component_drawable_node
+      - module: src/figma_flutter_agent/assets/composite_icons.py
+        symbol: collect_figma_composite_icon_groups
       - module: src/figma_flutter_agent/assets/collect.py
         symbol: collect_exportable_nodes
       - module: src/figma_flutter_agent/assets/vector_binding.py

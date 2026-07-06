@@ -188,7 +188,16 @@ async def run_dump_fetch_parse_phase(
                     figma_token,
                     settings.figma_api_base_url,
                 ) as connector:
+                    from figma_flutter_agent.assets.eligibility import (
+                        collect_raster_fallback_node_ids,
+                    )
+
                     exporter = AssetExporter(connector)
+                    raster_fallback_node_ids = collect_raster_fallback_node_ids(
+                        ctx.figma_root,
+                        exclude_node_ids=set(exclude_node_ids),
+                        flatten_exclude_node_ids=set(_flatten_excludes),
+                    )
                     outcome = await exporter.export_assets(
                         parsed.file_key,
                         ctx.figma_root,
@@ -206,6 +215,7 @@ async def run_dump_fetch_parse_phase(
                         exclude_node_ids=set(exclude_node_ids),
                         flatten_exclude_node_ids=set(_flatten_excludes),
                         render_boundary_node_ids=set(boundary_exports),
+                        raster_fallback_node_ids=raster_fallback_node_ids,
                     )
                     if outcome.manifest.entries:
                         merge_asset_manifests(raw_manifest, outcome.manifest)
