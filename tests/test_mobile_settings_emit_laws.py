@@ -9,6 +9,14 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.config.models import WidgetExtractionConfig
+from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_code_from_ir
+from figma_flutter_agent.generator.ir.extracted_paint import (
+    extracted_widget_subtree_conservation_needs_rematerialization,
+)
+from figma_flutter_agent.generator.layout import render_layout_file
+from figma_flutter_agent.generator.layout.flex_policy.stack import stack_flow_column_child_sort_key
+from figma_flutter_agent.generator.layout.navigation.helpers import bottom_nav_stateful_helpers
 from figma_flutter_agent.generator.layout.widget_roots import (
     finalize_extracted_widget_body,
     validate_widget_build_has_no_parent_data_root,
@@ -16,7 +24,9 @@ from figma_flutter_agent.generator.layout.widget_roots import (
 from figma_flutter_agent.generator.widget_extraction.collect import collect_widget_specs
 from figma_flutter_agent.generator.widget_extraction.enrich import apply_widget_enrich_response
 from figma_flutter_agent.generator.widget_extractor import render_cluster_widgets
-from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.parser.interaction.icons import layout_fact_occluding_icon_fill_plate
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.schemas.ir import WidgetIrNode
 from figma_flutter_agent.schemas.reusable_candidates import WidgetEnrichResponse
 
 _FIXTURE = Path(".debug/screen/limbo/mobile_settings/processed.json")
@@ -111,3 +121,143 @@ def test_settings_divider_cluster_widget_emits_bounded_root() -> None:
     divider = result.files["lib/widgets/settings_divider_widget.dart"]
     assert "return Stack(" not in divider
     assert "SvgPicture.asset(" in divider
+
+
+def test_bottom_viewport_chrome_sorts_after_body_tier() -> None:
+    """SystemChromeDockingLaw: home indicator uses trailing flow-column tier."""
+    home = CleanDesignTreeNode(
+        id="home",
+        name="iOS / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    body = CleanDesignTreeNode(
+        id="body",
+        name="Profile info",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=400.0),
+        children=[],
+    )
+    assert stack_flow_column_child_sort_key(home)[0] > stack_flow_column_child_sort_key(body)[0]
+
+
+def test_chevron_button_fill_plate_is_occluding_on_button_host() -> None:
+    """CompositeIconSilhouetteLaw: BUTTON chevron hosts veto full-bounds Fill plates."""
+    root = _load_root()
+    button = None
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node.id == "I272:9260;126:1367":
+            button = node
+            break
+        stack.extend(node.children)
+    assert button is not None
+    fill = next(child for child in button.children if child.name == "Fill")
+    assert layout_fact_occluding_icon_fill_plate(fill, parent=button)
+
+
+def test_chevron_cluster_widget_omits_occluding_fill_ink() -> None:
+    """ChevronButtonWidget must not paint occluding Fill as Ink decoration."""
+    if not _ENRICH.is_file():
+        pytest.skip("mobile_settings widget_enrich.json not available")
+    root = _load_root()
+    specs = _collect_enriched_specs(root)
+    result = render_cluster_widgets(specs, uses_svg=True, clean_trees=[root])
+    chevron = result.files["lib/widgets/chevron_button_widget.dart"]
+    assert "0xFF8F9098" not in chevron
+    assert "Ink(decoration: BoxDecoration(color:" not in chevron
+
+
+def _collect_enriched_specs(root: CleanDesignTreeNode):
+    config = WidgetExtractionConfig()
+    specs = collect_widget_specs(
+        root,
+        cluster_summary=_cluster_summary(root),
+        config=config,
+        llm_candidates=None,
+    )
+    enrich_raw = json.loads(_ENRICH.read_text(encoding="utf-8"))
+    enrich = WidgetEnrichResponse.model_validate(enrich_raw["response"])
+    return apply_widget_enrich_response(specs, enrich, widget_suffix="Widget")
+
+
+def test_avatar_extracted_widget_materializes_full_subtree() -> None:
+    """LAW-WIDGETIR-CONSERVE: Avatar extracted widget keeps profile plate and edit overlay."""
+    root = _load_root()
+    specs = _collect_enriched_specs(root)
+    cluster_result = render_cluster_widgets(specs, uses_svg=True, clean_trees=[root])
+    pre = json.loads(
+        Path(".debug/screen/limbo/mobile_settings/pre_emit.json").read_text(encoding="utf-8")
+    )
+    widget_ir = WidgetIrNode.model_validate(pre["extractedWidgets"][0]["widgetIr"])
+    ctx = IrEmitContext(
+        uses_svg=True,
+        cluster_classes=cluster_result.cluster_classes,
+        responsive_enabled=True,
+    )
+    code = emit_extracted_widget_code_from_ir(
+        widget_ir,
+        clean_tree=root,
+        widget_name="ProfileAvatarWidget",
+        ctx=ctx,
+    )
+    assert "81.5" in code
+    assert "80.0" in code
+    assert "272_9231" in code
+    assert "272_9625" in code
+
+
+def test_extracted_widget_subtree_conservation_detects_edit_only_cache() -> None:
+    """Cached edit-only avatar body must trigger rematerialization against full host."""
+    root = _load_root()
+    avatar_host = None
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node.id == "272:9638":
+            avatar_host = node
+            break
+        stack.extend(node.children)
+    assert avatar_host is not None
+    stale = (
+        "class AvatarWidget extends StatelessWidget {\n"
+        "  @override\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return SizedBox(width: 24.0, height: 24.0, child: Text('edit'));\n"
+        "  }\n"
+        "}\n"
+    )
+    assert extracted_widget_subtree_conservation_needs_rematerialization(avatar_host, stale)
+
+
+def test_flat_bottom_nav_helper_suppresses_material_elevation() -> None:
+    """FigmaChromeElevationMatchLaw: generated chrome uses zero elevation."""
+    helpers = bottom_nav_stateful_helpers(theme_variant="material_3", node_id="272:9115")
+    assert "elevation: 0" in helpers
+    assert "backgroundColor: Colors.white" in helpers
+
+
+def test_mobile_settings_layout_places_home_indicator_after_profile_block() -> None:
+    """Regression: home indicator must not precede avatar/profile content in flow column."""
+    if not _ENRICH.is_file():
+        pytest.skip("mobile_settings widget_enrich.json not available")
+    root = _load_root()
+    specs = _collect_enriched_specs(root)
+    cluster_result = render_cluster_widgets(specs, uses_svg=True, clean_trees=[root])
+    layout = render_layout_file(
+        root,
+        feature_name="mobile_settings",
+        cluster_classes=cluster_result.cluster_classes,
+        uses_svg=True,
+        theme_variant="material",
+        responsive_enabled=True,
+    )["lib/generated/mobile_settings_layout.dart"]
+    home_idx = layout.find("figma-I272_9113_126_2469")
+    avatar_idx = layout.find("ProfileAvatarWidget")
+    if avatar_idx < 0:
+        avatar_idx = layout.find("AvatarWidget")
+    assert home_idx > 0 and avatar_idx > 0
+    assert avatar_idx < home_idx

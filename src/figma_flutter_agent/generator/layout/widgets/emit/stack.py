@@ -786,6 +786,7 @@ def render_stack(
         from figma_flutter_agent.generator.layout.stack_chrome import (
             bottom_chrome_clearance_height,
             is_bottom_docked_stack_child,
+            stack_flow_child_is_trailing_chrome,
         )
         from figma_flutter_agent.generator.layout.widgets.positioned import (
             _stack_has_bottom_anchored_child,
@@ -839,7 +840,7 @@ def render_stack(
             is_scroll_body = uses_shared_scroll and stack_flow_child_is_shared_scroll_body(
                 child, node
             )
-            is_trailing = uses_shared_scroll and is_bottom_docked_stack_child(child)
+            is_trailing = uses_shared_scroll and stack_flow_child_is_trailing_chrome(child)
             if not uses_shared_scroll:
                 if (
                     pin_bottom_chrome

@@ -77,6 +77,21 @@ def is_bottom_docked_stack_child(child: CleanDesignTreeNode) -> bool:
     return placement.vertical == "BOTTOM"
 
 
+def stack_flow_child_is_trailing_chrome(child: CleanDesignTreeNode) -> bool:
+    """Return True when shared-scroll flow columns pin a slot after body content.
+
+    Bottom navigation and the iOS home-indicator band must trail scrollable body
+    panels instead of appearing ahead of the shared scroll host.
+    """
+    if is_bottom_docked_stack_child(child):
+        return True
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        _viewport_chrome_vertical_role,
+    )
+
+    return _viewport_chrome_vertical_role(child) == "BOTTOM"
+
+
 def bottom_chrome_clearance_height(stack: CleanDesignTreeNode) -> float:
     """Return scroll inset for content layered under docked bottom chrome."""
     chrome_height = 0.0

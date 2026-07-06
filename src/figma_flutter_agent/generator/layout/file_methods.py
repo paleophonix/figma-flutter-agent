@@ -208,6 +208,7 @@ def compose_decomposed_root_widget(
             )
             from figma_flutter_agent.generator.layout.stack_chrome import (
                 is_bottom_docked_stack_child,
+                stack_flow_child_is_trailing_chrome,
             )
 
             growable_panels = sum(
@@ -255,7 +256,7 @@ def compose_decomposed_root_widget(
                 is_scroll_body = uses_shared_scroll and stack_flow_child_is_shared_scroll_body(
                     child, tree
                 )
-                is_trailing = uses_shared_scroll and is_bottom_docked_stack_child(child)
+                is_trailing = uses_shared_scroll and stack_flow_child_is_trailing_chrome(child)
                 if not uses_shared_scroll:
                     if (
                         pin_bottom_chrome

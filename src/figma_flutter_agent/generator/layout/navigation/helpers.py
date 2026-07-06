@@ -30,6 +30,8 @@ def bottom_nav_stateful_helpers(
         if theme_variant == "cupertino"
         else f"""BottomNavigationBar(
             currentIndex: _currentIndex,
+            elevation: 0,
+            backgroundColor: Colors.white,
             onTap: (index) {{
               setState(() => _currentIndex = index);
               {open_zone}

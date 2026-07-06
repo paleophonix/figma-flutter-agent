@@ -231,7 +231,13 @@ def stack_flow_column_child_sort_key(child: CleanDesignTreeNode) -> tuple[int, f
         is_bottom_docked_stack_child,
     )
 
-    tier = 1 if is_bottom_docked_stack_child(child) else 0
+    chrome_role = _viewport_chrome_vertical_role(child)
+    if is_bottom_docked_stack_child(child) or chrome_role == "BOTTOM":
+        tier = 1
+    elif chrome_role == "TOP":
+        tier = -1
+    else:
+        tier = 0
     return (tier, stack_child_ordinal_top(child), child.id)
 
 

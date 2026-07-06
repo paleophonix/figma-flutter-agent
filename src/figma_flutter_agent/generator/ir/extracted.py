@@ -12,7 +12,9 @@ from figma_flutter_agent.generator.dart.llm_codegen import _canonical_widget_cla
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_screen_body_from_ir
 from figma_flutter_agent.generator.ir.extracted_paint import (
+    dominant_cluster_delegate_name,
     extracted_icon_badge_glyph_emit_needs_rematerialization,
+    extracted_widget_subtree_conservation_needs_rematerialization,
     prefers_clean_tree_extracted_widget_emit,
     subtree_has_visible_paint,
 )
@@ -414,11 +416,11 @@ def _preserve_extracted_widget_decoration_shell(
         surface = primary_surface_node(subtree)
         if surface is not None:
             from figma_flutter_agent.parser.interaction.icons import (
-                layout_fact_compact_icon_glyph_host,
+                _compact_icon_glyph_host_for_fill_veto,
                 layout_fact_occluding_icon_fill_plate,
             )
 
-            if layout_fact_compact_icon_glyph_host(
+            if _compact_icon_glyph_host_for_fill_veto(
                 subtree
             ) and layout_fact_occluding_icon_fill_plate(surface, parent=subtree):
                 return body
@@ -484,6 +486,12 @@ def materialize_extracted_widgets(
             continue
         existing = widget.resolved_code()
         subtree = tree_by_id.get(widget.widget_ir.figma_id)
+        preferred_name = widget.widget_name
+        if subtree is not None:
+            delegate_name = dominant_cluster_delegate_name(subtree, ctx.cluster_classes)
+            if delegate_name and delegate_name != widget.widget_name:
+                preferred_name = delegate_name
+        widget = widget.model_copy(update={"widget_name": preferred_name})
         if (
             prefer_existing_code
             and existing
@@ -493,6 +501,9 @@ def materialize_extracted_widgets(
                 and (
                     _extracted_widget_needs_decoration_rematerialization(subtree, existing)
                     or extracted_icon_badge_glyph_emit_needs_rematerialization(subtree, existing)
+                    or extracted_widget_subtree_conservation_needs_rematerialization(
+                        subtree, existing
+                    )
                 )
             )
         ):

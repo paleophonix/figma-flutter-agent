@@ -182,10 +182,18 @@ def prepare_layout_children(
                     omit_child_ids.add(surface.id)
     if node.type == NodeType.BUTTON:
         from figma_flutter_agent.parser.interaction.buttons import button_painted_overlay_surface
+        from figma_flutter_agent.parser.interaction.icons import (
+            layout_fact_button_has_occluding_icon_fill_plate,
+            layout_fact_occluding_icon_fill_plate,
+        )
 
-        surface = button_painted_overlay_surface(node) or primary_surface_node(node)
-        if surface is not None and surface_covers_node(node, surface):
-            omit_child_ids.add(surface.id)
+        for stack_child in sorted_children:
+            if layout_fact_occluding_icon_fill_plate(stack_child, parent=node):
+                omit_child_ids.add(stack_child.id)
+        if not layout_fact_button_has_occluding_icon_fill_plate(node):
+            surface = button_painted_overlay_surface(node) or primary_surface_node(node)
+            if surface is not None and surface_covers_node(node, surface):
+                omit_child_ids.add(surface.id)
     if node.type == NodeType.STACK:
         from figma_flutter_agent.parser.interaction import (
             layout_fact_stack_hero_full_bleed_scrim,

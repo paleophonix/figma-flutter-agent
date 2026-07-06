@@ -84,9 +84,7 @@ def extracted_icon_badge_glyph_emit_needs_rematerialization(
         and f"height: {plate_h_token}" in existing_code
         and f"width: {glyph_w_token}" not in existing_code
     )
-    if plate_sized_glyph and (
-        "BoxFit.fill" in existing_code or "BoxFit.contain" in existing_code
-    ):
+    if plate_sized_glyph and ("BoxFit.fill" in existing_code or "BoxFit.contain" in existing_code):
         return True
     return plate_sized_glyph
 
@@ -172,3 +170,59 @@ def prefers_clean_tree_extracted_widget_emit(
     if layout_fact_icon_badge_stack(subtree):
         return True
     return should_render_extracted_widget_from_clean_tree(widget_ir, subtree)
+
+
+def extracted_widget_subtree_conservation_needs_rematerialization(
+    subtree: CleanDesignTreeNode,
+    existing_code: str,
+) -> bool:
+    """Return True when cached widget body lost conserved clean-tree child paint."""
+    if len(subtree.children) < 2:
+        return False
+    host_width = float(subtree.sizing.width or 0.0)
+    host_height = float(subtree.sizing.height or 0.0)
+    if host_width <= 0 or host_height <= 0:
+        return False
+    root_match = re.search(
+        r"return\s+SizedBox\(width:\s*([\d.]+),\s*height:\s*([\d.]+)",
+        existing_code,
+    )
+    if root_match is not None:
+        emitted_width = float(root_match.group(1))
+        emitted_height = float(root_match.group(2))
+        if emitted_width + 4.0 < host_width or emitted_height + 4.0 < host_height:
+            return True
+    for child in subtree.children:
+        if not subtree_has_visible_paint(child):
+            continue
+        key_token = child.id.replace(":", "_")
+        if f"figma-{key_token}" not in existing_code and key_token not in existing_code:
+            return True
+    return False
+
+
+def dominant_cluster_delegate_name(
+    subtree: CleanDesignTreeNode,
+    cluster_classes: dict[str, str] | None,
+) -> str | None:
+    """Return the largest cluster delegate class name inside a subtree."""
+    if not cluster_classes:
+        return None
+    best_area = -1.0
+    best_name: str | None = None
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        nonlocal best_area, best_name
+        cluster_id = node.cluster_id
+        if cluster_id and cluster_id in cluster_classes:
+            width = float(node.sizing.width or 0.0)
+            height = float(node.sizing.height or 0.0)
+            area = width * height
+            if area > best_area:
+                best_area = area
+                best_name = cluster_classes[cluster_id]
+        for child in node.children:
+            walk(child)
+
+    walk(subtree)
+    return best_name

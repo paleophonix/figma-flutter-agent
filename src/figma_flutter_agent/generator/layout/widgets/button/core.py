@@ -252,8 +252,14 @@ def _wrap_button_stack(
 
     stack_widget = strip_flex_parent_data_deep(stack_widget)
     from figma_flutter_agent.parser.interaction.buttons import button_painted_overlay_surface
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_button_has_occluding_icon_fill_plate,
+    )
 
-    surface = button_painted_overlay_surface(node) or interaction_surface_node(node)
+    if layout_fact_button_has_occluding_icon_fill_plate(node):
+        surface = None
+    else:
+        surface = button_painted_overlay_surface(node) or interaction_surface_node(node)
     frame_height = band_height if band_height is not None else node.sizing.height
     radius = (
         surface.style.border_radius
@@ -275,7 +281,7 @@ def _wrap_button_stack(
     from figma_flutter_agent.parser.interaction import layout_fact_compact_icon_action_button
 
     if node.vector_asset_key and layout_fact_compact_icon_action_button(node):
-        pass
+        surface = None
     elif surface is not None:
         ink_fill, ink_border, ink_shadows, ink_gradient, ink_inner_overlays = (
             _button_ink_surface_params(surface)

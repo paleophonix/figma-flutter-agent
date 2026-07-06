@@ -258,11 +258,11 @@ def layout_fact_occluding_icon_fill_plate(
     parent: CleanDesignTreeNode | None = None,
 ) -> bool:
     """Full-bleed fill plate painted above a raster glyph sibling (occludes baked icon)."""
-    if node.type != NodeType.CONTAINER or parent is None or parent.type != NodeType.STACK:
+    if node.type != NodeType.CONTAINER or parent is None:
+        return False
+    if not _compact_icon_glyph_host_for_fill_veto(parent):
         return False
     if node.style.background_color is None:
-        return False
-    if not layout_fact_compact_icon_glyph_host(parent):
         return False
     node_index = next(
         (index for index, child in enumerate(parent.children) if child.id == node.id),
@@ -276,6 +276,24 @@ def layout_fact_occluding_icon_fill_plate(
         if sibling.image_asset_key:
             return True
     return False
+
+
+def _compact_icon_glyph_host_for_fill_veto(parent: CleanDesignTreeNode) -> bool:
+    """Return True when parent is a compact icon host that may carry occluding fill plates."""
+    if parent.type == NodeType.STACK:
+        return layout_fact_compact_icon_glyph_host(parent)
+    if parent.type != NodeType.BUTTON:
+        return False
+    width = parent.sizing.width
+    height = parent.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) > _COMPACT_ICON_GLYPH_HOST_MAX or float(height) > _COMPACT_ICON_GLYPH_HOST_MAX:
+        return False
+    return any(
+        child.type == NodeType.VECTOR and (child.image_asset_key or child.vector_asset_key)
+        for child in parent.children
+    )
 
 
 def _vector_paint_span(node: CleanDesignTreeNode) -> tuple[float, float]:
@@ -498,6 +516,13 @@ def layout_fact_info_icon_button(node: CleanDesignTreeNode) -> bool:
     return has_ring and has_marker
 
 
+def layout_fact_button_has_occluding_icon_fill_plate(node: CleanDesignTreeNode) -> bool:
+    """Return True when a ``BUTTON`` hosts a baked glyph under a full-bleed fill plate."""
+    if node.type != NodeType.BUTTON:
+        return False
+    return any(layout_fact_occluding_icon_fill_plate(child, parent=node) for child in node.children)
+
+
 def layout_fact_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
     """Circular flex ``BUTTON`` frames that only host a chevron/close vector."""
     if layout_fact_info_icon_button(node):
@@ -508,9 +533,12 @@ def layout_fact_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if width is None or height is None:
         return False
+    min_extent = (
+        12.0 if layout_fact_button_has_occluding_icon_fill_plate(node) else _COMPACT_ICON_ACTION_MIN
+    )
     if not (
-        _COMPACT_ICON_ACTION_MIN <= width <= _COMPACT_ICON_ACTION_MAX + 28.0
-        and _COMPACT_ICON_ACTION_MIN <= height <= _COMPACT_ICON_ACTION_MAX + 28.0
+        min_extent <= width <= _COMPACT_ICON_ACTION_MAX + 28.0
+        and min_extent <= height <= _COMPACT_ICON_ACTION_MAX + 28.0
     ):
         return False
     return _stack_has_vector_icon(_descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH))

@@ -661,9 +661,19 @@ def button_painted_overlay_surface(node: CleanDesignTreeNode) -> CleanDesignTree
 
     if node.type != NodeType.BUTTON:
         return None
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_button_has_occluding_icon_fill_plate,
+        layout_fact_occluding_icon_fill_plate,
+    )
+
+    if layout_fact_button_has_occluding_icon_fill_plate(node):
+        return None
     candidates: list[CleanDesignTreeNode] = []
+
     for child in node.children:
         if child.type == NodeType.TEXT:
+            continue
+        if layout_fact_occluding_icon_fill_plate(child, parent=node):
             continue
         if not surface_covers_node(node, child):
             continue
