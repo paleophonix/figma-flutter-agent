@@ -36,7 +36,8 @@ def conservation_node_multiset(
     """Count ``node.id`` occurrences over a clean-tree walk.
 
     Ref-stubs with ``children=[]`` after cluster dedup remain one entry.
-    ``flatten_figma_node_ids`` is metadata and is not counted separately.
+    Each id in ``flatten_figma_node_ids`` is counted once (metadata for pruned
+    subtrees whose children were cleared).
     """
     omit = omit_ids or frozenset()
     counts: Counter[str] = Counter()
@@ -214,15 +215,31 @@ def check_node_multiset_preserved(
         return []
     missing = sorted(set(expected) - set(actual))
     extra = sorted(set(actual) - set(expected))
+    count_mismatch = [
+        f"{node_id}: {expected[node_id]} -> {actual[node_id]}"
+        for node_id in sorted(set(expected) | set(actual))
+        if expected[node_id] != actual[node_id]
+    ]
     detail_parts: list[str] = []
     if missing:
         detail_parts.append(f"missing={missing[:6]}")
     if extra:
         detail_parts.append(f"extra={extra[:6]}")
+    if count_mismatch:
+        detail_parts.append(f"count_mismatch={count_mismatch[:6]}")
+    culprit = (
+        missing[0]
+        if missing
+        else (
+            extra[0]
+            if extra
+            else (count_mismatch[0].split(":")[0] if count_mismatch else baseline.id)
+        )
+    )
     return [
         geometry_violation(
             code="inv_node_multiset",
-            node_id=missing[0] if missing else (extra[0] if extra else baseline.id),
+            node_id=culprit,
             detail="; ".join(detail_parts) or "multiset mismatch",
         ),
     ]

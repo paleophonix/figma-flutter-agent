@@ -1,5 +1,10 @@
 """Regression tests for LAW-CLUSTER-PRUNE-PAINT-CONSERVATION."""
 
+from copy import deepcopy
+
+from figma_flutter_agent.generator.geometry.invariants.conservation import (
+    conservation_node_multiset,
+)
 from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
 
@@ -41,6 +46,25 @@ def test_duplicate_plus_icon_keeps_children_without_vector_asset() -> None:
     assert duplicate.children
     assert duplicate.children[0].type == NodeType.VECTOR
     assert duplicate.children[0].vector_asset_key is None
+
+
+def test_duplicate_plus_icon_cp0_parse_preserves_multiset_and_inline_paint() -> None:
+    """Blocked prune must not assign flatten metadata while children remain."""
+    first = _plus_icon_stack(node_id="plus-1", vector_id="vec-1")
+    duplicate = _plus_icon_stack(node_id="plus-2", vector_id="vec-2")
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[first, duplicate],
+    )
+    before = conservation_node_multiset(deepcopy(root))
+    prune_generation_layout_tree(root, checkpoint="CP0_parse")
+    after = conservation_node_multiset(root)
+
+    assert before == after
+    assert duplicate.children
+    assert not duplicate.flatten_figma_node_ids
 
 
 def test_duplicate_plus_icon_forwards_vector_asset_when_template_bound() -> None:

@@ -11,7 +11,7 @@ cases:
   status: FIXED
   observed_at: '2026-07-06'
   created_at: '2026-07-06T18:00:00Z'
-  updated_at: '2026-07-06T18:00:00Z'
+  updated_at: '2026-07-06T19:30:00Z'
   summary: LAW-CLUSTER-PRUNE-PAINT-CONSERVATION — duplicated Icons/28/Plus 
     component instances (component_910_3249) are pruned to empty STACK children 
     while a visible VECTOR descendant lacks vectorAssetKey; hydration fails 

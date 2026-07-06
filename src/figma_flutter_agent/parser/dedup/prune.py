@@ -17,9 +17,7 @@ def _would_drop_unbound_visible_vectors(
     image_asset_key: str | None = None,
 ) -> bool:
     """True when pruning would remove visible VECTOR paint without a drawable transfer."""
-    effective_image = (
-        image_asset_key if image_asset_key is not None else node.image_asset_key
-    )
+    effective_image = image_asset_key if image_asset_key is not None else node.image_asset_key
     if asset is not None or node.vector_asset_key or effective_image:
         return False
     effective_text = text if text is not None else node.text
