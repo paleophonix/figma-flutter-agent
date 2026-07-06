@@ -119,3 +119,97 @@ Analyzing element_coordinate_mapper.dart...
    info - element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
 1 issue found.
+
+--- dart format @ 2026-07-06T22:08:47.008374+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\close_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\cutlery_info_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\delivery_status_badge_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\detail_info_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\detail_row_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\large_action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\order_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\test\golden\niyama_order_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-c2hoidzr\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 23 files (23 changed) in 2.03 seconds.
+
+--- dart format @ 2026-07-06T22:08:51.234824+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\close_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\cutlery_info_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\delivery_status_badge_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\detail_info_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\detail_row_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\large_action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\order_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\test\golden\niyama_order_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ulr9zrtl\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 23 files (23 changed) in 2.06 seconds.
+
+--- dart format @ 2026-07-06T22:08:55.927944+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\features\niyama_order_2\niyama_order_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\close_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\cutlery_info_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\delivery_status_badge_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\detail_info_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\detail_row_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\large_action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\order_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\test\golden\niyama_order_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yxz0i20b\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 23 files (23 changed) in 2.25 seconds.
+
+--- pub get --offline @ 2026-07-06T22:08:59.367098+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
