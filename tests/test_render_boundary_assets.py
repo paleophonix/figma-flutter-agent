@@ -46,6 +46,34 @@ def test_discover_asset_path_for_instance_leaf_id(tmp_path: Path) -> None:
     )
 
 
+def test_discover_asset_path_for_component_vector_family_variant(tmp_path: Path) -> None:
+    """Sibling variant vectors in one Figma file share a file-key export family."""
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    (icons / "vector_1162_10106.svg").write_text("<svg></svg>", encoding="utf-8")
+    variant_id = "I3561:42994;1406:12001;1162:10248"
+    assert (
+        discover_asset_path_for_node(tmp_path, variant_id) == "assets/icons/vector_1162_10106.svg"
+    )
+
+
+def test_resolve_discovered_vector_asset_keys_binds_component_vector_family(
+    tmp_path: Path,
+) -> None:
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    (icons / "vector_1162_10106.svg").write_text("<svg></svg>", encoding="utf-8")
+    vector = CleanDesignTreeNode(
+        id="I3561:42994;1406:12001;1162:10248",
+        name="Vector",
+        type=NodeType.VECTOR,
+        component_ref="3481:34993",
+        sizing=Sizing(width=28.0, height=28.0),
+    )
+    resolve_discovered_vector_asset_keys(vector, tmp_path)
+    assert vector.vector_asset_key == "assets/icons/vector_1162_10106.svg"
+
+
 def test_resolve_discovered_vector_asset_keys_attaches_export(tmp_path: Path) -> None:
     icons = tmp_path / "assets" / "icons"
     icons.mkdir(parents=True)

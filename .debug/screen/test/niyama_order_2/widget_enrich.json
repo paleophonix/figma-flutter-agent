@@ -1,0 +1,77 @@
+{
+  "cacheKey": "a7101c446fa577a3651e72766c20747bd04d9cba78c4e7dd425f345f26c7c708",
+  "response": {
+    "entries": [
+      {
+        "clusterId": "component_3481_34334_871e00fd",
+        "widgetName": "BonusCountWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_34372",
+        "widgetName": "CloseIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_34398",
+        "widgetName": "CloseButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_34494",
+        "widgetName": "ModalHeaderWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_34558",
+        "widgetName": "SystemStatusBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_34585",
+        "widgetName": "HomeIndicatorWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_34893",
+        "widgetName": "SectionDividerWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_34945_bffe9c04",
+        "widgetName": "OrderProductItemWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_35010_49f9e897",
+        "widgetName": "CutleryInfoWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_35156",
+        "widgetName": "DeliveryStatusBadgeWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_35165_7cbfe998",
+        "widgetName": "DetailInfoCardWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_35212_0f40abd8",
+        "widgetName": "DetailRowCardWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_35218_9ad9ee27",
+        "widgetName": "LargeActionButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_3481_35229_81156683",
+        "widgetName": "OrderActionBarWidget",
+        "paramRenames": {}
+      }
+    ]
+  }
+}

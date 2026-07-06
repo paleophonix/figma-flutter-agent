@@ -77,6 +77,33 @@ def _asset_lookup_safe_ids(node_id: str) -> list[str]:
     return probes
 
 
+def _component_file_key_prefix_safe(node_id: str) -> str | None:
+    """Return ``<file_key>_`` safe prefix for variant vectors inside one Figma file."""
+    leaf = node_id.rsplit(";", maxsplit=1)[-1]
+    if ":" not in leaf:
+        return None
+    file_key = leaf.rsplit(":", maxsplit=1)[0].replace(":", "_")
+    return f"{file_key}_" if file_key else None
+
+
+def lookup_asset_path_for_component_vector_family(
+    asset_index: dict[str, str],
+    node_id: str,
+) -> str | None:
+    """Resolve a sibling variant vector export via shared Figma file-key prefix."""
+    prefix = _component_file_key_prefix_safe(node_id)
+    if prefix is None:
+        return None
+    candidates: list[tuple[tuple[int, str], str]] = []
+    for safe_id, rel_path in asset_index.items():
+        if not safe_id.startswith(prefix):
+            continue
+        candidates.append((_vector_asset_discovery_rank(rel_path), rel_path))
+    if not candidates:
+        return None
+    return min(candidates, key=lambda item: item[0])[1]
+
+
 def lookup_asset_path_for_node(
     asset_index: dict[str, str],
     node_id: str,
@@ -86,7 +113,7 @@ def lookup_asset_path_for_node(
         resolved = asset_index.get(safe_id)
         if resolved is not None:
             return resolved
-    return None
+    return lookup_asset_path_for_component_vector_family(asset_index, node_id)
 
 
 def discover_asset_path_for_node(
@@ -114,7 +141,13 @@ def discover_asset_path_for_node(
                     rank = _vector_asset_discovery_rank(rel)
                     if best is None or rank < best[0]:
                         best = (rank, rel)
-    return best[1] if best is not None else None
+    if best is not None:
+        return best[1]
+    family = lookup_asset_path_for_component_vector_family(
+        build_asset_node_index(project_dir),
+        node_id,
+    )
+    return family
 
 
 def _vector_asset_discovery_rank(asset_path: str) -> tuple[int, str]:
@@ -407,6 +440,8 @@ def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:
             ordered.append(node_id)
 
     add(node.id)
+    if node.component_ref:
+        add(node.component_ref)
     for flattened_id in node.flatten_figma_node_ids or ():
         add(flattened_id)
 

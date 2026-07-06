@@ -128,7 +128,13 @@ def render_simple_controls(
         )
 
     if node.type == NodeType.DIALOG:
-        widget = render_dialog(node, child_widgets=child_widgets, theme_variant=theme_variant)
+        from figma_flutter_agent.generator.layout.form import render_custom_overlay_sheet
+        from figma_flutter_agent.parser.components import clean_is_custom_overlay_sheet
+
+        if clean_is_custom_overlay_sheet(node):
+            widget = render_custom_overlay_sheet(node, child_widgets)
+        else:
+            widget = render_dialog(node, child_widgets=child_widgets, theme_variant=theme_variant)
         return _finalize_widget(
             node,
             widget,
@@ -326,6 +332,7 @@ def render_card(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, 
 
     from figma_flutter_agent.generator.layout.flex_policy import (
         card_has_edge_to_edge_hero_stack,
+        card_has_horizontal_thumbnail_body_row,
         card_has_inset_hero_media_frame,
     )
     from figma_flutter_agent.generator.layout.scroll import padding_edge_insets
@@ -463,7 +470,29 @@ def render_card(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, 
             width=node.sizing.width,
             height=node.sizing.height,
         )
-        if decoration is not None and node.style.effects:
+        if card_has_horizontal_thumbnail_body_row(node):
+            spacing = format_geometry_literal(float(node.spacing or 12.0))
+            row_body = (
+                f"Row("
+                f"crossAxisAlignment: CrossAxisAlignment.center, "
+                f"spacing: {spacing}, "
+                f"children: [{body}]"
+                f")"
+            )
+            card_width = node.sizing.width
+            card_height = node.sizing.height
+            width_lit = (
+                format_geometry_literal(float(card_width))
+                if card_width is not None and float(card_width) > 0
+                else "double.infinity"
+            )
+            height_lit = (
+                format_geometry_literal(float(card_height))
+                if card_height is not None and float(card_height) > 0
+                else "double.infinity"
+            )
+            widget = f"SizedBox(width: {width_lit}, height: {height_lit}, child: {row_body})"
+        elif decoration is not None and node.style.effects:
             widget = f"Container(decoration: {decoration}, child: {body})"
         else:
             widget = (

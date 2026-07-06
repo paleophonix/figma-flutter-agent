@@ -2,6 +2,22 @@ version: 1
 family_id: extracted_cluster_unbound_vector_shrink
 generated: true
 cases:
+- case_id: 2026-07-07-niyama-cutlery-component-vector-family-discovery
+  case_file: 
+    cases/2026-07-07-niyama-cutlery-component-vector-family-discovery.yaml
+  title: Component variant vector binds sibling export via file-key family 
+    discovery
+  project: test
+  feature: niyama_order_2
+  occurrence_id: niyama-order-2-cutlery-variant-vector-family
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T21:30:00Z'
+  updated_at: '2026-07-07T21:45:00Z'
+  summary: CutleryInfoWidget cluster materialization aborts when a visible 
+    compact icon VECTOR uses a variant leaf id (1162:10248) that was not 
+    re-exported, while an on-disk SVG from the same Figma component file key 
+    (vector_1162_10106.svg) already exists from a sibling variant on anothe...
 - case_id: 2026-07-06-verbatica-status-icon-unbound-vector
   case_file: cases/2026-07-06-verbatica-status-icon-unbound-vector.yaml
   title: Status bar icon clusters fail with missing vector asset error

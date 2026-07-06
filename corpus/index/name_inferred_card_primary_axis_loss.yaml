@@ -1,0 +1,18 @@
+version: 1
+family_id: name_inferred_card_primary_axis_loss
+generated: true
+cases:
+- case_id: 2026-07-07-niyama-card-horizontal-row-axis
+  case_file: cases/2026-07-07-niyama-card-horizontal-row-axis.yaml
+  title: Horizontal product row must not verticalize through generic Card emit
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-horizontal-product-card
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T01:10:00Z'
+  updated_at: '2026-07-07T01:10:00Z'
+  summary: Product rows named Card (347x76, image 76x76 + body column) were 
+    typed CARD from the layer name and emitted through Card→Column(stretch), 
+    stacking image above body and blowing vertical layout. Horizontal thumbnail 
+    rows must reject name-only CARD typing and emit Row when anatom...

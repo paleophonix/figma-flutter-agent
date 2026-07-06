@@ -1,0 +1,18 @@
+version: 1
+family_id: flex_cross_stretch_inflates_fixed_child
+generated: true
+cases:
+- case_id: 2026-07-07-niyama-image-cross-stretch-blowup
+  case_file: cases/2026-07-07-niyama-image-cross-stretch-blowup.yaml
+  title: Product image inflated by CrossAxisAlignment.stretch and BoxFit.cover
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-image-cross-stretch
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T00:30:00Z'
+  updated_at: '2026-07-07T01:10:00Z'
+  summary: 'In OrderProductItemWidget the product thumbnail is emitted as Image.asset(width:
+    76, height: 76, fit: BoxFit.cover) as a direct child of a Column with crossAxisAlignment:
+    CrossAxisAlignment.stretch. The stretch imposes a tight cross-axis width, overriding
+    the 76px width so the...'

@@ -1,0 +1,60 @@
+version: 1
+
+case:
+  id: 2026-07-07-niyama-card-horizontal-row-axis
+  title: Horizontal product row must not verticalize through generic Card emit
+  case_kind: regression
+  project: test
+  feature: niyama_order
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T01:10:00Z'
+  updated_at: '2026-07-07T01:10:00Z'
+  summary: >
+    Product rows named Card (347x76, image 76x76 + body column) were typed CARD from the
+    layer name and emitted through Card→Column(stretch), stacking image above body and
+    blowing vertical layout. Horizontal thumbnail rows must reject name-only CARD typing
+    and emit Row when anatomy is image+body side by side.
+
+occurrences:
+  - id: niyama-order-horizontal-product-card
+    family_id: name_inferred_card_primary_axis_loss
+    pipeline_arrow: A4
+    law_id: LAW-SEMANTIC-TYPE-PRESERVES-PRIMARY-AXIS
+    stage: parser
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/parser/components.py
+      symbol: validate_semantic_type_for_node
+    contract:
+      field: horizontal product row primary axis
+      field_class: fact
+      category: illegal
+      expected: >
+        A horizontal image+body row keeps ROW/COLUMN anatomy and CARD emit uses Row, not
+        a vertical Card→Column fallback.
+      actual: >
+        Name Card forced CARD typing and generic Card→Column verticalized the row.
+    authority_boundary: clean_tree_semantic_type
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/niyama_order/processed.json
+        summary: Card nodes 347x76 with IMAGE 76x76 + COLUMN Body typed CARD.
+      - kind: test
+        path: tests/test_layout_card.py
+        summary: test_horizontal_product_row_card_emits_row_not_column
+    repair:
+      summary: >
+        Reject name-only CARD for horizontal product-row anatomy in parser validation and
+        emit Row for CARD nodes matching thumbnail+body horizontal layout in render_card.
+      changed_files:
+        - src/figma_flutter_agent/parser/components.py
+        - src/figma_flutter_agent/generator/layout/flex_policy/stack.py
+        - src/figma_flutter_agent/generator/layout/widgets/emit/containers.py
+      regression_tests:
+        - tests/test_components.py::test_name_card_rejects_horizontal_product_row_frame
+        - tests/test_layout_card.py::test_horizontal_product_row_card_emits_row_not_column
+      verification:
+        - poetry run pytest tests/test_components.py tests/test_layout_card.py -q

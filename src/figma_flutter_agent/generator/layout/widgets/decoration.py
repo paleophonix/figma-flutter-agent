@@ -59,8 +59,12 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
             f"size: {format_geometry_literal(chevron_size)})"
         )
     if has_stroke and height <= 2.5 and width >= 8.0:
-        size = max(min(width * 1.6, 24.0), 16.0)
-        return f"Icon(Icons.remove, color: {color}, size: {format_geometry_literal(size)})"
+        width_lit = format_geometry_literal(max(width, 1.0))
+        thickness_lit = format_geometry_literal(max(height, 1.0))
+        return (
+            f"SizedBox(width: {width_lit}, "
+            f"child: Divider(color: {color}, thickness: {thickness_lit}, height: {thickness_lit}))"
+        )
     if has_stroke and width <= 2.5 and height >= 8.0:
         size = max(min(height * 1.6, 24.0), 16.0)
         return f"Icon(Icons.add, color: {color}, size: {format_geometry_literal(size)})"

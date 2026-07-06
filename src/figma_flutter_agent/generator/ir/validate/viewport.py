@@ -90,6 +90,13 @@ def _clamp_viewport_bounds(
         return False
     left, top, box_width, box_height = metrics
     margin = _VIEWPORT_OVERFLOW_MARGIN_PX
+    root_id = parent_by_id.get(clean.id)
+    root = tree_by_id.get(root_id) if root_id is not None else None
+    if root is not None:
+        from figma_flutter_agent.generator.artboard import is_tall_mobile_artboard
+
+        if is_tall_mobile_artboard(root.sizing.width, root.sizing.height):
+            return False
     if _viewport_clamp_preserves_outward_paint(clean, top=top, margin=margin):
         return False
     if _placement_preserves_artboard_right_peek(

@@ -1,0 +1,121 @@
+
+--- dart format @ 2026-07-06T22:08:17.166746+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\close_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\cutlery_info_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\delivery_status_badge_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\detail_info_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\detail_row_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\large_action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\order_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\test\golden\niyama_order_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-su_vjzrc\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 23 files (23 changed) in 2.01 seconds.
+
+--- pub get --offline @ 2026-07-06T22:08:20.585356+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/2) @ 2026-07-06T22:08:23.426511+00:00 ---
+exit_code=0
+Analyzing close_icon_widget.dart, cutlery_info_widget.dart, delivery_status_badge_widget.dart, detail_info_card_widget.dart, detail_row_card_widget.dart, home_indicator_widget.dart...
+
+warning - lib\widgets\home_indicator_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\home_indicator_widget.dart:5:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\home_indicator_widget.dart:6:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+
+3 issues found.
+
+--- dart analyze (generated) (2/2) @ 2026-07-06T22:08:26.377658+00:00 ---
+exit_code=0
+Analyzing large_action_button_widget.dart, modal_header_widget.dart, order_action_bar_widget.dart, order_product_item_widget.dart, section_divider_widget.dart...
+
+warning - lib\widgets\section_divider_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\section_divider_widget.dart:5:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\section_divider_widget.dart:6:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\modal_header_widget.dart:15:465 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:19:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:19:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+6 issues found.
+
+--- dart analyze (generated) (1/5) @ 2026-07-06T22:08:30.524316+00:00 ---
+exit_code=0
+Analyzing niyama_order_2_screen.dart, niyama_order_2_chunk_662b1bc1.dart, niyama_order_2_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart...
+
+warning - lib\features\niyama_order_2\niyama_order_2_screen.dart:7:8 - Unused import: 'package:test/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order_2\niyama_order_2_screen.dart:8:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order_2\niyama_order_2_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order_2\niyama_order_2_screen.dart:11:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_2_chunk_662b1bc1.dart:8:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_2_chunk_662b1bc1.dart:10:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_2_layout.dart:12:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_2_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\niyama_order_2_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\niyama_order_2_layout.dart:37:3159 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_2_layout.dart:37:3225 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_2_layout.dart:37:3313 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+12 issues found.
+
+--- dart analyze (generated) (2/5) @ 2026-07-06T22:08:33.384377+00:00 ---
+exit_code=0
+Analyzing app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart...
+
+warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+
+1 issue found.
+
+--- dart analyze (generated) (3/5) @ 2026-07-06T22:08:36.321419+00:00 ---
+exit_code=0
+Analyzing close_icon_widget.dart, cutlery_info_widget.dart, delivery_status_badge_widget.dart, detail_info_card_widget.dart, detail_row_card_widget.dart, home_indicator_widget.dart...
+
+warning - lib\widgets\home_indicator_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\home_indicator_widget.dart:5:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\home_indicator_widget.dart:6:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+
+3 issues found.
+
+--- dart analyze (generated) (4/5) @ 2026-07-06T22:08:39.791034+00:00 ---
+exit_code=0
+Analyzing large_action_button_widget.dart, modal_header_widget.dart, order_action_bar_widget.dart, order_product_item_widget.dart, section_divider_widget.dart, niyama_order_2_screen_test.dart...
+
+warning - lib\widgets\section_divider_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\section_divider_widget.dart:5:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\section_divider_widget.dart:6:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\modal_header_widget.dart:15:465 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:19:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:19:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+6 issues found.
+
+--- dart analyze (generated) (5/5) @ 2026-07-06T22:08:42.577656+00:00 ---
+exit_code=0
+Analyzing element_coordinate_mapper.dart...
+
+   info - element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+
+1 issue found.

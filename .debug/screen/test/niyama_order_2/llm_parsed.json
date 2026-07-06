@@ -1,0 +1,1008 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "niyama_order_2",
+  "screenIr": {
+    "root": {
+      "figmaId": "3561:42973",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "3561:42976",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "3561:42977",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3561:42977;919:5312",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I3561:42977;919:5313",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "CloseButtonWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "3561:42978",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "3561:42979",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3561:42979;1406:13315",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "3561:42980",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "3561:42981",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "3561:42982",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "3561:42983",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "3561:42984",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "3561:42985",
+                          "kind": "extracted",
+                          "children": [],
+                          "ref": {
+                            "widgetName": "BonusBadgeWidget",
+                            "namedArgs": {}
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "3561:42986",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "3561:42987",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "3561:42988",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "figmaId": "3561:42989",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "3561:42990",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3561:42990;1406:11910",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3561:42990;1406:11911",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I3561:42990;1406:11912",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I3561:42990;1406:11913",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:42990;1406:11914",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:42990;1406:11915",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I3561:42990;1406:11916",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:42990;1406:11917",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "I3561:42990;1406:11919",
+                      "kind": "extracted",
+                      "children": [],
+                      "ref": {
+                        "widgetName": "LineBorderWidget",
+                        "namedArgs": {}
+                      }
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "3561:42991",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3561:42991;1406:11910",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3561:42991;1406:11911",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I3561:42991;1406:11912",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I3561:42991;1406:11913",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:42991;1406:11914",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:42991;1406:11915",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I3561:42991;1406:11916",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:42991;1406:11917",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "I3561:42991;1406:11919",
+                      "kind": "extracted",
+                      "children": [],
+                      "ref": {
+                        "widgetName": "LineBorderWidget",
+                        "namedArgs": {}
+                      }
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "3561:42992",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3561:42992;1406:11910",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3561:42992;1406:11911",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I3561:42992;1406:11912",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I3561:42992;1406:11913",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:42992;1406:11914",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:42992;1406:11915",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I3561:42992;1406:11916",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I3561:42992;1406:11919",
+                          "kind": "extracted",
+                          "children": [],
+                          "ref": {
+                            "widgetName": "LineBorderWidget",
+                            "namedArgs": {}
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "3561:42993",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3561:42993;1406:11910",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I3561:42993;1406:11911",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I3561:42993;1406:11912",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:42993;1406:11913",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:42993;1406:11914",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I3561:42993;1406:11915",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I3561:42993;1406:11916",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:42993;1406:11919",
+                                  "kind": "extracted",
+                                  "children": [],
+                                  "ref": {
+                                    "widgetName": "LineBorderWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "3561:42994",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:42994;1406:11998",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:42994;1406:11999",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I3561:42994;1406:12000",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I3561:42994;1406:12001",
+                                              "kind": "extracted",
+                                              "children": [],
+                                              "ref": {
+                                                "widgetName": "CutleryIconWidget",
+                                                "namedArgs": {}
+                                              }
+                                            },
+                                            {
+                                              "figmaId": "I3561:42994;1406:12002",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "3561:42995",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "3561:42996",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "3561:42997",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "3561:42999",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "3561:43000",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43000;1311:8994",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:43000;1311:8995",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I3561:43000;1311:9010",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:43000;1311:8997",
+                                  "kind": "extracted",
+                                  "children": [],
+                                  "ref": {
+                                    "widgetName": "LineBorderWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "3561:43001",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43001;1311:8994",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:43001;1311:8995",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I3561:43001;1311:9010",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:43001;1311:8997",
+                                  "kind": "extracted",
+                                  "children": [],
+                                  "ref": {
+                                    "widgetName": "LineBorderWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "3561:43002",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43002;1311:8994",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:43002;1311:8995",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I3561:43002;1311:9010",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:43002;1311:8997",
+                                  "kind": "extracted",
+                                  "children": [],
+                                  "ref": {
+                                    "widgetName": "LineBorderWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "3561:43003",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43003;1311:8994",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:43003;1311:8995",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I3561:43003;1311:9010",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:43003;1311:8997",
+                                  "kind": "extracted",
+                                  "children": [],
+                                  "ref": {
+                                    "widgetName": "LineBorderWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "3561:43004",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43004;1311:8994",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:43004;1311:8995",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I3561:43004;1311:9010",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:43004;1311:8997",
+                                  "kind": "extracted",
+                                  "children": [],
+                                  "ref": {
+                                    "widgetName": "LineBorderWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "3561:43005",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43005;1033:7730",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:43005;1517:20251",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I3561:43005;1033:7707",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I3561:43005;1033:7727",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "3561:43006",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3561:43006;1026:6467",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I3561:43006;1026:6468",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43006;1026:6468;1026:6442",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "I3561:43006;1026:6469",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43006;1026:6469;1406:13137",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I3561:43006;1026:6470",
+                          "kind": "extracted",
+                          "children": [],
+                          "ref": {
+                            "widgetName": "HomeIndicatorWidget",
+                            "namedArgs": {}
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "3561:43007",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "3561:43008",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "3561:43009",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "3561:43010",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "3561:43011",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43011;1435:18100",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:43011;1435:15488",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I3561:43011;1517:21465",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I3561:43011;1435:15489",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I3561:43011;1435:15490",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I3561:43011;1435:18098",
+                                      "kind": "extracted",
+                                      "children": [],
+                                      "ref": {
+                                        "widgetName": "MapIconWidget",
+                                        "namedArgs": {}
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I3561:43011;1435:15491",
+                                  "kind": "extracted",
+                                  "children": [],
+                                  "ref": {
+                                    "widgetName": "LineBorderWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "3561:43012",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I3561:43012;1435:18100",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I3561:43012;1435:15488",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I3561:43012;1517:21465",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I3561:43012;1435:15489",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I3561:43012;1435:15490",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I3561:43012;1435:18098",
+                                      "kind": "extracted",
+                                      "children": [],
+                                      "ref": {
+                                        "widgetName": "BookReaderIconWidget",
+                                        "namedArgs": {}
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "3561:42974",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "3561:42975",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "3561:42975",
+      "3561:42976",
+      "3561:42974"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "order_receipt",
+      "confidence": 0.96,
+      "explanation": "Order completion receipt modal with delivery details, itemized product list, payment summary, and bottom action buttons.",
+      "warnings": [
+        "Absolute-positioned STACK root; preserve overlay paint order.",
+        "Several sections are informational rather than interactive."
+      ]
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "I3561:42977;919:5313",
+        "role": "button",
+        "subtype": "close",
+        "controlNodeId": "I3561:42977;919:5313",
+        "boundaryNodeId": "I3561:42977;919:5313",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I3561:42977;919:5313;913:17731",
+          "I3561:42977;919:5313;913:17731;913:17711"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "dismiss",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44x44",
+          "edge_aligned_overlay_button"
+        ],
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "dismiss_modal"
+        ],
+        "explanation": "Top-right close control for dismissing the order modal."
+      },
+      {
+        "nodeId": "I3561:43006;1026:6468",
+        "role": "button",
+        "subtype": "secondary_action",
+        "controlNodeId": "I3561:43006;1026:6468",
+        "boundaryNodeId": "I3561:43006;1026:6468",
+        "labelNodeIds": [
+          "I3561:43006;1026:6468;1026:6442"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "write_review",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44x44",
+          "two_action_bottom_bar"
+        ],
+        "options": [],
+        "confidence": 0.96,
+        "proposedEffects": [
+          "open_review_form"
+        ],
+        "explanation": "Primary left action in the bottom bar, labeled to leave a review."
+      },
+      {
+        "nodeId": "I3561:43006;1026:6469",
+        "role": "button",
+        "subtype": "primary_action",
+        "controlNodeId": "I3561:43006;1026:6469",
+        "boundaryNodeId": "I3561:43006;1026:6469",
+        "labelNodeIds": [
+          "I3561:43006;1026:6469;1406:13137"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "repeat_order",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44x44",
+          "two_action_bottom_bar"
+        ],
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "repeat_order"
+        ],
+        "explanation": "Primary right action in the bottom bar, intended to repeat the order."
+      },
+      {
+        "nodeId": "3561:43005",
+        "role": "information",
+        "subtype": "comment_block",
+        "boundaryNodeId": "3561:43005",
+        "labelNodeIds": [
+          "I3561:43005;1033:7727"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I3561:43005;1033:7707"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "isMultiline": true,
+          "maxLines": 2,
+          "obscureText": false,
+          "currentValue": "Во дворе есть охрана, пожалуйста, позвоните как курьер подъедет",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "multiline_text_block_top_align"
+        ],
+        "value": "Во дворе есть охрана, пожалуйста, позвоните как курьер подъедет",
+        "options": [],
+        "confidence": 0.89,
+        "proposedEffects": [],
+        "explanation": "Delivery note/comment text block with a caption label."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "CloseButtonWidget",
+      "widgetIr": {
+        "figmaId": "I3561:42977;919:5313",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3561:42977;919:5313;913:17731",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I3561:42977;919:5313;913:17731;913:17711",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "BonusBadgeWidget",
+      "widgetIr": {
+        "figmaId": "3561:42985",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3561:42985;1154:8698",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "LineBorderWidget",
+      "widgetIr": {
+        "figmaId": "I3561:42990;1406:11919",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3561:42990;1406:11919;933:4776",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "HomeIndicatorWidget",
+      "widgetIr": {
+        "figmaId": "I3561:43006;1026:6470",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3561:43006;1026:6470;908:4710",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "MapIconWidget",
+      "widgetIr": {
+        "figmaId": "I3561:43011;1435:18098",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3561:43011;1435:18098;1162:10099",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "BookReaderIconWidget",
+      "widgetIr": {
+        "figmaId": "I3561:43012;1435:18098",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3561:43012;1435:18098;3446:32815",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ],
+  "irCacheFingerprintVersion": "1",
+  "cleanTreeHash": "866e100193681c6a213c977ce5f837837629d1e633082f0c4819dd7322aeb2c4",
+  "cleanRootFigmaId": "3561:42973",
+  "cleanRootType": "STACK",
+  "cleanRootWidth": 375.0,
+  "cleanRootHeight": 1691.0,
+  "parserVersion": "2026.06.1",
+  "irSchemaVersion": "1",
+  "generationConfigFingerprintVersion": "1",
+  "generationConfigHash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06"
+}

@@ -77,6 +77,34 @@ def test_apply_ir_guards_clamps_viewport_by_default() -> None:
     assert child.stack_placement.top != 800.0
 
 
+def test_viewport_clamp_skips_tall_scroll_artboard_children() -> None:
+    chrome = CleanDesignTreeNode(
+        id="chrome",
+        name="Adss",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=887.0),
+        stack_placement=StackPlacement(
+            horizontal="LEFT",
+            left=0.0,
+            top=1020.0,
+            width=375.0,
+            height=887.0,
+        ),
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=1483.0),
+        children=[chrome],
+    )
+    screen_ir = default_screen_ir(root)
+    guarded = apply_ir_guards(screen_ir, root, preserve_placement=False)
+    child = guarded.children[0]
+    assert child.stack_placement is not None
+    assert child.stack_placement.top == 1020.0
+
+
 def test_viewport_clamp_preserves_outward_glow_bleed() -> None:
     """Atmospheric glow layers may extend above the artboard without viewport clamp."""
     from figma_flutter_agent.generator.ir.validate.viewport import _clamp_viewport_bounds

@@ -817,3 +817,90 @@ families:
       the single-line Dart string literal, yielding an unterminated_string_literal and
       illegal_character analyzer errors and aborting codegen before writeback.
     status: active
+
+  - id: flex_cross_stretch_inflates_fixed_child
+    title: CrossAxisAlignment.stretch inflates a fixed-size flex child
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/row.py
+        symbol: _column_child_keeps_intrinsic_width
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
+        symbol: apply_flex_wrap_to_widget
+    law_ids:
+      - LAW-CROSS-STRETCH-PRESERVES-FIXED-CHILD
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      A fixed or hug-size leaf (image, chip, badge) emitted as a direct child of a
+      CrossAxisAlignment.stretch Row/Column receives a tight cross-axis constraint that
+      overrides its width/height, inflating it to the parent extent (with BoxFit.cover
+      blowing images up) and causing RenderFlex overflow. Hug children must be wrapped
+      in Align/SizedBox so cross-stretch cannot override their intrinsic size.
+    status: active
+
+  - id: name_inferred_custom_sheet_native_dialog
+    title: Name-only modal hint types a custom overlay sheet as native DIALOG
+    pipeline_arrows:
+      - A4
+      - A3
+    owning_stage: parser
+    owners:
+      - module: src/figma_flutter_agent/parser/components.py
+        symbol: validate_semantic_type_for_node
+      - module: src/figma_flutter_agent/generator/layout/form.py
+        symbol: render_custom_overlay_sheet
+    law_ids:
+      - LAW-CUSTOM-OVERLAY-PAINT-CONSERVATION
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      A full-width custom overlay sheet (large frame, rich subtree, custom fill) must not
+      receive NodeType.DIALOG from layer-name hints alone. Native AlertDialog substitution
+      leaks frame titles, applies Material chrome, and narrows content. Prototype overlay
+      metadata may still authorize DIALOG; custom sheets render structurally.
+    status: active
+
+  - id: name_inferred_card_primary_axis_loss
+    title: Name-only card hint verticalizes a horizontal product row
+    pipeline_arrows:
+      - A4
+      - A3
+    owning_stage: parser
+    owners:
+      - module: src/figma_flutter_agent/parser/components.py
+        symbol: validate_semantic_type_for_node
+      - module: src/figma_flutter_agent/generator/layout/widgets/emit/containers.py
+        symbol: render_card
+    law_ids:
+      - LAW-SEMANTIC-TYPE-PRESERVES-PRIMARY-AXIS
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      A horizontal image+body product row must not be typed CARD from the layer name alone
+      nor emitted through the generic Card→Column fallback. Primary axis and thumbnail
+      anatomy must be preserved via parser rejection and axis-aware CARD emit (Row).
+    status: active
+
+  - id: tall_artboard_root_child_viewport_clamp
+    title: Viewport clamp rewrites scroll-tail stack placement on tall artboards
+    pipeline_arrows:
+      - CP2
+    owning_stage: ir_guards
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/validate/viewport.py
+        symbol: _clamp_viewport_bounds
+    law_ids:
+      - LAW-SCROLL-ARTBOARD-ABSOLUTE-PLACEMENT-CONSERVATION
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Root stack children whose bottom edge extends past the artboard height are scroll-tail
+      content. Viewport clamp must not rewrite their top coordinate upward to fit the
+      artboard box; preserve Figma absolute placement for long scroll screens.
+    status: active

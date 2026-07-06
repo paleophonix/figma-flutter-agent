@@ -456,6 +456,39 @@ def card_child_is_product_tile_metadata_slot(
     return card_has_edge_to_edge_hero_stack(parent_node)
 
 
+def card_has_horizontal_thumbnail_body_row(node: CleanDesignTreeNode) -> bool:
+    """Return True when a CARD is a compact horizontal image+body product row."""
+    if node.type != NodeType.CARD or len(node.children) != 2:
+        return False
+    media, body = node.children[0], node.children[1]
+    if media.type not in {NodeType.IMAGE, NodeType.STACK, NodeType.CONTAINER}:
+        return False
+    if body.type not in {NodeType.COLUMN, NodeType.ROW}:
+        return False
+    card_width = node.sizing.width
+    card_height = node.sizing.height
+    media_width = media.sizing.width
+    media_height = media.sizing.height
+    if (
+        card_width is None
+        or card_height is None
+        or media_width is None
+        or media_height is None
+        or float(card_width) <= 0
+        or float(card_height) <= 0
+        or float(media_width) <= 0
+        or float(media_height) <= 0
+    ):
+        return False
+    if float(card_height) > float(card_width) * 0.5:
+        return False
+    if float(media_width) > float(card_width) * 0.45:
+        return False
+    if float(media_height) > float(card_height) * 1.1:
+        return False
+    return float(media_width) <= float(card_height) * 1.2
+
+
 def _is_compact_dimension_label(text: str) -> bool:
     """Return True for short numeric or apparel-size labels on circular option chips."""
     stripped = text.strip()

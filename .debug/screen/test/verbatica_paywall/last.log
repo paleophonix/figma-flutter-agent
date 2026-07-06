@@ -1,30 +1,30 @@
 
---- dart format @ 2026-07-06T20:29:43.540555+00:00 ---
+--- dart format @ 2026-07-06T21:59:13.939371+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\features\verbatica_paywall\verbatica_paywall_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\battery_status_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\cellular_signal_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\close_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\paywall_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\start_free_trial_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\status_bar_content_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\tertiary_action_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\lib\widgets\wifi_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\test\golden\verbatica_paywall_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-m5lw5k6g\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 21 files (21 changed) in 0.78 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\features\verbatica_paywall\verbatica_paywall_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\battery_status_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\cellular_signal_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\close_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\paywall_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\start_free_trial_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\status_bar_content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\tertiary_action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\lib\widgets\wifi_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\test\golden\verbatica_paywall_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xj_1he6s\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 21 files (21 changed) in 0.69 seconds.
 
---- pub get --offline @ 2026-07-06T20:29:47.144891+00:00 ---
+--- pub get --offline @ 2026-07-06T21:59:17.291055+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -37,7 +37,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/2) @ 2026-07-06T20:29:49.833717+00:00 ---
+--- dart analyze (generated) (1/2) @ 2026-07-06T21:59:21.407235+00:00 ---
 exit_code=0
 Analyzing battery_status_icon_widget.dart, cellular_signal_icon_widget.dart, close_button_widget.dart, home_indicator_widget.dart, paywall_status_bar_widget.dart, start_free_trial_button_widget.dart...
 
@@ -52,7 +52,7 @@ warning - lib\widgets\home_indicator_widget.dart:6:8 - Unused import: 'package:t
 
 8 issues found.
 
---- dart analyze (generated) (2/2) @ 2026-07-06T20:29:52.602451+00:00 ---
+--- dart analyze (generated) (2/2) @ 2026-07-06T21:59:24.177142+00:00 ---
 exit_code=0
 Analyzing status_bar_content_widget.dart, tertiary_action_button_widget.dart, wifi_icon_widget.dart...
 
@@ -61,13 +61,11 @@ warning - lib\widgets\tertiary_action_button_widget.dart:5:8 - Unused import: 'p
 warning - lib\widgets\tertiary_action_button_widget.dart:6:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\wifi_icon_widget.dart:5:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\wifi_icon_widget.dart:6:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-   info - lib\widgets\status_bar_content_widget.dart:18:313 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\status_bar_content_widget.dart:18:463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\status_bar_content_widget.dart:18:762 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\status_bar_content_widget.dart:18:802 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-8 issues found.
+6 issues found.
 
---- dart analyze (generated) (1/4) @ 2026-07-06T20:29:55.650101+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-06T21:59:27.200283+00:00 ---
 exit_code=0
 Analyzing verbatica_paywall_screen.dart, verbatica_paywall_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -86,17 +84,17 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
    info - lib\generated\verbatica_paywall_layout.dart:48:1958 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\generated\verbatica_paywall_layout.dart:48:2005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\generated\verbatica_paywall_layout.dart:61:132 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\verbatica_paywall_layout.dart:61:916 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\verbatica_paywall_layout.dart:61:2052 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\verbatica_paywall_layout.dart:61:917 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\verbatica_paywall_layout.dart:61:2053 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 17 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-06T20:29:58.372953+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-06T21:59:29.887556+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, battery_status_icon_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/4) @ 2026-07-06T20:30:01.108462+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-06T21:59:32.460095+00:00 ---
 exit_code=0
 Analyzing cellular_signal_icon_widget.dart, close_button_widget.dart, home_indicator_widget.dart, paywall_status_bar_widget.dart, start_free_trial_button_widget.dart, status_bar_content_widget.dart...
 
@@ -108,13 +106,11 @@ warning - lib\widgets\home_indicator_widget.dart:5:8 - Unused import: 'package:t
 warning - lib\widgets\home_indicator_widget.dart:6:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
    info - lib\widgets\paywall_status_bar_widget.dart:15:158 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\widgets\start_free_trial_button_widget.dart:15:1573 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\status_bar_content_widget.dart:18:313 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\status_bar_content_widget.dart:18:463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\status_bar_content_widget.dart:18:762 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\status_bar_content_widget.dart:18:802 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-11 issues found.
+9 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-06T20:30:04.091304+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-06T21:59:35.259861+00:00 ---
 exit_code=0
 Analyzing tertiary_action_button_widget.dart, wifi_icon_widget.dart, verbatica_paywall_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -127,82 +123,79 @@ warning - lib\widgets\wifi_icon_widget.dart:6:8 - Unused import: 'package:test/t
 
 6 issues found.
 
---- dart format @ 2026-07-06T20:30:07.087121+00:00 ---
+--- dart format @ 2026-07-06T21:59:37.833057+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\features\verbatica_paywall\verbatica_paywall_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\battery_status_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\cellular_signal_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\close_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\paywall_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\start_free_trial_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\status_bar_content_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\tertiary_action_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\lib\widgets\wifi_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\test\golden\verbatica_paywall_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_i_ct92g\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 21 files (21 changed) in 0.80 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\features\verbatica_paywall\verbatica_paywall_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\widgets\battery_status_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\widgets\cellular_signal_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\widgets\close_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\widgets\paywall_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\widgets\start_free_trial_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\lib\widgets\status_bar_content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\test\golden\verbatica_paywall_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2avmyj3\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 19 files (19 changed) in 0.61 seconds.
 
---- dart format @ 2026-07-06T20:30:09.866156+00:00 ---
+--- dart format @ 2026-07-06T21:59:40.462450+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\features\verbatica_paywall\verbatica_paywall_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\battery_status_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\cellular_signal_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\close_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\paywall_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\start_free_trial_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\status_bar_content_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\tertiary_action_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\lib\widgets\wifi_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\test\golden\verbatica_paywall_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9ns3hd15\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 21 files (21 changed) in 0.78 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\features\verbatica_paywall\verbatica_paywall_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\widgets\battery_status_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\widgets\cellular_signal_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\widgets\close_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\widgets\paywall_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\widgets\start_free_trial_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\widgets\status_bar_content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\lib\widgets\tertiary_action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\test\golden\verbatica_paywall_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r7iediau\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 20 files (20 changed) in 0.73 seconds.
 
---- dart format @ 2026-07-06T20:30:13.290308+00:00 ---
+--- dart format @ 2026-07-06T21:59:43.646568+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\features\verbatica_paywall\verbatica_paywall_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\battery_status_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\cellular_signal_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\close_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\paywall_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\start_free_trial_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\status_bar_content_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\tertiary_action_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\lib\widgets\wifi_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\test\golden\verbatica_paywall_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-37smd11h\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 21 files (21 changed) in 0.77 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\features\verbatica_paywall\verbatica_paywall_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\battery_status_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\cellular_signal_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\close_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\paywall_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\start_free_trial_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\status_bar_content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\tertiary_action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\lib\widgets\wifi_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\test\golden\verbatica_paywall_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-a53e6zvn\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 21 files (21 changed) in 0.81 seconds.
 
---- pub get --offline @ 2026-07-06T20:30:16.326682+00:00 ---
+--- pub get --offline @ 2026-07-06T21:59:46.178235+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -215,7 +208,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/4) @ 2026-07-06T20:30:19.358246+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-06T21:59:49.102051+00:00 ---
 exit_code=0
 Analyzing verbatica_paywall_screen.dart, verbatica_paywall_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -234,17 +227,17 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
    info - lib\generated\verbatica_paywall_layout.dart:48:1958 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\generated\verbatica_paywall_layout.dart:48:2005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\generated\verbatica_paywall_layout.dart:61:132 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\verbatica_paywall_layout.dart:61:916 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\verbatica_paywall_layout.dart:61:2052 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\verbatica_paywall_layout.dart:61:917 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\verbatica_paywall_layout.dart:61:2053 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 17 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-06T20:30:22.083597+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-06T21:59:52.427452+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, battery_status_icon_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/4) @ 2026-07-06T20:30:24.810585+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-06T21:59:55.314927+00:00 ---
 exit_code=0
 Analyzing cellular_signal_icon_widget.dart, close_button_widget.dart, home_indicator_widget.dart, paywall_status_bar_widget.dart, start_free_trial_button_widget.dart, status_bar_content_widget.dart...
 
@@ -256,13 +249,11 @@ warning - lib\widgets\home_indicator_widget.dart:3:8 - Unused import: 'package:t
 warning - lib\widgets\home_indicator_widget.dart:4:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
    info - lib\widgets\paywall_status_bar_widget.dart:21:23 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\widgets\start_free_trial_button_widget.dart:94:98 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\status_bar_content_widget.dart:30:31 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\status_bar_content_widget.dart:37:41 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\status_bar_content_widget.dart:53:41 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\status_bar_content_widget.dart:55:41 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-11 issues found.
+9 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-06T20:30:27.825478+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-06T21:59:58.340469+00:00 ---
 exit_code=0
 Analyzing tertiary_action_button_widget.dart, wifi_icon_widget.dart, verbatica_paywall_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -275,7 +266,7 @@ warning - lib\widgets\wifi_icon_widget.dart:4:8 - Unused import: 'package:test/t
 
 6 issues found.
 
---- flutter pub get @ 2026-07-06T20:30:31.455567+00:00 ---
+--- flutter pub get @ 2026-07-06T22:00:02.568042+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -287,24 +278,19 @@ Got dependencies!
 4 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-06T20:30:31.457565+00:00 ---
-══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
-The following assertion was thrown building StatusBarContentWidget(dependencies:
-Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/flex.dart:441:15
+--- flutter render errors @ 2026-07-06T22:00:02.570171+00:00 ---
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 36 pixels on the bottom.
 The relevant error-causing widget was:
-When the exception was thrown, this was the stack:
-package:flutter/src/widgets/basic.dart 5576:12                                    createRenderObject
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+The specific RenderFlex in question is: RenderFlex#69b45 relayoutBoundary=up1 OVERFLOWING:
 ════════════════════════════════════════════════════════════════════════════════════════════════════
-Another exception was thrown: Stack Overflow
 Another exception was thrown: A RenderFlex overflowed by 8.7 pixels on the right.
 Another exception was thrown: A RenderFlex overflowed by 5.9 pixels on the right.
 Another exception was thrown: A RenderFlex overflowed by 7.8 pixels on the right.
 Another exception was thrown: A RenderFlex overflowed by 6.0 pixels on the bottom.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/widgets/framework.dart:6417:14
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/flex.dart:441:15
-Another exception was thrown: Stack Overflow
-Another exception was thrown: A RenderFlex overflowed by 8.7 pixels on the right.
-Another exception was thrown: A RenderFlex overflowed by 5.9 pixels on the right.
-Another exception was thrown: A RenderFlex overflowed by 7.8 pixels on the right.
-Another exception was thrown: A RenderFlex overflowed by 6.0 pixels on the bottom.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/object.dart:3675:12

@@ -210,6 +210,41 @@ def render_dialog(
     return f"Semantics(label: '{label}', child: {control})"
 
 
+def render_custom_overlay_sheet(
+    node: CleanDesignTreeNode,
+    child_widgets: list[str],
+) -> str:
+    """Render a custom overlay sheet structurally instead of a native AlertDialog host."""
+    body = ", ".join(child_widgets) if child_widgets else "const SizedBox.shrink()"
+    decoration = box_decoration_expr(
+        node.style,
+        width=node.sizing.width,
+        height=node.sizing.height,
+    )
+    width = node.sizing.width
+    height = node.sizing.height
+    width_lit = (
+        format_geometry_literal(float(width))
+        if width is not None and float(width) > 0
+        else "double.infinity"
+    )
+    height_lit = (
+        format_geometry_literal(float(height))
+        if height is not None and float(height) > 0
+        else "double.infinity"
+    )
+    column = (
+        "Column("
+        "mainAxisSize: MainAxisSize.min, "
+        "crossAxisAlignment: CrossAxisAlignment.stretch, "
+        f"children: [{body}]"
+        ")"
+    )
+    if decoration is not None:
+        column = f"Container(decoration: {decoration}, child: {column})"
+    return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {column})"
+
+
 def render_slider(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     from figma_flutter_agent.generator.variant.slider_facts import layout_fact_dual_thumb_range_slider
 

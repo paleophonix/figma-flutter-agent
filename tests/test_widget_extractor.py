@@ -238,3 +238,22 @@ def test_stroke_glyph_fallback_no_calendar_for_anonymous_vector() -> None:
         style=NodeStyle(has_stroke=True, border_color="0xFF000000"),
     )
     assert _render_stroke_glyph_fallback(node) is None
+
+
+def test_stroke_glyph_fallback_emits_divider_for_horizontal_hairline() -> None:
+    from figma_flutter_agent.generator.layout.widgets.decoration import (
+        _render_stroke_glyph_fallback,
+    )
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
+
+    node = CleanDesignTreeNode(
+        id="line:1",
+        name="Line 1",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=347.0, height=1.0),
+        style=NodeStyle(has_stroke=True, border_color="0xFFFFFFFF"),
+    )
+    body = _render_stroke_glyph_fallback(node)
+    assert body is not None
+    assert "Divider(" in body
+    assert "Icons.remove" not in body

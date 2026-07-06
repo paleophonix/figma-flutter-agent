@@ -1,0 +1,19 @@
+version: 1
+family_id: tall_artboard_root_child_viewport_clamp
+generated: true
+cases:
+- case_id: 2026-07-07-niyama-viewport-clamp-adss
+  case_file: cases/2026-07-07-niyama-viewport-clamp-adss.yaml
+  title: Viewport clamp must not rewrite scroll-tail Adss placement on tall 
+    artboard
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-adss-viewport-clamp
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T01:10:00Z'
+  updated_at: '2026-07-07T01:10:00Z'
+  summary: On the 375x1483 niyama artboard, the Adss background section at 
+    stackPlacement top 1020 was rewritten to top 616 by viewport_clamp_guard, 
+    leaking the section label into the modal region. Tall mobile artboards are 
+    scroll hosts; viewport clamp must skip direct root children when...

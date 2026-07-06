@@ -388,7 +388,14 @@ def _column_child_keeps_intrinsic_width(
         return False
     if float(width) > _COLUMN_INTRINSIC_WIDTH_CHILD_MAX_PX:
         return False
-    return node.type in {NodeType.ROW, NodeType.CONTAINER, NodeType.BUTTON, NodeType.STACK}
+    return node.type in {
+        NodeType.ROW,
+        NodeType.CONTAINER,
+        NodeType.BUTTON,
+        NodeType.STACK,
+        NodeType.IMAGE,
+        NodeType.VECTOR,
+    }
 
 
 def layout_fact_nav_bar_title_row(row: CleanDesignTreeNode) -> bool:

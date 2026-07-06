@@ -334,3 +334,26 @@ def test_column_stretch_wraps_hug_child_with_align() -> None:
         parent_node=parent,
     )
     assert wrapped.startswith("Align(alignment: Alignment.centerLeft")
+
+
+def test_column_stretch_wraps_fixed_image_with_align() -> None:
+    parent = CleanDesignTreeNode(
+        id="col",
+        name="row",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=347.0, height=76.0, width_mode=SizingMode.FILL),
+    )
+    image = CleanDesignTreeNode(
+        id="img",
+        name="Img",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=76.0, height=76.0, width_mode=SizingMode.FIXED),
+    )
+    assert _column_child_keeps_intrinsic_width(image, parent)
+    wrapped = apply_flex_wrap_to_widget(
+        "Image.asset('assets/images/sushi.png', width: 76.0, height: 76.0)",
+        parent_type=NodeType.COLUMN,
+        node=image,
+        parent_node=parent,
+    )
+    assert wrapped.startswith("Align(alignment: Alignment.centerLeft")

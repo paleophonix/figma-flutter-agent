@@ -1,0 +1,1167 @@
+{
+  "featureName": "niyama_order_2",
+  "emitterVersion": "2026.07.1",
+  "checkpoints": [
+    "CP1_guards",
+    "CP1_normalize",
+    "CP2_ir_passes",
+    "CP2_semantic",
+    "CP2_post_classify",
+    "CP2_fidelity_stamp"
+  ],
+  "mutations": [
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "3561:42984",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "3561:42988",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "3561:42997",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:43006;1026:6468;1026:6442",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:43006;1026:6469;1406:13137",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "3561:43009",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:42985;1154:8698",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:42990;1406:11915",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:42990;1406:11916",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:42991;1406:11915",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:42991;1406:11916",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:42992;1406:11915",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:42992;1406:11916",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:42993;1406:11915",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:42993;1406:11916",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:42994;1406:12002",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43000;1311:8995",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43000;1311:9010",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43001;1311:8995",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43001;1311:9010",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43002;1311:8995",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43002;1311:9010",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43003;1311:8995",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43003;1311:9010",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43004;1311:8995",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "I3561:43004;1311:9010",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:43005;1033:7707",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:43011;1435:15489",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I3561:43012;1435:15489",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42977;919:5312",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42977;919:5312",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:42989",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:42989",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42990;1406:11914",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42990;1406:11914",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42990;1406:11919;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42990;1406:11919;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42991;1406:11914",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42991;1406:11914",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42991;1406:11919;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42991;1406:11919;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42992;1406:11914",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42992;1406:11914",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42992;1406:11919;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42992;1406:11919;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42993;1406:11914",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42993;1406:11914",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42993;1406:11919;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42993;1406:11919;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43000",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43000",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43000;1311:8994",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43000;1311:8994",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43000;1311:8997;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43000;1311:8997;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43001",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43001",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43001;1311:8994",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43001;1311:8994",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43001;1311:8997;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43001;1311:8997;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43002",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43002",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43002;1311:8994",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43002;1311:8994",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43002;1311:8997;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43002;1311:8997;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43003",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43003",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43003;1311:8994",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43003;1311:8994",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43003;1311:8997;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43003;1311:8997;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43004",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43004",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43004;1311:8994",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43004;1311:8994",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43004;1311:8997;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43004;1311:8997;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43005",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43005",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43011",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43011",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43011;1435:15491;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:43011;1435:15491;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43012",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3561:43012",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42990;1406:11919;933:4776",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3561:42990;1406:11919;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    }
+  ],
+  "decisions": [
+    {
+      "nodeId": "I3561:42977;919:5312",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "3561:42989",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "COLUMN": 5
+        },
+        "child_count": 5,
+        "container_surface": "card"
+      }
+    },
+    {
+      "nodeId": "I3561:42990;1406:11914",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:42990;1406:11919;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "I3561:42991;1406:11914",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:42991;1406:11919;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "I3561:42992;1406:11914",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:42992;1406:11919;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "I3561:42993;1406:11914",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:42993;1406:11919;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "3561:43000",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "ROW": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "container_surface": "card",
+        "component_id": "3481:35212"
+      }
+    },
+    {
+      "nodeId": "I3561:43000;1311:8994",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:43000;1311:8997;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "3561:43001",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "ROW": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "container_surface": "card",
+        "component_id": "3481:35212"
+      }
+    },
+    {
+      "nodeId": "I3561:43001;1311:8994",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:43001;1311:8997;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "3561:43002",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "ROW": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "container_surface": "card",
+        "component_id": "3481:35212"
+      }
+    },
+    {
+      "nodeId": "I3561:43002;1311:8994",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:43002;1311:8997;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "3561:43003",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "ROW": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "container_surface": "card",
+        "component_id": "3481:35212"
+      }
+    },
+    {
+      "nodeId": "I3561:43003;1311:8994",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:43003;1311:8997;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "3561:43004",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "ROW": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "container_surface": "card",
+        "component_id": "3481:35212"
+      }
+    },
+    {
+      "nodeId": "I3561:43004;1311:8994",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "TEXT": 2
+        },
+        "child_count": 2
+      }
+    },
+    {
+      "nodeId": "I3561:43004;1311:8997;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "3561:43005",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "COLUMN": 1
+        },
+        "child_count": 1,
+        "container_surface": "card",
+        "component_id": "3481:35165"
+      }
+    },
+    {
+      "nodeId": "3561:43011",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "ROW": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "container_surface": "card",
+        "component_id": "3481:35172"
+      }
+    },
+    {
+      "nodeId": "I3561:43011;1435:15491;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "3561:43012",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "ROW": 1
+        },
+        "child_count": 1,
+        "container_surface": "card",
+        "component_id": "3481:35172"
+      }
+    }
+  ],
+  "deviations": []
+}

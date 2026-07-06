@@ -8,7 +8,7 @@ from figma_flutter_agent.parser.prototype import (
     collect_prototype_links,
     index_frames,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
 
 
 def test_dialog_semantic_renders_alert_dialog() -> None:
@@ -34,6 +34,39 @@ def test_dialog_semantic_renders_alert_dialog() -> None:
     assert "title: Text('Delete confirmation')" in layout
     assert "Navigator.of(context).pop()" in layout
     assert "This cannot be undone." in layout
+
+
+def test_custom_overlay_sheet_renders_without_native_alert_dialog() -> None:
+    dialog = CleanDesignTreeNode(
+        id="modal",
+        name="Modal",
+        type=NodeType.DIALOG,
+        sizing=Sizing(width=375.0, height=1213.0),
+        style=NodeStyle(background_color="0xFF1C1C1E"),
+        children=[
+            CleanDesignTreeNode(
+                id="head",
+                name="Head",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=52.0),
+            ),
+            CleanDesignTreeNode(
+                id="body",
+                name="Body",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=375.0, height=1100.0),
+            ),
+        ],
+    )
+
+    layout = render_layout_file(dialog, feature_name="order_sheet", uses_svg=False)[
+        "lib/generated/order_sheet_layout.dart"
+    ]
+
+    assert "AlertDialog(" not in layout
+    assert "Text('Modal')" not in layout
+    assert "Navigator.of(context).pop()" not in layout
+    assert "SizedBox(width: 375.0, height: 1213.0" in layout
 
 
 def test_overlay_to_dialog_destination_uses_show_dialog() -> None:

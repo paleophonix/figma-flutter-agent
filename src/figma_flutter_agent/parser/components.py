@@ -11,7 +11,7 @@ from figma_flutter_agent.parser.component_raw import (
     node_bbox_size,
     raw_looks_like_bottom_cta_footer,
 )
-from figma_flutter_agent.schemas import ComponentVariant, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, ComponentVariant, NodeType
 
 _SEMANTIC_NAME_HINTS: tuple[tuple[tuple[str, ...], NodeType], ...] = (
     (("checkbox", "check box"), NodeType.CHECKBOX),
@@ -40,6 +40,7 @@ _NAME_FALLBACK_INTERACTIVE_TYPES = frozenset(
         NodeType.RADIO,
         NodeType.RADIO_GROUP,
         NodeType.DROPDOWN,
+        NodeType.DIALOG,
         NodeType.SLIDER,
         NodeType.TABS,
         NodeType.BOTTOM_NAV,
@@ -52,6 +53,8 @@ _MAX_COMPACT_CARD_GLYPH_SPAN = 36.0
 _MAX_SLIDER_HOST_HEIGHT_PX = 56.0
 _MIN_HORIZONTAL_CARD_PEER_WIDTH_PX = 100.0
 _MIN_HORIZONTAL_CARD_PEER_HEIGHT_PX = 48.0
+_MIN_CUSTOM_OVERLAY_SHEET_WIDTH_PX = 280.0
+_MIN_CUSTOM_OVERLAY_SHEET_HEIGHT_PX = 400.0
 _MAX_BOTTOM_NAV_HOST_HEIGHT_PX = 160.0
 _MIN_BOTTOM_NAV_HOST_WIDTH_PX = 280.0
 _MAX_BOTTOM_NAV_HOST_ASPECT_HEIGHT_RATIO = 0.45
@@ -94,6 +97,30 @@ def _raw_is_compact_vector_glyph_host(node: dict[str, Any]) -> bool:
     return has_graphic_descendant(node)
 
 
+def raw_is_custom_overlay_sheet(node: dict[str, Any]) -> bool:
+    """Return True when a raw frame is a full custom sheet, not a native confirmation dialog."""
+    bbox = node_bbox_size(node)
+    if bbox is None:
+        return False
+    width, height = bbox
+    if width < _MIN_CUSTOM_OVERLAY_SHEET_WIDTH_PX or height < _MIN_CUSTOM_OVERLAY_SHEET_HEIGHT_PX:
+        return False
+    return len(node.get("children") or []) >= 2
+
+
+def clean_is_custom_overlay_sheet(node: CleanDesignTreeNode) -> bool:
+    """Return True when a clean-tree DIALOG node is a custom overlay sheet host."""
+    if node.type != NodeType.DIALOG:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return False
+    if float(width) < _MIN_CUSTOM_OVERLAY_SHEET_WIDTH_PX or float(height) < _MIN_CUSTOM_OVERLAY_SHEET_HEIGHT_PX:
+        return False
+    return len(node.children) >= 2
+
+
 def _raw_is_horizontal_card_peer(node: dict[str, Any]) -> bool:
     """Return True when a raw child looks like a carousel card tile, not a slider thumb."""
     bbox = node_bbox_size(node)
@@ -106,6 +133,45 @@ def _raw_is_horizontal_card_peer(node: dict[str, Any]) -> bool:
             return True
     name = str(node.get("name") or "").lower()
     return "card" in name and str(node.get("type") or "") == "INSTANCE"
+
+
+def _raw_child_bbox(node: dict[str, Any]) -> tuple[float, float] | None:
+    """Return width/height for a raw child when absoluteBoundingBox is present."""
+    bbox = node_bbox_size(node)
+    if bbox is None:
+        return None
+    width, height = bbox
+    if width <= 0 or height <= 0:
+        return None
+    return width, height
+
+
+def _raw_is_horizontal_product_row_card(node: dict[str, Any]) -> bool:
+    """Return True when a raw frame is a horizontal image+body row, not a stacked card."""
+    children = node.get("children") or []
+    if len(children) != 2:
+        return False
+    card_bbox = node_bbox_size(node)
+    if card_bbox is None:
+        return False
+    card_width, card_height = card_bbox
+    if card_width <= 0 or card_height <= 0:
+        return False
+    if float(card_height) > float(card_width) * 0.5:
+        return False
+    media, body = children[0], children[1]
+    media_bbox = _raw_child_bbox(media)
+    body_type = str(body.get("type") or "").upper()
+    if media_bbox is None:
+        return False
+    media_width, media_height = media_bbox
+    if float(media_width) > float(card_width) * 0.45:
+        return False
+    if float(media_height) > float(card_height) * 1.1:
+        return False
+    if float(media_width) > float(card_height) * 1.2:
+        return False
+    return body_type in {"FRAME", "GROUP", "INSTANCE", "COMPONENT"}
 
 
 def _raw_hosts_horizontal_scroll_card_peers(node: dict[str, Any]) -> bool:
@@ -199,11 +265,18 @@ def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) ->
     bbox = node_bbox_size(node)
     if bbox is not None and (bbox[0] <= 0 or bbox[1] <= 0):
         return False
+    if semantic == NodeType.DIALOG:
+        if infer_semantic_type_from_figma_overlay(node) is not None:
+            return True
+        if raw_is_custom_overlay_sheet(node):
+            return False
     if semantic == NodeType.CARD:
         children = node.get("children") or []
         if is_raw_graphic_type(raw_type) and not children:
             return False
         if _raw_is_compact_vector_glyph_host(node):
+            return False
+        if _raw_is_horizontal_product_row_card(node):
             return False
     if semantic == NodeType.BOTTOM_NAV:
         if raw_looks_like_bottom_cta_footer(node):
