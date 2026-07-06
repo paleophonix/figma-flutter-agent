@@ -185,6 +185,8 @@ families:
     owners:
       - module: src/figma_flutter_agent/parser/semantics/arbiter.py
         symbol: arbitrate
+      - module: src/figma_flutter_agent/generator/layout/widgets/emit/containers.py
+        symbol: render_container_body
     law_ids:
       - LAW-A3-CLASSIFY
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
@@ -204,6 +206,8 @@ families:
         symbol: plausible_kinds
       - module: src/figma_flutter_agent/parser/semantics/classify.py
         symbol: classify_screen_ir
+      - module: src/figma_flutter_agent/parser/semantics/detectors/inputs.py
+        symbol: _input_host_has_trailing_picker_affordance
     law_ids:
       - LAW-A3-CLASSIFY
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
@@ -311,6 +315,10 @@ families:
     owners:
       - module: src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
         symbol: _button_covering_surface_may_omit
+      - module: src/figma_flutter_agent/parser/interaction/buttons.py
+        symbol: button_painted_overlay_surface
+      - module: src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py
+        symbol: _button_painted_surface_overlay_body
     law_ids:
       - PaintSurfaceTransferCompletenessLaw
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR

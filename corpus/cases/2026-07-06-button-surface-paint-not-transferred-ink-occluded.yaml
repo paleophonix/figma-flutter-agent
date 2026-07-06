@@ -8,7 +8,7 @@ case:
   feature: rep_edit_profile
   observed_at: 2026-07-06
   created_at: '2026-07-06T14:05:00Z'
-  updated_at: '2026-07-06T14:05:00Z'
+  updated_at: '2026-07-06T15:35:00Z'
   summary: >
     The primary action button (node 2112:20299) emits a double surface: the outer
     host Container/Material has borderRadius 25 and no fill and wraps the InkWell,
@@ -28,10 +28,10 @@ occurrences:
     origin: COMPILER
     blast_radius: B2_SILENT_WRONG_BEHAVIOR
     confidence: high
-    status: OPEN
+    status: FIXED
     owner:
-      module: src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
-      symbol: _button_covering_surface_may_omit
+      module: src/figma_flutter_agent/parser/interaction/buttons.py
+      symbol: button_painted_overlay_surface
     contract:
       field: button covering-surface fill + borderRadius
       field_class: fact
@@ -51,3 +51,17 @@ occurrences:
       - kind: source_code
         path: apps/test/lib/widgets/save_button_content_widget.dart
         summary: Inner Container opaque white fill radius 12 width 350 paints over the host InkWell ink.
+    repair:
+      summary: >
+        Recognize ROW/STACK/COLUMN painted button surfaces as ink overlay hosts,
+        emit inner chrome via button_surface_content_emit_root, and center extracted
+        label content so paint transfers to the host Ink decoration instead of an
+        opaque inner child occluding the splash.
+      changed_files:
+        - src/figma_flutter_agent/parser/interaction/buttons.py
+        - src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py
+        - src/figma_flutter_agent/generator/widget_extractor.py
+      regression_tests:
+        - tests/test_rep_edit_profile_batch_repair.py::test_button_row_surface_is_painted_overlay
+      verification:
+        - poetry run pytest -q tests/test_rep_edit_profile_batch_repair.py::test_button_row_surface_is_painted_overlay

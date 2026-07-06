@@ -554,8 +554,13 @@ def render_cluster_widgets(
                 theme_variant="material_3",
             )
         else:
+            from figma_flutter_agent.parser.interaction.buttons import (
+                button_surface_content_emit_root,
+            )
+
+            emit_root = button_surface_content_emit_root(representative) or representative
             body = render_node_body(
-                representative,
+                emit_root,
                 uses_svg=uses_svg,
                 cluster_classes=cluster_classes,
                 skip_cluster_id=spec.cluster_id,

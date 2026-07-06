@@ -1,15 +1,13 @@
 {
   "feature": "verbatica_paywall",
-  "pipeline_run_id": "075342b3cb64",
-  "candidate_build_run_id": "075342b3cb64",
+  "pipeline_run_id": "0ff8d4baaf6c",
+  "candidate_build_run_id": "0ff8d4baaf6c",
   "status": "failed",
   "writeback": "failed",
   "written_files": [],
   "analyze_passed": null,
   "runMetaSchemaVersion": "2",
-  "captured_at": "2026-07-06T15:13:27.327386+00:00",
-  "run_started_at": "2026-07-06T15:13:04.020644+00:00",
-  "cached_ir_verdict": "compatible",
-  "clean_tree_hash": "fb34970912f29b4b3e01998c1a67d4c49b7b454f675c06560ce6be38a2f78819",
-  "last_error": "Cluster widget CellularSignalIconWidget cannot materialize: visible vector node(s) I2399:42783;266:1499;266:1646;339:8061 lack exported drawable assets."
+  "captured_at": "2026-07-06T15:38:31.405207+00:00",
+  "run_started_at": "2026-07-06T15:38:31.238642+00:00",
+  "last_error": "Low contrast on text node '9:30' (1.0:1, WCAG AA requires 4.5:1)."
 }

@@ -15,8 +15,12 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrK
 
 def _input_host_has_trailing_picker_affordance(node: CleanDesignTreeNode) -> bool:
     """True when an input host exposes a trailing picker/disclosure affordance."""
-    from figma_flutter_agent.parser.interaction.forms import stack_action_intent_vetoes_input
+    from figma_flutter_agent.parser.interaction.forms import (
+        input_trailing_chrome_implies_obscure_text,
+        stack_action_intent_vetoes_input,
+    )
     from figma_flutter_agent.parser.interaction.icons import layout_fact_input_trailing_icon_button
+    from figma_flutter_agent.parser.interaction.input_fields import input_trailing_chrome_nodes
     from figma_flutter_agent.parser.interaction.shared import (
         _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
         _descendant_nodes,
@@ -24,10 +28,13 @@ def _input_host_has_trailing_picker_affordance(node: CleanDesignTreeNode) -> boo
 
     if stack_action_intent_vetoes_input(node):
         return True
-    return any(
+    if any(
         layout_fact_input_trailing_icon_button(item)
         for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
-    )
+    ):
+        return True
+    chrome = input_trailing_chrome_nodes(node)
+    return bool(chrome) and not input_trailing_chrome_implies_obscure_text(node)
 
 
 def _is_input_text_field(ctx: DetectorContext) -> bool:

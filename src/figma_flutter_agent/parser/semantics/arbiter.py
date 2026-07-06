@@ -5,7 +5,7 @@ from __future__ import annotations
 from figma_flutter_agent.parser.semantics.models import Classification, DetectorContext, SignalTier
 from figma_flutter_agent.parser.semantics.prefilter import _OVERLAY_KINDS
 from figma_flutter_agent.parser.semantics.report import ArbitrationOutcome
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
+from figma_flutter_agent.schemas import WidgetIrKind
 from figma_flutter_agent.schemas.ir_payloads import payload_for_kind
 
 
@@ -61,16 +61,9 @@ def _composite_dropdown_vetoed(ctx: DetectorContext, kind: WidgetIrKind) -> bool
     """Reject single-select dropdown kinds on multi-control composite hosts."""
     if kind != WidgetIrKind.INPUT_DROPDOWN:
         return False
-    node = ctx.clean_node
-    from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
+    from figma_flutter_agent.parser.interaction.forms import layout_fact_composite_dropdown_host
 
-    descendants = _descendant_nodes(node, 5)
-    input_count = sum(1 for item in descendants if item.type == NodeType.INPUT)
-    if input_count >= 2:
-        return True
-    if any(item.type == NodeType.SLIDER for item in descendants):
-        return True
-    return len(node.children) >= 3 and node.type in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW}
+    return layout_fact_composite_dropdown_host(ctx.clean_node)
 
 
 def arbitrate(

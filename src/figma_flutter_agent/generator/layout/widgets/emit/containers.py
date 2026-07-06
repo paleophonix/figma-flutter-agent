@@ -114,6 +114,10 @@ def render_simple_controls(
         )
 
     if node.type == NodeType.DROPDOWN:
+        from figma_flutter_agent.parser.interaction.forms import layout_fact_composite_dropdown_host
+
+        if layout_fact_composite_dropdown_host(node):
+            return None
         widget = render_dropdown(node, theme_variant=theme_variant)
         return _finalize_widget(
             node,

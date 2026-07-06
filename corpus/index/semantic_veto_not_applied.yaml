@@ -10,10 +10,10 @@ cases:
   project: test
   feature: rep_edit_profile
   occurrence_id: rep-edit-profile-commission-dropdown-veto
-  status: OPEN
+  status: FIXED
   observed_at: '2026-07-06'
   created_at: '2026-07-06T14:05:00Z'
-  updated_at: '2026-07-06T14:05:00Z'
+  updated_at: '2026-07-06T15:35:00Z'
   summary: 'The commission range selector (node 2237:17339) is a composite control:
     label plus two paired numeric inputs, a unit suffix and a range slider. The arbiter
     accepted input_dropdown (conf 0.9) without a veto, and the emitter rendered a

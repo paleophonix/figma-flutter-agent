@@ -743,6 +743,24 @@ def _text_is_centered_action_label(
     return False
 
 
+def layout_fact_composite_dropdown_host(node: CleanDesignTreeNode) -> bool:
+    """True when a dropdown-shaped host is a multi-control composite, not a picker."""
+    from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
+
+    descendants = _descendant_nodes(node, 5)
+    input_count = sum(1 for item in descendants if item.type == NodeType.INPUT)
+    if input_count >= 2:
+        return True
+    if any(item.type == NodeType.SLIDER for item in descendants):
+        return True
+    return len(node.children) >= 3 and node.type in {
+        NodeType.STACK,
+        NodeType.COLUMN,
+        NodeType.ROW,
+        NodeType.DROPDOWN,
+    }
+
+
 def stack_action_intent_vetoes_input(host_node: CleanDesignTreeNode) -> bool:
     """Disclosure rows and centered action labels must not compile as INPUT."""
     from .icons import layout_fact_trailing_chevron_action_slot

@@ -636,23 +636,43 @@ def button_compiles_body_as_flex_row(node: CleanDesignTreeNode) -> bool:
 
 def button_has_painted_surface_overlay_label(node: CleanDesignTreeNode) -> bool:
     """Return True when a full-bleed painted surface carries overlaid label copy."""
-    from figma_flutter_agent.parser.interaction.input_fields import surface_covers_node
-
     if node.type != NodeType.BUTTON:
         return False
-    text_children = [
-        child
-        for child in node.children
-        if child.type == NodeType.TEXT and (child.text or "").strip()
+    from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
+
+    text_nodes = [
+        item
+        for item in _descendant_nodes(node, 4)
+        if item.type == NodeType.TEXT and (item.text or "").strip()
     ]
-    if len(text_children) != 1:
+    if len(text_nodes) != 1:
         return False
-    for child in node.children:
-        if child.type == NodeType.TEXT:
-            continue
-        if surface_covers_node(node, child):
-            return True
-    return False
+    return button_painted_overlay_surface(node) is not None
+
+
+def button_surface_content_emit_root(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return inner chrome when a cluster root is only a painted button surface shell."""
+    if node.type not in {NodeType.ROW, NodeType.STACK, NodeType.CONTAINER, NodeType.COLUMN}:
+        return None
+    if node.style.background_color is None:
+        return None
+    from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
+
+    text_nodes = [
+        item
+        for item in _descendant_nodes(node, 4)
+        if item.type == NodeType.TEXT and (item.text or "").strip()
+    ]
+    if len(text_nodes) != 1 or not node.children:
+        return None
+    if len(node.children) == 1 and node.children[0].type in {
+        NodeType.ROW,
+        NodeType.STACK,
+        NodeType.COLUMN,
+        NodeType.CONTAINER,
+    }:
+        return node.children[0]
+    return None
 
 
 def button_painted_overlay_surface(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
@@ -677,7 +697,13 @@ def button_painted_overlay_surface(node: CleanDesignTreeNode) -> CleanDesignTree
             continue
         if not surface_covers_node(node, child):
             continue
-        if child.type not in {NodeType.CONTAINER, NodeType.VECTOR}:
+        if child.type not in {
+            NodeType.CONTAINER,
+            NodeType.VECTOR,
+            NodeType.ROW,
+            NodeType.STACK,
+            NodeType.COLUMN,
+        }:
             continue
         if child.style.background_color is None or child.style.gradient is not None:
             continue

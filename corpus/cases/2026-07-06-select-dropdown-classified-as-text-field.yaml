@@ -8,7 +8,7 @@ case:
   feature: rep_edit_profile
   observed_at: 2026-07-06
   created_at: '2026-07-06T14:05:00Z'
-  updated_at: '2026-07-06T14:05:00Z'
+  updated_at: '2026-07-06T15:35:00Z'
   summary: >
     Non-editable single-select rows ("Choose your countries / cities / languages /
     type of property") carry a fixed value plus a trailing chevron glyph but the
@@ -28,10 +28,10 @@ occurrences:
     origin: COMPILER
     blast_radius: B2_SILENT_WRONG_BEHAVIOR
     confidence: high
-    status: OPEN
+    status: FIXED
     owner:
-      module: src/figma_flutter_agent/parser/semantics/prefilter.py
-      symbol: plausible_kinds
+      module: src/figma_flutter_agent/parser/semantics/detectors/inputs.py
+      symbol: _input_host_has_trailing_picker_affordance
     contract:
       field: semanticKind (select/dropdown candidate)
       field_class: proposal
@@ -50,3 +50,14 @@ occurrences:
       - kind: source_code
         path: apps/test/lib/generated/rep_edit_profile_chunk_d31b9cc1.dart
         summary: Choose-your-countries/cities/languages rows emit TextFormField initialValue plus a suffix IconButton chevron.
+    repair:
+      summary: >
+        Treat trailing STACK+VECTOR chevron chrome (via input_trailing_chrome_nodes)
+        as a picker affordance so select rows with fixed values generate
+        input_dropdown candidates instead of only input_text_field.
+      changed_files:
+        - src/figma_flutter_agent/parser/semantics/detectors/inputs.py
+      regression_tests:
+        - tests/test_rep_edit_profile_batch_repair.py::test_input_with_trailing_stack_vector_classifies_as_dropdown
+      verification:
+        - poetry run pytest -q tests/test_rep_edit_profile_batch_repair.py::test_input_with_trailing_stack_vector_classifies_as_dropdown

@@ -244,6 +244,7 @@ def _button_painted_surface_overlay_body(
     from figma_flutter_agent.parser.interaction.input_fields import surface_covers_node
 
     pairs = emitted_pairs or list(zip(node.children, child_widgets, strict=False))
+    ink_surface = button_painted_overlay_surface(node)
     label_pair = next(
         (
             (child, widget)
@@ -252,12 +253,16 @@ def _button_painted_surface_overlay_body(
         ),
         None,
     )
+    if ink_surface is not None:
+        if label_pair is not None:
+            label_widget = strip_stack_parent_data_wrappers(label_pair[1])
+            return f"Center(child: {label_widget})"
+        if len(child_widgets) == 1:
+            single = strip_stack_parent_data_wrappers(child_widgets[0])
+            return f"Center(child: {single})"
     if label_pair is None:
         return ", ".join(child_widgets)
     label_widget = strip_stack_parent_data_wrappers(label_pair[1])
-    ink_surface = button_painted_overlay_surface(node)
-    if ink_surface is not None:
-        return f"Center(child: {label_widget})"
     background_pair = next(
         (
             (child, widget)
