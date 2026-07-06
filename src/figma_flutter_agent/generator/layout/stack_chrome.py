@@ -45,6 +45,7 @@ def partition_viewport_pinned_stack_layers(
         index
         for index, child in enumerate(child_nodes)
         if stack_child_needs_viewport_pin_outside_scroll(child, stack_node)
+        or is_bottom_docked_stack_child(child)
     ]
     if not pinned_indices or len(pinned_indices) == len(child_nodes):
         return None

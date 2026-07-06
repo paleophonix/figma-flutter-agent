@@ -24,6 +24,24 @@ def test_escape_dart_string_handles_dollar_interpolation_marker() -> None:
     assert escape_dart_string("Total ${amount}") == r"Total \${amount}"
 
 
+def test_escape_dart_string_handles_unicode_line_terminators() -> None:
+    """Dart treats U+2028/U+2029 as line terminators inside string literals."""
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+
+    raw = "+ line one\n+ line two\u2028- line three"
+    escaped = escape_dart_string(raw)
+    assert "\u2028" not in escaped
+    assert "\u2029" not in escaped
+    assert "\\u2028" in escaped
+    literal = f"Text('{escaped}')"
+    assert validate_dart_delimiters(literal) is None
+
+    paragraph = "block one\u2029block two"
+    escaped_paragraph = escape_dart_string(paragraph)
+    assert "\\u2029" in escaped_paragraph
+    assert validate_dart_delimiters(f"Text('{escaped_paragraph}')") is None
+
+
 def test_sanitize_dart_type_name() -> None:
     assert sanitize_dart_type_name("123-btn") == "N123_btn"
     assert sanitize_dart_type_name("") == "Feature"

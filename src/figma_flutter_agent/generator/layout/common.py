@@ -136,6 +136,8 @@ def escape_dart_string(value: str) -> str:
     return (
         normalized.replace("\\", "\\\\")
         .replace("$", r"\$")
+        .replace("\u2028", "\\u2028")
+        .replace("\u2029", "\\u2029")
         .replace("\n", "\\n")
         .replace("'", "\\'")
     )
@@ -274,15 +276,14 @@ def bottom_chrome_pinned_live_viewport(
         "builder: (context, constraints) {"
         f"final viewportHeight = constraints.maxHeight.isFinite && "
         f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
-        "return Align("
-        "alignment: Alignment.bottomCenter, "
-        "child: ClipRect("
-        "child: SizedBox("
+        "return SizedBox("
         f"width: {width_token}, "
         "height: viewportHeight, "
+        "child: SingleChildScrollView("
+        "clipBehavior: Clip.none, "
         f"child: SizedBox(width: {width_token}, height: {height_token}, "
         f"child: {stack_widget}"
-        "))));"
+        ")));"
         "},"
         ")"
     )

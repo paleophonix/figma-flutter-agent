@@ -193,6 +193,8 @@ def compose_decomposed_root_widget(
             wallpaper_lead = _bound_column_wallpaper_lead(wallpaper_lead, tree)
         child_call_parts.insert(0, wallpaper_lead)
     child_calls = ", ".join(child_call_parts) or "const SizedBox.shrink()"
+    viewport_pinned_layers: list[str] | None = None
+    preview_stack_widget: str | None = None
     if tree.type == NodeType.STACK:
         from figma_flutter_agent.generator.layout.flex_policy import (
             stack_child_ordinal_bottom,
@@ -344,24 +346,57 @@ def compose_decomposed_root_widget(
         else:
             from figma_flutter_agent.generator.layout.stack_chrome import (
                 apply_pin_bottom_chrome_to_stack_layers,
+                partition_viewport_pinned_stack_layers,
             )
 
-            if pin_bottom_chrome:
-                child_nodes = [method.node for method in methods]
-                child_widgets = [f"{method.name}(context)" for method in methods]
-                child_calls = ", ".join(
-                    apply_pin_bottom_chrome_to_stack_layers(
-                        tree,
-                        child_nodes,
-                        child_widgets,
-                        allow_outward_paint=allow_outward_paint,
-                    )
+            child_nodes = [method.node for method in methods]
+            child_widgets = [f"{method.name}(context)" for method in methods]
+            layered_children = (
+                apply_pin_bottom_chrome_to_stack_layers(
+                    tree,
+                    child_nodes,
+                    child_widgets,
+                    allow_outward_paint=allow_outward_paint,
                 )
+                if pin_bottom_chrome
+                else child_widgets
+            )
             stack_clip = (
                 "Clip.hardEdge"
                 if artboard_background_lead
                 else ("Clip.none" if stack_needs_soft_clip(tree) else "Clip.hardEdge")
             )
+            preview_layers = list(layered_children)
+            if artboard_background_lead:
+                preview_layers.insert(
+                    0,
+                    f"Positioned.fill(child: {artboard_background_lead})",
+                )
+            if pin_bottom_chrome:
+                partition = partition_viewport_pinned_stack_layers(
+                    tree,
+                    child_nodes,
+                    layered_children,
+                )
+                if partition is not None:
+                    scroll_widgets, viewport_pinned_layers = partition
+                    stack_layers = list(scroll_widgets)
+                    if artboard_background_lead:
+                        stack_layers.insert(
+                            0,
+                            f"Positioned.fill(child: {artboard_background_lead})",
+                        )
+                    child_calls = ", ".join(stack_layers) or "const SizedBox.shrink()"
+                    preview_stack_widget = (
+                        f"Stack(clipBehavior: {stack_clip}, "
+                        f"children: [{', '.join(preview_layers)}])"
+                    )
+                else:
+                    stack_layers = preview_layers
+                    child_calls = ", ".join(stack_layers) or "const SizedBox.shrink()"
+            else:
+                stack_layers = preview_layers
+                child_calls = ", ".join(stack_layers) or "const SizedBox.shrink()"
             widget = f"Stack(clipBehavior: {stack_clip}, children: [{child_calls}])"
         root_decoration = box_decoration_expr(
             tree.style,
@@ -375,6 +410,8 @@ def compose_decomposed_root_widget(
             widget,
             is_layout_root=True,
             responsive_enabled=responsive_enabled,
+            viewport_pinned_layers=viewport_pinned_layers,
+            preview_stack_widget=preview_stack_widget,
         )
     if tree.type == NodeType.COLUMN:
         from figma_flutter_agent.generator.layout.flex_policy.stack import (

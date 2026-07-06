@@ -184,10 +184,10 @@ def _flex_spacing_field(node: CleanDesignTreeNode) -> str:
     """Emit Flutter 3.27+ ``spacing`` on ``Row``/``Column`` when Figma gap is set."""
     if node.flex_gap_mode == "explicit":
         return ""
-    if node.spacing <= 0:
+    if node.spacing == 0:
         return ""
     main = node.alignment.main or "start"
-    if main in {"spaceBetween", "stretch"}:
+    if main in {"spaceBetween", "stretch"} and node.spacing > 0:
         return ""
     gap = format_geometry_literal(node.spacing)
     return f"spacing: {gap}, "
