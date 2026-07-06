@@ -35,6 +35,17 @@ def test_discover_asset_path_for_node(tmp_path: Path) -> None:
     assert discover_asset_path_for_node(tmp_path, "1:3665") == "assets/icons/group_6813_1_3665.svg"
 
 
+def test_discover_asset_path_for_instance_leaf_id(tmp_path: Path) -> None:
+    """Canonical exports (910:3248) resolve for nested instance vector ids."""
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    (icons / "vector_910_3248.svg").write_text("<svg></svg>", encoding="utf-8")
+    instance_id = "I4408:44896;1154:7849;1149:9855;1149:9481;910:3248"
+    assert (
+        discover_asset_path_for_node(tmp_path, instance_id) == "assets/icons/vector_910_3248.svg"
+    )
+
+
 def test_resolve_discovered_vector_asset_keys_attaches_export(tmp_path: Path) -> None:
     icons = tmp_path / "assets" / "icons"
     icons.mkdir(parents=True)

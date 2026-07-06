@@ -1128,6 +1128,84 @@ def test_artboard_wallpaper_lead_preserves_stack_root_not_column_flow() -> None:
     )
 
 
+def test_pin_bottom_chrome_positions_non_scroll_decomposed_layers() -> None:
+    """Law: LAW-STACK-CHILD-POSITIONED — pin-bottom gaps keep stack placement."""
+    from figma_flutter_agent.generator.layout.file_methods import (
+        LayoutMethod,
+        compose_decomposed_root_widget,
+    )
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        apply_pin_bottom_chrome_to_stack_layers,
+    )
+
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Status",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=360.0, height=70.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(bottom=710.0, width=360.0, height=70.0),
+        children=[],
+    )
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Hero",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=360.0, height=202.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=98.0, bottom=480.0, width=360.0, height=202.0),
+        children=[],
+    )
+    plans = CleanDesignTreeNode(
+        id="plans",
+        name="Plans",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=360.0, height=363.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=300.0, bottom=117.0, width=360.0, height=363.0),
+        children=[],
+    )
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Footer",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=360.0, height=189.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=591.0, width=360.0, height=189.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Paywall",
+        type=NodeType.STACK,
+        sizing=Sizing(width=360.0, height=780.0, height_mode=SizingMode.FIXED),
+        children=[status, hero, plans, footer],
+    )
+    methods = [
+        LayoutMethod(name="_buildFeature", node=status),
+        LayoutMethod(name="_buildFeature2", node=hero),
+        LayoutMethod(name="_buildFeature3", node=plans),
+        LayoutMethod(name="_buildFeature4", node=footer),
+    ]
+    layered = apply_pin_bottom_chrome_to_stack_layers(
+        screen,
+        screen.children,
+        [f"{method.name}(context)" for method in methods],
+    )
+    joined = ", ".join(layered)
+    assert joined.count("Positioned(") >= 3
+    hero_idx = joined.index("_buildFeature2(context)")
+    footer_idx = joined.index("_buildFeature4(context)")
+    assert joined.rfind("Positioned(", 0, hero_idx) != -1
+    assert joined.rfind("Positioned(", 0, footer_idx) != -1
+
+    layout = compose_decomposed_root_widget(screen, methods, responsive_enabled=True)
+    compact = layout.replace(" ", "")
+    hero_idx = compact.index("_buildFeature2(context)")
+    footer_idx = compact.index("_buildFeature4(context)")
+    assert compact.rfind("Positioned(", 0, hero_idx) != -1
+    assert "top:98.0" in compact[compact.rfind("Positioned(", 0, hero_idx) : hero_idx]
+    assert compact.rfind("Positioned(", 0, footer_idx) != -1
+    assert "_buildFeature2(context)" in layout
+    assert "_buildFeature4(context)" in layout
+
+
 def test_stack_flow_column_hoists_expanded_above_fill_width_sizedbox() -> None:
     """``flex_parent_data_direct_under_flex_host`` on phone-shell flow columns."""
     status = CleanDesignTreeNode(

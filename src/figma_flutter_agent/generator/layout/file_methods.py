@@ -327,14 +327,11 @@ def compose_decomposed_root_widget(
                 ")"
             )
         else:
-            from figma_flutter_agent.generator.layout.flex_policy.stack import (
-                stack_uses_shared_body_scroll_host,
-            )
             from figma_flutter_agent.generator.layout.stack_chrome import (
                 apply_pin_bottom_chrome_to_stack_layers,
             )
 
-            if pin_bottom_chrome and stack_uses_shared_body_scroll_host(tree):
+            if pin_bottom_chrome:
                 child_nodes = [method.node for method in methods]
                 child_widgets = [f"{method.name}(context)" for method in methods]
                 child_calls = ", ".join(

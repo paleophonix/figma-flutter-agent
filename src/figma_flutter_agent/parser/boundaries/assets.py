@@ -61,12 +61,32 @@ def build_asset_node_index(project_dir: Path) -> dict[str, str]:
     }
 
 
+def _asset_lookup_safe_ids(node_id: str) -> list[str]:
+    """Return safe-id probes for on-disk asset discovery (full id, then instance leaf)."""
+    probes: list[str] = []
+    seen: set[str] = set()
+
+    def add(safe: str) -> None:
+        if safe and safe not in seen:
+            seen.add(safe)
+            probes.append(safe)
+
+    add(node_id.replace(":", "_"))
+    if ";" in node_id:
+        add(node_id.rsplit(";", 1)[-1].replace(":", "_"))
+    return probes
+
+
 def lookup_asset_path_for_node(
     asset_index: dict[str, str],
     node_id: str,
 ) -> str | None:
     """Resolve one node id against a pre-built :func:`build_asset_node_index` map."""
-    return asset_index.get(node_id.replace(":", "_"))
+    for safe_id in _asset_lookup_safe_ids(node_id):
+        resolved = asset_index.get(safe_id)
+        if resolved is not None:
+            return resolved
+    return None
 
 
 def discover_asset_path_for_node(
@@ -78,22 +98,22 @@ def discover_asset_path_for_node(
     """Find an on-disk SVG/PNG export for a Figma node id (any filename suffix)."""
     if asset_index is not None:
         return lookup_asset_path_for_node(asset_index, node_id)
-    suffix = node_id.replace(":", "_")
     best: tuple[tuple[int, str], str] | None = None
-    for folder in _ASSET_SCAN_FOLDERS:
-        asset_dir = project_dir / "assets" / folder
-        if not asset_dir.is_dir():
-            continue
-        for pattern in (
-            f"*_{suffix}.svg",
-            f"*_{suffix}.png",
-            f"render_boundary_{suffix}.svg",
-        ):
-            for match in asset_dir.glob(pattern):
-                rel = f"assets/{folder}/{match.name}".replace("\\", "/")
-                rank = _vector_asset_discovery_rank(rel)
-                if best is None or rank < best[0]:
-                    best = (rank, rel)
+    for suffix in _asset_lookup_safe_ids(node_id):
+        for folder in _ASSET_SCAN_FOLDERS:
+            asset_dir = project_dir / "assets" / folder
+            if not asset_dir.is_dir():
+                continue
+            for pattern in (
+                f"*_{suffix}.svg",
+                f"*_{suffix}.png",
+                f"render_boundary_{suffix}.svg",
+            ):
+                for match in asset_dir.glob(pattern):
+                    rel = f"assets/{folder}/{match.name}".replace("\\", "/")
+                    rank = _vector_asset_discovery_rank(rel)
+                    if best is None or rank < best[0]:
+                        best = (rank, rel)
     return best[1] if best is not None else None
 
 

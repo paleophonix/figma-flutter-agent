@@ -195,6 +195,37 @@ def canonicalize_root_bottom_nav_terminal_overlay(
     return root.model_copy(update={"children": children})
 
 
+def _position_pin_bottom_stack_layer(
+    child: CleanDesignTreeNode,
+    widget: str,
+    *,
+    parent_stack: CleanDesignTreeNode,
+) -> str:
+    """Wrap decomposed stack slots that pin-bottom chrome left without ``Positioned``."""
+    stripped = widget.strip()
+    if stripped.startswith("Positioned("):
+        return widget
+    placement = child.stack_placement
+    if placement is None:
+        return widget
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _positioned_fields,
+        sanitize_positioned_axis_fields,
+    )
+
+    parent_height = float(parent_stack.sizing.height or 0.0) or None
+    fields = sanitize_positioned_axis_fields(
+        _positioned_fields(
+            placement,
+            render_boundary=child.render_boundary,
+            parent_height=parent_height,
+        )
+    )
+    if not fields:
+        return widget
+    return f"Positioned({', '.join(fields)}, child: {widget})"
+
+
 def apply_pin_bottom_chrome_to_stack_layers(
     stack_node: CleanDesignTreeNode,
     child_nodes: list[CleanDesignTreeNode],
@@ -248,13 +279,31 @@ def apply_pin_bottom_chrome_to_stack_layers(
         if uses_shared_scroll:
             flush_shared_scroll()
         if is_bottom_docked_stack_child(child):
-            pinned.append(widget)
+            pinned.append(
+                _position_pin_bottom_stack_layer(
+                    child,
+                    widget,
+                    parent_stack=stack_node,
+                )
+            )
             continue
         if is_viewport_chrome_band(child):
-            pinned.append(widget)
+            pinned.append(
+                _position_pin_bottom_stack_layer(
+                    child,
+                    widget,
+                    parent_stack=stack_node,
+                )
+            )
             continue
         if not stack_child_should_use_pin_bottom_scroll_host(child, parent_stack=stack_node):
-            pinned.append(widget)
+            pinned.append(
+                _position_pin_bottom_stack_layer(
+                    child,
+                    widget,
+                    parent_stack=stack_node,
+                )
+            )
             continue
         pinned.append(
             pin_bottom_scroll_layer_expr(
