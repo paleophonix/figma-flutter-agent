@@ -713,6 +713,17 @@ class render_misc:
                 node, glyph, parent_type=parent_type, scroll_content_root=scroll_content_root
             )
 
+        from figma_flutter_agent.generator.layout.spacer import dimensioned_spacer_widget_expr
+
+        spacer = dimensioned_spacer_widget_expr(node)
+        if spacer is not None:
+            return _finalize_widget(
+                node,
+                spacer,
+                parent_type=parent_type,
+                scroll_content_root=scroll_content_root,
+            )
+
         return _finalize_widget(
             node,
             "const SizedBox.shrink()",

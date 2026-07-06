@@ -143,6 +143,14 @@ def plausible_kinds(node: CleanDesignTreeNode) -> frozenset[WidgetIrKind]:
     if typed:
         candidates.update(typed)
 
+    if signal_type == NodeType.INPUT:
+        from figma_flutter_agent.parser.semantics.detectors.inputs import (
+            _input_host_has_trailing_picker_affordance,
+        )
+
+        if _input_host_has_trailing_picker_affordance(node):
+            candidates.add(WidgetIrKind.INPUT_DROPDOWN)
+
     if signal_type == NodeType.SWITCH:
         from figma_flutter_agent.generator.layout.flex_policy.row import (
             layout_fact_switch_hosts_segmented_options,

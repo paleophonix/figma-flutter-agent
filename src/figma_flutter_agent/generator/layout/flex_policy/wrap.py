@@ -209,6 +209,12 @@ def resolve_flex_wrap(
             if node.type == NodeType.TEXT and ((node.style.text_align or "").upper() == "CENTER"):
                 return FlexWrapKind.NONE
             return FlexWrapKind.SIZED_BOX_WIDTH
+        from figma_flutter_agent.generator.layout.flex_policy.row import (
+            _column_child_keeps_intrinsic_width,
+        )
+
+        if _column_child_keeps_intrinsic_width(node, parent_node):
+            return FlexWrapKind.NONE
 
     return FlexWrapKind.NONE
 
@@ -648,6 +654,14 @@ def apply_flex_wrap_to_widget(
                 return bounded
     kind = resolve_flex_wrap(parent_type=parent_type, node=node, parent_node=parent_node)
     if kind == FlexWrapKind.NONE:
+        from figma_flutter_agent.generator.layout.flex_policy.row import (
+            _column_child_keeps_intrinsic_width,
+        )
+
+        if parent_type == NodeType.COLUMN and _column_child_keeps_intrinsic_width(
+            node, parent_node
+        ):
+            return f"Align(alignment: Alignment.centerLeft, child: {widget})"
         return widget
     if kind == FlexWrapKind.EXPANDED:
         if _unwrap_flex_parent_data_wrapper(widget.lstrip()) is not None:

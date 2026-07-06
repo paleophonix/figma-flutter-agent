@@ -18,6 +18,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMod
 
 _TIGHT_CHIP_ROW_MAX_USABLE_SPAN = 80.0
 _INTRINSIC_ROW_CHILD_MAX_SPAN = 120.0
+_COLUMN_INTRINSIC_WIDTH_CHILD_MAX_PX = 200.0
 _CARD_METADATA_STACK_MAX_WIDTH = 120.0
 
 
@@ -371,6 +372,42 @@ def _child_main_span(child: CleanDesignTreeNode) -> float | None:
     if span is None or span <= 0:
         return None
     return float(span)
+
+
+def _column_child_keeps_intrinsic_width(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """True when a bounded COLUMN child must not stretch to the parent cross-axis."""
+    if parent_node is None or parent_node.type != NodeType.COLUMN:
+        return False
+    if node.sizing.width_mode not in {SizingMode.FIXED, SizingMode.HUG}:
+        return False
+    width = node.sizing.width
+    if width is None or float(width) <= 0.0:
+        return False
+    if float(width) > _COLUMN_INTRINSIC_WIDTH_CHILD_MAX_PX:
+        return False
+    return node.type in {NodeType.ROW, NodeType.CONTAINER, NodeType.BUTTON, NodeType.STACK}
+
+
+def layout_fact_nav_bar_title_row(row: CleanDesignTreeNode) -> bool:
+    """True when a toolbar row groups a leading control with a title before trailing chrome."""
+    if row.type != NodeType.ROW or len(row.children) < 2:
+        return False
+    leading = row.children[0]
+    if leading.type != NodeType.ROW:
+        return False
+    has_leading_control = any(child.type == NodeType.BUTTON for child in leading.children)
+    has_title = any(
+        child.type == NodeType.TEXT
+        or (
+            child.type == NodeType.COLUMN
+            and any(grandchild.type == NodeType.TEXT for grandchild in child.children)
+        )
+        for child in leading.children
+    )
+    return has_leading_control and has_title
 
 
 def _row_child_keeps_intrinsic_width(

@@ -41,6 +41,22 @@ def _viewport_chrome_vertical_role(child: CleanDesignTreeNode) -> str | None:
     return None
 
 
+def layout_fact_viewport_chrome_left_pinned_text(node: CleanDesignTreeNode) -> bool:
+    """True when status-bar clock copy is pinned near the leading edge."""
+    if node.type != NodeType.TEXT:
+        return False
+    placement = node.stack_placement
+    if placement is None:
+        return False
+    left = placement.left
+    if left is not None and float(left) > 60.0:
+        return False
+    width = node.sizing.width
+    if width is not None and float(width) > 120.0:
+        return False
+    return True
+
+
 def is_viewport_chrome_band(node: CleanDesignTreeNode) -> bool:
     """Return True for full-bleed iOS/Android status and home-indicator chrome."""
     name = (node.name or "").strip()

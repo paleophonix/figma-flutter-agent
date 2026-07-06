@@ -211,6 +211,12 @@ def render_dialog(
 
 
 def render_slider(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
+    from figma_flutter_agent.generator.variant.slider_facts import layout_fact_dual_thumb_range_slider
+
+    if layout_fact_dual_thumb_range_slider(node):
+        control = render_slider_widget(label="", node=node, theme_variant=theme_variant)
+        semantic_label = escape_dart_string(node.accessibility_label or node.name)
+        return f"Semantics(label: '{semantic_label}', child: {control})"
     label = escape_dart_string(node.accessibility_label or node.name)
     control = render_slider_widget(label=label, node=node, theme_variant=theme_variant)
     return f"Semantics(label: '{label}', child: {control})"

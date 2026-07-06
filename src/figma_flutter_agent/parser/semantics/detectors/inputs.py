@@ -13,8 +13,27 @@ from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalT
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
 
 
+def _input_host_has_trailing_picker_affordance(node: CleanDesignTreeNode) -> bool:
+    """True when an input host exposes a trailing picker/disclosure affordance."""
+    from figma_flutter_agent.parser.interaction.forms import stack_action_intent_vetoes_input
+    from figma_flutter_agent.parser.interaction.icons import layout_fact_input_trailing_icon_button
+    from figma_flutter_agent.parser.interaction.shared import (
+        _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
+        _descendant_nodes,
+    )
+
+    if stack_action_intent_vetoes_input(node):
+        return True
+    return any(
+        layout_fact_input_trailing_icon_button(item)
+        for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+    )
+
+
 def _is_input_text_field(ctx: DetectorContext) -> bool:
-    return _signal_type(ctx.clean_node) == NodeType.INPUT
+    if _signal_type(ctx.clean_node) != NodeType.INPUT:
+        return False
+    return not _input_host_has_trailing_picker_affordance(ctx.clean_node)
 
 
 def _is_input_search_bar(ctx: DetectorContext) -> bool:
@@ -29,7 +48,12 @@ def _is_input_search_bar(ctx: DetectorContext) -> bool:
 
 
 def _is_input_dropdown(ctx: DetectorContext) -> bool:
-    return _signal_type(ctx.clean_node) == NodeType.DROPDOWN
+    node = ctx.clean_node
+    if _signal_type(node) == NodeType.DROPDOWN:
+        return True
+    if _signal_type(node) != NodeType.INPUT:
+        return False
+    return _input_host_has_trailing_picker_affordance(node)
 
 
 def _is_input_picker_date(ctx: DetectorContext) -> bool:

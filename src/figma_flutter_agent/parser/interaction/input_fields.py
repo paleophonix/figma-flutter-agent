@@ -73,12 +73,39 @@ def input_external_label_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode 
     return None
 
 
+def input_external_label_gap(node: CleanDesignTreeNode) -> float | None:
+    """Measure the vertical gap between an external label and the painted input surface."""
+    label = input_external_label_node(node)
+    surface = input_surface_node(node)
+    if label is None or surface is None:
+        return None
+    label_placement = label.stack_placement
+    surface_placement = surface.stack_placement
+    if label_placement is not None and surface_placement is not None:
+        label_bottom = float(label_placement.top or 0.0) + float(label.sizing.height or 0.0)
+        surface_top = float(surface_placement.top or 0.0)
+        gap = surface_top - label_bottom
+        if gap >= _MIN_EXTERNAL_LABEL_GAP_PX:
+            return gap
+    host_height = node.sizing.height
+    if host_height is None:
+        return None
+    label_height = float(label.sizing.height or 0.0)
+    surface_height = float(surface.sizing.height or 0.0)
+    gap = float(host_height) - label_height - surface_height
+    if gap >= _MIN_EXTERNAL_LABEL_GAP_PX:
+        return gap
+    return None
+
+
 def input_hint_text(node: CleanDesignTreeNode) -> str:
     """Return placeholder label for an input-like stack group."""
     hint_node = input_hint_node(node)
     if hint_node is not None and hint_node.text:
         return hint_node.text.strip()
     if input_external_label_node(node) is not None:
+        return ""
+    if node.component_ref is not None:
         return ""
     return node.accessibility_label or node.name
 

@@ -1,0 +1,15 @@
+{
+  "feature": "niyama_order",
+  "pipeline_run_id": "070bef2b619b",
+  "candidate_build_run_id": "070bef2b619b",
+  "status": "failed",
+  "writeback": "failed",
+  "written_files": [],
+  "analyze_passed": null,
+  "runMetaSchemaVersion": "2",
+  "captured_at": "2026-07-06T14:55:36.559080+00:00",
+  "run_started_at": "2026-07-06T14:49:50.996520+00:00",
+  "cached_ir_verdict": null,
+  "clean_tree_hash": "dd9f9f7387425f2a513a5ca7b29df347b794c0c3735bea0eb62a0be9e3d895ab",
+  "last_error": "Static contract gates failed: visible_extracted_must_not_emit_empty_or_recursive_shell: lib/widgets/plus_icon_widget.dart build returns only SizedBox.shrink"
+}

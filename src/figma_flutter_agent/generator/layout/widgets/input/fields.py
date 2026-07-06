@@ -16,6 +16,7 @@ from figma_flutter_agent.generator.layout.style import (
     text_widget_trailing_params,
 )
 from figma_flutter_agent.parser.interaction import (
+    input_external_label_gap,
     input_external_label_node,
     input_flex_value_text,
     input_hint_implies_obscure_text,
@@ -301,6 +302,7 @@ def _render_stack_input(
             dart_weight_overrides_by_family=dart_weight_overrides_by_family,
             text_theme_slot_by_style_name=text_theme_slot_by_style_name,
             text_theme_size_slots=text_theme_size_slots,
+            label_field_gap=input_external_label_gap(node),
         )
     return _finalize_widget(node, field, parent_type=parent_type)
 

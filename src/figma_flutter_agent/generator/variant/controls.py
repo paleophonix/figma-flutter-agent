@@ -8,6 +8,13 @@ from figma_flutter_agent.generator.variant.actions import (
     toggle_on_changed_expr,
     toggle_value_expr,
 )
+from figma_flutter_agent.generator.variant.slider_facts import (
+    dual_thumb_range_values,
+    layout_fact_dual_thumb_range_slider,
+    range_slider_active_color_expr,
+    range_slider_emit_height,
+)
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.generator.variant.state import (
     variant_button_kind,
     variant_input_has_error,
@@ -188,9 +195,31 @@ def render_slider_widget(
     node: CleanDesignTreeNode,
     theme_variant: str,
 ) -> str:
-    """Render Slider or CupertinoSlider with optional label."""
-    value = slider_value_expr(node)
+    """Render Slider, RangeSlider, or CupertinoSlider with optional label."""
     on_changed = slider_on_changed_expr(node)
+    if layout_fact_dual_thumb_range_slider(node):
+        start, end = dual_thumb_range_values(node)
+        active_color = range_slider_active_color_expr(node)
+        height = range_slider_emit_height(node)
+        if theme_variant == "cupertino":
+            control = (
+                f"CupertinoSlider("
+                f"value: {start}, "
+                f"onChanged: {on_changed})"
+            )
+        else:
+            control = (
+                f"RangeSlider("
+                f"values: Range({start}, {end}), "
+                f"activeColor: {active_color}, "
+                f"onChanged: {on_changed})"
+            )
+        return (
+            f"SizedBox("
+            f"height: {format_geometry_literal(height)}, "
+            f"child: {control})"
+        )
+    value = slider_value_expr(node)
     control = (
         f"CupertinoSlider(value: {value}, onChanged: {on_changed})"
         if theme_variant == "cupertino"

@@ -114,6 +114,7 @@ from .icons import (
     trailing_chevron_glyph_paint_span,
 )
 from .input_fields import (
+    input_external_label_gap,
     input_external_label_node,
     input_flex_value_text,
     input_hint_node,
@@ -233,6 +234,7 @@ __all__ = [
     "input_hint_implies_obscure_text",
     "input_trailing_chrome_implies_obscure_text",
     "input_hint_node",
+    "input_external_label_gap",
     "input_external_label_node",
     "input_hint_text",
     "input_surface_node",

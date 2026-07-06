@@ -350,29 +350,36 @@ def render_text_node(
         NodeType.COLUMN,
         NodeType.STACK,
     }:
-        centered_text_width = node.sizing.width
-        centered_text_height = node.sizing.height
-        centered_font_size = node.style.font_size
-        fixed_width_multiline = (
-            centered_text_width is not None
-            and centered_text_width > 0
-            and node.sizing.width_mode == SizingMode.FIXED
-            and centered_text_height is not None
-            and centered_font_size is not None
-            and float(centered_text_height) > float(centered_font_size) * 1.6
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            layout_fact_viewport_chrome_left_pinned_text,
         )
-        if fixed_width_multiline:
-            width_lit = format_geometry_literal(float(centered_text_width))
-            widget = f"SizedBox(width: {width_lit}, child: Center(child: {widget}))"
-        elif nav_tab_column_parent and parent_node is not None:
-            parent_width = parent_node.sizing.width
-            if parent_width is not None and float(parent_width) > 0:
-                width_lit = format_geometry_literal(float(parent_width))
-                widget = f"SizedBox(width: {width_lit}, child: Center(child: {widget}))"
-            else:
-                widget = f"Center(child: {widget})"
+
+        if layout_fact_viewport_chrome_left_pinned_text(node):
+            widget = f"Align(alignment: Alignment.centerLeft, child: {widget})"
         else:
-            widget = f"SizedBox(width: double.infinity, child: Center(child: {widget}))"
+            centered_text_width = node.sizing.width
+            centered_text_height = node.sizing.height
+            centered_font_size = node.style.font_size
+            fixed_width_multiline = (
+                centered_text_width is not None
+                and centered_text_width > 0
+                and node.sizing.width_mode == SizingMode.FIXED
+                and centered_text_height is not None
+                and centered_font_size is not None
+                and float(centered_text_height) > float(centered_font_size) * 1.6
+            )
+            if fixed_width_multiline:
+                width_lit = format_geometry_literal(float(centered_text_width))
+                widget = f"SizedBox(width: {width_lit}, child: Center(child: {widget}))"
+            elif nav_tab_column_parent and parent_node is not None:
+                parent_width = parent_node.sizing.width
+                if parent_width is not None and float(parent_width) > 0:
+                    width_lit = format_geometry_literal(float(parent_width))
+                    widget = f"SizedBox(width: {width_lit}, child: Center(child: {widget}))"
+                else:
+                    widget = f"Center(child: {widget})"
+            else:
+                widget = f"SizedBox(width: double.infinity, child: Center(child: {widget}))"
     text_width = node.sizing.width
     if (
         "\n" in (node.text or "")

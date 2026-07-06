@@ -42,6 +42,20 @@ def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
         bounded = _bound_stack_sized_box(node, body)
         if bounded is not None:
             return bounded
+    if node.type == NodeType.SLIDER:
+        from figma_flutter_agent.generator.variant.slider_facts import (
+            layout_fact_dual_thumb_range_slider,
+            range_slider_emit_height,
+        )
+
+        if layout_fact_dual_thumb_range_slider(node):
+            width, _ = _node_layout_size(node, node.stack_placement)
+            height = range_slider_emit_height(node)
+            if width is not None and width > 0 and height > 0:
+                return (
+                    f"SizedBox(width: {format_geometry_literal(width)}, "
+                    f"height: {format_geometry_literal(height)}, child: {body})"
+                )
     width, height = _node_layout_size(node, node.stack_placement)
     if (height is None or height <= 0) and node.type == NodeType.STACK:
         derived = stack_layout_bounded_height(node)

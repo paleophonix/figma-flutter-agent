@@ -1,0 +1,92 @@
+{
+  "cacheKey": "47b79dfe636967bd8ec490641f264e1c1b841df3edd0674fdb93b54a24eb87b5",
+  "response": {
+    "entries": [
+      {
+        "clusterId": "cluster_6",
+        "widgetName": "OrderProductPriceWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_1007_7119_e1043bbb",
+        "widgetName": "CheckoutBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_1154_7859_6271d11b",
+        "widgetName": "OrderProductCardWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_1154_8066_5cdcb24a",
+        "widgetName": "GuestsInfoWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_1154_8374_89112a74",
+        "widgetName": "PromoCodeCardWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_1154_8697_9095f282",
+        "widgetName": "BonusCountWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_1356_10366_754647f7",
+        "widgetName": "ProductActionRowWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_1356_10701_1aa13d53",
+        "widgetName": "AddOnProductCardWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_681_23583",
+        "widgetName": "SystemStatusBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_908_4711",
+        "widgetName": "BottomHomeIndicatorWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_910_3249",
+        "widgetName": "PlusIconWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_910_3255",
+        "widgetName": "AddProductButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_913_17730",
+        "widgetName": "CloseButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_913_8948",
+        "widgetName": "ProductIllustrationWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_919_5311",
+        "widgetName": "ModalHeaderWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_932_4599_e1043bbb",
+        "widgetName": "CheckoutButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_933_4777",
+        "widgetName": "SectionDividerWidget",
+        "paramRenames": {}
+      }
+    ]
+  }
+}

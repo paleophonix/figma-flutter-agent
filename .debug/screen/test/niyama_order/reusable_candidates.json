@@ -1,0 +1,100 @@
+{
+  "cacheKey": "469996dc3fcb80a1a5eba16b9e0ec1b3cf7a6243834c411e78f7d756d1416cc8",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "4408:44896",
+        "widgetName": "OrderProductCard",
+        "reason": "Repeated order-item card pattern with image, title, optional details, and quantity controls across multiple instances.",
+        "confidence": 0.98,
+        "suggestedParams": [
+          "title",
+          "price",
+          "description",
+          "imageUrl",
+          "quantity",
+          "showStepper"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "4408:44897",
+            "4408:44898",
+            "4408:44901",
+            "4408:44902"
+          ],
+          "shapeSimilarity": 0.97,
+          "semanticRole": "order item card"
+        }
+      },
+      {
+        "nodeId": "I4408:44896;1154:7849",
+        "widgetName": "QuantityStepper",
+        "reason": "Repeated plus/minus quantity control inside order product cards, with only the count changing between instances.",
+        "confidence": 0.97,
+        "suggestedParams": [
+          "count",
+          "minCount",
+          "maxCount",
+          "allowIncrement",
+          "allowDecrement"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I4408:44897;1154:7849",
+            "I4408:44898;1154:7849",
+            "I4408:44904;1154:8077"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "quantity selector"
+        }
+      },
+      {
+        "nodeId": "4408:44914",
+        "widgetName": "ProductSmallCard",
+        "reason": "Horizontal product tile repeats as a small card family with title, image/illustration, price or promo price, and add action variants.",
+        "confidence": 0.96,
+        "suggestedParams": [
+          "title",
+          "price",
+          "oldPrice",
+          "ctaLabel",
+          "showPrice",
+          "showCta"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "4408:44915",
+            "4408:44916"
+          ],
+          "shapeSimilarity": 0.94,
+          "semanticRole": "swipeable product tile"
+        }
+      },
+      {
+        "nodeId": "4408:44903",
+        "widgetName": "ActionCard",
+        "reason": "Icon + title + trailing arrow CTA card is a reusable action entry pattern, even though only one instance is present here.",
+        "confidence": 0.69,
+        "suggestedParams": [
+          "icon",
+          "title",
+          "trailingIcon",
+          "isActive"
+        ],
+        "evidence": null
+      },
+      {
+        "nodeId": "4408:44917",
+        "widgetName": "BottomAddBar",
+        "reason": "Modal footer CTA bar combines a primary button with the home indicator, suitable as a reusable bottom action bar.",
+        "confidence": 0.66,
+        "suggestedParams": [
+          "buttonLabel",
+          "isEnabled",
+          "showHomeIndicator"
+        ],
+        "evidence": null
+      }
+    ]
+  }
+}
