@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from figma_flutter_agent.errors import PlannedDartGraphError
+from figma_flutter_agent.generator.dart import static_contract_gates
 from figma_flutter_agent.generator.dart.static_contract_gates import (
     find_planned_widget_invocation_cycles,
     find_widget_callsite_constructor_mismatches,
@@ -12,6 +13,11 @@ from figma_flutter_agent.generator.dart.static_contract_gates import (
     run_static_contract_gates,
 )
 from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
+
+
+def test_static_contract_gates_binds_nested_flex_collector_at_import() -> None:
+    """Gate module must bind wrap.collect_nested_flex_parent_data_spans at import time."""
+    assert static_contract_gates.collect_nested_flex_parent_data_spans is not None
 
 
 def test_planned_widget_graph_acyclic_gate_detects_mutual_invocation() -> None:

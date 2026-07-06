@@ -23,6 +23,15 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
+      "nodeId": "I2007:14637;574:31016;8:2208;8:1929;8:1912",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
       "nodeId": "I2007:14824;574:31032;8:2208;8:1929;8:1912",
       "field": "wrap",
       "old": null,
@@ -87,6 +96,15 @@
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
       "nodeId": "I2237:17339;53:4482;8:2231;8:2208;8:1929;8:1912",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I2237:17339;53:4482;8:2231;8:2208;8:2196;8:1955",
       "field": "wrap",
       "old": null,
       "new": "flexibleLoose",
@@ -267,7 +285,7 @@
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
-      "policy": "manifest"
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -275,8 +293,8 @@
       "nodeId": "I2007:14824;574:31032",
       "field": "tier_source",
       "old": null,
-      "new": "manifest",
-      "policy": "manifest"
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -303,7 +321,7 @@
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
-      "policy": "manifest"
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -311,8 +329,8 @@
       "nodeId": "I2007:14854;574:31032",
       "field": "tier_source",
       "old": null,
-      "new": "manifest",
-      "policy": "manifest"
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -339,7 +357,7 @@
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
-      "policy": "manifest"
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -347,8 +365,8 @@
       "nodeId": "I2007:14945;574:31032",
       "field": "tier_source",
       "old": null,
-      "new": "manifest",
-      "policy": "manifest"
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -497,6 +515,24 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
+      "nodeId": "I2237:17339;53:4482;8:2231;8:2208;8:2196",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I2237:17339;53:4482;8:2231;8:2208;8:2196",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
       "nodeId": "2237:17331",
       "field": "fidelity_tier",
       "old": null,
@@ -537,7 +573,7 @@
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
-      "policy": "manifest"
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -545,8 +581,8 @@
       "nodeId": "I2236:16524;574:31032",
       "field": "tier_source",
       "old": null,
-      "new": "manifest",
-      "policy": "manifest"
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -644,10 +680,10 @@
     },
     {
       "nodeId": "I2007:14824;574:31032",
-      "kind": "input_text_field",
-      "confidence": 0.88,
+      "kind": "input_dropdown",
+      "confidence": 0.9,
       "evidence": {
-        "input_text_field": true,
+        "input_dropdown": true,
         "child_type_counts": {
           "ROW": 1
         },
@@ -672,10 +708,10 @@
     },
     {
       "nodeId": "I2007:14854;574:31032",
-      "kind": "input_text_field",
-      "confidence": 0.88,
+      "kind": "input_dropdown",
+      "confidence": 0.9,
       "evidence": {
-        "input_text_field": true,
+        "input_dropdown": true,
         "child_type_counts": {
           "ROW": 1
         },
@@ -700,10 +736,10 @@
     },
     {
       "nodeId": "I2007:14945;574:31032",
-      "kind": "input_text_field",
-      "confidence": 0.88,
+      "kind": "input_dropdown",
+      "confidence": 0.9,
       "evidence": {
-        "input_text_field": true,
+        "input_dropdown": true,
         "child_type_counts": {
           "ROW": 1
         },
@@ -826,6 +862,20 @@
       }
     },
     {
+      "nodeId": "I2237:17339;53:4482;8:2231;8:2208;8:2196",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "component_id": "8:1952"
+      }
+    },
+    {
       "nodeId": "2237:17331",
       "kind": "input_slider",
       "confidence": 0.9,
@@ -854,10 +904,10 @@
     },
     {
       "nodeId": "I2236:16524;574:31032",
-      "kind": "input_text_field",
-      "confidence": 0.88,
+      "kind": "input_dropdown",
+      "confidence": 0.9,
       "evidence": {
-        "input_text_field": true,
+        "input_dropdown": true,
         "child_type_counts": {
           "ROW": 1
         },

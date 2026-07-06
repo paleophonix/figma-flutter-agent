@@ -6,6 +6,9 @@ import re
 from collections.abc import Mapping
 
 from figma_flutter_agent.errors import PlannedDartGraphError
+from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+    collect_nested_flex_parent_data_spans,
+)
 
 _WIDGET_CTOR_CALL_RE = re.compile(r"\b([A-Z][A-Za-z0-9_]*Widget\d*)\s*\(")
 _NAMED_ARG_RE = re.compile(r"(?<![\w.])(?P<name>[a-z][A-Za-z0-9_]*)\s*:")
@@ -227,10 +230,6 @@ def find_loose_flex_infinite_width_violations(planned: Mapping[str, str]) -> lis
 
 def find_nested_flex_parent_data_wrappers(planned: Mapping[str, str]) -> list[str]:
     """Detect ``Expanded``/``Flexible`` nested inside another flex parent-data wrapper."""
-    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
-        collect_nested_flex_parent_data_spans,
-    )
-
     errors: list[str] = []
     for path, content in planned.items():
         rel = path.replace("\\", "/")
