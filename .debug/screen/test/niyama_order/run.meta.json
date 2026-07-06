@@ -1,15 +1,16 @@
 {
   "feature": "niyama_order",
-  "pipeline_run_id": "b520e88dda3c",
-  "candidate_build_run_id": "b520e88dda3c",
+  "pipeline_run_id": "fb369ccec310",
+  "candidate_build_run_id": "fb369ccec310",
   "status": "failed",
   "writeback": "failed",
   "written_files": [],
   "analyze_passed": null,
   "runMetaSchemaVersion": "2",
-  "captured_at": "2026-07-06T17:01:40.996720+00:00",
-  "run_started_at": "2026-07-06T17:01:21.637021+00:00",
+  "captured_at": "2026-07-06T17:57:35.899298+00:00",
+  "run_started_at": "2026-07-06T17:55:05.176064+00:00",
   "cached_ir_verdict": "incompatible",
-  "clean_tree_hash": "4b0761de09c4a3f6786cb066e1436f6eace35e1bf71be3c09500fee908daeaf3",
-  "last_error": "Cluster widget OrderProductItemWidget cannot materialize: visible vector node(s) I4408:44896;1154:7849;1149:9855;1149:9481;910:3248, I4408:44896;1154:7849;1149:9856;1149:9479;910:3261 lack exported drawable assets."
+  "clean_tree_hash": "8f2c828789c48534efa1ed0db2cbb17ed0da7bbcef501b6858a7357436358b3f",
+  "generation_config_hash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
+  "last_error": "Skipping write: planned Dart still fails analyze after repair exhaustion (LLM analyze repair exhausted (0/5 attempts); rolled back to pre-repair baseline.)"
 }

@@ -1,0 +1,317 @@
+
+--- dart format @ 2026-07-06T17:56:09.229019+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\widgets\divider_line_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\widgets\guests_count_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\widgets\order_bottom_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\widgets\place_order_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\widgets\plus_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\lib\widgets\promo_code_action_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqpn7mcw\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 21 files (21 changed) in 1.53 seconds.
+
+--- pub get --offline @ 2026-07-06T17:56:12.326661+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/2) @ 2026-07-06T17:56:14.973005+00:00 ---
+exit_code=0
+Analyzing divider_line_widget.dart, guests_count_widget.dart, home_indicator_widget.dart, modal_header_widget.dart, order_bottom_bar_widget.dart, order_product_item_widget.dart...
+
+warning - lib\widgets\modal_header_widget.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\modal_header_widget.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\order_product_item_widget.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\modal_header_widget.dart:23:488 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_bottom_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_bottom_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\order_bottom_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_bottom_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+8 issues found.
+
+--- dart analyze (generated) (2/2) @ 2026-07-06T17:56:17.169902+00:00 ---
+exit_code=0
+Analyzing place_order_button_widget.dart, plus_icon_widget.dart, promo_code_action_card_widget.dart...
+No issues found!
+
+--- dart analyze (generated) (1/4) @ 2026-07-06T17:56:20.167709+00:00 ---
+exit_code=3
+Analyzing niyama_order_screen.dart, niyama_order_chunk_00f13e69.dart, niyama_order_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart...
+
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:27:6026 - Unterminated string literal. - unterminated_string_literal
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:1 - The operator '-' isn't defined for the type 'String'. Try defining the operator '-'. - undefined_operator
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:3 - Illegal character '1058'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:3 - Undefined name 'Тверская'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:4 - Illegal character '1074'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:5 - Illegal character '1077'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:6 - Illegal character '1088'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:7 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:8 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:9 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:10 - Illegal character '1103'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:12 - Expected to find ','. - expected_token
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:12 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:12 - Too many positional arguments: 0 expected, but 3 found. Try removing the extra positional arguments, or specifying the name for named arguments. - extra_positional_arguments_could_be_named
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:12 - Undefined name 'колбаска'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:13 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:14 - Illegal character '1083'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:15 - Illegal character '1073'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:16 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:17 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:18 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:19 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:20 - Expected to find ','. - expected_token
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:68 - Illegal character '1054'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:68 - Undefined name 'Острый'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:69 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:70 - Illegal character '1090'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:71 - Illegal character '1088'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:72 - Illegal character '1099'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:73 - Illegal character '1081'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:75 - Expected to find ','. - expected_token
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:75 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:75 - Undefined name 'соус'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:76 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:77 - Illegal character '1091'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:78 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:79 - Expected to find ')'. - expected_token
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:83 - Illegal character '1060'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:84 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:85 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:86 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:87 - Illegal character '1095'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:88 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:90 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:92 - Illegal character '1087'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:93 - Illegal character '1077'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:94 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:95 - Illegal character '1090'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:96 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3 - Illegal character '1058'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:4 - Illegal character '1074'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:5 - Illegal character '1077'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:6 - Illegal character '1088'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:7 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:8 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:9 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:10 - Illegal character '1103'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:12 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:13 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:14 - Illegal character '1083'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:15 - Illegal character '1073'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:16 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:17 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:18 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:19 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3527 - Illegal character '1058'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3528 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3529 - Illegal character '1084'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3531 - Illegal character '1071'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3532 - Illegal character '1084'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3549 - Illegal character '1058'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3550 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3551 - Illegal character '1084'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3553 - Illegal character '1071'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3554 - Illegal character '1084'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3994 - Unterminated string literal. - unterminated_string_literal
+warning - lib\features\niyama_order\niyama_order_screen.dart:7:8 - Unused import: 'package:test/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order\niyama_order_screen.dart:8:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order\niyama_order_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order\niyama_order_screen.dart:11:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:10:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:12:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:13:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\niyama_order_chunk_00f13e69.dart:27:1336 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_chunk_00f13e69.dart:27:1402 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_chunk_00f13e69.dart:27:1490 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_chunk_00f13e69.dart:28:20 - Use interpolation to compose strings and values. Try using string interpolation to build the composite string. - prefer_interpolation_to_compose_strings
+
+88 issues found.
+
+--- dart analyze (llm_repair) @ 2026-07-06T17:56:20.169393+00:00 ---
+Recorded 76 analyzer error(s) in dart-errors.json
+
+--- dart format @ 2026-07-06T17:57:20.007572+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\divider_line_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\guests_count_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\order_bottom_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\place_order_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\plus_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\widgets\promo_code_action_card_widget.dart
+Formatted 9 files (9 changed) in 3.57 seconds.
+
+--- pub get --offline @ 2026-07-06T17:57:22.458420+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/2) @ 2026-07-06T17:57:24.895117+00:00 ---
+exit_code=0
+Analyzing divider_line_widget.dart, guests_count_widget.dart, home_indicator_widget.dart, modal_header_widget.dart, order_bottom_bar_widget.dart, order_product_item_widget.dart...
+
+warning - lib\widgets\modal_header_widget.dart:7:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\modal_header_widget.dart:8:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\order_product_item_widget.dart:7:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\modal_header_widget.dart:43:46 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_bottom_bar_widget.dart:22:50 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_bottom_bar_widget.dart:39:54 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\order_bottom_bar_widget.dart:66:47 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_bottom_bar_widget.dart:76:57 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+8 issues found.
+
+--- dart analyze (generated) (2/2) @ 2026-07-06T17:57:27.285338+00:00 ---
+exit_code=0
+Analyzing place_order_button_widget.dart, plus_icon_widget.dart, promo_code_action_card_widget.dart...
+No issues found!
+
+--- dart format @ 2026-07-06T17:57:32.669135+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-cb5_3_uy\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 22 files (13 changed) in 3.71 seconds.
+
+--- dart analyze (generated) (1/4) @ 2026-07-06T17:57:35.878826+00:00 ---
+exit_code=3
+Analyzing niyama_order_screen.dart, niyama_order_chunk_00f13e69.dart, niyama_order_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart...
+
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:27:6026 - Unterminated string literal. - unterminated_string_literal
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:1 - The operator '-' isn't defined for the type 'String'. Try defining the operator '-'. - undefined_operator
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:3 - Illegal character '1058'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:3 - Undefined name 'Тверская'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:4 - Illegal character '1074'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:5 - Illegal character '1077'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:6 - Illegal character '1088'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:7 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:8 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:9 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:10 - Illegal character '1103'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:12 - Expected to find ','. - expected_token
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:12 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:12 - Too many positional arguments: 0 expected, but 3 found. Try removing the extra positional arguments, or specifying the name for named arguments. - extra_positional_arguments_could_be_named
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:12 - Undefined name 'колбаска'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:13 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:14 - Illegal character '1083'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:15 - Illegal character '1073'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:16 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:17 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:18 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:19 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:20 - Expected to find ','. - expected_token
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:68 - Illegal character '1054'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:68 - Undefined name 'Острый'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:69 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:70 - Illegal character '1090'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:71 - Illegal character '1088'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:72 - Illegal character '1099'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:73 - Illegal character '1081'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:75 - Expected to find ','. - expected_token
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:75 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:75 - Undefined name 'соус'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:76 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:77 - Illegal character '1091'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:78 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:79 - Expected to find ')'. - expected_token
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:83 - Illegal character '1060'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:84 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:85 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:86 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:87 - Illegal character '1095'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:88 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:90 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:92 - Illegal character '1087'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:93 - Illegal character '1077'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:94 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:95 - Illegal character '1090'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:28:96 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3 - Illegal character '1058'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:4 - Illegal character '1074'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:5 - Illegal character '1077'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:6 - Illegal character '1088'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:7 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:8 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:9 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:10 - Illegal character '1103'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:12 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:13 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:14 - Illegal character '1083'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:15 - Illegal character '1073'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:16 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:17 - Illegal character '1089'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:18 - Illegal character '1082'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:19 - Illegal character '1072'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3527 - Illegal character '1058'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3528 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3529 - Illegal character '1084'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3531 - Illegal character '1071'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3532 - Illegal character '1084'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3549 - Illegal character '1058'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3550 - Illegal character '1086'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3551 - Illegal character '1084'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3553 - Illegal character '1071'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3554 - Illegal character '1084'. - illegal_character
+  error - lib\generated\niyama_order_chunk_00f13e69.dart:29:3994 - Unterminated string literal. - unterminated_string_literal
+warning - lib\features\niyama_order\niyama_order_screen.dart:6:8 - Unused import: 'package:test/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order\niyama_order_screen.dart:7:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order\niyama_order_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\niyama_order\niyama_order_screen.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:7:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:11:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\niyama_order_chunk_00f13e69.dart:27:1336 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_chunk_00f13e69.dart:27:1402 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_chunk_00f13e69.dart:27:1490 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_chunk_00f13e69.dart:28:20 - Use interpolation to compose strings and values. Try using string interpolation to build the composite string. - prefer_interpolation_to_compose_strings
+
+88 issues found.
+
+--- dart analyze (llm_repair) @ 2026-07-06T17:57:35.880424+00:00 ---
+Recorded 76 analyzer error(s) in dart-errors.json

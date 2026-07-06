@@ -1,95 +1,99 @@
 {
-  "cacheKey": "92d5cb58986e7f8f295c46786e4baf36e22b102de024a8450ad4870b1457e274",
+  "cacheKey": "c49ccc3df888b9f22320495dbb4cf850cbe7d0bf07d554b4f738fd992fca7d78",
   "response": {
     "candidates": [
       {
-        "nodeId": "2399:42789",
-        "widgetName": "SubscriptionPlanOption",
-        "reason": "Three plan rows share the same card/list-item structure with term, pricing, and a trailing check icon; only text content and badge emphasis vary.",
-        "confidence": 0.97,
+        "nodeId": "2399:42788",
+        "widgetName": "PlanOptionCard",
+        "reason": "This plan tile is repeated as a shared structure across the three pricing options: duration, monthly price, total price, and optional savings badge/check state.",
+        "confidence": 0.98,
         "suggestedParams": [
-          "termLabel",
-          "totalPriceLabel",
+          "planLengthLabel",
           "monthlyPriceLabel",
-          "badgeText",
-          "isHighlighted"
+          "totalPriceLabel",
+          "badgeLabel",
+          "isSelected"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42789",
-            "2399:42802",
-            "2399:42813"
+            "2399:42801",
+            "2399:42812"
           ],
-          "shapeSimilarity": 0.96,
-          "semanticRole": "subscription plan option row"
+          "shapeSimilarity": 0.97,
+          "semanticRole": "subscription plan selection option"
         }
       },
       {
-        "nodeId": "2399:42837",
-        "widgetName": "PaywallPrimaryButton",
-        "reason": "Primary CTA button component with two text lines; reusable as a marketing-style paywall action button.",
-        "confidence": 0.88,
-        "suggestedParams": [
-          "title",
-          "subtitle"
-        ],
-        "evidence": null
-      },
-      {
         "nodeId": "2399:42838",
-        "widgetName": "PaywallSecondaryActionButton",
-        "reason": "The same tertiary button component is used twice with different labels and one compact variant, so it should be parameterized.",
-        "confidence": 0.96,
+        "widgetName": "TertiaryActionButton",
+        "reason": "Same button component is reused for two different paywall actions, with only the label and compactness changing.",
+        "confidence": 0.97,
         "suggestedParams": [
           "label",
           "isCompact"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42838",
             "2399:42839"
           ],
-          "shapeSimilarity": 0.94,
-          "semanticRole": "tertiary action button"
+          "shapeSimilarity": 0.99,
+          "semanticRole": "secondary paywall action button"
         }
       },
       {
-        "nodeId": "2399:42783",
-        "widgetName": "DeviceStatusBar",
-        "reason": "Standard device chrome component reused across screens; extracted as a configurable status bar wrapper.",
-        "confidence": 0.82,
+        "nodeId": "2399:42837",
+        "widgetName": "PrimarySubscriptionButton",
+        "reason": "The primary CTA is a structured button component with a title and supporting subtitle, suitable for reuse across subscription flows.",
+        "confidence": 0.95,
         "suggestedParams": [
-          "timeText",
-          "showCamera",
-          "showDate",
-          "showBatteryTime",
-          "showDateText",
-          "cutoutType"
+          "title",
+          "subtitle"
         ],
-        "evidence": null
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "primary subscription call to action"
+        }
       },
       {
         "nodeId": "2399:42786",
         "widgetName": "CloseIconButton",
-        "reason": "Standard trailing close control component, suitable for reuse anywhere a dismiss action is needed.",
-        "confidence": 0.81,
-        "suggestedParams": [
-          "mode",
-          "vibrant"
-        ],
-        "evidence": null
+        "reason": "A standard trailing close button component that can be reused anywhere a dismiss action is needed.",
+        "confidence": 0.93,
+        "suggestedParams": [],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "dismiss/close control"
+        }
       },
       {
         "nodeId": "2399:42843",
-        "widgetName": "HomeIndicator",
-        "reason": "Standard iPhone home indicator component used as reusable device chrome.",
-        "confidence": 0.95,
+        "widgetName": "HomeIndicatorBar",
+        "reason": "System home indicator is a reusable device chrome element, though it is not paywall-specific.",
+        "confidence": 0.88,
+        "suggestedParams": [],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "iPhone home indicator"
+        }
+      },
+      {
+        "nodeId": "2399:42783",
+        "widgetName": "StatusBar",
+        "reason": "The status bar is a reusable OS chrome component and already appears as a distinct Figma component on this screen.",
+        "confidence": 0.86,
         "suggestedParams": [
-          "device",
-          "orientation",
-          "mode"
+          "timeText",
+          "showCamera",
+          "showBatteryTime"
         ],
-        "evidence": null
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "mobile status bar"
+        }
       }
     ]
   }

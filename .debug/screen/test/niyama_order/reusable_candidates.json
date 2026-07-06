@@ -1,18 +1,40 @@
 {
-  "cacheKey": "25185174fc01bda9b7e28af4a604d881b32ae1890e7b3315699f106432965a42",
+  "cacheKey": "b4e97e5953346f25bc9e4a6a9cd9dbbc5be28dcc025708d52d747531b78a5117",
   "response": {
     "candidates": [
       {
-        "nodeId": "4408:44896",
-        "widgetName": "OrderProductItem",
-        "reason": "Repeated order-item card with image, title/price area, optional description, quantity controls, and divider; appears as a shared component across multiple product rows.",
+        "nodeId": "4408:44914",
+        "widgetName": "ProductSmallCard",
+        "reason": "Repeated product tile in the horizontal product carousel; same layout appears with add, promo-price, and standard-price variants.",
         "confidence": 0.97,
         "suggestedParams": [
-          "title",
+          "productTitle",
           "priceText",
-          "descriptionText",
-          "quantity",
-          "showDivider"
+          "secondaryPriceText",
+          "showAddButton",
+          "showPromoBadge"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "4408:44915",
+            "4408:44916"
+          ],
+          "shapeSimilarity": 0.96,
+          "semanticRole": "product tile"
+        }
+      },
+      {
+        "nodeId": "4408:44896",
+        "widgetName": "OrderProductCard",
+        "reason": "Core order item card repeated several times with the same image/title/price/quantity pattern and small content variations.",
+        "confidence": 0.96,
+        "suggestedParams": [
+          "titleText",
+          "priceText",
+          "quantityText",
+          "detailsText",
+          "showDivider",
+          "showExpandedInfo"
         ],
         "evidence": {
           "similarNodes": [
@@ -21,78 +43,79 @@
             "4408:44901",
             "4408:44902"
           ],
-          "shapeSimilarity": 0.96,
-          "semanticRole": "Order product list item"
+          "shapeSimilarity": 0.94,
+          "semanticRole": "order line item"
         }
       },
       {
         "nodeId": "I4408:44896;1154:7849",
         "widgetName": "QuantityStepper",
-        "reason": "The minus/plus/count control is repeated across order items and the cutlery row, making it a clear reusable input-style widget.",
+        "reason": "The add/remove quantity control repeats across multiple product cards and order rows with the same plus/minus structure.",
         "confidence": 0.95,
         "suggestedParams": [
           "quantity",
-          "isDarkVariant"
+          "canIncrement",
+          "canDecrement"
         ],
         "evidence": {
           "similarNodes": [
             "I4408:44897;1154:7849",
             "I4408:44898;1154:7849",
-            "I4408:44904;1154:8077"
+            "I4408:44904;1154:8077",
+            "I4408:44915;1356:10712",
+            "I4408:44916;1356:10673"
           ],
-          "shapeSimilarity": 0.98,
-          "semanticRole": "Quantity adjustment control"
-        }
-      },
-      {
-        "nodeId": "4408:44914",
-        "widgetName": "ProductSmallCard",
-        "reason": "Small product card family repeats with multiple variants (add, default, promo) but the same underlying layout: title, image/illustration, gradient strip, and action/price area.",
-        "confidence": 0.96,
-        "suggestedParams": [
-          "title",
-          "priceText",
-          "oldPriceText",
-          "actionLabel",
-          "variant"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "4408:44915",
-            "4408:44916"
-          ],
-          "shapeSimilarity": 0.94,
-          "semanticRole": "Compact product carousel card"
-        }
-      },
-      {
-        "nodeId": "4408:44917",
-        "widgetName": "BottomActionBar",
-        "reason": "Bottom-sheet action area with a primary button and home indicator, structurally reusable as a bottom CTA bar.",
-        "confidence": 0.88,
-        "suggestedParams": [
-          "buttonText"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 0.82,
-          "semanticRole": "Primary bottom action footer"
+          "shapeSimilarity": 0.97,
+          "semanticRole": "quantity control"
         }
       },
       {
         "nodeId": "4408:44903",
-        "widgetName": "ActionCard",
-        "reason": "Navigation/action card with leading icon, title text, trailing arrow, and divider; matches a reusable settings-style action row/card pattern.",
-        "confidence": 0.86,
+        "widgetName": "ActionCardRow",
+        "reason": "A reusable action/settings-style card pattern with leading icon, title, and trailing arrow; useful as a generic navigable row.",
+        "confidence": 0.72,
         "suggestedParams": [
-          "title",
           "iconName",
+          "titleText",
+          "trailingIconName",
           "showDivider"
         ],
         "evidence": {
+          "similarNodes": [
+            "4408:44904"
+          ],
+          "shapeSimilarity": 0.82,
+          "semanticRole": "navigation action row"
+        }
+      },
+      {
+        "nodeId": "4408:44917",
+        "widgetName": "BottomCtaBar",
+        "reason": "Bottom action bar with primary CTA and safe-area home indicator; a good reusable modal footer pattern.",
+        "confidence": 0.71,
+        "suggestedParams": [
+          "buttonText",
+          "showHomeIndicator"
+        ],
+        "evidence": {
           "similarNodes": [],
-          "shapeSimilarity": 0.85,
-          "semanticRole": "Tap-through action card"
+          "shapeSimilarity": 0.8,
+          "semanticRole": "modal footer CTA"
+        }
+      },
+      {
+        "nodeId": "4408:44889",
+        "widgetName": "ModalSheetHeader",
+        "reason": "Modal-sheet header structure with drag handle and close button is reusable as a standard bottom-sheet header.",
+        "confidence": 0.69,
+        "suggestedParams": [
+          "showCloseButton",
+          "showDragHandle"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": 0.79,
+          "semanticRole": "modal header"
         }
       }
     ]

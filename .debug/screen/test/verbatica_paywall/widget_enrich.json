@@ -1,5 +1,5 @@
 {
-  "cacheKey": "9e0ef66572afbed1d4e58822938ef0deaaa515c71990b70a8bc1c489547ef076",
+  "cacheKey": "88ef83951df5811eaf5bcfdd953faf11cc63b2febd2491f609f3210ec8e274ff",
   "response": {
     "entries": [
       {
@@ -9,12 +9,12 @@
       },
       {
         "clusterId": "component_111_17496",
-        "widgetName": "PaywallHomeIndicatorWidget",
+        "widgetName": "HomeIndicatorWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_118_7511_24ebf3ca",
-        "widgetName": "FreeTrialButtonWidget",
+        "widgetName": "TertiaryActionButtonWidget",
         "paramRenames": {}
       },
       {
@@ -24,7 +24,7 @@
       },
       {
         "clusterId": "component_282_23343",
-        "widgetName": "WifiIconWidget",
+        "widgetName": "WifiStatusWidget",
         "paramRenames": {}
       },
       {
@@ -34,7 +34,7 @@
       },
       {
         "clusterId": "component_282_23393_de98d704",
-        "widgetName": "PhoneStatusWidget",
+        "widgetName": "StatusAreaWidget",
         "paramRenames": {}
       },
       {

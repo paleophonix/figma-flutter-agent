@@ -2,30 +2,18 @@
   "featureName": "verbatica_paywall",
   "emitterVersion": "2026.07.1",
   "checkpoints": [
-    "CP1_guards",
     "CP1_normalize",
-    "CP2_ir_passes",
-    "CP2_semantic",
-    "CP2_post_classify",
-    "CP2_fidelity_stamp"
+    "CP1_guards",
+    "CP2_ir_passes"
   ],
   "mutations": [
     {
       "checkpoint": "CP1_guards",
-      "transform": "min_touch_target_guard",
-      "nodeId": "2399:42786",
-      "field": "min_touch_target",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I2399:42783;266:1499;266:1641",
+      "field": "wrap",
       "old": null,
-      "new": 44.0,
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "min_touch_target_guard",
-      "nodeId": "2399:42839",
-      "field": "min_touch_target",
-      "old": null,
-      "new": 44.0,
+      "new": "flexibleLoose",
       "policy": null
     },
     {
@@ -35,6 +23,51 @@
       "field": "min_touch_target",
       "old": null,
       "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "2399:42831",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "2399:42833",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "2399:42800",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "2399:42825",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "2399:42827",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
       "policy": null
     },
     {
@@ -171,221 +204,8 @@
       "old": null,
       "new": 34.0,
       "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "min_touch_target_guard",
-      "nodeId": "2399:42786",
-      "field": "min_touch_target",
-      "old": null,
-      "new": 44.0,
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "min_touch_target_guard",
-      "nodeId": "2399:42839",
-      "field": "min_touch_target",
-      "old": null,
-      "new": 44.0,
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "sectionize",
-      "nodeId": "2399:42778",
-      "field": "type",
-      "old": "STACK",
-      "new": "COLUMN",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "sectionize",
-      "nodeId": "2399:42778",
-      "field": "layout_evidence",
-      "old": null,
-      "new": {
-        "sections": 3,
-        "bands": 3,
-        "bottom_chrome": 1,
-        "top_chrome": 0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "sectionize",
-      "nodeId": "2399:42778",
-      "field": "children_count",
-      "old": 5,
-      "new": 4,
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42778",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42778",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42786",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42786",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42837",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42837",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42838",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42838",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42839",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42839",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
     }
   ],
-  "decisions": [
-    {
-      "nodeId": "2399:42778",
-      "kind": "nav_scroll_host",
-      "confidence": 0.86,
-      "evidence": {
-        "nav_scroll_host": true,
-        "child_type_counts": {
-          "STACK": 1,
-          "COLUMN": 3
-        },
-        "child_count": 4
-      }
-    },
-    {
-      "nodeId": "2399:42786",
-      "kind": "button_filled",
-      "confidence": 0.86,
-      "evidence": {
-        "button_filled": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "54:3907"
-      }
-    },
-    {
-      "nodeId": "2399:42837",
-      "kind": "button_filled",
-      "confidence": 0.86,
-      "evidence": {
-        "button_filled": true,
-        "child_type_counts": {
-          "COLUMN": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "111:16846",
-        "variant.type": "Primary"
-      }
-    },
-    {
-      "nodeId": "2399:42838",
-      "kind": "button_text",
-      "confidence": 0.84,
-      "evidence": {
-        "button_text": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "118:7511",
-        "variant.type": "Tertiary"
-      }
-    },
-    {
-      "nodeId": "2399:42839",
-      "kind": "button_text",
-      "confidence": 0.84,
-      "evidence": {
-        "button_text": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "118:7511",
-        "variant.type": "Tertiary"
-      }
-    }
-  ],
+  "decisions": [],
   "deviations": []
 }

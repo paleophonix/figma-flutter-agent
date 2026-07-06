@@ -671,3 +671,26 @@ families:
       (slider_facts _RANGE_SLIDER_MIN_HEIGHT_PX = 48). The Column overflows the
       track-height bounds and Flutter throws a RenderFlex bottom overflow.
     status: active
+
+  - id: stack_children_missing_positioned_placement
+    title: Preview-branch Stack root leaves some children non-positioned
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/file_methods.py
+        symbol: compose_decomposed_root_widget
+      - module: src/figma_flutter_agent/generator/layout/stack_chrome.py
+        symbol: apply_pin_bottom_chrome_to_stack_layers
+    law_ids:
+      - LAW-STACK-CHILD-POSITIONED
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      The default (non-artboard) LayoutBuilder branch emits a Stack root where some
+      children are Positioned while others (header, footer) are non-positioned, so the
+      non-positioned children pile at top-left and the last-painted footer overpaints
+      the content, leaving only the footer visible in the running app while the
+      artboard-capture branch renders correctly.
+    status: active

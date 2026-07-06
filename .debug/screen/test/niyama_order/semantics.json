@@ -151,6 +151,17 @@
       "rejectReason": null
     },
     {
+      "figmaId": "I4408:44897;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": null
+    },
+    {
       "figmaId": "I4408:44898;1154:7841",
       "kind": "container_card",
       "confidence": 0.86,
@@ -162,6 +173,17 @@
         },
         "child_count": 2,
         "container_surface": "card"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I4408:44898;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
       },
       "rejectReason": null
     },
@@ -181,6 +203,17 @@
       "rejectReason": null
     },
     {
+      "figmaId": "I4408:44901;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": null
+    },
+    {
       "figmaId": "I4408:44902;1154:7841",
       "kind": "container_card",
       "confidence": 0.86,
@@ -192,6 +225,17 @@
         },
         "child_count": 2,
         "container_surface": "card"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I4408:44902;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
       },
       "rejectReason": null
     },
@@ -209,6 +253,17 @@
         "component_id": "1154:8374"
       },
       "rejectReason": null
+    },
+    {
+      "figmaId": "I4408:44903;1159:8160;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": null
     }
   ],
   "rejectedBelowThreshold": [
@@ -218,9 +273,22 @@
       "confidence": 0.7,
       "evidence": {
         "media_badge": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "910:3249"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I4408:44915;1356:10712;910:3253;910:3248",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
       },
       "rejectReason": "below_confidence_threshold"
     },
@@ -230,9 +298,22 @@
       "confidence": 0.7,
       "evidence": {
         "media_badge": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "910:3249"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I4408:44916;1356:10673;910:3253;910:3248",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
       },
       "rejectReason": "below_confidence_threshold"
     },
@@ -328,8 +409,10 @@
       "confidence": 0.7,
       "evidence": {
         "media_badge": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "910:3262"
       },
       "rejectReason": "below_confidence_threshold"
@@ -340,14 +423,66 @@
       "confidence": 0.7,
       "evidence": {
         "media_badge": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "910:3249"
       },
       "rejectReason": "below_confidence_threshold"
     },
     {
+      "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481;910:3248",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
       "figmaId": "I4408:44898;1154:7842",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "910:3262"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I4408:44898;1154:7849;1149:9855;1149:9481",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "910:3249"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I4408:44898;1154:7849;1149:9855;1149:9481;910:3248",
       "kind": "media_avatar",
       "confidence": 0.7,
       "evidence": {
@@ -431,15 +566,54 @@
         "component_id": "4181:43464"
       },
       "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I4408:44904;1154:8077;1149:9856;1149:9479",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "910:3262"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I4408:44904;1154:8077;1149:9855;1149:9481",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "910:3249"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I4408:44904;1154:8077;1149:9855;1149:9481;910:3248",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
     }
   ],
   "rejectedByInvariant": [
     {
       "figmaId": "4408:44886",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
         "child_type_counts": {},
         "child_count": 0,
@@ -449,10 +623,10 @@
     },
     {
       "figmaId": "4408:44889",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
         "child_type_counts": {
           "CONTAINER": 1,
@@ -465,10 +639,10 @@
     },
     {
       "figmaId": "I4408:44896;1154:7850",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
         "child_type_counts": {
           "VECTOR": 1
@@ -481,13 +655,15 @@
     },
     {
       "figmaId": "I4408:44897;1154:7850",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "933:4777",
         "variant.type": "Line border"
       },
@@ -495,13 +671,15 @@
     },
     {
       "figmaId": "I4408:44898;1154:7850",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "933:4777",
         "variant.type": "Line border"
       },
@@ -509,13 +687,15 @@
     },
     {
       "figmaId": "I4408:44901;1154:7850",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "933:4777",
         "variant.type": "Line border"
       },
@@ -523,13 +703,15 @@
     },
     {
       "figmaId": "I4408:44902;1154:7850",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "933:4777",
         "variant.type": "Line border"
       },
@@ -537,13 +719,15 @@
     },
     {
       "figmaId": "I4408:44903;1159:8160",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
-        "child_type_counts": {},
-        "child_count": 0,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
         "component_id": "933:4777",
         "variant.type": "Line border"
       },
@@ -551,10 +735,10 @@
     },
     {
       "figmaId": "I4408:44904;1159:8273",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
         "child_type_counts": {
           "ROW": 2
@@ -567,6 +751,6 @@
   "legacySemanticTypeDetected": [],
   "nameSignalUsed": [],
   "llmAnnotationUsed": [],
-  "acceptedCount": 14,
-  "totalDecisions": 41
+  "acceptedCount": 19,
+  "totalDecisions": 55
 }

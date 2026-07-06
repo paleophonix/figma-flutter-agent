@@ -1,0 +1,19 @@
+version: 1
+family_id: stack_children_missing_positioned_placement
+generated: true
+cases:
+- case_id: 2026-07-06-preview-stack-nonpositioned-children
+  case_file: cases/2026-07-06-preview-stack-nonpositioned-children.yaml
+  title: Verbatica preview shows only footer — Stack root children not 
+    positioned
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-preview-stack-nonpositioned
+  status: FIXED
+  observed_at: '2026-07-06'
+  created_at: '2026-07-06T17:40:00Z'
+  updated_at: '2026-07-06T18:10:00Z'
+  summary: After the stack_root_flattened_to_column fix, the default 
+    (non-artboard) LayoutBuilder branch of verbatica_paywall_layout.dart emits 
+    the root as a Stack but only wraps some children in Positioned (the feature 
+    and feature3 SingleChildScrollViews). _buildFeature2 (header) and _b...
