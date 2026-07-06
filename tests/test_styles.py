@@ -107,6 +107,26 @@ def test_enrich_node_style_composes_solid_fill_paint_opacity() -> None:
     assert style.clips_content is True
 
 
+def test_enrich_text_style_composes_solid_fill_paint_opacity() -> None:
+    """Law: text solid fill paint opacity composes into textColor ARGB."""
+    style = enrich_node_style(
+        {
+            "type": "TEXT",
+            "fills": [
+                {
+                    "type": "SOLID",
+                    "visible": True,
+                    "opacity": 0.54,
+                    "color": {"r": 0.0, "g": 0.0, "b": 0.0, "a": 1.0},
+                }
+            ],
+        },
+        NodeStyle(),
+    )
+
+    assert style.text_color == "0x8A000000"
+
+
 def test_enrich_node_style_populates_css_from_rest() -> None:
     """enrich_node_style now auto-builds css_properties from REST data."""
     style = enrich_node_style(

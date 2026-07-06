@@ -18,231 +18,333 @@
             {
               "figmaId": "2399:42783",
               "kind": "extracted",
-              "children": [],
-              "ref": {
-                "widgetName": "StatusBarWidget",
-                "namedArgs": {}
-              }
-            },
-            {
-              "figmaId": "2399:42784",
-              "kind": "auto",
               "children": [
                 {
-                  "figmaId": "2399:42786",
-                  "kind": "extracted",
-                  "children": [],
-                  "ref": {
-                    "widgetName": "CloseButtonWidget",
-                    "namedArgs": {}
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "figmaId": "2399:42828",
-          "kind": "auto",
-          "children": [
-            {
-              "figmaId": "2399:42829",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "2399:42830",
+                  "figmaId": "I2399:42783;266:1499",
                   "kind": "auto",
                   "children": [
                     {
-                      "figmaId": "2399:42831",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                },
-                {
-                  "figmaId": "2399:42832",
-                  "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "2399:42833",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "figmaId": "2399:42787",
-          "kind": "auto",
-          "children": [
-            {
-              "figmaId": "2399:42788",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "2399:42789",
-                  "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "2399:42790",
+                      "figmaId": "I2399:42783;266:1499;266:1640",
                       "kind": "auto",
                       "children": [
                         {
-                          "figmaId": "2399:42791",
-                          "kind": "auto",
-                          "children": []
-                        },
-                        {
-                          "figmaId": "2399:42792",
+                          "figmaId": "I2399:42783;266:1499;266:1641",
                           "kind": "auto",
                           "children": []
                         }
                       ]
                     },
                     {
-                      "figmaId": "2399:42793",
+                      "figmaId": "I2399:42783;266:1499;266:1643",
                       "kind": "auto",
                       "children": [
                         {
-                          "figmaId": "2399:42794",
+                          "figmaId": "I2399:42783;266:1499;266:1644",
                           "kind": "auto",
                           "children": [
                             {
-                              "figmaId": "2399:42795",
-                              "kind": "auto",
-                              "children": []
-                            }
-                          ]
-                        },
-                        {
-                          "figmaId": "2399:42797",
-                          "kind": "extracted",
-                          "children": [],
-                          "ref": {
-                            "widgetName": "CheckCircleBadgeWidget",
-                            "namedArgs": {}
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "figmaId": "2399:42799",
-                  "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "2399:42800",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "figmaId": "2399:42801",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "2399:42802",
-                  "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "2399:42803",
-                      "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "2399:42804",
-                          "kind": "auto",
-                          "children": []
-                        },
-                        {
-                          "figmaId": "2399:42805",
-                          "kind": "auto",
-                          "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "figmaId": "2399:42806",
-                      "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "2399:42807",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "2399:42808",
-                              "kind": "auto",
-                              "children": []
-                            }
-                          ]
-                        },
-                        {
-                          "figmaId": "2399:42810",
-                          "kind": "extracted",
-                          "children": [],
-                          "ref": {
-                            "widgetName": "CheckCircleBadgeWidget",
-                            "namedArgs": {}
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "figmaId": "2399:42812",
-                  "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "2399:42813",
-                      "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "2399:42814",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "2399:42815",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "2399:42816",
-                              "kind": "auto",
-                              "children": []
-                            }
-                          ]
-                        },
-                        {
-                          "figmaId": "2399:42817",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "2399:42818",
+                              "figmaId": "I2399:42783;266:1499;266:1645",
                               "kind": "auto",
                               "children": [
                                 {
-                                  "figmaId": "2399:42819",
+                                  "figmaId": "I2399:42783;266:1499;266:1645;346:8257",
                                   "kind": "auto",
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "figmaId": "2399:42821",
+                              "figmaId": "I2399:42783;266:1499;266:1646",
                               "kind": "auto",
                               "children": [
                                 {
-                                  "figmaId": "2399:42822",
+                                  "figmaId": "I2399:42783;266:1499;266:1646;339:8061",
                                   "kind": "auto",
                                   "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I2399:42783;266:1499;266:1647",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I2399:42783;266:1499;266:1648",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I2399:42783;266:1499;266:1648;348:8871",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I2399:42783;266:1499;266:1650",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I2399:42783;266:1499;266:1651",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ],
+                      "ref": {
+                        "widgetName": "StatusBarWidget",
+                        "namedArgs": {}
+                      }
+                    },
+                    {
+                      "figmaId": "2399:42784",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "2399:42786",
+                          "kind": "extracted",
+                          "children": [
+                            {
+                              "figmaId": "I2399:42786;54:3908",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ],
+                          "ref": {
+                            "widgetName": "CloseButtonWidget",
+                            "namedArgs": {}
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "2399:42828",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "2399:42829",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "2399:42830",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "2399:42831",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "2399:42832",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "2399:42833",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "2399:42787",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "2399:42788",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "2399:42789",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "2399:42790",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "2399:42791",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "2399:42792",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "2399:42793",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "2399:42794",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "2399:42795",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "2399:42797",
+                                  "kind": "extracted",
+                                  "children": [
+                                    {
+                                      "figmaId": "2399:42798",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ],
+                                  "ref": {
+                                    "widgetName": "CheckCircleWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "2399:42799",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "2399:42800",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "2399:42801",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "2399:42802",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "2399:42803",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "2399:42804",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "2399:42805",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "2399:42806",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "2399:42807",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "2399:42808",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "2399:42810",
+                                  "kind": "extracted",
+                                  "children": [
+                                    {
+                                      "figmaId": "2399:42811",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ],
+                                  "ref": {
+                                    "widgetName": "CheckCircleWidget",
+                                    "namedArgs": {}
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "2399:42812",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "2399:42813",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "2399:42814",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "2399:42815",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "2399:42816",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "2399:42817",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "2399:42818",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "2399:42819",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "2399:42821",
+                                  "kind": "extracted",
+                                  "children": [
+                                    {
+                                      "figmaId": "2399:42822",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ],
+                                  "ref": {
+                                    "widgetName": "CheckCircleWidget",
+                                    "namedArgs": {}
+                                  }
                                 }
                               ]
                             }
@@ -295,7 +397,24 @@
                             {
                               "figmaId": "2399:42837",
                               "kind": "extracted",
-                              "children": [],
+                              "children": [
+                                {
+                                  "figmaId": "I2399:42837;1866:23605",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I2399:42837;111:16845",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I2399:42837;1866:22162",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ],
                               "ref": {
                                 "widgetName": "PrimarySubscribeButtonWidget",
                                 "namedArgs": {}
@@ -306,18 +425,30 @@
                         {
                           "figmaId": "2399:42838",
                           "kind": "extracted",
-                          "children": [],
+                          "children": [
+                            {
+                              "figmaId": "I2399:42838;118:7512",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ],
                           "ref": {
-                            "widgetName": "TertiaryTrialButtonWidget",
+                            "widgetName": "TertiaryActionButtonWidget",
                             "namedArgs": {}
                           }
                         },
                         {
                           "figmaId": "2399:42839",
                           "kind": "extracted",
-                          "children": [],
+                          "children": [
+                            {
+                              "figmaId": "I2399:42839;118:7512",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ],
                           "ref": {
-                            "widgetName": "TertiaryRestoreButtonWidget",
+                            "widgetName": "TertiaryActionButtonWidget",
                             "namedArgs": {}
                           }
                         }
@@ -330,7 +461,13 @@
                         {
                           "figmaId": "2399:42843",
                           "kind": "extracted",
-                          "children": [],
+                          "children": [
+                            {
+                              "figmaId": "I2399:42843;106:60028",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ],
                           "ref": {
                             "widgetName": "HomeIndicatorWidget",
                             "namedArgs": {}
@@ -342,8 +479,7 @@
                 }
               ]
             }
-          ],
-          "layoutHints": {}
+          ]
         }
       ]
     },
@@ -358,10 +494,12 @@
     "stateByFigmaId": {},
     "adaptiveRules": [],
     "semanticSummary": {
-      "screenRole": "subscription_paywall",
+      "screenRole": "paywall",
       "confidence": 0.98,
-      "explanation": "Paywall screen for selecting a subscription plan and activating a trial/purchase flow with restore and legal actions.",
-      "warnings": []
+      "explanation": "Subscription selection paywall with three plan options, a primary subscribe CTA, secondary restore action, and legal/disclaimer copy.",
+      "warnings": [
+        "Background image is intentionally oversized/off-canvas within the fixed stack frame."
+      ]
     },
     "semanticVerdicts": [
       {
@@ -380,87 +518,92 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "currentValue": "close",
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "􀅾",
           "actionKind": "dismiss",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "44dp_min_touch_target"
+          "min_touch_target_44px"
         ],
-        "value": "close",
+        "value": "􀅾",
         "options": [],
         "confidence": 0.99,
         "proposedEffects": [
-          "dismiss_paywall"
+          "close_paywall"
         ],
         "explanation": "Trailing close control dismisses the paywall."
       },
       {
         "nodeId": "2399:42787",
         "role": "choice_chip_group",
-        "subtype": "subscription_plan_selector",
+        "subtype": "subscription_plan_picker",
         "controlNodeId": "2399:42787",
         "boundaryNodeId": "2399:42787",
-        "labelNodeIds": [],
+        "labelNodeIds": [
+          "2399:42831"
+        ],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [],
         "optionNodeIds": [
-          "2399:42788",
+          "2399:42789",
           "2399:42801",
           "2399:42812"
         ],
         "stateNodeIds": [
-          "2399:42797",
-          "2399:42810"
+          "2399:42789"
         ],
         "contractKind": "choice_chip_group",
         "contractTraits": {
+          "isMultiline": false,
+          "obscureText": false,
           "currentValue": "12 месяцев",
           "selectedOptions": [
             "12 месяцев"
           ],
-          "actionKind": "select_subscription_plan",
           "visualState": "selected"
         },
         "proposedLayoutLaws": [
-          "selected_option_state_preserved",
-          "one_of_many_selection"
+          "selected_chip_state_preserved",
+          "single_selection_group"
         ],
         "value": "12 месяцев",
         "options": [
           {
-            "nodeId": "2399:42788",
+            "nodeId": "2399:42789",
             "label": "12 месяцев",
             "selected": true,
             "value": "12 месяцев",
-            "confidence": 0.95
+            "confidence": 0.99
           },
           {
             "nodeId": "2399:42801",
             "label": "3 месяца",
             "selected": false,
             "value": "3 месяца",
-            "confidence": 0.93
+            "confidence": 0.98
           },
           {
             "nodeId": "2399:42812",
             "label": "1 месяц",
             "selected": false,
             "value": "1 месяц",
-            "confidence": 0.93
+            "confidence": 0.98
           }
         ],
-        "confidence": 0.95,
+        "confidence": 0.97,
         "proposedEffects": [
-          "update_selected_subscription_plan"
+          "update_selected_plan"
         ],
-        "explanation": "Three stacked subscription options with a visible selected state on the annual plan."
+        "explanation": "Three subscription options are presented as a single-select plan group; the 12-month plan is visually selected."
       },
       {
         "nodeId": "2399:42837",
         "role": "button",
-        "subtype": "primary",
+        "subtype": "primary_cta",
         "controlNodeId": "2399:42837",
         "boundaryNodeId": "2399:42837",
         "labelNodeIds": [
@@ -474,60 +617,28 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": true,
+          "isMultiline": false,
           "maxLines": 2,
+          "obscureText": false,
           "currentValue": "Подписаться",
-          "actionKind": "start_trial_purchase",
+          "actionKind": "subscribe",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "primary_cta_two_line_center_stack"
+          "primary_cta_stacked_label"
         ],
         "value": "Подписаться",
         "options": [],
-        "confidence": 0.98,
+        "confidence": 0.99,
         "proposedEffects": [
-          "start_free_trial_purchase"
+          "start_subscription_checkout"
         ],
-        "explanation": "Primary subscription CTA with a two-line label and trial pricing subtitle."
-      },
-      {
-        "nodeId": "2399:42838",
-        "role": "button",
-        "subtype": "secondary",
-        "controlNodeId": "2399:42838",
-        "boundaryNodeId": "2399:42838",
-        "labelNodeIds": [
-          "I2399:42838;118:7512"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "button",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "currentValue": "Учиться 7 дней бесплатно",
-          "actionKind": "start_free_trial",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "single_line_button_label"
-        ],
-        "value": "Учиться 7 дней бесплатно",
-        "options": [],
-        "confidence": 0.96,
-        "proposedEffects": [
-          "start_trial_flow"
-        ],
-        "explanation": "Secondary action button offering a free 7-day trial."
+        "explanation": "Primary paywall subscription CTA with title and subtitle."
       },
       {
         "nodeId": "2399:42839",
         "role": "button",
-        "subtype": "secondary",
+        "subtype": "restore_purchase",
         "controlNodeId": "2399:42839",
         "boundaryNodeId": "2399:42839",
         "labelNodeIds": [
@@ -542,20 +653,21 @@
         "contractTraits": {
           "isMultiline": false,
           "maxLines": 1,
+          "obscureText": false,
           "currentValue": "Восстановить подписку",
-          "actionKind": "restore_purchase",
+          "actionKind": "restore_purchases",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "single_line_button_label"
+          "secondary_action_text_button"
         ],
         "value": "Восстановить подписку",
         "options": [],
-        "confidence": 0.96,
+        "confidence": 0.98,
         "proposedEffects": [
-          "restore_subscription"
+          "restore_entitlement"
         ],
-        "explanation": "Secondary action to restore an existing subscription."
+        "explanation": "Secondary action restores prior subscription entitlement."
       }
     ]
   },
@@ -591,21 +703,25 @@
                     "children": [
                       {
                         "figmaId": "I2399:42783;266:1499;266:1645",
-                        "kind": "extracted",
-                        "children": [],
-                        "ref": {
-                          "widgetName": "WifiIconWidget",
-                          "namedArgs": {}
-                        }
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I2399:42783;266:1499;266:1645;346:8257",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
                       },
                       {
                         "figmaId": "I2399:42783;266:1499;266:1646",
-                        "kind": "extracted",
-                        "children": [],
-                        "ref": {
-                          "widgetName": "SignalIconWidget",
-                          "namedArgs": {}
-                        }
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I2399:42783;266:1499;266:1646;339:8061",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
                       }
                     ]
                   },
@@ -615,12 +731,14 @@
                     "children": [
                       {
                         "figmaId": "I2399:42783;266:1499;266:1648",
-                        "kind": "extracted",
-                        "children": [],
-                        "ref": {
-                          "widgetName": "BatteryIconWidget",
-                          "namedArgs": {}
-                        }
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I2399:42783;266:1499;266:1648;348:8871",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
                       }
                     ]
                   },
@@ -643,48 +761,6 @@
       }
     },
     {
-      "widgetName": "WifiIconWidget",
-      "widgetIr": {
-        "figmaId": "I2399:42783;266:1499;266:1645",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I2399:42783;266:1499;266:1645;346:8257",
-            "kind": "auto",
-            "children": []
-          }
-        ]
-      }
-    },
-    {
-      "widgetName": "SignalIconWidget",
-      "widgetIr": {
-        "figmaId": "I2399:42783;266:1499;266:1646",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I2399:42783;266:1499;266:1646;339:8061",
-            "kind": "auto",
-            "children": []
-          }
-        ]
-      }
-    },
-    {
-      "widgetName": "BatteryIconWidget",
-      "widgetIr": {
-        "figmaId": "I2399:42783;266:1499;266:1648",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I2399:42783;266:1499;266:1648;348:8871",
-            "kind": "auto",
-            "children": []
-          }
-        ]
-      }
-    },
-    {
       "widgetName": "CloseButtonWidget",
       "widgetIr": {
         "figmaId": "2399:42786",
@@ -699,7 +775,7 @@
       }
     },
     {
-      "widgetName": "CheckCircleBadgeWidget",
+      "widgetName": "CheckCircleWidget",
       "widgetIr": {
         "figmaId": "2399:42797",
         "kind": "auto",
@@ -738,27 +814,13 @@
       }
     },
     {
-      "widgetName": "TertiaryTrialButtonWidget",
+      "widgetName": "TertiaryActionButtonWidget",
       "widgetIr": {
         "figmaId": "2399:42838",
         "kind": "auto",
         "children": [
           {
             "figmaId": "I2399:42838;118:7512",
-            "kind": "auto",
-            "children": []
-          }
-        ]
-      }
-    },
-    {
-      "widgetName": "TertiaryRestoreButtonWidget",
-      "widgetIr": {
-        "figmaId": "2399:42839",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I2399:42839;118:7512",
             "kind": "auto",
             "children": []
           }
@@ -781,7 +843,7 @@
     }
   ],
   "irCacheFingerprintVersion": "1",
-  "cleanTreeHash": "50cda5946ed08a54ba8c5bbda1fee3571c957f8d5ba2c31483e254946e4599ca",
+  "cleanTreeHash": "7f9597b374e7c5216254576db5ca98a916a42c39f06d4bd924c9bee53c40afc6",
   "cleanRootFigmaId": "2399:42778",
   "cleanRootType": "STACK",
   "cleanRootWidth": 360.0,

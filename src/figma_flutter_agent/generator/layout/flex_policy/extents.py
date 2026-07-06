@@ -12,6 +12,26 @@ from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 _ROW_TEXT_LINE_BOX_FRAME_RATIO = 0.85
+_COMPACT_ICON_SLOT_MAX_CROSS_EXTENT = 32.0
+_INFLATED_ICON_WRAPPER_HEIGHT_RATIO = 1.25
+
+
+def _row_compact_icon_wrapper_cross_extent(node: CleanDesignTreeNode) -> float | None:
+    """Clamp inflated icon-wrapper ROW height to the inner glyph/stack intrinsic."""
+    if node.type != NodeType.ROW or len(node.children) != 1:
+        return None
+    child = node.children[0]
+    if child.type not in {NodeType.STACK, NodeType.VECTOR, NodeType.IMAGE}:
+        return None
+    child_height = child.sizing.height
+    row_height = node.sizing.height
+    if child_height is None or row_height is None or child_height <= 0 or row_height <= 0:
+        return None
+    if float(child_height) > _COMPACT_ICON_SLOT_MAX_CROSS_EXTENT:
+        return None
+    if float(row_height) <= float(child_height) * _INFLATED_ICON_WRAPPER_HEIGHT_RATIO:
+        return None
+    return float(child_height)
 
 
 def _row_padded_interior_height(row: CleanDesignTreeNode) -> float | None:
@@ -275,6 +295,9 @@ def bind_row_cross_axis_height(
                     )
         return widget
     height = node.sizing.height
+    compact_extent = _row_compact_icon_wrapper_cross_extent(node)
+    if compact_extent is not None:
+        height = compact_extent
     if parent_row is not None and node.type == NodeType.TEXT:
         text_extent = _row_text_cross_axis_extent(node)
         if text_extent is not None:

@@ -100,6 +100,39 @@ def layout_fact_payment_plan_row_label_text(node: CleanDesignTreeNode) -> bool:
     return 150.0 <= float(width) <= 260.0
 
 
+def layout_fact_payment_plan_trailing_price_cluster(node: CleanDesignTreeNode) -> bool:
+    """Trailing price + radio cluster beside expanded plan copy in a plan card row."""
+    from figma_flutter_agent.parser.interaction import _subtree_has_currency_price
+
+    if node.type != NodeType.ROW:
+        return False
+    width = node.sizing.width
+    if width is None or not (72.0 <= float(width) <= 120.0):
+        return False
+    if not _subtree_has_currency_price(node):
+        return False
+    return any(
+        child.type in {NodeType.ROW, NodeType.RADIO, NodeType.VECTOR, NodeType.STACK}
+        for child in node.children
+    )
+
+
+def layout_fact_payment_plan_option_row(node: CleanDesignTreeNode) -> bool:
+    """Plan card body row pairing expanded copy with a trailing price cluster."""
+    if node.type != NodeType.ROW or len(node.children) < 2:
+        return False
+    leading = node.children[0]
+    trailing = node.children[-1]
+    if leading.type != NodeType.COLUMN:
+        return False
+    return layout_fact_payment_plan_trailing_price_cluster(trailing) or (
+        layout_fact_payment_plan_primary_copy_column(leading)
+        and trailing.type == NodeType.ROW
+        and trailing.sizing.width is not None
+        and 72.0 <= float(trailing.sizing.width) <= 120.0
+    )
+
+
 def layout_fact_hosts_payment_selection_indicator(node: CleanDesignTreeNode) -> bool:
     """True when a compact trailing margin hosts a circular payment radio badge."""
     if node.type != NodeType.COLUMN:

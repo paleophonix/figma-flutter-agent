@@ -118,7 +118,10 @@ def _first_visible_solid_fill_hex(fills: list[dict[str, Any]]) -> str | None:
         if fill.get("visible") is False:
             continue
         if fill.get("type") == "SOLID" and fill.get("color"):
-            return rgba_to_argb_hex(fill["color"])
+            return solid_paint_to_argb_hex(
+                fill["color"],
+                paint_opacity=float(fill.get("opacity", 1.0)),
+            )
     return None
 
 

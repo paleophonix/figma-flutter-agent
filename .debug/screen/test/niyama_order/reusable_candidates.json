@@ -1,40 +1,20 @@
 {
-  "cacheKey": "b4e97e5953346f25bc9e4a6a9cd9dbbc5be28dcc025708d52d747531b78a5117",
+  "cacheKey": "a4c006b322fba0eef9c45ecafe9a761ca2b19c63cd9a0584395396be357ee695",
   "response": {
     "candidates": [
       {
-        "nodeId": "4408:44914",
-        "widgetName": "ProductSmallCard",
-        "reason": "Repeated product tile in the horizontal product carousel; same layout appears with add, promo-price, and standard-price variants.",
-        "confidence": 0.97,
-        "suggestedParams": [
-          "productTitle",
-          "priceText",
-          "secondaryPriceText",
-          "showAddButton",
-          "showPromoBadge"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "4408:44915",
-            "4408:44916"
-          ],
-          "shapeSimilarity": 0.96,
-          "semanticRole": "product tile"
-        }
-      },
-      {
         "nodeId": "4408:44896",
         "widgetName": "OrderProductCard",
-        "reason": "Core order item card repeated several times with the same image/title/price/quantity pattern and small content variations.",
-        "confidence": 0.96,
+        "reason": "Repeated order item card appears across five instances with the same thumbnail/text/quantity-control structure and only content changes.",
+        "confidence": 0.98,
         "suggestedParams": [
-          "titleText",
-          "priceText",
-          "quantityText",
-          "detailsText",
-          "showDivider",
-          "showExpandedInfo"
+          "title",
+          "price",
+          "subtitle",
+          "quantity",
+          "imageUrl",
+          "showStepper",
+          "showDivider"
         ],
         "evidence": {
           "similarNodes": [
@@ -43,19 +23,18 @@
             "4408:44901",
             "4408:44902"
           ],
-          "shapeSimilarity": 0.94,
-          "semanticRole": "order line item"
+          "shapeSimilarity": 0.97,
+          "semanticRole": "Order item card with image, title/price, optional description, and quantity controls."
         }
       },
       {
         "nodeId": "I4408:44896;1154:7849",
         "widgetName": "QuantityStepper",
-        "reason": "The add/remove quantity control repeats across multiple product cards and order rows with the same plus/minus structure.",
-        "confidence": 0.95,
+        "reason": "The plus/minus counter row repeats in multiple order and product tiles, with only the displayed count and styling varying.",
+        "confidence": 0.96,
         "suggestedParams": [
-          "quantity",
-          "canIncrement",
-          "canDecrement"
+          "count",
+          "isDarkTheme"
         ],
         "evidence": {
           "similarNodes": [
@@ -65,57 +44,50 @@
             "I4408:44915;1356:10712",
             "I4408:44916;1356:10673"
           ],
-          "shapeSimilarity": 0.97,
-          "semanticRole": "quantity control"
+          "shapeSimilarity": 0.95,
+          "semanticRole": "Increment/decrement quantity control."
+        }
+      },
+      {
+        "nodeId": "4408:44914",
+        "widgetName": "ProductSmallTile",
+        "reason": "Compact product tiles repeat as a 3-item family, sharing the same image/title/price/add-action composition with variant-specific content.",
+        "confidence": 0.93,
+        "suggestedParams": [
+          "title",
+          "price",
+          "oldPrice",
+          "imageUrl",
+          "actionLabel",
+          "hasPromoBadge"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "4408:44915",
+            "4408:44916"
+          ],
+          "shapeSimilarity": 0.9,
+          "semanticRole": "Small product card with image, title, pricing, and add button."
         }
       },
       {
         "nodeId": "4408:44903",
-        "widgetName": "ActionCardRow",
-        "reason": "A reusable action/settings-style card pattern with leading icon, title, and trailing arrow; useful as a generic navigable row.",
-        "confidence": 0.72,
+        "widgetName": "ActionRowCard",
+        "reason": "A reusable tappable promo/action row with leading icon, text, and trailing arrow; fits a common list-action pattern.",
+        "confidence": 0.84,
         "suggestedParams": [
+          "title",
           "iconName",
-          "titleText",
           "trailingIconName",
-          "showDivider"
+          "onTap"
         ],
         "evidence": {
           "similarNodes": [
-            "4408:44904"
+            "I4408:44903;1162:9965",
+            "I4408:44903;1154:8385"
           ],
           "shapeSimilarity": 0.82,
-          "semanticRole": "navigation action row"
-        }
-      },
-      {
-        "nodeId": "4408:44917",
-        "widgetName": "BottomCtaBar",
-        "reason": "Bottom action bar with primary CTA and safe-area home indicator; a good reusable modal footer pattern.",
-        "confidence": 0.71,
-        "suggestedParams": [
-          "buttonText",
-          "showHomeIndicator"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 0.8,
-          "semanticRole": "modal footer CTA"
-        }
-      },
-      {
-        "nodeId": "4408:44889",
-        "widgetName": "ModalSheetHeader",
-        "reason": "Modal-sheet header structure with drag handle and close button is reusable as a standard bottom-sheet header.",
-        "confidence": 0.69,
-        "suggestedParams": [
-          "showCloseButton",
-          "showDragHandle"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 0.79,
-          "semanticRole": "modal header"
+          "semanticRole": "Navigable action card / list row with leading icon and chevron."
         }
       }
     ]

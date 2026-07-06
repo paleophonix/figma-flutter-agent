@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from figma_flutter_agent.parser.interaction import is_link_text
-from figma_flutter_agent.parser.tokens.colors import rgba_to_argb_hex
+from figma_flutter_agent.parser.tokens.colors import solid_paint_to_argb_hex
 from figma_flutter_agent.parser.typography import resolve_font_weight
 from figma_flutter_agent.schemas import TextSpanPart
 
@@ -46,7 +46,10 @@ def extract_text_span_parts(node: dict[str, Any]) -> list[TextSpanPart] | None:
         text_color: str | None = None
         for fill in override.get("fills") or []:
             if fill.get("type") == "SOLID" and fill.get("color"):
-                text_color = rgba_to_argb_hex(fill["color"])
+                text_color = solid_paint_to_argb_hex(
+                    fill["color"],
+                    paint_opacity=float(fill.get("opacity", 1.0)),
+                )
                 break
         override_style = override.get("style") or {}
         merged_style = {**base_style, **override_style}

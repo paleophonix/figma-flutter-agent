@@ -46,7 +46,7 @@ def artboard_bleed_placement_exempt(
 
 def is_screen_wallpaper_node(node: CleanDesignTreeNode, root: CleanDesignTreeNode) -> bool:
     """Oversized collapsed illustration that must render as cover wallpaper only."""
-    if not node.render_boundary or not node.vector_asset_key:
+    if not node.render_boundary or not (node.vector_asset_key or node.image_asset_key):
         return False
     screen_width = float(root.sizing.width or 0.0)
     screen_height = float(root.sizing.height or 0.0)

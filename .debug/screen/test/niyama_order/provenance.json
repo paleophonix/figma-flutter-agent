@@ -13,162 +13,6 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44914;1356:10664;1356:10367",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44915;1356:10710",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44916;1356:10670",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44916;1356:10671",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
       "nodeId": "4408:44893",
       "field": "wrap",
       "old": null,
@@ -339,47 +183,38 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "4408:44908",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 1020.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 616.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "4408:44908",
-      "field": "type",
-      "old": "STACK",
-      "new": "COLUMN",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "4408:44908",
-      "field": "flex_gap_mode",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I4408:44914;1356:10664;1356:10367",
+      "field": "wrap",
       "old": null,
-      "new": "uniform",
+      "new": "flexibleLoose",
       "policy": null
     },
     {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "4408:44908",
-      "field": "layout_evidence",
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I4408:44915;1356:10710",
+      "field": "wrap",
       "old": null,
-      "new": {
-        "cross_delta": 0.0,
-        "gap_spread": 0.0
-      },
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I4408:44916;1356:10670",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I4408:44916;1356:10671",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
       "policy": null
     },
     {
@@ -413,6 +248,36 @@
       "checkpoint": "CP2_ir_passes",
       "transform": "unstack",
       "nodeId": "I4408:44903;1159:8235",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "cross_delta": 0.0,
+        "gap_spread": 0.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "4408:44908",
+      "field": "type",
+      "old": "STACK",
+      "new": "COLUMN",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "4408:44908",
+      "field": "flex_gap_mode",
+      "old": null,
+      "new": "uniform",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "4408:44908",
       "field": "layout_evidence",
       "old": null,
       "new": {
@@ -505,96 +370,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "4408:44914",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44914",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44915",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44915",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44916",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44916",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44916;1356:10669",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44916;1356:10669",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44888",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44888",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "I4408:44889;919:5312",
       "field": "fidelity_tier",
       "old": null,
@@ -605,24 +380,6 @@
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "I4408:44889;919:5312",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44896;1154:7841",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44896;1154:7841",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -649,24 +406,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44897;1154:7841",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44897;1154:7841",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "I4408:44897;1154:7850;933:4776",
       "field": "fidelity_tier",
       "old": null,
@@ -677,24 +416,6 @@
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "I4408:44897;1154:7850;933:4776",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44898;1154:7841",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44898;1154:7841",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -721,24 +442,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44901;1154:7841",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44901;1154:7841",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "I4408:44901;1154:7850;933:4776",
       "field": "fidelity_tier",
       "old": null,
@@ -749,24 +452,6 @@
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "I4408:44901;1154:7850;933:4776",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44902;1154:7841",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44902;1154:7841",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -901,7 +586,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44889;919:5312",
+      "nodeId": "4408:44914",
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
@@ -910,7 +595,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44889;919:5312",
+      "nodeId": "4408:44914",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -919,7 +604,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44896;1154:7841",
+      "nodeId": "4408:44915",
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
@@ -928,7 +613,61 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44896;1154:7841",
+      "nodeId": "4408:44915",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "4408:44916",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "4408:44916",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I4408:44916;1356:10669",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I4408:44916;1356:10669",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I4408:44889;919:5312",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I4408:44889;919:5312",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -961,12 +700,95 @@
       "evidence": {
         "nav_scroll_host": true,
         "child_type_counts": {
-          "STACK": 1,
+          "STACK": 2,
           "COLUMN": 1,
-          "CONTAINER": 1,
-          "DIALOG": 1
+          "CONTAINER": 1
         },
         "child_count": 4
+      }
+    },
+    {
+      "nodeId": "I4408:44889;919:5312",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "I4408:44896;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "I4408:44897;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "I4408:44898;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "I4408:44901;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "I4408:44902;1154:7850;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "4408:44903",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "COLUMN": 1
+        },
+        "child_count": 1,
+        "container_surface": "card",
+        "component_id": "1154:8374"
+      }
+    },
+    {
+      "nodeId": "I4408:44903;1159:8160;933:4776",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
       }
     },
     {
@@ -1029,175 +851,6 @@
           "TEXT": 2
         },
         "child_count": 2
-      }
-    },
-    {
-      "nodeId": "4408:44888",
-      "kind": "overlay_dialog",
-      "confidence": 0.92,
-      "evidence": {
-        "overlay_dialog": true,
-        "child_type_counts": {
-          "STACK": 1,
-          "COLUMN": 3,
-          "TEXT": 1
-        },
-        "child_count": 5,
-        "overlay": true
-      }
-    },
-    {
-      "nodeId": "I4408:44889;919:5312",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I4408:44896;1154:7841",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "IMAGE": 1,
-          "COLUMN": 1
-        },
-        "child_count": 2,
-        "container_surface": "card"
-      }
-    },
-    {
-      "nodeId": "I4408:44896;1154:7850;933:4776",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I4408:44897;1154:7841",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "IMAGE": 1,
-          "COLUMN": 1
-        },
-        "child_count": 2,
-        "container_surface": "card"
-      }
-    },
-    {
-      "nodeId": "I4408:44897;1154:7850;933:4776",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I4408:44898;1154:7841",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "IMAGE": 1,
-          "COLUMN": 1
-        },
-        "child_count": 2,
-        "container_surface": "card"
-      }
-    },
-    {
-      "nodeId": "I4408:44898;1154:7850;933:4776",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I4408:44901;1154:7841",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "IMAGE": 1,
-          "COLUMN": 1
-        },
-        "child_count": 2,
-        "container_surface": "card"
-      }
-    },
-    {
-      "nodeId": "I4408:44901;1154:7850;933:4776",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I4408:44902;1154:7841",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "IMAGE": 1,
-          "COLUMN": 1
-        },
-        "child_count": 2,
-        "container_surface": "card"
-      }
-    },
-    {
-      "nodeId": "I4408:44902;1154:7850;933:4776",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "4408:44903",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "COLUMN": 1
-        },
-        "child_count": 1,
-        "container_surface": "card",
-        "component_id": "1154:8374"
-      }
-    },
-    {
-      "nodeId": "I4408:44903;1159:8160;933:4776",
-      "kind": "technical_divider",
-      "confidence": 0.82,
-      "evidence": {
-        "technical_divider": true,
-        "child_type_counts": {},
-        "child_count": 0
       }
     }
   ],

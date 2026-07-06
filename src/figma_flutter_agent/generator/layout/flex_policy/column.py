@@ -587,7 +587,11 @@ def wrap_column_child_width_fill(
     from figma_flutter_agent.parser.interaction.selection import (
         layout_fact_payment_plan_primary_copy_column,
         layout_fact_payment_plan_row_label_text,
+        layout_fact_payment_plan_trailing_price_cluster,
     )
+
+    if node.type == NodeType.ROW and layout_fact_payment_plan_trailing_price_cluster(node):
+        return relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
 
     if node.type == NodeType.TEXT and (
         layout_fact_payment_plan_row_label_text(node)
@@ -634,6 +638,9 @@ def wrap_column_child_width_fill(
         width,
         width_mode=node.sizing.width_mode,
     )
+    if node.type == NodeType.ROW and layout_fact_payment_plan_trailing_price_cluster(node):
+        return relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
+
     if node.type == NodeType.TEXT and (node.style.text_align or "").upper() == "CENTER":
         relaxed = relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
         return f"SizedBox(width: {width_lit}, child: Center(child: {relaxed}))"

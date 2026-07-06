@@ -201,6 +201,25 @@ def test_unresolved_render_boundary_validate_passes_after_non_strict_resolve(
     validate_screen_ir(screen_ir, root, project_dir=tmp_path)
 
 
+def test_resolve_render_boundary_binds_raster_export(tmp_path: Path) -> None:
+  illustrations = tmp_path / "assets" / "illustrations"
+  illustrations.mkdir(parents=True)
+  (illustrations / "render_boundary_2399_42779.png").write_bytes(b"png")
+  node = CleanDesignTreeNode(
+      id="2399:42779",
+      name="Img",
+      type=NodeType.STACK,
+      sizing=Sizing(width=393.0, height=454.0),
+      render_boundary=True,
+      flatten_figma_node_ids=["2399:42780", "2399:42781"],
+      vector_asset_key=render_boundary_asset_path("2399:42779"),
+  )
+  root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
+  unresolved = resolve_render_boundary_asset_keys(root, tmp_path, AssetManifest())
+  assert unresolved == []
+  assert node.image_asset_key == "assets/illustrations/render_boundary_2399_42779.png"
+
+
 def test_unresolved_render_boundary_strict_raises(tmp_path: Path) -> None:
     node = _render_boundary_node("1:boundary")
     root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])

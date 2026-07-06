@@ -21,11 +21,65 @@
     },
     {
       "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "2399:42831",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "2399:42833",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "2399:42800",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "2399:42825",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "2399:42827",
+      "field": "wrap",
+      "old": null,
+      "new": "expanded",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
       "nodeId": "2399:42839",
       "field": "min_touch_target",
       "old": null,
       "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I2399:42783;266:1499;266:1641",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
       "policy": null
     },
     {
@@ -39,11 +93,11 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "min_touch_target_guard",
-      "nodeId": "2399:42839",
-      "field": "min_touch_target",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I2399:42783;266:1499;266:1641",
+      "field": "wrap",
       "old": null,
-      "new": 44.0,
+      "new": "flexibleLoose",
       "policy": null
     },
     {
@@ -261,6 +315,24 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
+      "nodeId": "2399:42786",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "2399:42786",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
       "nodeId": "2399:42837",
       "field": "fidelity_tier",
       "old": null,
@@ -322,15 +394,6 @@
       "policy": null
     },
     {
-      "checkpoint": "CP1_guards",
-      "transform": "min_touch_target_guard",
-      "nodeId": "2399:42839",
-      "field": "min_touch_target",
-      "old": null,
-      "new": 44.0,
-      "policy": null
-    },
-    {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "2399:42786",
@@ -392,33 +455,6 @@
       "old": null,
       "new": "manifest",
       "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42839",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42839",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "min_touch_target_guard",
-      "nodeId": "2399:42839",
-      "field": "min_touch_target",
-      "old": null,
-      "new": 44.0,
-      "policy": null
     }
   ],
   "decisions": [
@@ -433,6 +469,20 @@
           "COLUMN": 3
         },
         "child_count": 4
+      }
+    },
+    {
+      "nodeId": "2399:42786",
+      "kind": "button_filled",
+      "confidence": 0.86,
+      "evidence": {
+        "button_filled": true,
+        "child_type_counts": {
+          "TEXT": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "54:3907"
       }
     },
     {

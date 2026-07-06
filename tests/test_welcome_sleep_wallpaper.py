@@ -79,6 +79,17 @@ def test_screen_wallpaper_node_detects_oversized_boundary() -> None:
     assert len(foreground) == 2
 
 
+def test_screen_wallpaper_node_accepts_raster_boundary_key() -> None:
+    root = _welcome_sleep_root()
+    wallpaper = root.children[0].model_copy(
+        update={
+            "vector_asset_key": None,
+            "image_asset_key": "assets/illustrations/group_3_2913.png",
+        }
+    )
+    assert is_screen_wallpaper_node(wallpaper, root)
+
+
 def test_layout_renders_wallpaper_behind_foreground() -> None:
     root = reconcile_centered_text_placements_in_tree(_welcome_sleep_root())
     layout = render_layout_file(root, feature_name="welcome_sleep", uses_svg=True)[

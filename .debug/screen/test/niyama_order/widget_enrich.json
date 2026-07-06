@@ -1,20 +1,25 @@
 {
-  "cacheKey": "d978df3bee4c2d16b633a895a91382068a0e5add8ce09dd103d18999d5c43046",
+  "cacheKey": "ba1e91898fee0bd071ec637fa402a922be4626cc4540f791be6ccfcb377e5c5f",
   "response": {
     "entries": [
       {
         "clusterId": "component_1007_7119_e1043bbb",
-        "widgetName": "OrderBottomBarWidget",
+        "widgetName": "PlaceOrderBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_1149_9467_afa6f842",
+        "widgetName": "QuantityStepperWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_7859_6271d11b",
-        "widgetName": "OrderProductItemWidget",
+        "widgetName": "OrderItemCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_8066_faf0fa44",
-        "widgetName": "GuestsCountWidget",
+        "widgetName": "CutleryOptionWidget",
         "paramRenames": {}
       },
       {
@@ -24,17 +29,17 @@
       },
       {
         "clusterId": "component_1154_8697_9095f282",
-        "widgetName": "CountBadgeWidget",
+        "widgetName": "PlusEighteenBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10366_754647f7",
-        "widgetName": "AddTextButtonWidget",
+        "widgetName": "AddButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10701_1aa13d53",
-        "widgetName": "SmallProductCardWidget",
+        "widgetName": "MenuProductCardWidget",
         "paramRenames": {}
       },
       {
@@ -48,13 +53,8 @@
         "paramRenames": {}
       },
       {
-        "clusterId": "component_910_3249",
-        "widgetName": "PlusIconWidget",
-        "paramRenames": {}
-      },
-      {
-        "clusterId": "component_910_3255",
-        "widgetName": "AddProductButtonWidget",
+        "clusterId": "component_913_17712",
+        "widgetName": "CloseIconWidget",
         "paramRenames": {}
       },
       {
@@ -64,7 +64,7 @@
       },
       {
         "clusterId": "component_913_8948",
-        "widgetName": "SmallProductIllustrationWidget",
+        "widgetName": "IllustrationWidget",
         "paramRenames": {}
       },
       {
@@ -83,8 +83,8 @@
         "paramRenames": {}
       },
       {
-        "clusterId": "shape_8",
-        "widgetName": "OrderActionLabelWidget",
+        "clusterId": "shape_6",
+        "widgetName": "OrderItemPriceWidget",
         "paramRenames": {}
       }
     ]

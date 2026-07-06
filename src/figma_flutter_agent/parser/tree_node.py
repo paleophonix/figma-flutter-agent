@@ -16,7 +16,7 @@ from figma_flutter_agent.parser.geometry import (
 )
 from figma_flutter_agent.parser.numeric_rounding import round_geometry, round_micro_style
 from figma_flutter_agent.parser.styles import enrich_node_style
-from figma_flutter_agent.parser.tokens.colors import rgba_to_argb_hex, solid_paint_to_argb_hex
+from figma_flutter_agent.parser.tokens.colors import solid_paint_to_argb_hex
 from figma_flutter_agent.parser.typography import (
     resolve_font_family,
     resolve_font_style,
@@ -147,7 +147,10 @@ def extract_style(
             if fill.get("visible") is False:
                 continue
             if fill.get("type") == "SOLID" and fill.get("color"):
-                style.text_color = rgba_to_argb_hex(fill["color"])
+                style.text_color = solid_paint_to_argb_hex(
+                    fill["color"],
+                    paint_opacity=float(fill.get("opacity", 1.0)),
+                )
                 break
 
     dev_mode_css: dict[str, str] | None = None

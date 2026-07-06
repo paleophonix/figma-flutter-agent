@@ -47,6 +47,7 @@
           "strokeAlign": "INSIDE",
           "clipsContent": true
         },
+        "vectorAssetKey": "assets/icons/vector_2399_42798.svg",
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "right": -33.0,
@@ -3640,7 +3641,7 @@
                     },
                     "style": {
                       "strokeAlign": "OUTSIDE",
-                      "textColor": "0xFF000000",
+                      "textColor": "0x8A000000",
                       "fontSize": 13.0,
                       "fontWeight": "w400",
                       "textAlign": "LEFT",
@@ -3762,7 +3763,7 @@
                     },
                     "style": {
                       "strokeAlign": "OUTSIDE",
-                      "textColor": "0xFF000000",
+                      "textColor": "0x8A000000",
                       "fontSize": 13.0,
                       "fontWeight": "w400",
                       "textAlign": "LEFT",
@@ -6181,7 +6182,7 @@
       "style": {
         "fontSize": 13.0,
         "fontWeight": "w400",
-        "textColor": "0xFF000000",
+        "textColor": "0x8A000000",
         "textAlign": "LEFT",
         "fontFamily": "Nekst"
       }
@@ -6241,7 +6242,7 @@
       "style": {
         "fontSize": 13.0,
         "fontWeight": "w400",
-        "textColor": "0xFF000000",
+        "textColor": "0x8A000000",
         "textAlign": "LEFT",
         "fontFamily": "Nekst"
       }

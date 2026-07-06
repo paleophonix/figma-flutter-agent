@@ -726,6 +726,10 @@ families:
       - A3
     owning_stage: parser
     owners:
+      - module: src/figma_flutter_agent/parser/boundaries/assets.py
+        symbol: resolve_render_boundary_asset_keys
+      - module: src/figma_flutter_agent/generator/background/detection.py
+        symbol: is_screen_wallpaper_node
       - module: src/figma_flutter_agent/generator/background/render.py
         symbol: render_ambient_decorative_node
     law_ids:
@@ -903,4 +907,27 @@ families:
       Root stack children whose bottom edge extends past the artboard height are scroll-tail
       content. Viewport clamp must not rewrite their top coordinate upward to fit the
       artboard box; preserve Figma absolute placement for long scroll screens.
+    status: active
+
+  - id: status_chrome_icon_slot_height_overflow
+    title: Status-bar icon slot uses inflated Figma height and overflows the bar
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/extents.py
+        symbol: bind_row_cross_axis_height
+      - module: src/figma_flutter_agent/generator/layout/widgets/shared.py
+        symbol: _node_layout_size
+    law_ids:
+      - LAW-STATUS-CHROME-SLOT-HEIGHT-CLAMP
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      A status-bar icon group node carries an inflated Figma bound (e.g. a Battery ROW
+      parsed as 16x52 wrapping a 16x16 icon). The emitter uses the 52px slot height
+      verbatim, so the status-bar Column (icon row + gap + time) exceeds the fixed bar
+      height (40px) and Flutter throws a bottom RenderFlex overflow. System-chrome icon
+      slots must clamp to the bar height or the inner icon intrinsic.
     status: active

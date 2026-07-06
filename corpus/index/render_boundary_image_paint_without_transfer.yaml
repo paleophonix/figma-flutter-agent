@@ -8,10 +8,10 @@ cases:
   project: test
   feature: verbatica_paywall
   occurrence_id: verbatica-paywall-hero-render-boundary-empty
-  status: OPEN
+  status: FIXED
   observed_at: '2026-07-06'
   created_at: '2026-07-06T18:35:00Z'
-  updated_at: '2026-07-06T18:35:00Z'
+  updated_at: '2026-07-07T02:30:00Z'
   summary: Paywall hero Img 2399:42779 is flattened to a render boundary without
     imageAssetKey; ambient wallpaper emit produced SizedBox.shrink and the 
     decomposed stack path omitted Positioned.fill wallpaper lead.

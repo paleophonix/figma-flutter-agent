@@ -1,115 +1,71 @@
 {
-  "cacheKey": "92d5cb58986e7f8f295c46786e4baf36e22b102de024a8450ad4870b1457e274",
+  "cacheKey": "38d49080bb2d3dc0aa2b6de1fb8bf36b840b3779c0fc7d94d52e64a5b150d724",
   "response": {
     "candidates": [
       {
-        "nodeId": "2399:42789",
-        "widgetName": "PricingPlanOption",
-        "reason": "Shared pricing-row structure repeated for the 12, 3, and 1 month plan choices with the same title/price/check layout.",
+        "nodeId": "2399:42788",
+        "widgetName": "SubscriptionPlanOption",
+        "reason": "Three plan rows share the same card-like structure: duration, monthly price, total price, and a trailing check icon; the first variant also adds an optional savings badge.",
         "confidence": 0.98,
         "suggestedParams": [
-          "durationLabel",
-          "priceLabel",
+          "planDurationLabel",
           "monthlyPriceLabel",
-          "showSelectionIcon"
+          "totalPriceLabel",
+          "savingsLabel",
+          "showSavingsBadge",
+          "isSelected"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42789",
-            "2399:42802",
-            "2399:42813"
+            "2399:42801",
+            "2399:42812"
           ],
-          "shapeSimilarity": 0.99,
-          "semanticRole": "subscription plan option row"
-        }
-      },
-      {
-        "nodeId": "2399:42837",
-        "widgetName": "PrimarySubscriptionButton",
-        "reason": "Primary CTA button combines a main label with a supporting subtitle, making it a reusable subscription action pattern.",
-        "confidence": 0.97,
-        "suggestedParams": [
-          "title",
-          "subtitle"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "2399:42837"
-          ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "primary purchase action button"
+          "shapeSimilarity": 0.97,
+          "semanticRole": "Selectable subscription plan option"
         }
       },
       {
         "nodeId": "2399:42838",
-        "widgetName": "SecondaryActionButton",
-        "reason": "The same tertiary Button component is reused for two secondary actions with different labels and compactness.",
-        "confidence": 0.94,
+        "widgetName": "TertiaryActionButton",
+        "reason": "Repeated tertiary action button family with the same component ref and only the label/compact sizing varying between instances.",
+        "confidence": 0.93,
         "suggestedParams": [
           "label",
           "isCompact"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42838",
             "2399:42839"
           ],
-          "shapeSimilarity": 0.96,
-          "semanticRole": "secondary action button"
+          "shapeSimilarity": 0.99,
+          "semanticRole": "Secondary CTA / text button"
         }
       },
       {
-        "nodeId": "2399:42783",
-        "widgetName": "DeviceStatusBar",
-        "reason": "Standard phone status bar component with time and system indicators, reusable across screens.",
+        "nodeId": "2399:42837",
+        "widgetName": "PrimarySubscriptionCtaButton",
+        "reason": "Primary CTA button component with stacked title and helper text, suitable for a reusable paywall subscribe action.",
         "confidence": 0.9,
         "suggestedParams": [
-          "time",
-          "showDate",
-          "showCamera",
-          "showBatteryTime"
+          "title",
+          "helperText"
         ],
         "evidence": {
-          "similarNodes": [
-            "2399:42783"
-          ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "device status bar"
-        }
-      },
-      {
-        "nodeId": "2399:42843",
-        "widgetName": "HomeIndicator",
-        "reason": "Standard iPhone home indicator component that can be reused on other mobile screens.",
-        "confidence": 0.89,
-        "suggestedParams": [
-          "device",
-          "orientation",
-          "mode"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "2399:42843"
-          ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "home indicator"
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "Primary subscription CTA button"
         }
       },
       {
         "nodeId": "2399:42786",
-        "widgetName": "CloseButton",
-        "reason": "Reusable trailing dismiss control shown as a compact close icon button.",
-        "confidence": 0.88,
-        "suggestedParams": [
-          "iconLabel",
-          "mode"
-        ],
+        "widgetName": "TrailingCloseButton",
+        "reason": "Standalone close button component used in the top-right of the paywall header; reusable across modal and overlay screens.",
+        "confidence": 0.78,
+        "suggestedParams": [],
         "evidence": {
-          "similarNodes": [
-            "2399:42786"
-          ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "dismiss button"
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "Trailing close icon button"
         }
       }
     ]

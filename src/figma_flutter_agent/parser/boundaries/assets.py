@@ -18,6 +18,45 @@ def render_boundary_asset_path(node_id: str) -> str:
     return f"assets/illustrations/render_boundary_{safe_id}.svg"
 
 
+def render_boundary_raster_asset_path(node_id: str) -> str:
+    """Relative Flutter asset path reserved for a render-boundary raster export."""
+    safe_id = node_id.replace(":", "_")
+    return f"assets/illustrations/render_boundary_{safe_id}.png"
+
+
+def _render_boundary_asset_candidates(
+    node: CleanDesignTreeNode,
+    project_dir: Path,
+    manifest_paths: dict[str, str],
+) -> list[str]:
+    """Ordered on-disk export paths for one render-boundary node."""
+    candidates: list[str] = []
+    seen: set[str] = set()
+
+    def add(path: str | None) -> None:
+        if path and path not in seen:
+            seen.add(path)
+            candidates.append(path)
+
+    manifest_path = manifest_paths.get(node.id)
+    add(manifest_path)
+    add(render_boundary_asset_path(node.id))
+    add(render_boundary_raster_asset_path(node.id))
+    add(discover_asset_path_for_node(project_dir, node.id))
+    for probe_id in _vector_discovery_node_ids(node):
+        add(discover_asset_path_for_node(project_dir, probe_id))
+    return candidates
+
+
+def _bind_render_boundary_asset(node: CleanDesignTreeNode, candidate: str) -> None:
+    """Attach a resolved export path to vector or raster keys on a boundary node."""
+    normalized = candidate.replace("\\", "/")
+    if normalized.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+        node.image_asset_key = normalized
+    else:
+        node.vector_asset_key = normalized
+
+
 def _register_asset_index_entry(
     entries: dict[str, list[tuple[tuple[int, str], str]]],
     safe_id: str,
@@ -350,6 +389,26 @@ def resolve_missing_image_asset_keys(
         return None
 
     def visit(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
+        if node.render_boundary and not node.image_asset_key:
+            for probe_id in _vector_discovery_node_ids(node):
+                discovered = discover_asset_path_for_node(
+                    project_dir,
+                    probe_id,
+                    asset_index=asset_index,
+                )
+                if discovered is not None and discovered.lower().endswith(
+                    (".png", ".jpg", ".jpeg", ".webp")
+                ):
+                    node.image_asset_key = discovered.replace("\\", "/")
+                    break
+            if not node.image_asset_key:
+                fallback = _discover_filter_raster_fallback_path(
+                    node,
+                    project_dir,
+                    asset_index=asset_index,
+                )
+                if fallback is not None:
+                    node.image_asset_key = fallback
         if not node.image_asset_key and node.type == NodeType.IMAGE:
             discovered = _discover_image_key(node, parent=parent)
             if discovered is not None:
@@ -448,7 +507,9 @@ def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:
     from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 
     for child in node.children:
-        walk_clean_tree(child, lambda item, _add=add: _add(item.id), phase="assets_vector_discovery")
+        walk_clean_tree(
+            child, lambda item, _add=add: _add(item.id), phase="assets_vector_discovery"
+        )
     return ordered
 
 
@@ -585,25 +646,17 @@ def resolve_render_boundary_asset_keys(
     def visit_boundary(node: CleanDesignTreeNode) -> None:
         if not node.render_boundary:
             return
-        candidates: list[str] = []
-        manifest_path = manifest_paths.get(node.id)
-        if manifest_path:
-            candidates.append(manifest_path)
-        reserved = render_boundary_asset_path(node.id)
-        if reserved not in candidates:
-            candidates.append(reserved)
-        discovered = discover_asset_path_for_node(project_dir, node.id)
-        if discovered and discovered not in candidates:
-            candidates.append(discovered)
+        candidates = _render_boundary_asset_candidates(node, project_dir, manifest_paths)
         for candidate in candidates:
             if (project_dir / Path(candidate)).is_file():
-                node.vector_asset_key = candidate.replace("\\", "/")
-                break
-        else:
-            unresolved.append(node.id)
-            if not strict:
-                node.vector_asset_key = None
-                node.image_asset_key = None
+                _bind_render_boundary_asset(node, candidate)
+                return
+        if node.image_asset_key and (project_dir / Path(node.image_asset_key)).is_file():
+            return
+        unresolved.append(node.id)
+        if not strict:
+            node.vector_asset_key = None
+            node.image_asset_key = None
 
     from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 

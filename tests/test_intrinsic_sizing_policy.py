@@ -247,6 +247,39 @@ def test_wrap_column_child_width_fill_respects_intrinsic_hosts() -> None:
     assert "SizedBox(width:" in compact
 
 
+def test_row_cross_axis_height_clamps_inflated_icon_wrapper_row() -> None:
+    """Law: LAW-STATUS-CHROME-SLOT-HEIGHT-CLAMP — icon wrapper ROW uses inner intrinsic height."""
+    from figma_flutter_agent.generator.layout.flex_policy.extents import bind_row_cross_axis_height
+
+    battery_stack = CleanDesignTreeNode(
+        id="266:1648",
+        name="Battery",
+        type=NodeType.STACK,
+        sizing=Sizing(width=16.0, height=16.0),
+    )
+    battery_row = CleanDesignTreeNode(
+        id="266:1647",
+        name="Battery",
+        type=NodeType.ROW,
+        sizing=Sizing(width=16.0, height=52.0),
+        children=[battery_stack],
+    )
+    status_row = CleanDesignTreeNode(
+        id="266:1499",
+        name="Status",
+        type=NodeType.ROW,
+        sizing=Sizing(width=360.0, height=40.0),
+        children=[battery_row],
+    )
+    pinned = bind_row_cross_axis_height(
+        battery_row,
+        "Stack(children: [const SizedBox.shrink()])",
+        parent_row=status_row,
+    )
+    assert "height: 52.0" not in pinned.replace("\n", "")
+    assert "height: 16.0" in pinned.replace("\n", "")
+
+
 def test_row_cross_axis_height_pin_skips_address_but_keeps_chat_metadata() -> None:
     """Address columns size intrinsically; chat list cards keep bounded row rails."""
     from figma_flutter_agent.generator.layout.flex_policy import bind_row_cross_axis_height
