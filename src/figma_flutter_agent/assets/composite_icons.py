@@ -57,6 +57,25 @@ def _figma_subtree_has_visible_text(node: dict[str, Any]) -> bool:
     return any(_figma_subtree_has_visible_text(child) for child in node.get("children") or [])
 
 
+def is_figma_compact_component_drawable_node(node: dict[str, Any]) -> bool:
+    """True when a published compact component instance should export as one drawable."""
+    node_type = node.get("type")
+    if node_type not in {"INSTANCE", "COMPONENT"}:
+        return False
+    if _figma_subtree_has_visible_text(node):
+        return False
+    if is_figma_composite_icon_node(node):
+        return False
+    if node_type == "INSTANCE" and not node.get("componentId"):
+        return False
+    if _count_figma_vectors(node) < 1:
+        return False
+    width, height = _figma_bbox_size(node)
+    if width is None or height is None:
+        return False
+    return width <= _MAX_COMPOSITE_ICON_WIDTH and height <= _MAX_COMPOSITE_ICON_HEIGHT
+
+
 def is_figma_composite_icon_node(node: dict[str, Any]) -> bool:
     """True when a Figma frame/group is a small multicolor vector icon (e.g. Google G)."""
     node_type = node.get("type")
@@ -178,6 +197,13 @@ def collect_figma_composite_icon_groups(
                 for child in node.get("children") or []:
                     collect_descendants(child)
             return
+        if is_figma_compact_component_drawable_node(node):
+            node_id = node.get("id")
+            if isinstance(node_id, str):
+                parents.add(node_id)
+                for child in node.get("children") or []:
+                    _mark_composite_icon_descendants_skip(child, skip)
+            return
         for child in node.get("children") or []:
             walk(child)
 
@@ -280,3 +306,14 @@ def layout_fact_compact_vector_icon_export_node(node: CleanDesignTreeNode) -> bo
     if layout_fact_checkbox_control(node):
         return False
     return layout_fact_compact_vector_icon_shape(node) and bool(node.vector_asset_key)
+
+
+def drawable_asset_covers_descendant_vectors(node: CleanDesignTreeNode) -> bool:
+    """True when an ancestor drawable SVG bakes visible descendant vector paint."""
+    if not node.vector_asset_key:
+        return False
+    if is_composite_icon_export_node(node):
+        return True
+    if layout_fact_compact_vector_icon_export_node(node):
+        return True
+    return bool(node.component_ref and layout_fact_compact_vector_icon_shape(node))

@@ -422,6 +422,29 @@ families:
       visible_extracted_must_not_emit_empty_or_recursive_shell before writeback.
     status: active
 
+  - id: compact_component_leaf_vector_export_gap
+    title: Compact component instance exports nested leaf vector instead of host drawable
+    pipeline_arrows:
+      - A2
+    owning_stage: assets
+    owners:
+      - module: src/figma_flutter_agent/assets/composite_icons.py
+        symbol: is_figma_compact_component_drawable_node
+      - module: src/figma_flutter_agent/assets/collect.py
+        symbol: collect_exportable_nodes
+      - module: src/figma_flutter_agent/assets/vector_binding.py
+        symbol: collect_unbound_visible_vector_ids
+    law_ids:
+      - CompactComponentDrawableCoverageLaw
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Compact published component instances with one or few visible vectors are
+      exported as nested leaf VECTOR ids instead of the component host, leaving
+      cluster widgets without drawable assets and aborting with MissingVectorAssetError.
+    status: active
+
   - id: extracted_cluster_unbound_vector_shrink
     title: Extracted cluster widget emits shrink shell for unbound visible vectors
     pipeline_arrows:

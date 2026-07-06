@@ -35,15 +35,28 @@ def collect_unbound_visible_vector_ids(root: CleanDesignTreeNode) -> list[str]:
     Returns:
         Sorted node ids missing ``vector_asset_key`` and ``image_asset_key``.
     """
+    from figma_flutter_agent.assets.composite_icons import (
+        drawable_asset_covers_descendant_vectors,
+    )
+
     found: list[str] = []
 
-    def walk(node: CleanDesignTreeNode) -> None:
-        if _vector_has_visible_paint(node):
-            found.append(node.id)
-        for child in node.children:
-            walk(child)
+    def _ancestor_drawable_covers(
+        ancestors: tuple[CleanDesignTreeNode, ...],
+    ) -> bool:
+        return any(drawable_asset_covers_descendant_vectors(item) for item in ancestors)
 
-    walk(root)
+    def walk(
+        node: CleanDesignTreeNode,
+        ancestors: tuple[CleanDesignTreeNode, ...],
+    ) -> None:
+        if _vector_has_visible_paint(node) and not _ancestor_drawable_covers(ancestors):
+            found.append(node.id)
+        child_ancestors = (*ancestors, node)
+        for child in node.children:
+            walk(child, child_ancestors)
+
+    walk(root, ())
     return sorted(found)
 
 
