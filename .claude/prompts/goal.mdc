@@ -1,0 +1,44 @@
+---
+
+description: Project-wide objective for bringing figma-flutter-agent to preproduction quality
+alwaysApply: true
+-----------------
+
+# Project Goal: Preproduction Readiness
+
+The current project-wide objective is to bring `figma-flutter-agent` to **preproduction quality by August 6, 2026**.
+
+Preproduction means that a qualified Flutter developer who is not the compiler author can use the existing GitLab workflow to generate supported Figma screens independently:
+
+```text
+Figma → GitLab workflow → generation and validation → Merge Request
+```
+
+The operator must not need to:
+
+* modify the compiler source code;
+* manually patch generated Flutter code;
+* rely on undocumented knowledge;
+* receive live assistance from the compiler author.
+
+For supported screen classes, the compiler must produce buildable and visually acceptable Flutter output.
+
+When correct generation is not possible, the system must fail clearly and diagnostically instead of silently publishing broken, empty, or misleading output.
+
+Recurring failures must be addressed as systemic compiler defects with corpus cases and regression proof, rather than one-off patches for individual screens.
+
+## Guidance for all agents
+
+When making decisions, prefer work that improves:
+
+* independent use by another developer;
+* correctness and reproducibility;
+* fail-loud behavior;
+* diagnostic clarity;
+* systemic defect resolution;
+* regression protection;
+* the reliability of the existing GitLab end-to-end workflow.
+
+Avoid unrelated feature expansion, infrastructure work, or local workarounds unless they are necessary to achieve this goal.
+
+Do not assume that every task requires changes across the entire system. Work only within the scope of the current task while keeping this project-wide objective in mind.

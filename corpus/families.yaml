@@ -395,6 +395,25 @@ families:
       positioned children emit bare Stack without finite height, crashing in Column.
     status: active
 
+  - id: cluster_spacer_widget_shrink_shell
+    title: Cluster spacer widget emits shrink child inside finite bounds
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/widget_extractor.py
+        symbol: _bound_cluster_widget_root
+    law_ids:
+      - ExtractedWidgetFixedBoundsLaw
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Repeated leaf fixed-size Figma spacer components extracted as cluster widgets
+      materialize as SizedBox(dimensions, child: SizedBox.shrink()), tripping
+      visible_extracted_must_not_emit_empty_or_recursive_shell before writeback.
+    status: active
+
   - id: stroke_only_surface_synthetic_fill
     title: Stroke-only surface gets synthetic opaque fill
     pipeline_arrows:

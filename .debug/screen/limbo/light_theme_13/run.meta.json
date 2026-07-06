@@ -1,0 +1,10 @@
+{
+  "feature": "light_theme_13",
+  "pipeline_run_id": "bb36dd148e98",
+  "candidate_build_run_id": "bb36dd148e98",
+  "status": "parsed",
+  "runMetaSchemaVersion": "2",
+  "run_started_at": "2026-07-06T11:27:17.202348+00:00",
+  "captured_at": "2026-07-06T11:27:17.931385+00:00",
+  "clean_tree_hash": "893744a5899ec4c14c9d820257f0463ed80796d2a27aa4782731a38ad6eff3eb"
+}

@@ -1,0 +1,294 @@
+
+--- dart format @ 2026-07-06T13:58:09.795470+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\features\rep_edit_profile\rep_edit_profile_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\generated\rep_edit_profile_chunk_5a65a54b.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\generated\rep_edit_profile_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\widgets\close_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\widgets\commission_range_selector_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\widgets\labeled_input_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\widgets\range_slider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\widgets\save_button_content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\widgets\save_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\lib\widgets\spacing_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\test\golden\rep_edit_profile_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-um7oaiyf\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 22 files (22 changed) in 0.70 seconds.
+
+--- pub get --offline @ 2026-07-06T13:58:16.907462+00:00 ---
+exit_code=0
+
+┌─────────────────────────────────────────────────────────┐
+│ A new version of Flutter is available!                  │
+│                                                         │
+│ To update to the latest version, run "flutter upgrade". │
+└─────────────────────────────────────────────────────────┘
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/2) @ 2026-07-06T13:58:27.813201+00:00 ---
+exit_code=0
+Analyzing close_icon_widget.dart, commission_range_selector_widget.dart, home_indicator_widget.dart, ios_top_menu_widget.dart, labeled_input_widget.dart, range_slider_widget.dart...
+
+warning - lib\widgets\commission_range_selector_widget.dart:14:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\widgets\range_slider_widget.dart:14:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\widgets\commission_range_selector_widget.dart:15:181 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+3 issues found.
+
+--- dart analyze (generated) (2/2) @ 2026-07-06T13:58:30.536413+00:00 ---
+exit_code=0
+Analyzing save_button_content_widget.dart, save_button_widget.dart, spacing_widget.dart...
+
+   info - lib\widgets\save_button_widget.dart:15:654 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+1 issue found.
+
+--- dart analyze (generated) (1/4) @ 2026-07-06T13:58:34.391446+00:00 ---
+exit_code=0
+Analyzing rep_edit_profile_screen.dart, rep_edit_profile_chunk_5a65a54b.dart, rep_edit_profile_chunk_d31b9cc1.dart, rep_edit_profile_layout.dart, main.dart, app_colors.dart...
+
+warning - lib\features\rep_edit_profile\rep_edit_profile_screen.dart:7:8 - Unused import: 'package:test/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\rep_edit_profile\rep_edit_profile_screen.dart:8:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\rep_edit_profile\rep_edit_profile_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\rep_edit_profile\rep_edit_profile_screen.dart:11:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_5a65a54b.dart:8:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_5a65a54b.dart:9:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_5a65a54b.dart:10:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_d31b9cc1.dart:14:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_d31b9cc1.dart:15:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_d31b9cc1.dart:16:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:10:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:12:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:13:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:19:8 - Unused import: 'package:test/generated/rep_edit_profile_chunk_5a65a54b.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\rep_edit_profile_chunk_5a65a54b.dart:17:153 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\rep_edit_profile_layout.dart:38:1492 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+17 issues found.
+
+--- dart analyze (generated) (2/4) @ 2026-07-06T13:58:37.110111+00:00 ---
+exit_code=0
+Analyzing app_edge_insets.dart, app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart...
+
+warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+
+1 issue found.
+
+--- dart analyze (generated) (3/4) @ 2026-07-06T13:58:40.008390+00:00 ---
+exit_code=0
+Analyzing app_typography.dart, close_icon_widget.dart, commission_range_selector_widget.dart, home_indicator_widget.dart, ios_top_menu_widget.dart, labeled_input_widget.dart...
+
+warning - lib\widgets\commission_range_selector_widget.dart:14:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\widgets\commission_range_selector_widget.dart:15:181 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+2 issues found.
+
+--- dart analyze (generated) (4/4) @ 2026-07-06T13:58:43.561160+00:00 ---
+exit_code=0
+Analyzing range_slider_widget.dart, save_button_content_widget.dart, save_button_widget.dart, spacing_widget.dart, rep_edit_profile_screen_test.dart, element_coordinate_mapper.dart...
+
+warning - lib\widgets\range_slider_widget.dart:14:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\widgets\save_button_widget.dart:15:654 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - test\harness\element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+
+3 issues found.
+
+--- dart format @ 2026-07-06T13:58:46.592336+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\features\rep_edit_profile\rep_edit_profile_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\generated\rep_edit_profile_chunk_5a65a54b.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\generated\rep_edit_profile_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\widgets\close_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\widgets\commission_range_selector_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\widgets\labeled_input_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\widgets\range_slider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\widgets\save_button_content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\widgets\save_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\lib\widgets\spacing_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\test\golden\rep_edit_profile_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kbueg8p5\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 22 files (22 changed) in 0.71 seconds.
+
+--- dart format @ 2026-07-06T13:58:49.717714+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\features\rep_edit_profile\rep_edit_profile_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\generated\rep_edit_profile_chunk_5a65a54b.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\generated\rep_edit_profile_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\widgets\close_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\widgets\commission_range_selector_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\widgets\labeled_input_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\widgets\range_slider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\widgets\save_button_content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\widgets\save_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\lib\widgets\spacing_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\test\golden\rep_edit_profile_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jbifjskq\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 22 files (22 changed) in 0.69 seconds.
+
+--- dart format @ 2026-07-06T13:58:53.615669+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\features\rep_edit_profile\rep_edit_profile_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\generated\rep_edit_profile_chunk_5a65a54b.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\generated\rep_edit_profile_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\close_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\commission_range_selector_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\ios_top_menu_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\labeled_input_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\range_slider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\save_button_content_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\save_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\lib\widgets\spacing_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\test\golden\rep_edit_profile_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ooezt6wc\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 23 files (23 changed) in 1.33 seconds.
+
+--- pub get --offline @ 2026-07-06T13:58:56.607235+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/4) @ 2026-07-06T13:58:59.510031+00:00 ---
+exit_code=0
+Analyzing rep_edit_profile_screen.dart, rep_edit_profile_chunk_5a65a54b.dart, rep_edit_profile_chunk_d31b9cc1.dart, rep_edit_profile_layout.dart, main.dart, app_colors.dart...
+
+warning - lib\features\rep_edit_profile\rep_edit_profile_screen.dart:6:8 - Unused import: 'package:test/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\rep_edit_profile\rep_edit_profile_screen.dart:7:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\rep_edit_profile\rep_edit_profile_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\rep_edit_profile\rep_edit_profile_screen.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_5a65a54b.dart:5:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_5a65a54b.dart:6:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_5a65a54b.dart:7:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_d31b9cc1.dart:14:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_d31b9cc1.dart:15:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_chunk_d31b9cc1.dart:16:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:7:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:11:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\rep_edit_profile_layout.dart:16:8 - Unused import: 'package:test/generated/rep_edit_profile_chunk_5a65a54b.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\rep_edit_profile_chunk_5a65a54b.dart:18:19 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\rep_edit_profile_layout.dart:137:43 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+17 issues found.
+
+--- dart analyze (generated) (2/4) @ 2026-07-06T13:59:02.139048+00:00 ---
+exit_code=0
+Analyzing app_edge_insets.dart, app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart...
+
+warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+
+1 issue found.
+
+--- dart analyze (generated) (3/4) @ 2026-07-06T13:59:04.891475+00:00 ---
+exit_code=0
+Analyzing app_typography.dart, close_icon_widget.dart, commission_range_selector_widget.dart, home_indicator_widget.dart, ios_top_menu_widget.dart, labeled_input_widget.dart...
+
+warning - lib\widgets\commission_range_selector_widget.dart:14:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\widgets\commission_range_selector_widget.dart:23:28 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+2 issues found.
+
+--- dart analyze (generated) (4/4) @ 2026-07-06T13:59:07.783602+00:00 ---
+exit_code=0
+Analyzing range_slider_widget.dart, save_button_content_widget.dart, save_button_widget.dart, spacing_widget.dart, rep_edit_profile_screen_test.dart, element_coordinate_mapper.dart...
+
+warning - lib\widgets\range_slider_widget.dart:14:11 - The value of the local variable 'textScaler' isn't used. Try removing the variable or using it. - unused_local_variable
+   info - lib\widgets\save_button_widget.dart:44:47 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - test\harness\element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+
+3 issues found.
+
+--- flutter pub get @ 2026-07-06T13:59:11.822783+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
++ args 2.7.0
++ flutter_svg 2.3.0
++ http 1.6.0
++ http_parser 4.1.2
+  matcher 0.12.19 (0.12.20 available)
+  meta 1.18.0 (1.18.3 available)
++ path_parsing 1.1.0
++ petitparser 7.0.2
+  test_api 0.7.11 (0.7.13 available)
++ typed_data 1.4.0
++ vector_graphics 1.2.2
++ vector_graphics_codec 1.1.13
++ vector_graphics_compiler 1.2.6
+  vector_math 2.2.0 (2.4.0 available)
++ web 1.1.1
++ xml 7.0.1
+Changed 12 dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- flutter render errors @ 2026-07-06T13:59:11.824784+00:00 ---
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 63 pixels on the bottom.
+The relevant error-causing widget was:
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+The specific RenderFlex in question is: RenderFlex#c2b06 relayoutBoundary=up2 OVERFLOWING:
+════════════════════════════════════════════════════════════════════════════════════════════════════

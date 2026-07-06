@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 from pathlib import Path
 
@@ -13,6 +14,12 @@ from figma_flutter_agent.generator.layout import render_node_body, render_widget
 from figma_flutter_agent.generator.layout.common import to_pascal_case, to_snake_case
 from figma_flutter_agent.generator.widget_models import ClusterWidgetResult, ClusterWidgetSpec
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+
+def _is_shrink_only_widget_body_expr(body: str) -> bool:
+    """Return True when a widget body expression is only ``SizedBox.shrink()``."""
+    compact = re.sub(r"\s+", "", body.strip())
+    return compact in {"constSizedBox.shrink()", "SizedBox.shrink()"}
 
 
 def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
@@ -35,12 +42,20 @@ def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
         derived = stack_layout_bounded_height(node)
         if derived is not None and derived > 0:
             height = derived
+    shrink_only = _is_shrink_only_widget_body_expr(body)
     if width is not None and height is not None and width > 0 and height > 0:
+        if shrink_only:
+            return (
+                f"SizedBox(width: {format_geometry_literal(width)}, "
+                f"height: {format_geometry_literal(height)})"
+            )
         return (
             f"SizedBox(width: {format_geometry_literal(width)}, "
             f"height: {format_geometry_literal(height)}, child: {body})"
         )
     if height is not None and height > 0:
+        if shrink_only:
+            return f"SizedBox(height: {format_geometry_literal(height)})"
         return f"SizedBox(height: {format_geometry_literal(height)}, child: {body})"
     return body
 

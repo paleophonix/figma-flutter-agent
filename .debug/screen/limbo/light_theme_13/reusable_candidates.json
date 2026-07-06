@@ -1,0 +1,92 @@
+{
+  "cacheKey": "50e430113c5519aaa3d7faa398073fb271d41fc923a77e2345501f0cb9c57678",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "3212:24012",
+        "widgetName": "ContentRowItem",
+        "reason": "Repeated 7 times as the same 72px list-row family with headline, description, and trailing arrow action.",
+        "confidence": 0.98,
+        "suggestedParams": [
+          "titleText",
+          "descriptionText",
+          "trailingIconWidget"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "3212:24013",
+            "3212:24014",
+            "3212:24015",
+            "3212:24017",
+            "3212:24018",
+            "3212:24019",
+            "3212:24020"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "reusable list item / content row"
+        }
+      },
+      {
+        "nodeId": "3212:24011",
+        "widgetName": "SectionHeaderAction",
+        "reason": "Section header pattern repeats and alternates between plain header and header-with-action button, making it a shared header component.",
+        "confidence": 0.91,
+        "suggestedParams": [
+          "titleText",
+          "actionText",
+          "showActionButton"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "3212:24016"
+          ],
+          "shapeSimilarity": 0.93,
+          "semanticRole": "section header with optional action"
+        }
+      },
+      {
+        "nodeId": "I3212:24022;3207:12707;368:1121",
+        "widgetName": "TabItem",
+        "reason": "Eight tab instances share the same shape and component group, so the tab label cell is a strong reusable widget candidate.",
+        "confidence": 0.96,
+        "suggestedParams": [
+          "labelText"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I3212:24022;3207:12707;368:1123",
+            "I3212:24022;3207:12707;368:1132",
+            "I3212:24022;3207:12707;368:1134",
+            "I3212:24022;3207:12707;368:1136",
+            "I3212:24022;3207:12707;368:1138",
+            "I3212:24022;3207:12707;368:1125",
+            "I3212:24022;3207:12707;368:1127"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "tab selector item"
+        }
+      },
+      {
+        "nodeId": "I3212:24021;0:580",
+        "widgetName": "FooterIconButton",
+        "reason": "Footer and navigation actions reuse the same 40px icon-button family across multiple instances, suitable for a generic action icon widget.",
+        "confidence": 0.95,
+        "suggestedParams": [
+          "iconWidget"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I3212:24021;0:578",
+            "I3212:24021;0:576",
+            "I3212:24021;14:11937",
+            "I3212:24021;0:577",
+            "I3212:24022;3207:11602",
+            "I3212:24022;3207:11603"
+          ],
+          "shapeSimilarity": 0.97,
+          "semanticRole": "small icon action button"
+        }
+      }
+    ]
+  }
+}

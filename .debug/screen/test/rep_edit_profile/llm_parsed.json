@@ -1,0 +1,1470 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "rep_edit_profile",
+  "screenIr": {
+    "root": {
+      "figmaId": "1966:14409",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "2007:14674",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "IosTopMenuWidget",
+            "namedArgs": {}
+          }
+        },
+        {
+          "figmaId": "2310:16385",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "2310:16384",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "2237:17330",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "2112:20298",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "2310:16383",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "2310:16382",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "2112:20299",
+                      "kind": "extracted",
+                      "children": [],
+                      "ref": {
+                        "widgetName": "ProfileSaveButtonWidget",
+                        "namedArgs": {}
+                      }
+                    },
+                    {
+                      "figmaId": "2112:20300",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "2007:14993",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "2007:14994",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I2007:14994;1402:19621",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "2237:17240",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "2007:14634",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "2007:14635",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I2007:14635;574:32266",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I2007:14635;574:32267",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I2007:14635;574:31016",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I2007:14635;574:31016;8:2208",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I2007:14635;574:31016;8:2208;8:2205",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I2007:14635;574:31016;8:2208;8:1929",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I2007:14635;574:31016;8:2208;8:1929;8:1912",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "2007:14636",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "2007:14637",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I2007:14637;574:32266",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I2007:14637;574:32267",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I2007:14637;574:31016",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I2007:14637;574:31016;8:2208",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "2007:14823",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "2007:14824",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I2007:14824;574:32302",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I2007:14824;574:32303",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I2007:14824;574:31032",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I2007:14824;574:31032;8:2208",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I2007:14824;574:31032;8:2208;8:2205",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I2007:14824;574:31032;8:2208;8:1929",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I2007:14824;574:31032;8:2208;8:1929;8:1912",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I2007:14824;574:31032;8:2208;8:2200",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I2007:14824;574:31032;8:2208;8:2200;1270:26161",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "2007:14853",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "2007:14883",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "2007:14884",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "2007:14900",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "2007:14886",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "2007:14887",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "2007:14888",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I2007:14888;1270:26327",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "2007:14890",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "2007:14854",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I2007:14854;574:32302",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I2007:14854;574:32303",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I2007:14854;574:31032",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I2007:14854;574:31032;8:2208",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I2007:14854;574:31032;8:2208;8:2205",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I2007:14854;574:31032;8:2208;8:1929",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I2007:14854;574:31032;8:2208;8:1929;8:1912",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I2007:14854;574:31032;8:2208;8:2200",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "2007:14893",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "2007:14894",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "2007:14895",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "2007:14897",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "2007:14896",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "2007:14901",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "2007:14898",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "2007:14944",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "2007:14945",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I2007:14945;574:32302",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I2007:14945;574:32303",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I2007:14945;574:31032",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I2007:14945;574:31032;8:2208",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I2007:14945;574:31032;8:2208;8:2205",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I2007:14945;574:31032;8:2208;8:1929",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I2007:14945;574:31032;8:2208;8:1929;8:1912",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I2007:14945;574:31032;8:2208;8:2200",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "2007:14946",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "2007:14947",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "2007:14948",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "2007:14949",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "2007:14950",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "2007:14951",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "2007:14952",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "2007:14902",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "2007:14903",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I2007:14903;574:32266",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "I2007:14903;574:32267",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "I2007:14903;574:31016",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I2007:14903;574:31016;8:2208",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I2007:14903;574:31016;8:2208;8:2205",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I2007:14903;574:31016;8:2208;8:1929",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I2007:14903;574:31016;8:2208;8:1929;8:1912",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "2007:14992",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "2260:16195",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "2237:17339",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I2237:17339;53:4501",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I2237:17339;53:4465",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I2237:17339;53:4465;49:3407",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I2237:17339;53:4496",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I2237:17339;53:4467",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I2237:17339;53:4467;8:2231",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I2237:17339;53:4467;8:2231;8:2208",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I2237:17339;53:4467;8:2231;8:2208;8:2205",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I2237:17339;53:4467;8:2231;8:2208;8:1929",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I2237:17339;53:4467;8:2231;8:2208;8:1929;8:1912",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "figmaId": "I2237:17339;53:4467;8:2231;8:2208;8:2196",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I2237:17339;53:4467;8:2231;8:2208;8:2196;8:1973",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                },
+                                                                {
+                                                                  "figmaId": "I2237:17339;53:4467;8:2231;8:2208;8:2196;8:1955",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "figmaId": "I2237:17339;67:5859",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "I2237:17339;53:4482",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I2237:17339;53:4482;8:2231",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I2237:17339;53:4482;8:2231;8:2208",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I2237:17339;53:4482;8:2231;8:2208;8:2205",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I2237:17339;53:4482;8:2231;8:2208;8:1929",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I2237:17339;53:4482;8:2231;8:2208;8:1929;8:1912",
+                                                                      "kind": "auto",
+                                                                      "children": []
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "figmaId": "I2237:17339;53:4482;8:2231;8:2208;8:2196",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "figmaId": "2260:16194",
+                                              "kind": "auto",
+                                              "children": []
+                                            },
+                                            {
+                                              "figmaId": "2237:17331",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I2237:17331;119:6102",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I2237:17331;119:6103",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "figmaId": "I2237:17331;119:6104",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I2237:17331;119:6105",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I2237:17331;119:6105;119:6112",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "figmaId": "I2237:17331;119:6106",
+                                                          "kind": "auto",
+                                                          "children": []
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "figmaId": "2237:17241",
+                                              "kind": "auto",
+                                              "children": []
+                                            },
+                                            {
+                                              "figmaId": "2236:16524",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I2236:16524;574:32302",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "I2236:16524;574:32303",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "I2236:16524;574:31032",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I2236:16524;574:31032;8:2208",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I2236:16524;574:31032;8:2208;8:2205",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I2236:16524;574:31032;8:2208;8:1929",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I2236:16524;574:31032;8:2208;8:1929;8:1912",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "figmaId": "I2236:16524;574:31032;8:2208;8:2200",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "figmaId": "2310:16306",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "2310:16307",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "2310:16308",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "2310:16309",
+                                                          "kind": "auto",
+                                                          "children": []
+                                                        },
+                                                        {
+                                                          "figmaId": "2310:16310",
+                                                          "kind": "auto",
+                                                          "children": []
+                                                        },
+                                                        {
+                                                          "figmaId": "2310:16311",
+                                                          "kind": "auto",
+                                                          "children": []
+                                                        },
+                                                        {
+                                                          "figmaId": "2310:16312",
+                                                          "kind": "auto",
+                                                          "children": []
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "figmaId": "2260:16337",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "2007:14924",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I2007:14924;574:32266",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "figmaId": "I2007:14924;574:32267",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "figmaId": "I2007:14924;574:31016",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I2007:14924;574:31016;8:2208",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I2007:14924;574:31016;8:2208;8:2205",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I2007:14924;574:31016;8:2208;8:1929",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I2007:14924;574:31016;8:2208;8:1929;8:1912",
+                                                                      "kind": "auto",
+                                                                      "children": []
+                                                                    }
+                                                                  ],
+                                                                  "isMultiline": true
+                                                                }
+                                                              ],
+                                                              "isMultiline": true
+                                                            }
+                                                          ],
+                                                          "isMultiline": true
+                                                        }
+                                                      ],
+                                                      "isMultiline": true
+                                                    },
+                                                    {
+                                                      "figmaId": "2310:16386",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    }
+                                                  ],
+                                                  "layoutHints": {
+                                                    "scrollAxis": "vertical",
+                                                    "gapMode": "uniform"
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "2237:17240",
+      "2310:16385",
+      "2007:14674"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "edit_profile",
+      "confidence": 0.97,
+      "explanation": "Profile editing form with several labeled text inputs, dropdown-like selectors, selected chips, a range selector, and a primary save action.",
+      "warnings": [
+        "Multiple repeated input rows suggest reusable field contracts.",
+        "Several controls are selection-style fields with trailing chevrons rather than plain text entry."
+      ]
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "2007:14635",
+        "role": "input",
+        "subtype": "text",
+        "controlNodeId": "I2007:14635;574:31016",
+        "boundaryNodeId": "I2007:14635;574:31016",
+        "labelNodeIds": [
+          "I2007:14635;574:32266"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I2007:14635;574:31016;8:2208;8:1929;8:1912"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Sergey",
+          "keyboardIntent": "text",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center"
+        ],
+        "value": "Sergey",
+        "options": [],
+        "confidence": 0.99,
+        "proposedEffects": [
+          "edit_text"
+        ],
+        "explanation": "Single-line name field."
+      },
+      {
+        "nodeId": "2007:14637",
+        "role": "input",
+        "subtype": "text",
+        "controlNodeId": "I2007:14637;574:31016",
+        "boundaryNodeId": "I2007:14637;574:31016",
+        "labelNodeIds": [
+          "I2007:14637;574:32266"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "",
+          "keyboardIntent": "text",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center"
+        ],
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "edit_text"
+        ],
+        "explanation": "Single-line last name field."
+      },
+      {
+        "nodeId": "2007:14824",
+        "role": "control",
+        "subtype": "dropdown",
+        "controlNodeId": "I2007:14824;574:31032",
+        "boundaryNodeId": "I2007:14824;574:31032",
+        "labelNodeIds": [
+          "I2007:14824;574:32302"
+        ],
+        "placeholderNodeIds": [
+          "I2007:14824;574:31032;8:2208;8:1929;8:1912"
+        ],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I2007:14824;574:31032;8:2208;8:2200"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Choose your countries",
+          "keyboardIntent": "selection",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_with_trailing_decoration"
+        ],
+        "value": "Choose your countries",
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "open_picker"
+        ],
+        "explanation": "Selection field with trailing chevron."
+      },
+      {
+        "nodeId": "2007:14854",
+        "role": "control",
+        "subtype": "dropdown",
+        "controlNodeId": "I2007:14854;574:31032",
+        "boundaryNodeId": "I2007:14854;574:31032",
+        "labelNodeIds": [
+          "I2007:14854;574:32302"
+        ],
+        "placeholderNodeIds": [
+          "I2007:14854;574:31032;8:2208;8:1929;8:1912"
+        ],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I2007:14854;574:31032;8:2208;8:2200"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Choose your cities",
+          "keyboardIntent": "selection",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_with_trailing_decoration"
+        ],
+        "value": "Choose your cities",
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "open_picker"
+        ],
+        "explanation": "Selection field with trailing chevron."
+      },
+      {
+        "nodeId": "2007:14903",
+        "role": "input",
+        "subtype": "url",
+        "controlNodeId": "I2007:14903;574:31016",
+        "boundaryNodeId": "I2007:14903;574:31016",
+        "labelNodeIds": [
+          "I2007:14903;574:32266"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I2007:14903;574:31016;8:2208;8:1929;8:1912"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "https://website.com",
+          "keyboardIntent": "url",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center"
+        ],
+        "value": "https://website.com",
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "edit_text"
+        ],
+        "explanation": "Website URL entry."
+      },
+      {
+        "nodeId": "2236:16524",
+        "role": "control",
+        "subtype": "dropdown",
+        "controlNodeId": "I2236:16524;574:31032",
+        "boundaryNodeId": "I2236:16524;574:31032",
+        "labelNodeIds": [
+          "I2236:16524;574:32302"
+        ],
+        "placeholderNodeIds": [
+          "I2236:16524;574:31032;8:2208;8:1929;8:1912"
+        ],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I2236:16524;574:31032;8:2208;8:2200"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Choose type of property",
+          "keyboardIntent": "selection",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_with_trailing_decoration"
+        ],
+        "value": "Choose type of property",
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "open_picker"
+        ],
+        "explanation": "Selection field with trailing chevron."
+      },
+      {
+        "nodeId": "2007:14924",
+        "role": "input",
+        "subtype": "textarea",
+        "controlNodeId": "I2007:14924;574:31016",
+        "boundaryNodeId": "I2007:14924;574:31016",
+        "labelNodeIds": [
+          "I2007:14924;574:32266"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I2007:14924;574:31016;8:2208;8:1929;8:1912"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "textarea",
+        "contractTraits": {
+          "isMultiline": true,
+          "obscureText": false,
+          "currentValue": "About me",
+          "keyboardIntent": "text",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "multiline_input_top_align"
+        ],
+        "value": "About me",
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "edit_text"
+        ],
+        "explanation": "Multi-line description field."
+      },
+      {
+        "nodeId": "2237:17339",
+        "role": "control",
+        "subtype": "range",
+        "controlNodeId": "2237:17331",
+        "boundaryNodeId": "2237:17339",
+        "labelNodeIds": [
+          "I2237:17339;53:4465;49:3407"
+        ],
+        "placeholderNodeIds": [
+          "I2237:17339;53:4467;8:2231;8:2208;8:2196;8:1955"
+        ],
+        "valueNodeIds": [
+          "I2237:17339;53:4467;8:2231;8:2208;8:1929;8:1912",
+          "I2237:17339;53:4482;8:2231;8:2208;8:1929;8:1912"
+        ],
+        "decorationNodeIds": [
+          "I2237:17339;67:5859"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "I2237:17339;53:4467;8:2231;8:2208;8:2196",
+          "I2237:17339;53:4482;8:2231;8:2208;8:2196"
+        ],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "1-6",
+          "keyboardIntent": "range",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "dual_value_range_input"
+        ],
+        "value": "1-6",
+        "options": [],
+        "confidence": 0.88,
+        "proposedEffects": [
+          "adjust_range"
+        ],
+        "explanation": "Two-field interval selector paired with a slider track."
+      },
+      {
+        "nodeId": "2237:17240",
+        "role": "control",
+        "subtype": "chips",
+        "controlNodeId": "2237:17240",
+        "boundaryNodeId": "2237:17240",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [
+          "2007:14883",
+          "2007:14894",
+          "2007:14947",
+          "2310:16307"
+        ],
+        "stateNodeIds": [
+          "2007:14883",
+          "2007:14894",
+          "2007:14947",
+          "2310:16307"
+        ],
+        "contractKind": "choice_chip_group",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "selectedOptions": [
+            "Russia",
+            "Moscow",
+            "Ru",
+            "COMMERCIAL"
+          ],
+          "keyboardIntent": "selection",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "selected_chip_state_preserved"
+        ],
+        "options": [
+          {
+            "nodeId": "2007:14883",
+            "label": "Russia",
+            "selected": true,
+            "value": "Russia",
+            "confidence": 0.91
+          },
+          {
+            "nodeId": "2007:14894",
+            "label": "Moscow",
+            "selected": true,
+            "value": "Moscow",
+            "confidence": 0.91
+          },
+          {
+            "nodeId": "2007:14947",
+            "label": "Ru",
+            "selected": true,
+            "value": "Ru",
+            "confidence": 0.86
+          },
+          {
+            "nodeId": "2310:16307",
+            "label": "COMMERCIAL",
+            "selected": true,
+            "value": "COMMERCIAL",
+            "confidence": 0.89
+          }
+        ],
+        "confidence": 0.89,
+        "proposedEffects": [
+          "remove_chip",
+          "update_selection"
+        ],
+        "explanation": "Selected removable chips representing current filter tags."
+      },
+      {
+        "nodeId": "2112:20299",
+        "role": "button",
+        "subtype": "primary",
+        "controlNodeId": "2112:20299",
+        "boundaryNodeId": "2112:20299",
+        "labelNodeIds": [
+          "I2112:20299;68:9624;7:1620;6:153"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "save",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "primary_action_button"
+        ],
+        "value": "Save",
+        "options": [],
+        "confidence": 0.99,
+        "proposedEffects": [
+          "commit_profile_changes"
+        ],
+        "explanation": "Primary save action."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "IosTopMenuWidget",
+      "widgetIr": {
+        "figmaId": "2007:14674",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2007:14674;68:5900",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I2007:14674;68:5900;68:5787",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I2007:14674;68:5900;68:5696",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I2007:14674;68:5900;68:5783",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I2007:14674;68:5900;68:5783;68:5770",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "figmaId": "I2007:14674;68:5900;68:5697",
+                        "kind": "auto",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "figmaId": "I2007:14674;68:5900;68:5761",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I2007:14674;68:5900;68:5761;68:5747",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "I2007:14674;68:5900;68:5761;68:5748",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "I2007:14674;68:5900;68:5761;68:5749",
+                                "kind": "auto",
+                                "children": []
+                              },
+                              {
+                                "figmaId": "I2007:14674;68:5900;68:5761;68:5750",
+                                "kind": "auto",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "figmaId": "I2007:14674;68:5900;68:5761;68:5751",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "figmaId": "I2007:14674;625:12167",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "I2007:14674;68:5885",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I2007:14674;68:5885;65:7406",
+                    "kind": "auto",
+                    "children": []
+                  },
+                  {
+                    "figmaId": "I2007:14674;68:5885;65:7407",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7408",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7409",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7410",
+                        "kind": "auto",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "figmaId": "I2007:14674;68:5885;65:7411",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7412",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7413",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7414",
+                        "kind": "auto",
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "figmaId": "I2007:14674;68:5885;65:7415",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7416",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7417",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7418",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "I2007:14674;68:5885;65:7419",
+                        "kind": "auto",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "ProfileSaveButtonWidget",
+      "widgetIr": {
+        "figmaId": "2112:20299",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2112:20299;68:9624",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I2112:20299;68:9624;7:1620",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I2112:20299;68:9624;6:153",
+                    "kind": "auto",
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "irCacheFingerprintVersion": "1",
+  "cleanTreeHash": "3727bacd165cda6f0bd390ef05ac1ec8a0b5fa4749f02bd03fb293fbf9a5e6af",
+  "cleanRootFigmaId": "1966:14409",
+  "cleanRootType": "STACK",
+  "cleanRootWidth": 375.0,
+  "cleanRootHeight": 1148.0,
+  "parserVersion": "2026.06.1",
+  "irSchemaVersion": "1",
+  "generationConfigFingerprintVersion": "1",
+  "generationConfigHash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06"
+}

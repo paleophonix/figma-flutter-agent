@@ -1,24 +1,24 @@
 
---- dart format @ 2026-07-05T19:33:49.808315+00:00 ---
+--- dart format @ 2026-07-06T11:20:44.743576+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\widgets\star_filled_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\widgets\subscribe_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\lib\widgets\subscription_plan_radio_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-93vp4a9m\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\widgets\star_filled_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\widgets\subscribe_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\lib\widgets\subscription_plan_radio_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-tk2rz1vo\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 15 files (15 changed) in 0.03 seconds.
 
---- pub get --offline @ 2026-07-05T19:33:52.843343+00:00 ---
+--- pub get --offline @ 2026-07-06T11:20:47.814493+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -31,12 +31,12 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-07-05T19:33:55.547566+00:00 ---
+--- dart analyze (generated) @ 2026-07-06T11:20:50.162330+00:00 ---
 exit_code=0
 Analyzing ios_status_bar_widget.dart, star_filled_icon_widget.dart, subscribe_button_widget.dart, subscription_plan_radio_button_widget.dart...
 No issues found!
 
---- dart analyze (generated) (1/3) @ 2026-07-05T19:33:58.420717+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-07-06T11:20:53.049821+00:00 ---
 exit_code=0
 Analyzing mobile_sub_plans_screen.dart, mobile_sub_plans_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -51,17 +51,16 @@ warning - lib\generated\mobile_sub_plans_layout.dart:13:8 - Unused import: 'pack
 warning - lib\generated\mobile_sub_plans_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\mobile_sub_plans_layout.dart:33:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\mobile_sub_plans_layout.dart:52:10110 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\generated\mobile_sub_plans_layout.dart:55:496 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-13 issues found.
+12 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-07-05T19:34:00.842532+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-07-06T11:20:55.386105+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, ios_status_bar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-07-05T19:34:08.285547+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-07-06T11:20:57.901081+00:00 ---
 exit_code=0
 Analyzing star_filled_icon_widget.dart, subscribe_button_widget.dart, subscription_plan_radio_button_widget.dart, mobile_sub_plans_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -69,65 +68,65 @@ Analyzing star_filled_icon_widget.dart, subscribe_button_widget.dart, subscripti
 
 1 issue found.
 
---- dart format @ 2026-07-05T19:34:11.555147+00:00 ---
+--- dart format @ 2026-07-06T11:20:59.777507+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\widgets\star_filled_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\widgets\subscribe_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\lib\widgets\subscription_plan_radio_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mm3s5vkf\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\widgets\star_filled_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\widgets\subscribe_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\lib\widgets\subscription_plan_radio_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-l_oh6yix\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.04 seconds.
+
+--- dart format @ 2026-07-06T11:21:01.445302+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\widgets\star_filled_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\widgets\subscribe_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\lib\widgets\subscription_plan_radio_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ymzq70cc\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 15 files (15 changed) in 0.03 seconds.
 
---- dart format @ 2026-07-05T19:34:13.608665+00:00 ---
+--- dart format @ 2026-07-06T11:21:03.678683+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\widgets\star_filled_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\widgets\subscribe_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\lib\widgets\subscription_plan_radio_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\test\golden\mobile_sub_plans_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1vw5cdrl\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 15 files (15 changed) in 0.03 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\widgets\ios_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\widgets\star_filled_icon_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\widgets\subscribe_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\lib\widgets\subscription_plan_radio_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\test\golden\mobile_sub_plans_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-9qogd2ev\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 16 files (16 changed) in 0.35 seconds.
 
---- dart format @ 2026-07-05T19:34:16.675305+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\features\mobile_sub_plans\mobile_sub_plans_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\widgets\ios_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\widgets\star_filled_icon_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\widgets\subscribe_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\lib\widgets\subscription_plan_radio_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\test\golden\mobile_sub_plans_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ub419evz\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 16 files (16 changed) in 0.39 seconds.
-
---- pub get --offline @ 2026-07-05T19:34:19.426213+00:00 ---
+--- pub get --offline @ 2026-07-06T11:21:06.175627+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -140,7 +139,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-07-05T19:34:22.038518+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-07-06T11:21:08.522525+00:00 ---
 exit_code=0
 Analyzing mobile_sub_plans_screen.dart, mobile_sub_plans_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -155,17 +154,16 @@ warning - lib\generated\mobile_sub_plans_layout.dart:13:8 - Unused import: 'pack
 warning - lib\generated\mobile_sub_plans_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\mobile_sub_plans_layout.dart:33:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\mobile_sub_plans_layout.dart:52:10110 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\generated\mobile_sub_plans_layout.dart:55:496 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-13 issues found.
+12 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-07-05T19:34:24.822306+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-07-06T11:21:10.902148+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, ios_status_bar_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-07-05T19:34:28.299369+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-07-06T11:21:13.360476+00:00 ---
 exit_code=0
 Analyzing star_filled_icon_widget.dart, subscribe_button_widget.dart, subscription_plan_radio_button_widget.dart, mobile_sub_plans_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -173,7 +171,7 @@ Analyzing star_filled_icon_widget.dart, subscribe_button_widget.dart, subscripti
 
 1 issue found.
 
---- flutter pub get @ 2026-07-05T19:34:34.704151+00:00 ---
+--- flutter pub get @ 2026-07-06T11:21:17.283186+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -186,4 +184,4 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-05T19:34:34.705668+00:00 ---
+--- flutter render errors @ 2026-07-06T11:21:17.284704+00:00 ---

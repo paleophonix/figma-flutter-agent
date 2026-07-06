@@ -1,0 +1,111 @@
+{
+  "cacheKey": "e27d6c441df4838c3eb4f35842274092707350de6a97bf40ee1ac1ea2e74949e",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "2007:14635",
+        "widgetName": "ProfileFormField",
+        "reason": "Repeated label-plus-input form field pattern appears across multiple profile rows, with consistent spacing and optional trailing dropdown icon.",
+        "confidence": 0.98,
+        "suggestedParams": [
+          "labelText",
+          "valueText",
+          "showTrailingIcon"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2007:14635",
+            "2007:14637",
+            "2007:14824",
+            "2007:14854",
+            "2007:14903",
+            "2007:14924",
+            "2236:16524"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "profile form field"
+        }
+      },
+      {
+        "nodeId": "2237:17339",
+        "widgetName": "CommissionRangeSelector",
+        "reason": "Composite control combines a label, paired value inputs, unit suffix, and a range slider, making it a good reusable selection widget.",
+        "confidence": 0.9,
+        "suggestedParams": [
+          "labelText",
+          "leftValueText",
+          "rightValueText",
+          "unitLabel"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2237:17339",
+            "I2237:17339;53:4467",
+            "I2237:17339;53:4482",
+            "2237:17331"
+          ],
+          "shapeSimilarity": 0.93,
+          "semanticRole": "labeled range selection control"
+        }
+      },
+      {
+        "nodeId": "2237:17331",
+        "widgetName": "RangeSliderControl",
+        "reason": "Standalone dual-thumb slider control is repeated as a named component and can be reused wherever a bounded range is needed.",
+        "confidence": 0.94,
+        "suggestedParams": [
+          "minValue",
+          "maxValue",
+          "leftThumbValue",
+          "rightThumbValue"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2237:17331",
+            "I2237:17331;119:6105",
+            "I2237:17331;119:6106"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "range slider"
+        }
+      },
+      {
+        "nodeId": "2007:14883",
+        "widgetName": "SelectedValueChip",
+        "reason": "The removable value chip pattern repeats for selected countries/cities/languages, with the same text-plus-close layout.",
+        "confidence": 0.89,
+        "suggestedParams": [
+          "labelText",
+          "onRemove"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2007:14883",
+            "2007:14894",
+            "2310:16307"
+          ],
+          "shapeSimilarity": 0.97,
+          "semanticRole": "selected tag chip"
+        }
+      },
+      {
+        "nodeId": "2112:20299",
+        "widgetName": "PrimaryActionButton",
+        "reason": "Full-width primary action button is a reusable CTA pattern and is already defined as a component instance on the screen.",
+        "confidence": 0.97,
+        "suggestedParams": [
+          "label",
+          "isEnabled",
+          "onPressed"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2112:20299"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "primary screen action button"
+        }
+      }
+    ]
+  }
+}
