@@ -171,6 +171,13 @@ class AssetsConfig(BaseModel):
             "instead of only emitting a warning."
         ),
     )
+    strict_visible_vectors: bool = Field(
+        default=False,
+        description=(
+            "When true, visible VECTOR nodes without drawable asset keys after "
+            "the asset stage abort the pipeline with a named error."
+        ),
+    )
 
 
 class FontsConfig(BaseModel):

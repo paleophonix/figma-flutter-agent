@@ -232,6 +232,16 @@ async def run_dump_fetch_parse_phase(
                         ctx.warnings.append(
                             "Asset export hit Figma rate limits; some batches were retried."
                         )
+                    from figma_flutter_agent.assets.vector_binding import (
+                        assert_visible_vectors_bound,
+                    )
+
+                    assert_visible_vectors_bound(
+                        ctx.clean_tree,
+                        strict=settings.agent.assets.strict_visible_vectors,
+                        failed_export_node_ids=outcome.failed_node_ids,
+                        destination_trees=ctx.destination_trees,
+                    )
 
     with log_stage(log, "fonts"):
         ctx.font_manifest = export_fonts(
@@ -726,17 +736,17 @@ async def run_llm_and_plan_phase(
     Returns:
         A tuple of ``(llm_outcome, planned_files)``.
     """
-    from figma_flutter_agent.generator.planner import GenerationPlanContext
-    from figma_flutter_agent.generator.pubspec import read_pubspec_name
-    from figma_flutter_agent.compiler.ir_cache_policy import ir_cache_policy_at_pipeline_boundary
-    from figma_flutter_agent.errors import CachedIrRegenerationRequired
-    from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
-    from figma_flutter_agent.stages import PlanStageRequest, plan_generation_output
-    from figma_flutter_agent.debug.run_meta import update_run_meta_stage
     from figma_flutter_agent.compiler.generation_config_fingerprint import (
         generation_config_fingerprint,
     )
+    from figma_flutter_agent.compiler.ir_cache_policy import ir_cache_policy_at_pipeline_boundary
+    from figma_flutter_agent.debug.run_meta import update_run_meta_stage
+    from figma_flutter_agent.errors import CachedIrRegenerationRequired
+    from figma_flutter_agent.generator.planner import GenerationPlanContext
+    from figma_flutter_agent.generator.pubspec import read_pubspec_name
     from figma_flutter_agent.pipeline.incremental import design_hashes
+    from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
+    from figma_flutter_agent.stages import PlanStageRequest, plan_generation_output
 
     ir_cache_policy = ir_cache_policy_at_pipeline_boundary()
 

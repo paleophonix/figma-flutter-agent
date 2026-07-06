@@ -14,60 +14,6 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
-      "nodeId": "2007:14886",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "2007:14896",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "2007:14950",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "2310:16310",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I2007:14674;68:5900;68:5697",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I2112:20299;68:9624;6:153",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
       "nodeId": "I2007:14635;574:31016;8:2208;8:1929;8:1912",
       "field": "wrap",
       "old": null,
@@ -443,24 +389,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "2237:17339",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2237:17339",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "I2237:17339;53:4496",
       "field": "fidelity_tier",
       "old": null,
@@ -810,20 +738,6 @@
         "child_count": 1,
         "interactive_surface": "input",
         "component_id": "8:2230"
-      }
-    },
-    {
-      "nodeId": "2237:17339",
-      "kind": "input_dropdown",
-      "confidence": 0.9,
-      "evidence": {
-        "input_dropdown": true,
-        "child_type_counts": {
-          "ROW": 2
-        },
-        "child_count": 2,
-        "interactive_surface": "dropdown",
-        "component_id": "53:4504"
       }
     },
     {

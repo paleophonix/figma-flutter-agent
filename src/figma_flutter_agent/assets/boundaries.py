@@ -46,6 +46,7 @@ class RenderBoundaryAssetExportMixin:
         illustrations_dir.mkdir(parents=True, exist_ok=True)
         manifest = AssetManifest()
         pending: list[tuple[str, str, Path]] = []
+        unavailable_node_ids: list[str] = []
         for node_id in sorted(node_ids):
             node = figma_nodes.get(node_id)
             if not isinstance(node, dict):
@@ -88,6 +89,7 @@ class RenderBoundaryAssetExportMixin:
         for node_id, name, target in pending:
             url = result.urls.get(node_id)
             if url is None:
+                unavailable_node_ids.append(node_id)
                 logger.warning("Render-boundary SVG export unavailable for node {}", node_id)
                 continue
             has_filter = await self._download_to_file(
@@ -111,6 +113,12 @@ class RenderBoundaryAssetExportMixin:
             illustrations_dir=illustrations_dir,
             continue_on_rate_limit=continue_on_rate_limit,
         )
+        if unavailable_node_ids:
+            logger.warning(
+                "Render-boundary SVG export unavailable for {} node(s): {}",
+                len(unavailable_node_ids),
+                ", ".join(unavailable_node_ids[:12]),
+            )
         return manifest
 
     async def _export_render_boundary_raster_fallbacks(

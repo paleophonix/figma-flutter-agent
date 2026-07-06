@@ -212,7 +212,12 @@ def apply_production_profile(settings: Settings) -> Settings:
                     "sync": agent.sync.model_copy(
                         update={"enabled": True, "fail_on_corrupt_snapshot": True}
                     ),
-                    "assets": agent.assets.model_copy(update={"strict_render_boundary": True}),
+                    "assets": agent.assets.model_copy(
+                        update={
+                            "strict_render_boundary": True,
+                            "strict_visible_vectors": True,
+                        }
+                    ),
                     "semantics": agent.semantics.model_copy(update={"strict_fidelity": True}),
                 }
             ),

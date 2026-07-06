@@ -119,6 +119,10 @@ class GenerationError(FigmaFlutterError):
     """Raised when writing generated files fails."""
 
 
+class MissingVectorAssetError(GenerationError):
+    """Raised when visible vectors lack exported drawable assets before emit."""
+
+
 class PlannedDartGraphError(GenerationError):
     """Raised when planned Dart files reference missing ``lib/widgets`` targets."""
 

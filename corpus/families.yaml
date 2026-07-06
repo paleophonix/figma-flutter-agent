@@ -414,6 +414,27 @@ families:
       visible_extracted_must_not_emit_empty_or_recursive_shell before writeback.
     status: active
 
+  - id: extracted_cluster_unbound_vector_shrink
+    title: Extracted cluster widget emits shrink shell for unbound visible vectors
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/widget_extractor.py
+        symbol: _raise_for_unbound_cluster_vector_shell
+      - module: src/figma_flutter_agent/assets/vector_binding.py
+        symbol: assert_visible_vectors_bound
+    law_ids:
+      - VisibleVectorAssetConservationLaw
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Component-family cluster widgets with visible VECTOR descendants but no
+      vectorAssetKey silently degrade to Semantics(SizedBox.shrink()), then fail
+      the generic extracted-widget shrink-shell gate instead of naming the asset gap.
+    status: active
+
   - id: stroke_only_surface_synthetic_fill
     title: Stroke-only surface gets synthetic opaque fill
     pipeline_arrows:
@@ -503,4 +524,27 @@ families:
     description: >
       iOS home-indicator viewport chrome must sort with trailing bottom chrome
       in flow-column shells, not ahead of scrollable profile content.
+    status: active
+
+  - id: cluster_prune_visible_paint_without_transfer
+    title: Cluster prune drops visible vector paint without drawable transfer
+    pipeline_arrows:
+      - A4
+    owning_stage: parser_dedup
+    owners:
+      - module: src/figma_flutter_agent/parser/dedup/prune.py
+        symbol: prune_duplicated_cluster_subtrees
+      - module: src/figma_flutter_agent/parser/dedup/prune.py
+        symbol: _would_drop_unbound_visible_vectors
+      - module: src/figma_flutter_agent/parser/dedup/hydrate.py
+        symbol: hydrate_pruned_cluster_instances
+    law_ids:
+      - LAW-CLUSTER-PRUNE-PAINT-CONSERVATION
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Repeated component clusters are pruned to empty children while visible VECTOR
+      descendants lack drawable assets and hydration keys mismatch leaf vs structure,
+      yielding empty extracted cluster widgets and shrink-shell plan failures.
     status: active

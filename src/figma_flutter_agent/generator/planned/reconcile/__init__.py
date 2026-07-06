@@ -331,7 +331,6 @@ def reconcile_planned_dart_files(
         updated = repair_stale_widget_ctor_names_in_planned(updated)
     elif not incremental:
         logger.info("Planned reconcile: skipping hydrate/absorb (widgets already complete)")
-    cluster_classes: dict[str, str] | None = None
     cluster_vector_variants: dict | None = None
     if cluster_classes is not None:
         if clean_tree is not None and cluster_widget_specs:

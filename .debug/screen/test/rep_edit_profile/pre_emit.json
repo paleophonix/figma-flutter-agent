@@ -584,7 +584,7 @@
               "children": [
                 {
                   "figmaId": "2237:17339",
-                  "kind": "input_dropdown",
+                  "kind": "auto",
                   "children": [
                     {
                       "figmaId": "I2237:17339;53:4501",
@@ -754,12 +754,7 @@
                       "fidelityTier": "native_unverified",
                       "tierSource": "policy_fallback"
                     }
-                  ],
-                  "payload": {
-                    "payloadKind": "input_dropdown"
-                  },
-                  "fidelityTier": "native_unverified",
-                  "tierSource": "policy_fallback"
+                  ]
                 },
                 {
                   "figmaId": "2260:16194",

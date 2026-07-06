@@ -9,6 +9,26 @@ _DECORATIVE_VECTOR_MAX_WIDTH_PX = 300.0
 _BACKGROUND_CONTAINER_MIN_SCREEN_FRACTION = 0.5
 
 
+def _would_drop_unbound_visible_vectors(
+    node: CleanDesignTreeNode,
+    *,
+    asset: str | None,
+) -> bool:
+    """True when pruning would remove visible VECTOR paint without a drawable transfer."""
+    if asset is not None or node.vector_asset_key or node.image_asset_key:
+        return False
+    if (node.text or "").strip():
+        return False
+    from figma_flutter_agent.assets.vector_binding import _vector_has_visible_paint
+
+    def walk(current: CleanDesignTreeNode) -> bool:
+        if _vector_has_visible_paint(current):
+            return True
+        return any(walk(child) for child in current.children)
+
+    return walk(node)
+
+
 def prune_top_level_cluster_duplicates(root: CleanDesignTreeNode) -> None:
     """No-op: ``prune_duplicated_cluster_subtrees`` dedups clusters at every depth."""
 
@@ -173,6 +193,8 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
             photo = find_raster_photo_leaf(node)
             if photo is not None and photo.image_asset_key:
                 node.image_asset_key = photo.image_asset_key
+            if _would_drop_unbound_visible_vectors(node, asset=asset):
+                return
             node.children = []
             return
         if cluster_id:

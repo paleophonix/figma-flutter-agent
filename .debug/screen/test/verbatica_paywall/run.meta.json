@@ -1,15 +1,15 @@
 {
   "feature": "verbatica_paywall",
-  "pipeline_run_id": "9fa5a764feb2",
-  "candidate_build_run_id": "9fa5a764feb2",
+  "pipeline_run_id": "075342b3cb64",
+  "candidate_build_run_id": "075342b3cb64",
   "status": "failed",
   "writeback": "failed",
   "written_files": [],
   "analyze_passed": null,
   "runMetaSchemaVersion": "2",
-  "captured_at": "2026-07-06T14:21:56.948084+00:00",
-  "run_started_at": "2026-07-06T14:18:06.936853+00:00",
-  "cached_ir_verdict": null,
+  "captured_at": "2026-07-06T15:13:27.327386+00:00",
+  "run_started_at": "2026-07-06T15:13:04.020644+00:00",
+  "cached_ir_verdict": "compatible",
   "clean_tree_hash": "fb34970912f29b4b3e01998c1a67d4c49b7b454f675c06560ce6be38a2f78819",
-  "last_error": "Static contract gates failed: visible_extracted_must_not_emit_empty_or_recursive_shell: lib/widgets/cellular_signal_icon_widget.dart build returns only SizedBox.shrink; visible_extracted_must_not_emit_empty_or_recursive_shell: lib/widgets/wifi_status_icon_widget.dart build returns only SizedBox.shrink; visible_extracted_must_not_emit_empty_or_recursive_shell: lib/widgets/battery_status_icon_widget.dart build returns only SizedBox.shrink"
+  "last_error": "Cluster widget CellularSignalIconWidget cannot materialize: visible vector node(s) I2399:42783;266:1499;266:1646;339:8061 lack exported drawable assets."
 }

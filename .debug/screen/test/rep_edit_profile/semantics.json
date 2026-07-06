@@ -147,21 +147,6 @@
       "rejectReason": null
     },
     {
-      "figmaId": "2237:17339",
-      "kind": "input_dropdown",
-      "confidence": 0.9,
-      "evidence": {
-        "input_dropdown": true,
-        "child_type_counts": {
-          "ROW": 2
-        },
-        "child_count": 2,
-        "interactive_surface": "dropdown",
-        "component_id": "53:4504"
-      },
-      "rejectReason": null
-    },
-    {
       "figmaId": "I2237:17339;53:4496",
       "kind": "chip_input",
       "confidence": 0.82,
@@ -492,11 +477,27 @@
         "component_id": "1402:19620"
       },
       "rejectReason": "overlay_without_t1_signal"
+    },
+    {
+      "figmaId": "2237:17339",
+      "kind": "input_dropdown",
+      "confidence": 0.9,
+      "evidence": {
+        "input_dropdown": true,
+        "compositeDropdownVeto": true,
+        "child_type_counts": {
+          "ROW": 2
+        },
+        "child_count": 2,
+        "interactive_surface": "dropdown",
+        "component_id": "53:4504"
+      },
+      "rejectReason": "composite_dropdown_veto"
     }
   ],
   "legacySemanticTypeDetected": [],
   "nameSignalUsed": [],
   "llmAnnotationUsed": [],
-  "acceptedCount": 22,
+  "acceptedCount": 21,
   "totalDecisions": 35
 }

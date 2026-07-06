@@ -24,7 +24,42 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 def _is_shrink_only_widget_body_expr(body: str) -> bool:
     """Return True when a widget body expression is only ``SizedBox.shrink()``."""
     compact = re.sub(r"\s+", "", body.strip())
-    return compact in {"constSizedBox.shrink()", "SizedBox.shrink()"}
+    if compact in {"constSizedBox.shrink()", "SizedBox.shrink()"}:
+        return True
+    if re.search(r"\b(Row|Column|Stack|Container)\s*\(", body):
+        return False
+    return "SizedBox.shrink()" in compact
+
+
+def _collect_unbound_visible_vector_ids(node: CleanDesignTreeNode) -> list[str]:
+    """Return visible VECTOR descendants missing drawable asset keys."""
+    from figma_flutter_agent.assets.vector_binding import collect_unbound_visible_vector_ids
+
+    return collect_unbound_visible_vector_ids(node)
+
+
+def _raise_for_unbound_cluster_vector_shell(
+    spec: ClusterWidgetSpec,
+    body: str,
+    representative: CleanDesignTreeNode,
+    *,
+    compact_body: str | None,
+) -> None:
+    """Abort cluster emit when visible vectors lack assets and body uses shrink placeholders."""
+    from figma_flutter_agent.errors import MissingVectorAssetError
+
+    if compact_body is not None:
+        return
+    unbound = _collect_unbound_visible_vector_ids(representative)
+    if not unbound or "SizedBox.shrink()" not in body:
+        return
+    preview = ", ".join(unbound[:8])
+    if len(unbound) > 8:
+        preview = f"{preview} (+{len(unbound) - 8} more)"
+    raise MissingVectorAssetError(
+        f"Cluster widget {spec.class_name} cannot materialize: visible vector node(s) "
+        f"{preview} lack exported drawable assets."
+    )
 
 
 def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
@@ -38,6 +73,17 @@ def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
     from figma_flutter_agent.generator.layout.widgets import _node_layout_size
     from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 
+    width, height = _node_layout_size(node, node.stack_placement)
+    if (height is None or height <= 0) and node.type == NodeType.STACK:
+        derived = stack_layout_bounded_height(node)
+        if derived is not None and derived > 0:
+            height = derived
+    shrink_only = _is_shrink_only_widget_body_expr(body)
+    if shrink_only and width is not None and height is not None and width > 0 and height > 0:
+        return (
+            f"SizedBox(width: {format_geometry_literal(width)}, "
+            f"height: {format_geometry_literal(height)})"
+        )
     if node.type == NodeType.STACK:
         bounded = _bound_stack_sized_box(node, body)
         if bounded is not None:
@@ -56,18 +102,7 @@ def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
                     f"SizedBox(width: {format_geometry_literal(width)}, "
                     f"height: {format_geometry_literal(height)}, child: {body})"
                 )
-    width, height = _node_layout_size(node, node.stack_placement)
-    if (height is None or height <= 0) and node.type == NodeType.STACK:
-        derived = stack_layout_bounded_height(node)
-        if derived is not None and derived > 0:
-            height = derived
-    shrink_only = _is_shrink_only_widget_body_expr(body)
     if width is not None and height is not None and width > 0 and height > 0:
-        if shrink_only:
-            return (
-                f"SizedBox(width: {format_geometry_literal(width)}, "
-                f"height: {format_geometry_literal(height)})"
-            )
         return (
             f"SizedBox(width: {format_geometry_literal(width)}, "
             f"height: {format_geometry_literal(height)}, child: {body})"
@@ -101,9 +136,7 @@ _GENERIC_CLUSTER_LABELS = frozenset(
 )
 
 
-def _widget_class_name(
-    node: CleanDesignTreeNode, cluster_id: str, widget_suffix: str
-) -> str:
+def _widget_class_name(node: CleanDesignTreeNode, cluster_id: str, widget_suffix: str) -> str:
     label = _cluster_label(node)
     normalized = (to_pascal_case(label) or "").lower()
     stem = normalized.removesuffix("widget")
@@ -134,9 +167,7 @@ def _representative_score(node: CleanDesignTreeNode) -> int:
     return 50
 
 
-def cluster_has_top_level_usage(
-    trees: list[CleanDesignTreeNode], cluster_id: str
-) -> bool:
+def cluster_has_top_level_usage(trees: list[CleanDesignTreeNode], cluster_id: str) -> bool:
     """Return True when a cluster member is a direct child of a screen root node."""
     for tree in trees:
         for child in tree.children:
@@ -323,9 +354,7 @@ def _collect_component_family_widget_specs(
             continue
         if cluster_key in existing_cluster_ids:
             continue
-        if component_id and _component_family_already_extracted(
-            component_id, existing_cluster_ids
-        ):
+        if component_id and _component_family_already_extracted(component_id, existing_cluster_ids):
             continue
         from figma_flutter_agent.parser.interaction import (
             layout_fact_hosts_compact_checkbox_control,
@@ -454,9 +483,7 @@ def render_cluster_widgets(
         compare_definition_key_shadow,
     )
 
-    policy: M3Policy = (
-        m3_policy if isinstance(m3_policy, M3Policy) else DEFAULT_M3_POLICY
-    )
+    policy: M3Policy = m3_policy if isinstance(m3_policy, M3Policy) else DEFAULT_M3_POLICY
     plan = ClusterExtractionPlan.from_specs_and_trees(specs, clean_trees or [])
 
     if policy.shadow_enabled("definition_key"):
@@ -542,13 +569,13 @@ def render_cluster_widgets(
         widget_fields = ""
         constructor_params = "{super.key}"
         if chip_cluster:
-            default_label, _default_selected = chip_label_widget_defaults(
-                representative
-            )
+            default_label, _default_selected = chip_label_widget_defaults(representative)
             body = parameterize_chip_label_widget_body(body, default_label)
             body = parameterize_chip_hug_width_widget_body(body)
             widget_fields = "  final String label;\n  final bool isSelected;\n\n"
-            constructor_params = f"{{super.key, this.label = '{default_label}', this.isSelected = false}}"
+            constructor_params = (
+                f"{{super.key, this.label = '{default_label}', this.isSelected = false}}"
+            )
         elif variant is not None:
             widget_fields = f"  final bool {variant.param_name};\n\n"
             constructor_params = f"{{super.key, this.{variant.param_name} = true}}"
@@ -582,6 +609,12 @@ def render_cluster_widgets(
         )
 
         body = finalize_extracted_widget_body(body)
+        _raise_for_unbound_cluster_vector_shell(
+            spec,
+            body,
+            representative,
+            compact_body=compact_body,
+        )
         if chip_cluster:
             body = _bound_cluster_widget_root_hug_width(spec.representative, body)
         else:
@@ -597,9 +630,7 @@ def render_cluster_widgets(
             widget_fields=widget_fields,
             constructor_params=constructor_params,
         )
-        ensure_widget_file_no_parent_data_root(
-            widget_source, widget_name=spec.class_name
-        )
+        ensure_widget_file_no_parent_data_root(widget_source, widget_name=spec.class_name)
         files[path] = widget_source
     return ClusterWidgetResult(files=files, cluster_classes=cluster_classes)
 
@@ -735,9 +766,7 @@ def refresh_cluster_widget_planned_files(
             _is_shrink_only_widget_source(existing)
             or _is_self_referential_widget_build(existing, spec.class_name)
             or _is_foreign_delegate_widget_build(existing, spec.class_name)
-            or icon_badge_planned_widget_needs_rematerialization(
-                spec.representative, existing
-            )
+            or icon_badge_planned_widget_needs_rematerialization(spec.representative, existing)
         ):
             to_render.append(spec)
 
@@ -840,9 +869,7 @@ def refresh_stale_icon_badge_planned_widget_files(
     refreshed = 0
     for path, existing in planned.items():
         normalized = path.replace("\\", "/")
-        if not normalized.startswith("lib/widgets/") or not normalized.endswith(
-            ".dart"
-        ):
+        if not normalized.startswith("lib/widgets/") or not normalized.endswith(".dart"):
             continue
         content = (existing or "").strip()
         if not content:
