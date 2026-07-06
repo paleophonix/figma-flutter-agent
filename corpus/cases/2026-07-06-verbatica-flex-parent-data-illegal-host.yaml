@@ -1,0 +1,64 @@
+version: 1
+
+case:
+  id: 2026-07-06-verbatica-flex-parent-data-illegal-host
+  title: Flexible under Center on payment radio after min touch target wrap
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-06
+  created_at: '2026-07-06T17:20:00Z'
+  updated_at: '2026-07-06T17:20:00Z'
+  summary: >
+    LAW-FLEX-PARENT-DATA-HOST — min-touch-target Center wrap and missing hoist
+    markers placed Flexible under Center on the 1-month plan radio, aborting
+    LayoutBuilder mount with ParentDataWidget assert.
+
+occurrences:
+  - id: verbatica-paywall-center-flexible-radio
+    family_id: flex_parent_data_illegal_host
+    pipeline_arrow: A3
+    law_id: LAW-FLEX-PARENT-DATA-HOST
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/widgets/finalize.py
+      symbol: _wrap_min_touch_target
+    contract:
+      field: flex_parent_data_wrapper
+      field_class: intent
+      category: illegal
+      expected: >
+        Expanded/Flexible must be direct children of Row/Column/Flex, or hoisted
+        outside Center/Padding/ClipRect/Opacity box hosts before write.
+      actual: >
+        SizedBox(width: 20, child: Center(child: Flexible(...))) emitted on
+        1-month pricing radio; static gate only scanned nested flex pairs.
+    authority_boundary: emitter
+    evidence:
+      - kind: debug_artifact
+        path: apps/test/lib/generated/verbatica_paywall_layout.dart
+        summary: >
+          Center(child: Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox.shrink()))
+          on Ellipse 697 radio affordance.
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/last.log
+        summary: Flutter render ParentDataWidget assert for Flexible inside Center.
+    repair:
+      summary: >
+        Hoist flex parent-data through Center/Padding/ClipRect/Opacity in
+        repair_flex_parent_data_order; make _wrap_min_touch_target flex-preserving;
+        add illegal-host static gate and reconcile repair.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
+        - src/figma_flutter_agent/generator/layout/widgets/finalize.py
+        - src/figma_flutter_agent/generator/dart/static_contract_gates.py
+      regression_tests:
+        - tests/test_flex_padding_emit.py::test_repair_flex_parent_data_order_hoists_flexible_above_center
+        - tests/test_flex_padding_emit.py::test_repair_nested_flex_parent_data_in_source_repairs_center_host
+        - tests/test_static_contract_gates.py::test_illegal_flex_parent_data_host_gate_flags_center_flexible
+      verification:
+        - poetry run pytest tests/test_flex_padding_emit.py::test_repair_flex_parent_data_order_hoists_flexible_above_center tests/test_flex_padding_emit.py::test_repair_nested_flex_parent_data_in_source_repairs_center_host tests/test_static_contract_gates.py::test_illegal_flex_parent_data_host_gate_flags_center_flexible -q

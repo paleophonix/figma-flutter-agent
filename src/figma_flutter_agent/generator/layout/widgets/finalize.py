@@ -92,8 +92,15 @@ def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
         t = float(target)
         if max(w, h) >= t * 2.0 and min(w, h) >= t * 0.85:
             return widget
+    from figma_flutter_agent.generator.layout.widgets.flex_sizing import (
+        _hoist_flex_parent_data,
+    )
+
     size = format_geometry_literal(target)
-    return f"SizedBox(width: {size}, height: {size}, child: Center(child: {widget}))"
+    return _hoist_flex_parent_data(
+        lambda inner: f"SizedBox(width: {size}, height: {size}, child: Center(child: {inner}))",
+        widget,
+    )
 
 
 def _wrap_non_interactive_screen_chrome(node: CleanDesignTreeNode, widget: str) -> str:

@@ -20,7 +20,7 @@
               "kind": "extracted",
               "children": [],
               "ref": {
-                "widgetName": "PaywallStatusBarWidget",
+                "widgetName": "StatusBarWidget",
                 "namedArgs": {}
               }
             },
@@ -33,7 +33,7 @@
                   "kind": "extracted",
                   "children": [],
                   "ref": {
-                    "widgetName": "PaywallCloseButtonWidget",
+                    "widgetName": "CloseButtonWidget",
                     "namedArgs": {}
                   }
                 }
@@ -125,7 +125,7 @@
                           "kind": "extracted",
                           "children": [],
                           "ref": {
-                            "widgetName": "PaywallCheckCircleWidget",
+                            "widgetName": "CheckCircleBadgeWidget",
                             "namedArgs": {}
                           }
                         }
@@ -135,11 +135,11 @@
                 },
                 {
                   "figmaId": "2399:42799",
-                  "kind": "row",
+                  "kind": "auto",
                   "children": [
                     {
                       "figmaId": "2399:42800",
-                      "kind": "text",
+                      "kind": "auto",
                       "children": [],
                       "wrap": "flexibleLoose"
                     }
@@ -191,7 +191,7 @@
                           "kind": "extracted",
                           "children": [],
                           "ref": {
-                            "widgetName": "PaywallCheckCircleWidget",
+                            "widgetName": "CheckCircleBadgeWidget",
                             "namedArgs": {}
                           }
                         }
@@ -203,46 +203,46 @@
             },
             {
               "figmaId": "2399:42812",
-              "kind": "auto",
+              "kind": "column",
               "children": [
                 {
                   "figmaId": "2399:42813",
-                  "kind": "auto",
+                  "kind": "row",
                   "children": [
                     {
                       "figmaId": "2399:42814",
-                      "kind": "auto",
+                      "kind": "column",
                       "children": [
                         {
                           "figmaId": "2399:42815",
-                          "kind": "auto",
+                          "kind": "text",
                           "children": []
                         },
                         {
                           "figmaId": "2399:42816",
-                          "kind": "auto",
+                          "kind": "text",
                           "children": []
                         }
                       ]
                     },
                     {
                       "figmaId": "2399:42817",
-                      "kind": "auto",
+                      "kind": "row",
                       "children": [
                         {
                           "figmaId": "2399:42818",
-                          "kind": "auto",
+                          "kind": "column",
                           "children": [
                             {
                               "figmaId": "2399:42819",
-                              "kind": "auto",
+                              "kind": "text",
                               "children": []
                             }
                           ]
                         },
                         {
                           "figmaId": "2399:42821",
-                          "kind": "auto",
+                          "kind": "row",
                           "children": [
                             {
                               "figmaId": "2399:42822",
@@ -287,7 +287,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "layoutHints": {}
         },
         {
           "figmaId": "2399:42834",
@@ -394,82 +395,10 @@
     "semanticSummary": {
       "screenRole": "subscription_paywall",
       "confidence": 0.98,
-      "explanation": "Mobile paywall screen with one exclusive subscription option group, a primary subscribe CTA, trial and restore actions, and a dismiss control.",
-      "warnings": [
-        "The decorative hero image node is present as a background stack without an exported asset mapping in the manifest."
-      ]
+      "explanation": "Paywall screen for selecting a subscription plan and activating a trial/purchase flow with restore and legal actions.",
+      "warnings": []
     },
     "semanticVerdicts": [
-      {
-        "nodeId": "2399:42787",
-        "role": "choice_group",
-        "subtype": "subscription_plan_group",
-        "controlNodeId": "2399:42787",
-        "boundaryNodeId": "2399:42787",
-        "labelNodeIds": [
-          "2399:42831",
-          "2399:42833"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [
-          "2399:42797",
-          "2399:42810",
-          "2399:42799"
-        ],
-        "optionNodeIds": [
-          "2399:42789",
-          "2399:42802",
-          "2399:42813"
-        ],
-        "stateNodeIds": [
-          "2399:42797",
-          "2399:42810",
-          "2399:42821"
-        ],
-        "contractKind": "choice_chip_group",
-        "contractTraits": {
-          "currentValue": "12 месяцев",
-          "selectedOptions": [
-            "12 месяцев"
-          ],
-          "visualState": "selected"
-        },
-        "proposedLayoutLaws": [
-          "exclusive_single_select_cards",
-          "selected_card_emphasis_preserved",
-          "plan_card_group_equal_width"
-        ],
-        "value": "12 месяцев",
-        "options": [
-          {
-            "nodeId": "2399:42789",
-            "label": "12 месяцев",
-            "selected": true,
-            "value": "12 месяцев",
-            "confidence": 0.99
-          },
-          {
-            "nodeId": "2399:42802",
-            "label": "3 месяца",
-            "selected": false,
-            "value": "3 месяца",
-            "confidence": 0.96
-          },
-          {
-            "nodeId": "2399:42813",
-            "label": "1 месяц",
-            "selected": false,
-            "value": "1 месяц",
-            "confidence": 0.96
-          }
-        ],
-        "confidence": 0.94,
-        "proposedEffects": [
-          "select_subscription_plan"
-        ],
-        "explanation": "Three mutually exclusive pricing cards behave as a plan selector with one visibly selected state."
-      },
       {
         "nodeId": "2399:42786",
         "role": "button",
@@ -486,25 +415,87 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "currentValue": "dismiss",
+          "currentValue": "close",
           "actionKind": "dismiss",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "minimum_touch_target_44"
+          "44dp_min_touch_target"
         ],
-        "value": "dismiss",
+        "value": "close",
         "options": [],
         "confidence": 0.99,
         "proposedEffects": [
           "dismiss_paywall"
         ],
-        "explanation": "Trailing close affordance is a tappable button."
+        "explanation": "Trailing close control dismisses the paywall."
+      },
+      {
+        "nodeId": "2399:42787",
+        "role": "choice_chip_group",
+        "subtype": "subscription_plan_selector",
+        "controlNodeId": "2399:42787",
+        "boundaryNodeId": "2399:42787",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [
+          "2399:42788",
+          "2399:42801",
+          "2399:42812"
+        ],
+        "stateNodeIds": [
+          "2399:42797",
+          "2399:42810"
+        ],
+        "contractKind": "choice_chip_group",
+        "contractTraits": {
+          "currentValue": "12 месяцев",
+          "selectedOptions": [
+            "12 месяцев"
+          ],
+          "actionKind": "select_subscription_plan",
+          "visualState": "selected"
+        },
+        "proposedLayoutLaws": [
+          "selected_option_state_preserved",
+          "one_of_many_selection"
+        ],
+        "value": "12 месяцев",
+        "options": [
+          {
+            "nodeId": "2399:42788",
+            "label": "12 месяцев",
+            "selected": true,
+            "value": "12 месяцев",
+            "confidence": 0.95
+          },
+          {
+            "nodeId": "2399:42801",
+            "label": "3 месяца",
+            "selected": false,
+            "value": "3 месяца",
+            "confidence": 0.93
+          },
+          {
+            "nodeId": "2399:42812",
+            "label": "1 месяц",
+            "selected": false,
+            "value": "1 месяц",
+            "confidence": 0.93
+          }
+        ],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "update_selected_subscription_plan"
+        ],
+        "explanation": "Three stacked subscription options with a visible selected state on the annual plan."
       },
       {
         "nodeId": "2399:42837",
         "role": "button",
-        "subtype": "primary_subscribe",
+        "subtype": "primary",
         "controlNodeId": "2399:42837",
         "boundaryNodeId": "2399:42837",
         "labelNodeIds": [
@@ -521,25 +512,24 @@
           "isMultiline": true,
           "maxLines": 2,
           "currentValue": "Подписаться",
-          "actionKind": "subscribe",
+          "actionKind": "start_trial_purchase",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "primary_cta_vertical_stack_label_subtitle",
-          "minimum_touch_target_44"
+          "primary_cta_two_line_center_stack"
         ],
         "value": "Подписаться",
         "options": [],
-        "confidence": 0.99,
+        "confidence": 0.98,
         "proposedEffects": [
-          "start_subscription_checkout"
+          "start_free_trial_purchase"
         ],
-        "explanation": "Primary CTA with title and billing subtitle."
+        "explanation": "Primary subscription CTA with a two-line label and trial pricing subtitle."
       },
       {
         "nodeId": "2399:42838",
         "role": "button",
-        "subtype": "trial_offer",
+        "subtype": "secondary",
         "controlNodeId": "2399:42838",
         "boundaryNodeId": "2399:42838",
         "labelNodeIds": [
@@ -552,25 +542,27 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
           "currentValue": "Учиться 7 дней бесплатно",
-          "actionKind": "start_trial",
+          "actionKind": "start_free_trial",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "minimum_touch_target_44"
+          "single_line_button_label"
         ],
         "value": "Учиться 7 дней бесплатно",
         "options": [],
-        "confidence": 0.97,
+        "confidence": 0.96,
         "proposedEffects": [
-          "start_free_trial"
+          "start_trial_flow"
         ],
-        "explanation": "Secondary action button for trial start."
+        "explanation": "Secondary action button offering a free 7-day trial."
       },
       {
         "nodeId": "2399:42839",
         "role": "button",
-        "subtype": "restore_purchase",
+        "subtype": "secondary",
         "controlNodeId": "2399:42839",
         "boundaryNodeId": "2399:42839",
         "labelNodeIds": [
@@ -583,26 +575,28 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
           "currentValue": "Восстановить подписку",
           "actionKind": "restore_purchase",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "minimum_touch_target_44"
+          "single_line_button_label"
         ],
         "value": "Восстановить подписку",
         "options": [],
-        "confidence": 0.97,
+        "confidence": 0.96,
         "proposedEffects": [
           "restore_subscription"
         ],
-        "explanation": "Restoration action is a tappable button."
+        "explanation": "Secondary action to restore an existing subscription."
       }
     ]
   },
   "extractedWidgets": [
     {
-      "widgetName": "PaywallStatusBarWidget",
+      "widgetName": "StatusBarWidget",
       "widgetIr": {
         "figmaId": "2399:42783",
         "kind": "auto",
@@ -633,25 +627,21 @@
                     "children": [
                       {
                         "figmaId": "I2399:42783;266:1499;266:1645",
-                        "kind": "auto",
-                        "children": [
-                          {
-                            "figmaId": "I2399:42783;266:1499;266:1645;346:8257",
-                            "kind": "auto",
-                            "children": []
-                          }
-                        ]
+                        "kind": "extracted",
+                        "children": [],
+                        "ref": {
+                          "widgetName": "WifiIconWidget",
+                          "namedArgs": {}
+                        }
                       },
                       {
                         "figmaId": "I2399:42783;266:1499;266:1646",
-                        "kind": "auto",
-                        "children": [
-                          {
-                            "figmaId": "I2399:42783;266:1499;266:1646;339:8061",
-                            "kind": "auto",
-                            "children": []
-                          }
-                        ]
+                        "kind": "extracted",
+                        "children": [],
+                        "ref": {
+                          "widgetName": "SignalIconWidget",
+                          "namedArgs": {}
+                        }
                       }
                     ]
                   },
@@ -661,14 +651,12 @@
                     "children": [
                       {
                         "figmaId": "I2399:42783;266:1499;266:1648",
-                        "kind": "auto",
-                        "children": [
-                          {
-                            "figmaId": "I2399:42783;266:1499;266:1648;348:8871",
-                            "kind": "auto",
-                            "children": []
-                          }
-                        ]
+                        "kind": "extracted",
+                        "children": [],
+                        "ref": {
+                          "widgetName": "BatteryIconWidget",
+                          "namedArgs": {}
+                        }
                       }
                     ]
                   }
@@ -689,10 +677,147 @@
           }
         ]
       }
+    },
+    {
+      "widgetName": "WifiIconWidget",
+      "widgetIr": {
+        "figmaId": "I2399:42783;266:1499;266:1645",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2399:42783;266:1499;266:1645;346:8257",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "SignalIconWidget",
+      "widgetIr": {
+        "figmaId": "I2399:42783;266:1499;266:1646",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2399:42783;266:1499;266:1646;339:8061",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "BatteryIconWidget",
+      "widgetIr": {
+        "figmaId": "I2399:42783;266:1499;266:1648",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2399:42783;266:1499;266:1648;348:8871",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "CloseButtonWidget",
+      "widgetIr": {
+        "figmaId": "2399:42786",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2399:42786;54:3908",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "CheckCircleBadgeWidget",
+      "widgetIr": {
+        "figmaId": "2399:42797",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "2399:42798",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "PrimarySubscribeButtonWidget",
+      "widgetIr": {
+        "figmaId": "2399:42837",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2399:42837;1866:23605",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I2399:42837;111:16845",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "I2399:42837;1866:22162",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "TertiaryTrialButtonWidget",
+      "widgetIr": {
+        "figmaId": "2399:42838",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2399:42838;118:7512",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "TertiaryRestoreButtonWidget",
+      "widgetIr": {
+        "figmaId": "2399:42839",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2399:42839;118:7512",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "HomeIndicatorWidget",
+      "widgetIr": {
+        "figmaId": "2399:42843",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I2399:42843;106:60028",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
     }
   ],
   "irCacheFingerprintVersion": "1",
-  "cleanTreeHash": "fb34970912f29b4b3e01998c1a67d4c49b7b454f675c06560ce6be38a2f78819",
+  "cleanTreeHash": "50cda5946ed08a54ba8c5bbda1fee3571c957f8d5ba2c31483e254946e4599ca",
   "cleanRootFigmaId": "2399:42778",
   "cleanRootType": "STACK",
   "cleanRootWidth": 360.0,

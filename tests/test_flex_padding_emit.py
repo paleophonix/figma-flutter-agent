@@ -411,6 +411,45 @@ def test_repair_flex_parent_data_order_collapses_double_flexible() -> None:
     assert repaired.startswith("Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(")
 
 
+def test_repair_flex_parent_data_order_hoists_flexible_above_center() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = (
+        "SizedBox(width: 20.0, child: Center(child: Flexible(fit: FlexFit.loose, flex: 0, "
+        "child: SizedBox(width: 24.0, child: const SizedBox.shrink()))))"
+    )
+    repaired = repair_flex_parent_data_order(misordered)
+    assert "Center(child: Flexible(" not in repaired
+    assert repaired.startswith("Flexible(fit: FlexFit.loose")
+
+
+def test_repair_nested_flex_parent_data_in_source_repairs_center_host() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        repair_nested_flex_parent_data_in_source,
+    )
+
+    source = """
+class RadioWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 20.0,
+      child: Center(
+        child: Flexible(
+          fit: FlexFit.loose,
+          flex: 0,
+          child: SizedBox(width: 24.0, child: const SizedBox.shrink()),
+        ),
+      ),
+    );
+  }
+}
+"""
+    repaired = repair_nested_flex_parent_data_in_source(source)
+    assert "Center(child: Flexible(" not in repaired.replace("\n", "").replace(" ", "")
+    assert "Flexible(" in repaired
+
+
 def test_repair_nested_flex_parent_data_in_source_repairs_row_child() -> None:
     from figma_flutter_agent.generator.layout.flex_policy.wrap import (
         repair_nested_flex_parent_data_in_source,

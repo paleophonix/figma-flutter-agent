@@ -7,6 +7,7 @@ from collections.abc import Mapping
 
 from figma_flutter_agent.errors import PlannedDartGraphError
 from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+    collect_illegal_flex_parent_data_host_spans,
     collect_nested_flex_parent_data_spans,
 )
 
@@ -228,6 +229,21 @@ def find_loose_flex_infinite_width_violations(planned: Mapping[str, str]) -> lis
     return errors
 
 
+def find_illegal_flex_parent_data_hosts(planned: Mapping[str, str]) -> list[str]:
+    """Detect ``Expanded``/``Flexible`` placed under non-flex box hosts."""
+    errors: list[str] = []
+    for path, content in planned.items():
+        rel = path.replace("\\", "/")
+        if not rel.endswith(".dart"):
+            continue
+        for start in sorted(set(collect_illegal_flex_parent_data_host_spans(content))):
+            errors.append(
+                "generated_dart_must_not_place_flex_parent_data_under_box_host: "
+                f"{rel} near offset {start}"
+            )
+    return errors
+
+
 def find_nested_flex_parent_data_wrappers(planned: Mapping[str, str]) -> list[str]:
     """Detect ``Expanded``/``Flexible`` nested inside another flex parent-data wrapper."""
     errors: list[str] = []
@@ -275,6 +291,7 @@ def run_static_contract_gates(planned: Mapping[str, str]) -> None:
     violations.extend(find_widget_callsite_constructor_mismatches(planned))
     violations.extend(find_extracted_widget_empty_or_recursive_shells(planned))
     violations.extend(find_nested_flex_parent_data_wrappers(planned))
+    violations.extend(find_illegal_flex_parent_data_hosts(planned))
     violations.extend(find_loose_flex_infinite_width_violations(planned))
 
     if not violations:

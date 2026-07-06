@@ -1060,6 +1060,74 @@ def test_decomposed_column_phone_shell_expands_content() -> None:
     assert "mainAxisSize: MainAxisSize.max" in layout
 
 
+def test_artboard_wallpaper_lead_preserves_stack_root_not_column_flow() -> None:
+    """Law: artboard_wallpaper_must_not_flatten_stack_root_to_column_flow."""
+    from figma_flutter_agent.generator.layout.file_methods import (
+        LayoutMethod,
+        compose_decomposed_root_widget,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import stack_should_flow_as_column
+
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=360.0, height=44.0),
+        stack_placement=StackPlacement(width=360.0, height=44.0),
+        children=[],
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        alignment=Alignment(main="spaceBetween", cross="stretch"),
+        sizing=Sizing(width=360.0, height=600.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=70.0, bottom=120.0, width=360.0, height=600.0),
+        children=[
+            CleanDesignTreeNode(id="form", name="Form", type=NodeType.COLUMN, children=[]),
+            CleanDesignTreeNode(id="footer", name="Footer", type=NodeType.ROW, children=[]),
+        ],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=360.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=746.0, width=360.0, height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Paywall",
+        type=NodeType.STACK,
+        sizing=Sizing(width=360.0, height=780.0, height_mode=SizingMode.FIXED),
+        children=[status, content, home],
+    )
+    methods = [
+        LayoutMethod(name="_buildNativeStatusBar", node=status),
+        LayoutMethod(name="_buildContent", node=content),
+        LayoutMethod(name="_buildNativeHomeIndicator", node=home),
+    ]
+    assert stack_should_flow_as_column(screen)
+    column_flow = compose_decomposed_root_widget(screen, methods, responsive_enabled=True)
+    assert "Column(" in column_flow
+
+    stack_root = compose_decomposed_root_widget(
+        screen,
+        methods,
+        responsive_enabled=True,
+        artboard_background_lead="_buildBackground(context)",
+    )
+    compact = stack_root.replace(" ", "")
+    assert "Stack(clipBehavior:" in stack_root
+    assert "_buildBackground(context)" in stack_root
+    assert (
+        "Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.stretch,"
+        "children:[SizedBox(width:double.infinity,height:780.0,child:_buildBackground(context))"
+        not in compact
+    )
+
+
 def test_stack_flow_column_hoists_expanded_above_fill_width_sizedbox() -> None:
     """``flex_parent_data_direct_under_flex_host`` on phone-shell flow columns."""
     status = CleanDesignTreeNode(

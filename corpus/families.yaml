@@ -604,3 +604,70 @@ families:
       child, or nested flex wrappers survive reconcile; Flutter aborts mount with
       competing FlexParentData at runtime.
     status: active
+
+  - id: flex_parent_data_illegal_host
+    title: Expanded or Flexible under non-flex box host
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
+        symbol: collect_illegal_flex_parent_data_host_spans
+      - module: src/figma_flutter_agent/generator/layout/widgets/finalize.py
+        symbol: _wrap_min_touch_target
+      - module: src/figma_flutter_agent/generator/dart/static_contract_gates.py
+        symbol: find_illegal_flex_parent_data_hosts
+    law_ids:
+      - LAW-FLEX-PARENT-DATA-HOST
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Expanded or Flexible parent-data widgets are emitted under Center, Padding,
+      or other box hosts instead of direct Flex children, causing ParentDataWidget
+      runtime asserts.
+    status: active
+
+  - id: stack_root_flattened_to_column
+    title: Stack artboard root flattened to column flow with wallpaper lead
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/file_methods.py
+        symbol: compose_decomposed_root_widget
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/stack.py
+        symbol: stack_should_flow_as_column
+    law_ids:
+      - LAW-ARTBOARD-WALLPAPER-PRESERVES-STACK
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      A STACK root with an extracted artboard wallpaper background is lowered to a
+      Column flow shell, placing the full-height background as the first flow child
+      and pushing overlaid content off-screen.
+    status: active
+
+  - id: slider_control_track_height_overflow
+    title: Slider control crammed into Figma track height overflows
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/variant/controls.py
+        symbol: render_slider_widget
+      - module: src/figma_flutter_agent/generator/widget_extractor.py
+        symbol: _bound_cluster_widget_root
+    law_ids:
+      - RangeSliderMinHeightLaw
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      A SLIDER/range-slider node extracted as a cluster widget is bound to its Figma
+      track height (e.g. 8px), but the emitted body is an interactive Slider plus the
+      node name as a Text in a Column that needs the slider control min height
+      (slider_facts _RANGE_SLIDER_MIN_HEIGHT_PX = 48). The Column overflows the
+      track-height bounds and Flutter throws a RenderFlex bottom overflow.
+    status: active

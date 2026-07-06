@@ -4,57 +4,92 @@
     "candidates": [
       {
         "nodeId": "2399:42789",
-        "widgetName": "PricingPlanOptionItem",
-        "reason": "Repeating plan row structure appears three times with the same title/price layout, optional check icon, and a savings badge.",
-        "confidence": 0.98,
+        "widgetName": "SubscriptionPlanOption",
+        "reason": "Three plan rows share the same card/list-item structure with term, pricing, and a trailing check icon; only text content and badge emphasis vary.",
+        "confidence": 0.97,
         "suggestedParams": [
-          "planDuration",
-          "totalPrice",
-          "monthlyPrice",
-          "savingsLabel",
-          "isSelected"
+          "termLabel",
+          "totalPriceLabel",
+          "monthlyPriceLabel",
+          "badgeText",
+          "isHighlighted"
         ],
         "evidence": {
           "similarNodes": [
+            "2399:42789",
             "2399:42802",
             "2399:42813"
           ],
-          "shapeSimilarity": 0.97,
-          "semanticRole": "Selectable subscription plan option"
+          "shapeSimilarity": 0.96,
+          "semanticRole": "subscription plan option row"
         }
       },
       {
         "nodeId": "2399:42837",
-        "widgetName": "PrimaryPaywallCTAButton",
-        "reason": "Standalone primary CTA component on the paywall with two lines of text; good candidate for a configurable subscription action button.",
-        "confidence": 0.84,
+        "widgetName": "PaywallPrimaryButton",
+        "reason": "Primary CTA button component with two text lines; reusable as a marketing-style paywall action button.",
+        "confidence": 0.88,
         "suggestedParams": [
           "title",
-          "subtitle",
-          "isEnabled"
+          "subtitle"
         ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "Primary subscription call-to-action"
-        }
+        "evidence": null
       },
       {
         "nodeId": "2399:42838",
-        "widgetName": "SecondaryPaywallActionButton",
-        "reason": "Same button component appears twice as the tertiary action family, with only label and height varying across instances.",
-        "confidence": 0.92,
+        "widgetName": "PaywallSecondaryActionButton",
+        "reason": "The same tertiary button component is used twice with different labels and one compact variant, so it should be parameterized.",
+        "confidence": 0.96,
         "suggestedParams": [
           "label",
-          "buttonHeight"
+          "isCompact"
         ],
         "evidence": {
           "similarNodes": [
+            "2399:42838",
             "2399:42839"
           ],
-          "shapeSimilarity": 0.95,
-          "semanticRole": "Secondary paywall action such as restore subscription"
+          "shapeSimilarity": 0.94,
+          "semanticRole": "tertiary action button"
         }
+      },
+      {
+        "nodeId": "2399:42783",
+        "widgetName": "DeviceStatusBar",
+        "reason": "Standard device chrome component reused across screens; extracted as a configurable status bar wrapper.",
+        "confidence": 0.82,
+        "suggestedParams": [
+          "timeText",
+          "showCamera",
+          "showDate",
+          "showBatteryTime",
+          "showDateText",
+          "cutoutType"
+        ],
+        "evidence": null
+      },
+      {
+        "nodeId": "2399:42786",
+        "widgetName": "CloseIconButton",
+        "reason": "Standard trailing close control component, suitable for reuse anywhere a dismiss action is needed.",
+        "confidence": 0.81,
+        "suggestedParams": [
+          "mode",
+          "vibrant"
+        ],
+        "evidence": null
+      },
+      {
+        "nodeId": "2399:42843",
+        "widgetName": "HomeIndicator",
+        "reason": "Standard iPhone home indicator component used as reusable device chrome.",
+        "confidence": 0.95,
+        "suggestedParams": [
+          "device",
+          "orientation",
+          "mode"
+        ],
+        "evidence": null
       }
     ]
   }

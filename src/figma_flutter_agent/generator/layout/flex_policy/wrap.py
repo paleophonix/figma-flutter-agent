@@ -293,10 +293,16 @@ def bind_equal_row_flex_child(widget: str) -> str:
 
 _FLEX_HOIST_WRAPPER_MARKERS = (
     "Align(",
+    "Center(",
+    "ClipRect(",
     "ConstrainedBox(",
-    "SizedBox(",
+    "Opacity(",
+    "Padding(",
     "RepaintBoundary(",
+    "SizedBox(",
 )
+
+_ILLEGAL_FLEX_PARENT_DATA_HOST_MARKERS = _FLEX_HOIST_WRAPPER_MARKERS
 
 
 def repair_flex_parent_data_order(widget: str) -> str:
@@ -327,6 +333,65 @@ def _collapse_adjacent_flex_parent_data(widget: str) -> str:
 
 
 _FLEX_PARENT_DATA_START_RE = re.compile(r"\b(?:const\s+)?(?:Expanded|Flexible)\s*\(")
+
+
+def _starts_with_flex_parent_data_wrapper(widget: str) -> bool:
+    """Return True when ``widget`` begins with an ``Expanded``/``Flexible`` wrapper."""
+    trimmed = widget.lstrip()
+    if trimmed.startswith("const "):
+        trimmed = trimmed[6:].lstrip()
+    return _FLEX_PARENT_DATA_START_RE.match(trimmed) is not None
+
+
+def collect_illegal_flex_parent_data_host_spans(
+    segment: str,
+    *,
+    base_offset: int = 0,
+) -> list[int]:
+    """Collect offsets where a box host wraps ``Expanded``/``Flexible`` illegally."""
+    from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
+        _find_matching_paren,
+    )
+
+    violations: list[int] = []
+    for box_marker in _ILLEGAL_FLEX_PARENT_DATA_HOST_MARKERS:
+        pos = 0
+        while pos < len(segment):
+            idx = segment.find(box_marker, pos)
+            if idx < 0:
+                break
+            expr_start = idx - 6 if idx >= 6 and segment[idx - 6 : idx] == "const " else idx
+            open_paren = segment.find("(", expr_start)
+            if open_paren < 0:
+                pos = idx + 1
+                continue
+            end = _find_matching_paren(segment, open_paren)
+            if end is None:
+                pos = idx + 1
+                continue
+            expr = segment[expr_start : end + 1]
+            trimmed = expr.lstrip()
+            child_marker = "child: "
+            child_start = trimmed.find(child_marker)
+            if child_start < 0:
+                pos = idx + 1
+                continue
+            child = _extract_balanced_prefix_child(trimmed, child_start + len(child_marker))
+            if child is None:
+                pos = idx + 1
+                continue
+            if _starts_with_flex_parent_data_wrapper(child):
+                violations.append(base_offset + expr_start)
+                child_offset = expr.find(child)
+                if child_offset >= 0:
+                    violations.extend(
+                        collect_illegal_flex_parent_data_host_spans(
+                            child,
+                            base_offset=base_offset + expr_start + child_offset,
+                        )
+                    )
+            pos = idx + 1
+    return violations
 
 
 def collect_nested_flex_parent_data_spans(
@@ -378,14 +443,16 @@ def collect_nested_flex_parent_data_spans(
 
 
 def repair_nested_flex_parent_data_in_source(source: str) -> str:
-    """Strip nested ``Expanded``/``Flexible`` wrappers anywhere in a Dart source."""
+    """Repair illegal flex parent-data wrappers anywhere in a Dart source."""
     from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
         _find_matching_paren,
     )
 
     updated = source
     while True:
-        spans = collect_nested_flex_parent_data_spans(updated)
+        nested_spans = collect_nested_flex_parent_data_spans(updated)
+        illegal_host_spans = collect_illegal_flex_parent_data_host_spans(updated)
+        spans = sorted(set(nested_spans + illegal_host_spans))
         if not spans:
             return updated
         start = spans[0]
@@ -644,21 +711,25 @@ def neutralize_parent_data_for_flex_child(widget: str) -> str:
 def _unwrap_flex_parent_data_wrapper(widget: str) -> tuple[str, str] | None:
     """Return ``(wrapper_prefix, inner)`` for a top-level Expanded/Flexible wrapper."""
     trimmed = widget.lstrip()
-    for marker in (
-        "Expanded(child: ",
-        "Flexible(fit: FlexFit.loose, flex: 0, child: ",
-        "Flexible(fit: FlexFit.loose, child: ",
-        "Flexible(child: ",
-        "const Expanded(child: ",
-        "const Flexible(fit: FlexFit.loose, flex: 0, child: ",
-        "const Flexible(fit: FlexFit.loose, child: ",
-        "const Flexible(child: ",
-    ):
-        if trimmed.startswith(marker):
-            inner = _extract_balanced_prefix_child(trimmed, len(marker))
-            if inner is not None:
-                return marker, inner
-    return None
+    const_prefix = ""
+    if trimmed.startswith("const "):
+        const_prefix = "const "
+        trimmed = trimmed[6:].lstrip()
+    match = _FLEX_PARENT_DATA_START_RE.match(trimmed)
+    if match is None:
+        return None
+    open_paren = trimmed.find("(", match.start())
+    if open_paren < 0:
+        return None
+    child_marker = "child: "
+    child_idx = trimmed.find(child_marker, open_paren)
+    if child_idx < 0:
+        return None
+    inner = _extract_balanced_prefix_child(trimmed, child_idx + len(child_marker))
+    if inner is None:
+        return None
+    marker = f"{const_prefix}{trimmed[: child_idx + len(child_marker)]}"
+    return marker, inner
 
 
 def apply_flex_wrap_to_widget(

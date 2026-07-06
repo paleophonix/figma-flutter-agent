@@ -7,9 +7,9 @@
   "typography_hash": "ad9f51209fc04bc9013662319d1577e3a1fcce96c25d707a1cd717d4a4b2b4e3",
   "spacing_hash": "c2c90039e4f805ca8edcb8fdc4fea75b7b34fd5f3f8a84abc1b04697a4f1dc68",
   "file_hashes": {
-    "lib/widgets/start_free_trial_button_widget.dart": "a21232eefe62153f3da577fd4accb7fc8f216491eb77be50555e2362cdf3e349",
-    "lib/widgets/home_indicator_widget.dart": "6705377a149ed37daabd09392157f4b9602a3ef6949e92c1760972db92bd7eb9",
-    "lib/widgets/free_trial_text_button_widget.dart": "b4d8311aef1dce5eef57ebc2ef2c5a1b4da98528639e59e4fa0c7bc7f2e4b15b",
+    "lib/widgets/subscribe_button_widget.dart": "05f0dd7fe1f6f04edbecc976f98770678af1e682035651777026f1a64f59e6c0",
+    "lib/widgets/paywall_home_indicator_widget.dart": "5d0fd15e446e843ae3c7a7873d9e4d10e789e09804db24f63a68957fd99617ef",
+    "lib/widgets/free_trial_button_widget.dart": "43eb5e14d4abc7a93e87b35f3063b8459d67538d13e401289c074532049a6f8c",
     "lib/widgets/paywall_status_bar_widget.dart": "c5cc6ec383bacb46ac86232e790913bc6023f333835d2358cb95d88dd8baa139",
     "lib/widgets/close_button_widget.dart": "2a6cfe559d0936767fabf74afabe57b870168d5183f09694ed05b882fe8826af",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
@@ -20,7 +20,7 @@
     "lib/theme/app_edge_insets.dart": "aaeb9146daa5e498a875990e15314d2ec895873c600f367b9269fa16950f2ece",
     "lib/theme/app_elevation.dart": "45b0cdd0a1240245407bdaab9b3527436cb24d4eb34315cec6ca701be4c95896",
     "lib/theme/app_theme.dart": "08707d7adf00e0166921c73866ee527b28160225f8c8c0a67f949e30881ef7f5",
-    "lib/generated/verbatica_paywall_layout.dart": "56edaf857c3ce3661fba5b74e8afc15215329f7bf02e9693a87c79e7a1516332",
+    "lib/generated/verbatica_paywall_layout.dart": "8ed16e6fd8d5bf991881d52f892589a32f2aad3f2727c36ca6d55ccd8d887e12",
     "lib/features/verbatica_paywall/verbatica_paywall_screen.dart": "42d15a0bc4ca28199ac8ba19fcd7fe2d3cb573a74d5cefb1cf0febcbe56a75bd",
     "test/golden/verbatica_paywall_screen_test.dart": "2d2c1f5e40865d3eb3d87ae4a30329baaef6c5936e7b5a322772ef7822bfdda2",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -34,6 +34,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 2,
-  "updated_at": "2026-07-06T16:52:46.233639+00:00"
+  "version": 3,
+  "updated_at": "2026-07-06T17:31:43.991500+00:00"
 }

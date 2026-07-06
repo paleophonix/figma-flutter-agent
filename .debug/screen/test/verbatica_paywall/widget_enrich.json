@@ -4,17 +4,17 @@
     "entries": [
       {
         "clusterId": "component_111_16846_ed645bd8",
-        "widgetName": "StartFreeTrialButtonWidget",
+        "widgetName": "SubscribeButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_111_17496",
-        "widgetName": "HomeIndicatorWidget",
+        "widgetName": "PaywallHomeIndicatorWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_118_7511_24ebf3ca",
-        "widgetName": "FreeTrialTextButtonWidget",
+        "widgetName": "FreeTrialButtonWidget",
         "paramRenames": {}
       },
       {
@@ -24,7 +24,7 @@
       },
       {
         "clusterId": "component_282_23343",
-        "widgetName": "WifiSignalWidget",
+        "widgetName": "WifiIconWidget",
         "paramRenames": {}
       },
       {
@@ -34,7 +34,7 @@
       },
       {
         "clusterId": "component_282_23393_de98d704",
-        "widgetName": "DeviceStatusWidget",
+        "widgetName": "PhoneStatusWidget",
         "paramRenames": {}
       },
       {

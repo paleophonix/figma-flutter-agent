@@ -1,0 +1,17 @@
+version: 1
+family_id: flex_parent_data_illegal_host
+generated: true
+cases:
+- case_id: 2026-07-06-verbatica-flex-parent-data-illegal-host
+  case_file: cases/2026-07-06-verbatica-flex-parent-data-illegal-host.yaml
+  title: Flexible under Center on payment radio after min touch target wrap
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-center-flexible-radio
+  status: FIXED
+  observed_at: '2026-07-06'
+  created_at: '2026-07-06T17:20:00Z'
+  updated_at: '2026-07-06T17:20:00Z'
+  summary: LAW-FLEX-PARENT-DATA-HOST — min-touch-target Center wrap and missing 
+    hoist markers placed Flexible under Center on the 1-month plan radio, 
+    aborting LayoutBuilder mount with ParentDataWidget assert.

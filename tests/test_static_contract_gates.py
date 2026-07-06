@@ -120,6 +120,40 @@ class PaywallStatusBarWidget extends StatelessWidget {
     assert "paywall_status_bar_widget.dart" in violations[0]
 
 
+def test_illegal_flex_parent_data_host_gate_flags_center_flexible() -> None:
+    from figma_flutter_agent.generator.dart.static_contract_gates import (
+        find_illegal_flex_parent_data_hosts,
+    )
+
+    planned = {
+        "lib/generated/paywall_layout.dart": """
+class PaywallLayout extends StatelessWidget {
+  const PaywallLayout({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 20.0,
+      child: Center(
+        child: Flexible(
+          fit: FlexFit.loose,
+          flex: 0,
+          child: SizedBox(width: 24.0, child: const SizedBox.shrink()),
+        ),
+      ),
+    );
+  }
+}
+""",
+    }
+    violations = find_illegal_flex_parent_data_hosts(planned)
+    assert violations
+    with pytest.raises(
+        PlannedDartGraphError,
+        match="generated_dart_must_not_place_flex_parent_data_under_box_host",
+    ):
+        run_static_contract_gates(planned)
+
+
 def test_reconcile_repairs_nested_flex_before_static_gate() -> None:
     planned = {
         "lib/widgets/header_widget.dart": """

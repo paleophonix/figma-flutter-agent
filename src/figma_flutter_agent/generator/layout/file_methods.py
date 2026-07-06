@@ -197,7 +197,7 @@ def compose_decomposed_root_widget(
             stack_should_flow_as_column,
         )
 
-        if stack_should_flow_as_column(tree):
+        if stack_should_flow_as_column(tree) and artboard_background_lead is None:
             from figma_flutter_agent.generator.layout.flex_policy.stack import (
                 _stack_is_phone_shell_layout,
                 is_viewport_chrome_band,

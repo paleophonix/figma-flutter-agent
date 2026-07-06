@@ -1,0 +1,18 @@
+version: 1
+family_id: slider_control_track_height_overflow
+generated: true
+cases:
+- case_id: 2026-07-06-slider-track-height-overflow
+  case_file: cases/2026-07-06-slider-track-height-overflow.yaml
+  title: Commission range slider crammed into 8px track height overflows 63px
+  project: test
+  feature: rep_edit_profile
+  occurrence_id: rep-edit-profile-slider-track-overflow
+  status: OPEN
+  observed_at: '2026-07-06'
+  created_at: '2026-07-06T17:20:00Z'
+  updated_at: '2026-07-06T17:20:00Z'
+  summary: "The commission range slider (node 2237:17331) is extracted as CommissionRangeSliderWidget
+    bound to its Figma track height of 8px. The emitted body is Container(height:
+    8, child: Center(Column([Text('Slider / Range'), Slider(value: 0.5)]))) — an interactive
+    native Slider plus t..."
