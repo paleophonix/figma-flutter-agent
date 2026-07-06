@@ -168,8 +168,6 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
             from figma_flutter_agent.parser.boundaries.ids import collect_descendant_figma_ids
 
             flattened = collect_descendant_figma_ids(node)
-            if flattened:
-                node.flatten_figma_node_ids = flattened
             asset = primary_vector_asset(node) or node.vector_asset_key
             if asset is None:
                 forward, backward = cluster_assets.get(cluster_id, (None, None))
@@ -178,29 +176,42 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                     if _cluster_instance_is_backward(node, parent_width=parent_width)
                     else forward
                 )
-            if asset is not None:
-                node.vector_asset_key = asset
             from figma_flutter_agent.parser.interaction import (
                 extract_cart_quantity_digit,
                 layout_fact_cart_quantity_scrim_row,
             )
 
+            proposed_text = node.text
             if layout_fact_cart_quantity_scrim_row(node):
                 digit = extract_cart_quantity_digit(node)
                 if digit is not None:
-                    node.text = digit
+                    proposed_text = digit
+            from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+            photo = find_raster_photo_leaf(node)
+            proposed_image_key = node.image_asset_key
+            if photo is not None and photo.image_asset_key:
+                proposed_image_key = photo.image_asset_key
+            if _would_drop_unbound_visible_vectors(
+                node,
+                asset=asset,
+                text=proposed_text,
+                image_asset_key=proposed_image_key,
+            ):
+                return
+            if flattened:
+                node.flatten_figma_node_ids = flattened
+            if asset is not None:
+                node.vector_asset_key = asset
+            if proposed_text is not None and proposed_text != node.text:
+                node.text = proposed_text
             from figma_flutter_agent.parser.interaction.chip_variant import (
                 capture_chip_prune_facts,
             )
 
             capture_chip_prune_facts(node)
-            from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
-
-            photo = find_raster_photo_leaf(node)
-            if photo is not None and photo.image_asset_key:
-                node.image_asset_key = photo.image_asset_key
-            if _would_drop_unbound_visible_vectors(node, asset=asset):
-                return
+            if proposed_image_key is not None:
+                node.image_asset_key = proposed_image_key
             node.children = []
             return
         if cluster_id:
