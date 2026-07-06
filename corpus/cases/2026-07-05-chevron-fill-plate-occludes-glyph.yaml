@@ -1,0 +1,75 @@
+version: 1
+
+case:
+  id: 2026-07-05-chevron-fill-plate-occludes-glyph
+  title: Right Button Fill plate occludes chevron glyph in list rows
+  case_kind: regression
+  project: limbo
+  feature: mobile_settings
+  observed_at: 2026-07-05
+  created_at: '2026-07-05T20:45:00Z'
+  updated_at: '2026-07-06T00:31:00Z'
+  summary: >
+    CompositeIconSilhouetteLaw — Right Button component exports a full-bounds
+    Fill plate I272:9260;126:1367;126:902 (12x12, 0xFF8F9098) that emit promotes
+    to Ink BoxDecoration color, occluding the nested chevron vector. Expected:
+    transparent or omitted fill plate with visible chevron glyph in the 44x44
+    trailing slot. Actual: gray square placeholders in every settings row.
+    First arrow where fact changed: A3 button ink surface / cluster widget emit.
+    User observation: gray square stubs instead of menu chevron arrows.
+
+occurrences:
+  - id: mobile-settings-chevron-fill-plate
+    family_id: cluster_widget_occluding_fill_emit
+    pipeline_arrow: A3
+    law_id: CompositeIconSilhouetteLaw
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/widgets/button/core.py
+      symbol: _wrap_button_stack
+    contract:
+      field: cluster widget / button ink materialization
+      field_class: fact
+      category: illegal
+      expected: >
+        ChevronButtonWidget omits occluding Fill plate 126:902; chevron vector
+        126:901 remains visible at slot extent inside 44x44 row trailing host.
+      actual: >
+        ChevronButtonWidget Ink decoration uses color 0xFF8F9098 from Fill plate;
+        7x11.5 chevron PNG hidden behind opaque 12x12 square, centered in 44x44.
+    authority_boundary: emit_layout
+    loss_boundary: decorative_glyph_paint
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_settings/screen.dart
+        summary: >
+          ChevronButtonWidget Ink(decoration: BoxDecoration(color: Color(0xFF8F9098)))
+          with nested shape_I272_9260 chevron asset.
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_settings/processed.json
+        summary: >
+          I272:9260;126:1367 Right Button stacks vector 126:901 and Fill
+          CONTAINER 126:902 backgroundColor 0xFF8F9098 at 12x12.
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_settings/widget_enrich.json
+        summary: component_126_919 maps to ChevronButtonWidget cluster delegate.
+    repair:
+      summary: >
+        CompositeIconSilhouetteLaw detects occluding fill plates on compact BUTTON
+        hosts, routes disclosure chevrons through compact icon emit, and suppresses
+        Ink/Material surface decoration derived from the fill plate.
+      changed_files:
+        - src/figma_flutter_agent/parser/interaction/icons.py
+        - src/figma_flutter_agent/parser/interaction/buttons.py
+        - src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
+        - src/figma_flutter_agent/generator/layout/widgets/button/core.py
+        - src/figma_flutter_agent/generator/ir/extracted.py
+      regression_tests:
+        - tests/test_mobile_settings_emit_laws.py::test_chevron_button_fill_plate_is_occluding_on_button_host
+        - tests/test_mobile_settings_emit_laws.py::test_chevron_cluster_widget_omits_occluding_fill_ink
+      verification:
+        - poetry run pytest tests/test_mobile_settings_emit_laws.py::test_chevron_cluster_widget_omits_occluding_fill_ink -q

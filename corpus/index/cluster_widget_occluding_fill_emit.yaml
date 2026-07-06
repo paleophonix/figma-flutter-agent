@@ -2,6 +2,20 @@ version: 1
 family_id: cluster_widget_occluding_fill_emit
 generated: true
 cases:
+- case_id: 2026-07-05-chevron-fill-plate-occludes-glyph
+  case_file: cases/2026-07-05-chevron-fill-plate-occludes-glyph.yaml
+  title: Right Button Fill plate occludes chevron glyph in list rows
+  project: limbo
+  feature: mobile_settings
+  occurrence_id: mobile-settings-chevron-fill-plate
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T20:45:00Z'
+  updated_at: '2026-07-06T00:31:00Z'
+  summary: 'CompositeIconSilhouetteLaw — Right Button component exports a full-bounds
+    Fill plate I272:9260;126:1367;126:902 (12x12, 0xFF8F9098) that emit promotes to
+    Ink BoxDecoration color, occluding the nested chevron vector. Expected: transparent
+    or omitted fill plate with visible chev...'
 - case_id: 2026-07-05-star-cluster-fill-plate-occludes-glyph
   case_file: cases/2026-07-05-star-cluster-fill-plate-occludes-glyph.yaml
   title: Star Filled cluster widget emits occluding fill plate

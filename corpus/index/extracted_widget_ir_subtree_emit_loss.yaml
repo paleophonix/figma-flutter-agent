@@ -1,0 +1,18 @@
+version: 1
+family_id: extracted_widget_ir_subtree_emit_loss
+generated: true
+cases:
+- case_id: 2026-07-05-extracted-avatar-widget-subtree-collapse
+  case_file: cases/2026-07-05-extracted-avatar-widget-subtree-collapse.yaml
+  title: Extracted AvatarWidget collapses to edit-badge subtree only
+  project: limbo
+  feature: mobile_settings
+  occurrence_id: mobile-settings-avatar-subtree-collapse
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-05T20:45:00Z'
+  updated_at: '2026-07-06T00:31:00Z'
+  summary: 'LAW-WIDGETIR-CONSERVE — pre_emit extractedWidgets AvatarWidget roots at
+    figmaId 272:9638 (80x80 profile stack plus edit badge) but avatar_widget.dart
+    materializes only the 24x24 blue edit host 272:9624/272:9625. Expected: full ProfileAvatarWidget
+    body (component_6_1263, 81.5x8...'

@@ -122,6 +122,24 @@ families:
       Extracted widget IR validation is skipped or silent without a named outcome.
     status: active
 
+  - id: extracted_widget_ir_subtree_emit_loss
+    title: Extracted widget IR subtree lost during materialize emit
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/ir/extracted.py
+        symbol: emit_extracted_widget_code_from_ir
+    law_ids:
+      - LAW-WIDGETIR-CONSERVE
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Extracted widget IR conserves a multi-child figma subtree in pre_emit but
+      materialize emit collapses to a nested child terminal, dropping siblings.
+    status: active
+
   - id: cluster_delegate_map_reconcile_clobber
     title: Planner cluster delegate map clobbered in reconcile
     pipeline_arrows:
@@ -347,6 +365,8 @@ families:
     owners:
       - module: src/figma_flutter_agent/generator/widget_extractor.py
         symbol: render_cluster_widgets
+      - module: src/figma_flutter_agent/generator/layout/widgets/button/core.py
+        symbol: _wrap_button_stack
     law_ids:
       - CompositeIconSilhouetteLaw
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
@@ -427,4 +447,41 @@ families:
     description: >
       Leading row pictograms size to nested micro-vector paint spans or host
       stack extents instead of the component slot bounds, inflating or shrinking glyphs.
+    status: active
+
+  - id: figma_chrome_material_elevation_default
+    title: Figma-flat chrome gets Material default elevation shadow
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/navigation/helpers.py
+        symbol: bottom_nav_stateful_helpers
+    law_ids:
+      - FigmaChromeElevationMatchLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      BOTTOM_NAV frames with solid fill and no drop effects emit via
+      BottomNavigationBar without suppressing Material default elevation,
+      adding shadow backing not present in Figma.
+    status: active
+
+  - id: viewport_chrome_bottom_flow_sort
+    title: Bottom viewport chrome sorted into trailing column tier
+    pipeline_arrows:
+      - A3
+    owning_stage: layout_materialization
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/stack.py
+        symbol: stack_flow_column_child_sort_key
+    law_ids:
+      - SystemChromeDockingLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      iOS home-indicator viewport chrome must sort with trailing bottom chrome
+      in flow-column shells, not ahead of scrollable profile content.
     status: active

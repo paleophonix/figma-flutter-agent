@@ -1,8 +1,8 @@
 {
   "feature": "food_menu_2",
-  "pipeline_run_id": "637477c754a1",
-  "candidate_build_run_id": "637477c754a1",
-  "committed_build_run_id": "637477c754a1",
+  "pipeline_run_id": "a8626a2f26a4",
+  "candidate_build_run_id": "a8626a2f26a4",
+  "committed_build_run_id": "a8626a2f26a4",
   "writeback": "committed",
   "written_files": [
     "lib/features/food_menu_2/food_menu_2_screen.dart",
@@ -23,11 +23,11 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-05T18:18:48.114082+00:00",
+  "captured_at": "2026-07-05T23:21:12.236515+00:00",
   "runMetaSchemaVersion": "2",
   "status": "completed",
   "cached_ir_verdict": "incompatible",
   "clean_tree_hash": "ccbf25f476346290b724fab88ae5a210b0d0e72192564f7510717e6d1cdf0349",
   "generation_config_hash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
-  "run_started_at": "2026-07-05T18:17:49.789875+00:00"
+  "run_started_at": "2026-07-05T23:20:07.083418+00:00"
 }

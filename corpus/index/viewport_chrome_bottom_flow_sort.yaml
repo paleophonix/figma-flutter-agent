@@ -1,0 +1,18 @@
+version: 1
+family_id: viewport_chrome_bottom_flow_sort
+generated: true
+cases:
+- case_id: 2026-07-05-viewport-chrome-home-indicator-flow-sort
+  case_file: cases/2026-07-05-viewport-chrome-home-indicator-flow-sort.yaml
+  title: Home indicator viewport chrome sorts before profile content
+  project: limbo
+  feature: mobile_settings
+  occurrence_id: mobile-settings-home-indicator-flow-sort
+  status: FIXED
+  observed_at: '2026-07-05'
+  created_at: '2026-07-06T00:25:00Z'
+  updated_at: '2026-07-06T00:31:00Z'
+  summary: 'SystemChromeDockingLaw — iOS Home Indicator 272:9113 is bottom viewport
+    chrome (vertical BOTTOM) but stack_flow_column_child_sort_key kept it in tier
+    0, so flow-column emit placed the 34px chrome band above scrollable profile content.
+    Expected: home indicator sorts with traili...'

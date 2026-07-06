@@ -1,0 +1,69 @@
+version: 1
+
+case:
+  id: 2026-07-05-viewport-chrome-home-indicator-flow-sort
+  title: Home indicator viewport chrome sorts before profile content
+  case_kind: regression
+  project: limbo
+  feature: mobile_settings
+  observed_at: 2026-07-05
+  created_at: '2026-07-06T00:25:00Z'
+  updated_at: '2026-07-06T00:31:00Z'
+  summary: >
+    SystemChromeDockingLaw — iOS Home Indicator 272:9113 is bottom viewport chrome
+    (vertical BOTTOM) but stack_flow_column_child_sort_key kept it in tier 0, so
+    flow-column emit placed the 34px chrome band above scrollable profile content.
+    Expected: home indicator sorts with trailing bottom chrome after body panels.
+    Actual: black home-indicator bar appears between nav header and avatar.
+    First arrow where fact changed: A3 layout materialization / flow-column sort.
+    User observation: black stick above profile — home indicator, not avatar.
+
+occurrences:
+  - id: mobile-settings-home-indicator-flow-sort
+    family_id: viewport_chrome_bottom_flow_sort
+    pipeline_arrow: A3
+    law_id: SystemChromeDockingLaw
+    stage: layout_materialization
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/flex_policy/stack.py
+      symbol: stack_flow_column_child_sort_key
+    contract:
+      field: stack_flow_column_child_sort_key tier
+      field_class: compiler_owned
+      category: illegal
+      expected: >
+        Bottom viewport chrome (home indicator) uses trailing sort tier so it
+        emits after scrollable body content in phone-shell flow columns.
+      actual: >
+        Home indicator tier 0 with ordinal sort places chrome above profile
+        block in MobileSettingsLayout Column children.
+    authority_boundary: emit_layout
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_settings/screen.dart
+        summary: >
+          Column orders status bar, nav, gap, height 34 home indicator Stack,
+          then Expanded scroll with avatar — home indicator before profile.
+      - kind: debug_artifact
+        path: .debug/screen/limbo/mobile_settings/processed.json
+        summary: >
+          Node 272:9113 iOS / Home Indicator stackPlacement vertical BOTTOM,
+          top 778, height 34.
+    repair:
+      summary: >
+        SystemChromeDockingLaw now assigns bottom viewport chrome to trailing
+        flow-column buckets under shared body scroll, and stack_flow_column_child_sort_key
+        keeps home indicator in the trailing tier after scrollable body panels.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/stack_chrome.py
+        - src/figma_flutter_agent/generator/layout/flex_policy/stack.py
+        - src/figma_flutter_agent/generator/layout/file_methods.py
+        - src/figma_flutter_agent/generator/layout/widgets/emit/stack.py
+      regression_tests:
+        - tests/test_mobile_settings_emit_laws.py::test_mobile_settings_layout_places_home_indicator_after_profile_block
+      verification:
+        - poetry run pytest tests/test_mobile_settings_emit_laws.py::test_mobile_settings_layout_places_home_indicator_after_profile_block -q
