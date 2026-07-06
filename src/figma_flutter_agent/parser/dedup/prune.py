@@ -13,11 +13,17 @@ def _would_drop_unbound_visible_vectors(
     node: CleanDesignTreeNode,
     *,
     asset: str | None,
+    text: str | None = None,
+    image_asset_key: str | None = None,
 ) -> bool:
     """True when pruning would remove visible VECTOR paint without a drawable transfer."""
-    if asset is not None or node.vector_asset_key or node.image_asset_key:
+    effective_image = (
+        image_asset_key if image_asset_key is not None else node.image_asset_key
+    )
+    if asset is not None or node.vector_asset_key or effective_image:
         return False
-    if (node.text or "").strip():
+    effective_text = text if text is not None else node.text
+    if (effective_text or "").strip():
         return False
     from figma_flutter_agent.assets.vector_binding import _vector_has_visible_paint
 

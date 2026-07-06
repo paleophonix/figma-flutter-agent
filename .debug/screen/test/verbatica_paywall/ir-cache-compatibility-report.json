@@ -1,9 +1,11 @@
 {
   "schemaVersion": "1",
   "dumpPath": "llm_validated.json",
-  "verdict": "compatible",
+  "verdict": "incompatible",
   "missingIdentityFields": [],
-  "mismatchedIdentityFields": [],
+  "mismatchedIdentityFields": [
+    "cleanTreeHash"
+  ],
   "cachedMetadata": {
     "cleanRootFigmaId": "2399:42778",
     "cleanRootHeight": 780.0,
@@ -710,7 +712,7 @@
   },
   "currentFingerprint": {
     "irCacheFingerprintVersion": "1",
-    "cleanTreeHash": "fb34970912f29b4b3e01998c1a67d4c49b7b454f675c06560ce6be38a2f78819",
+    "cleanTreeHash": "50cda5946ed08a54ba8c5bbda1fee3571c957f8d5ba2c31483e254946e4599ca",
     "cleanRootFigmaId": "2399:42778",
     "cleanRootType": "STACK",
     "cleanRootWidth": 360.0,

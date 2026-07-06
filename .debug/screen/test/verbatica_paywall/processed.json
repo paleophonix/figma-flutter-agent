@@ -379,6 +379,8 @@
                                   "backgroundColor": "0xFFFFFFFF",
                                   "strokeAlign": "INSIDE"
                                 },
+                                "vectorAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1645;346_8257.svg",
+                                "vectorSvgPathCount": 1,
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -507,6 +509,8 @@
                                   "backgroundColor": "0xFFFFFFFF",
                                   "strokeAlign": "INSIDE"
                                 },
+                                "vectorAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1646;339_8061.svg",
+                                "vectorSvgPathCount": 1,
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -697,6 +701,8 @@
                                   "backgroundColor": "0xFFFFFFFF",
                                   "strokeAlign": "INSIDE"
                                 },
+                                "vectorAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1648;348_8871.svg",
+                                "vectorSvgPathCount": 3,
                                 "accessibilityLabel": "Base",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -2114,6 +2120,8 @@
                               "backgroundColor": "0xFF8459C9",
                               "strokeAlign": "INSIDE"
                             },
+                            "vectorAssetKey": "assets/icons/vector_2399_42798.svg",
+                            "vectorSvgPathCount": 2,
                             "accessibilityLabel": "check_circle",
                             "geometryFrame": {
                               "layoutRect": {
@@ -2854,6 +2862,8 @@
                               "backgroundColor": "0x1719191A",
                               "strokeAlign": "INSIDE"
                             },
+                            "vectorAssetKey": "assets/icons/vector_2399_42811.svg",
+                            "vectorSvgPathCount": 1,
                             "accessibilityLabel": "Ellipse 697",
                             "geometryFrame": {
                               "layoutRect": {

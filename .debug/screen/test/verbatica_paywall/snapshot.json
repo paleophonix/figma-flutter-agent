@@ -1,0 +1,39 @@
+{
+  "file_key": "EwHCjXKb9voYpE9iPai34K",
+  "node_id": "2399:42778",
+  "feature_name": "verbatica_paywall",
+  "tree_hash": "50cda5946ed08a54ba8c5bbda1fee3571c957f8d5ba2c31483e254946e4599ca",
+  "colors_hash": "d2fd1b20f3c80c8ee1238aabd1b9c5f6314c40c374bb4f8656fa4b1bbf37d86f",
+  "typography_hash": "ad9f51209fc04bc9013662319d1577e3a1fcce96c25d707a1cd717d4a4b2b4e3",
+  "spacing_hash": "c2c90039e4f805ca8edcb8fdc4fea75b7b34fd5f3f8a84abc1b04697a4f1dc68",
+  "file_hashes": {
+    "lib/widgets/start_free_trial_button_widget.dart": "a21232eefe62153f3da577fd4accb7fc8f216491eb77be50555e2362cdf3e349",
+    "lib/widgets/home_indicator_widget.dart": "6705377a149ed37daabd09392157f4b9602a3ef6949e92c1760972db92bd7eb9",
+    "lib/widgets/free_trial_text_button_widget.dart": "b4d8311aef1dce5eef57ebc2ef2c5a1b4da98528639e59e4fa0c7bc7f2e4b15b",
+    "lib/widgets/paywall_status_bar_widget.dart": "8a85d740e64144d0d58730ea807a2ed67a02e3e4286501b7dd05b2006ce87469",
+    "lib/widgets/close_button_widget.dart": "2a6cfe559d0936767fabf74afabe57b870168d5183f09694ed05b882fe8826af",
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "bccf10c9ee887275b22eed1cc4de102c4df21423f4e0a130c892479293112645",
+    "lib/theme/app_spacing.dart": "0517071e3da4d991f950070f0795470658b64a6f9be996c089ced7f9f4cf05c6",
+    "lib/theme/app_typography.dart": "1741552dba64c96f8130bcaaa55da0f51fc91ec4c89c54b55c0976e35dba745a",
+    "lib/theme/app_radius.dart": "c57f8e15f4e37837102c5a260835cec9f86558405e7927ada143500bc755a08e",
+    "lib/theme/app_edge_insets.dart": "aaeb9146daa5e498a875990e15314d2ec895873c600f367b9269fa16950f2ece",
+    "lib/theme/app_elevation.dart": "45b0cdd0a1240245407bdaab9b3527436cb24d4eb34315cec6ca701be4c95896",
+    "lib/theme/app_theme.dart": "08707d7adf00e0166921c73866ee527b28160225f8c8c0a67f949e30881ef7f5",
+    "lib/generated/verbatica_paywall_layout.dart": "56edaf857c3ce3661fba5b74e8afc15215329f7bf02e9693a87c79e7a1516332",
+    "lib/features/verbatica_paywall/verbatica_paywall_screen.dart": "42d15a0bc4ca28199ac8ba19fcd7fe2d3cb573a74d5cefb1cf0febcbe56a75bd",
+    "test/golden/verbatica_paywall_screen_test.dart": "2d2c1f5e40865d3eb3d87ae4a30329baaef6c5936e7b5a322772ef7822bfdda2",
+    "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
+    "lib/main.dart": "8079e98deebf986be67eda3d6d3c9381ee57889b6399d6074a6850c9345c3320"
+  },
+  "layout_region_hash": "6ed84e7c35f66ee9d055dbd87c27e4984248942bceeff8057a98536d1d6f9059",
+  "cluster_hashes": {
+    "cluster_0": "b2e680160f07f74be0817bafd89b98aa3e29c2686737b0d72554550f07ed603e",
+    "component_118_7511_24ebf3ca": "40e8c09984e325f292bf9b4e178df1a095fff57036d552279e91785a0ff8275f",
+    "component_118_7511_9df17ef6": "09ffd2a052d7e169f70485d0107ae8c2ee3846d118a943539bdd1c3772385a7e"
+  },
+  "reference_image_hash": null,
+  "emitter_version": "2026.07.1",
+  "version": 1,
+  "updated_at": "2026-07-06T16:16:28.849492+00:00"
+}
