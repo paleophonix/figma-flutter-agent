@@ -3,8 +3,8 @@ name: consilium
 description: >-
   Optional synthesis for ambiguous or high-risk batch repairs. NOT a mandatory
   gate per queue item. Produces an exhaustive plan aimed at ALL current symptoms
-  and evidence-backed foreseen failures — systemic laws only, no local patching.
-  Use when evidence conflicts, anti-patching risk is unclear, or user asks for
+  and   evidence-backed foreseen failures — systemic laws only, no local patching.
+  Optional corpus audit/amend of diagnose OPEN cases. Use when evidence conflicts, anti-patching risk is unclear, or user asks for
   consilium. Default /repair skips consilium.
 disable-model-invocation: true
 ---

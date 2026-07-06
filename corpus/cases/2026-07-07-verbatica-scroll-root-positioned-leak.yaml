@@ -1,0 +1,57 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-scroll-root-positioned-leak
+  title: scroll_content_root flag leaks and suppresses nested absolute Positioned
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-06
+  created_at: '2026-07-07T00:15:00Z'
+  updated_at: '2026-07-07T00:15:00Z'
+  summary: >
+    Pin-bottom scroll host sets scroll_content_root on the growable panel child, but
+    assemble_layout_emit inherited the flag to all descendants. Nested absolute
+    badge nodes inside scroll content lost Positioned and expanded to fill the card.
+
+occurrences:
+  - id: verbatica-paywall-badge-positioned-leak
+    family_id: scroll_root_positioned_suppression_leak
+    pipeline_arrow: A3
+    law_id: LAW-SCROLL-ROOT-SUPPRESSION-SCOPE
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
+      symbol: assemble_layout_emit
+    contract:
+      field: scroll_content_root propagation
+      field_class: compiler_owned
+      category: illegal
+      expected: >
+        scroll_content_root suppresses Positioned only on the direct pin-bottom
+        scroll slot child, not on nested descendants inside scroll content.
+      actual: >
+        child_scroll_root = scroll_content_root or pin_bottom_chrome propagated
+        the flag down the tree, skipping Positioned on nested absolute badges.
+    authority_boundary: clean_tree_geometry
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/processed.json
+        summary: badge node 2399:42799 ABSOLUTE left 262 top -8 width 99 height 22.
+      - kind: source_code
+        path: apps/test/lib/widgets/plan_card_widget.dart
+        summary: badge emitted as raw Stack child without Positioned.
+    repair:
+      summary: >
+        assemble_layout_emit sets child_scroll_root only from pin_bottom_chrome
+        scroll-host predicate on direct children, without inheriting parent flag.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
+      regression_tests:
+        - tests/test_layout_flex_policy.py::test_scroll_content_root_does_not_suppress_nested_stack_absolute_children
+      verification:
+        - poetry run pytest tests/test_layout_flex_policy.py::test_scroll_content_root_does_not_suppress_nested_stack_absolute_children -q

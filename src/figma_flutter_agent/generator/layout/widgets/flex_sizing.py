@@ -147,6 +147,47 @@ def _wrap_sizing(
     return repair_flex_parent_data_order(wrapped)
 
 
+def _collect_inter_child_gaps(node: CleanDesignTreeNode, child_count: int) -> list[float]:
+    """Return Figma gap values between flex children (one per adjacent pair)."""
+    if child_count <= 1:
+        return []
+    if node.flex_gap_mode == "explicit" and node.flex_explicit_gaps:
+        return [
+            float(node.flex_explicit_gaps[min(index, len(node.flex_explicit_gaps) - 1)])
+            for index in range(child_count - 1)
+        ]
+    if node.spacing != 0:
+        return [float(node.spacing)] * (child_count - 1)
+    return []
+
+
+def _compose_flex_children_with_negative_overlap(
+    child_widgets: list[str],
+    gaps: list[float],
+    *,
+    axis: str,
+) -> str:
+    """Conserv negative Figma gaps via cumulative ``Transform.translate`` — never ``Flex.spacing``."""
+    size_kw = "width" if axis == "horizontal" else "height"
+    parts: list[str] = []
+    cumulative = 0.0
+    for index, widget in enumerate(child_widgets):
+        if index > 0:
+            gap = gaps[index - 1]
+            if gap < 0:
+                cumulative += gap
+                if axis == "horizontal":
+                    offset = f"Offset({format_geometry_literal(cumulative)}, 0.0)"
+                else:
+                    offset = f"Offset(0.0, {format_geometry_literal(cumulative)})"
+                widget = f"Transform.translate(offset: {offset}, child: {widget})"
+            elif gap > 0:
+                cumulative = 0.0
+                parts.append(f"SizedBox({size_kw}: {format_geometry_literal(gap)})")
+        parts.append(widget)
+    return ", ".join(parts)
+
+
 def flex_children_body(
     node: CleanDesignTreeNode,
     child_widgets: list[str],
@@ -157,6 +198,13 @@ def flex_children_body(
     """Join flex child widgets, inserting explicit ``SizedBox`` gaps when requested."""
     if not child_widgets:
         return "const SizedBox.shrink()"
+    inter_child_gaps = _collect_inter_child_gaps(node, len(child_widgets))
+    if inter_child_gaps and any(gap < 0 for gap in inter_child_gaps):
+        return _compose_flex_children_with_negative_overlap(
+            child_widgets,
+            inter_child_gaps,
+            axis=axis,
+        )
     if explicit_gap_cap is not None and node.spacing > 0 and len(child_widgets) >= 2:
         size_kw = "width" if axis == "horizontal" else "height"
         gap = format_geometry_literal(min(float(node.spacing), float(explicit_gap_cap)))
@@ -184,7 +232,7 @@ def _flex_spacing_field(node: CleanDesignTreeNode) -> str:
     """Emit Flutter 3.27+ ``spacing`` on ``Row``/``Column`` when Figma gap is set."""
     if node.flex_gap_mode == "explicit":
         return ""
-    if node.spacing == 0:
+    if node.spacing <= 0:
         return ""
     main = node.alignment.main or "start"
     if main in {"spaceBetween", "stretch"} and node.spacing > 0:

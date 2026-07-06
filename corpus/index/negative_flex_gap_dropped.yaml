@@ -8,11 +8,11 @@ cases:
   project: test
   feature: verbatica_paywall
   occurrence_id: verbatica-paywall-status-icon-negative-gap
-  status: OPEN
+  status: FIXED
   observed_at: '2026-07-06'
   created_at: '2026-07-06T18:35:00Z'
-  updated_at: '2026-07-06T20:20:00Z'
+  updated_at: '2026-07-07T00:15:00Z'
   summary: 'Figma Wi-Fi Network row is 30px wide with two 16px icons and itemSpacing
-    -2. The first fix dropped non-positive spacing (2px right overflow); the follow-up
-    fix conserved it by emitting Row(spacing: -2.0) in StatusBarContentWidget. Flutter
-    asserts Flex.spacing >= 0.0 (flex.dart...'
+    -2. A prior fix conserved overlap by emitting Row(spacing: -2.0), which crashes
+    Flutter (Flex.spacing >= 0.0). Negative overlap must use Transform.translate cumulative
+    offsets, never negative Flex.spacing.'

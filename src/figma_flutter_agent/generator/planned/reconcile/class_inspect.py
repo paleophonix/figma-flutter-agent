@@ -170,9 +170,16 @@ def _build_contains_self_widget_ctor(content: str, class_name: str) -> bool:
     return bool(re.search(rf"\b(?:const\s+)?{re.escape(class_name)}\s*\(", build))
 
 
-def _strip_would_collapse_substantive_widget(build_body: str, patched_build: str) -> bool:
+def _strip_would_collapse_substantive_widget(
+    build_body: str,
+    patched_build: str,
+    *,
+    class_name: str,
+) -> bool:
     """True when stripping nested self ctors would erase real subtree content."""
     if patched_build == build_body or "SizedBox.shrink" not in patched_build:
+        return False
+    if re.search(rf"\b(?:const\s+)?{re.escape(class_name)}\s*\(", build_body):
         return False
     return (
         "SvgPicture.asset" in build_body
@@ -203,7 +210,11 @@ def _strip_nested_self_widget_ctors(content: str, class_name: str) -> str:
         "SizedBox.shrink(",
         patched_build,
     )
-    if _strip_would_collapse_substantive_widget(build_body, patched_build):
+    if _strip_would_collapse_substantive_widget(
+        build_body,
+        patched_build,
+        class_name=class_name,
+    ):
         return content
     return content[:start] + patched_build + content[end:]
 
@@ -240,6 +251,8 @@ def _build_is_thin_self_delegate(build: str, class_name: str) -> bool:
 def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
     if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
         return False
+    if _build_contains_self_widget_ctor(content, class_name):
+        return True
     build = _widget_build_snippet(content, class_name=class_name)
     called = _bare_widget_ctor_return_class(build)
     if called == "__context_widget__":

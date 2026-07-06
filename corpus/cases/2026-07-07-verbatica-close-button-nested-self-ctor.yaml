@@ -1,0 +1,59 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-close-button-nested-self-ctor
+  title: Extracted widget build nests self ctor inside decorated container
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-06
+  created_at: '2026-07-07T00:15:00Z'
+  updated_at: '2026-07-07T00:15:00Z'
+  summary: >
+    CloseButtonWidget build returns Container with BoxDecoration wrapping
+    const CloseButtonWidget(), causing infinite recursion at runtime. The
+    reconcile gate missed nested self ctors when BoxDecoration chrome blocked strip.
+
+occurrences:
+  - id: verbatica-paywall-close-button-self-recursion
+    family_id: extracted_widget_nested_self_ctor
+    pipeline_arrow: A3
+    law_id: LAW-WIDGET-DELEGATE-ACYCLIC
+    stage: planned_reconcile
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/planned/reconcile/class_inspect.py
+      symbol: _is_self_referential_widget_build
+    contract:
+      field: extracted widget build graph
+      field_class: compiler_owned
+      category: illegal
+      expected: >
+        No widget build may instantiate its own class (directly or nested). Strip
+        and static gates must detect nested self ctors even inside layout chrome.
+      actual: >
+        _strip_would_collapse_substantive_widget refused strip when BoxDecoration
+        was present; _is_self_referential_widget_build missed nested self ctor.
+    authority_boundary: planned_dart_graph
+    evidence:
+      - kind: source_code
+        path: apps/test/lib/widgets/close_button_widget.dart
+        summary: Container(decoration BoxDecoration, child const CloseButtonWidget()).
+      - kind: log
+        path: apps/test (Chrome preview)
+        summary: Stack Overflow building CloseButtonWidget.
+    repair:
+      summary: >
+        _is_self_referential_widget_build checks _build_contains_self_widget_ctor.
+        _strip_would_collapse_substantive_widget always allows stripping nested self
+        ctors even when BoxDecoration chrome is present.
+      changed_files:
+        - src/figma_flutter_agent/generator/planned/reconcile/class_inspect.py
+        - src/figma_flutter_agent/generator/planned/reconcile/delegate_repair.py
+      regression_tests:
+        - tests/test_planned_dart_reconcile.py::test_strip_nested_self_ctor_inside_decorated_container
+      verification:
+        - poetry run pytest tests/test_planned_dart_reconcile.py::test_strip_nested_self_ctor_inside_decorated_container -q

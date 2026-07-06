@@ -31,9 +31,9 @@ Goal: one clear call for the **whole batch** (or one blocked item), not N micro-
 
 Do not write code in this skill.
 
-## Corpus (consilium cannot skip)
+## Corpus — audit / amend (optional)
 
-**corpus handoff: none strong** = defer blocking/oracle only. `/diagnose` and `/repair` still require OPEN case + `defects validate` (`.claude/skills/corpus/SKILL.md`). Fixture pytest alone is not corpus signoff.
+Diagnose owns default OPEN write. Consilium reviews/amends per `.cursor/skills/corpus/SKILL.md`: fix `family_id`, merge duplicates, first OPEN when diagnose left `needs_evidence`. `OPEN` only — never `FIXED`. Run `defects index --write` + `validate` after edits. `corpus handoff: none strong` = no blocking promote only.
 
 ---
 

@@ -430,9 +430,8 @@ def assemble_layout_emit(
             or child.id in playback_decor_omit_ids
         ):
             continue
-        child_scroll_root = scroll_content_root or (
-            pin_bottom_chrome
-            and stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll(child)
+        child_scroll_root = pin_bottom_chrome and (
+            stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll(child)
         )
         widget = recurse(
             child,

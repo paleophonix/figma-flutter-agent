@@ -747,6 +747,8 @@ families:
     owners:
       - module: src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py
         symbol: _flex_spacing_field
+      - module: src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py
+        symbol: flex_children_body
     law_ids:
       - LAW-NEGATIVE-GAP-CONSERVATION
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
@@ -756,6 +758,43 @@ families:
       Row and Column emitters skip spacing when Figma itemSpacing is zero or negative,
       but negative gaps are overlap contracts. Dropping them inflates rigid child sums
       and causes RenderFlex overflow in tight icon clusters.
+    status: active
+
+  - id: extracted_widget_nested_self_ctor
+    title: Extracted widget build nests self widget ctor
+    pipeline_arrows:
+      - A3
+    owning_stage: planned_reconcile
+    owners:
+      - module: src/figma_flutter_agent/generator/planned/reconcile/class_inspect.py
+        symbol: _is_self_referential_widget_build
+    law_ids:
+      - LAW-WIDGET-DELEGATE-ACYCLIC
+    default_blast_radius: B3_BLOCKING
+    allowed_origins:
+      - COMPILER
+    description: >
+      Extracted widget Dart builds instantiate the hosting widget class inside layout
+      chrome, causing infinite recursion that reconcile gates and strip logic miss.
+    status: active
+
+  - id: scroll_root_positioned_suppression_leak
+    title: scroll_content_root flag leaks to nested absolute children
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/emit/shell.py
+        symbol: assemble_layout_emit
+    law_ids:
+      - LAW-SCROLL-ROOT-SUPPRESSION-SCOPE
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Pin-bottom scroll host sets scroll_content_root on the scroll slot child but
+      the flag propagates to all descendants, suppressing Positioned on nested
+      absolute nodes inside scroll content.
     status: active
 
   - id: dart_string_unescaped_line_separator

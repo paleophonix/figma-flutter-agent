@@ -21,7 +21,23 @@ failed generate    → when mechanism is known or classifiable
 compiler fix PR    → before handoff or "done"
 ```
 
-**Pairs with:** `/diagnose` → `/repair`. Do not mix with `/debug` → `/fix` (infra).
+**Pairs with:** `/diagnose` → [`/consilium`?] → `/repair`. Do not mix with `/debug` → `/fix` (infra).
+
+## Workflow by step
+
+```text
+/diagnose     read index + write OPEN (default when mechanism clear)
+/consilium?   audit / amend OPEN — optional; does NOT replace diagnose write
+/repair       read index + write OPEN→FIXED
+```
+
+| Step | Corpus read | Corpus write |
+|------|-------------|--------------|
+| **diagnose** | always (Step 2) | **OPEN** when `ready_for_record` + confidence `high`/`medium` |
+| **consilium** | audit diagnose cases + index | **amend** family/summary/evidence; **first OPEN** if diagnose left `needs_evidence` |
+| **repair** | before each R? (anti-loop) | **OPEN** attempts; **FIXED** + `repair` when proven |
+
+**Consilium is optional.** If skipped, diagnose must have written OPEN (or reported `unclassified` / deferred with reason). Repair must not start without on-disk case for each in-scope mechanism.
 
 ## What is NOT corpus-done
 

@@ -257,7 +257,11 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
                     "SizedBox.shrink(",
                     patched_build,
                 )
-                if _strip_would_collapse_substantive_widget(patched_build, candidate):
+                if _strip_would_collapse_substantive_widget(
+                    patched_build,
+                    candidate,
+                    class_name=class_name,
+                ):
                     continue
                 replacement = "SizedBox.shrink"
             patched_build = re.sub(

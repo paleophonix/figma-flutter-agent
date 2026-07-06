@@ -1,0 +1,19 @@
+version: 1
+family_id: scroll_root_positioned_suppression_leak
+generated: true
+cases:
+- case_id: 2026-07-07-verbatica-scroll-root-positioned-leak
+  case_file: cases/2026-07-07-verbatica-scroll-root-positioned-leak.yaml
+  title: scroll_content_root flag leaks and suppresses nested absolute 
+    Positioned
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-badge-positioned-leak
+  status: FIXED
+  observed_at: '2026-07-06'
+  created_at: '2026-07-07T00:15:00Z'
+  updated_at: '2026-07-07T00:15:00Z'
+  summary: Pin-bottom scroll host sets scroll_content_root on the growable panel
+    child, but assemble_layout_emit inherited the flag to all descendants. 
+    Nested absolute badge nodes inside scroll content lost Positioned and 
+    expanded to fill the card.

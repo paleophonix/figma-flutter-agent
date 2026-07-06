@@ -21,7 +21,17 @@ failed generate    → when mechanism is known or classifiable
 compiler fix PR    → before handoff or "done"
 ```
 
-**Pairs with:** `/diagnose` → `/repair`. Do not mix with `/debug` → `/fix` (infra).
+**Pairs with:** `/diagnose` → [`/consilium`?] → `/repair`.
+
+## Workflow
+
+| Step | Write |
+|------|-------|
+| diagnose | OPEN (default) |
+| consilium? | audit / amend OPEN only — does not replace diagnose |
+| repair | FIXED |
+
+Consilium optional. If skipped, diagnose OPEN stands. `corpus handoff: none strong` = no blocking promote only.
 
 ## What is NOT corpus-done
 
@@ -60,7 +70,7 @@ Pick row: same `project`+`feature` → `OPEN` → `FIXED` with `repair` → `obs
 
 ## Step 3 — Write or update case YAML
 
-Template: `corpus/case-template.yaml`. Diagnose → `OPEN` only. Repair → `FIXED` only with `repair` block + proof.
+Template: `corpus/case-template.yaml`. **Diagnose** → `OPEN`. **Consilium** → audit/amend `OPEN` only (see `.cursor/skills/corpus/SKILL.md`). **Repair** → `FIXED` with proof.
 
 One mechanism → one case file. Max 2 repair attempts without fresh `/diagnose`.
 
@@ -79,4 +89,4 @@ No handoff without validate passing.
 
 ## Forbidden
 
-- Fix from `.debug/` alone; glob all cases; `FIXED` without proof; consilium skips Steps 3–4 on diagnose/repair; hand-edit `corpus/index/`.
+- Fix from `.debug/` alone; glob all cases; `FIXED` without proof; consilium **replacing** diagnose OPEN on clear mechanisms; hand-edit `corpus/index/`.

@@ -7,8 +7,9 @@ Machine-checkable defect families for compiler pipeline failures. Each family na
 **Workflow (agent-owned):**
 
 ```text
-/diagnose → OPEN
-/repair   → OPEN until proven → FIXED (or WONT_FIX / DEFERRED_BY_POLICY)
+/diagnose  → read + OPEN
+/consilium? → audit / amend OPEN (optional)
+/repair    → OPEN until proven → FIXED
 ```
 
 Binary rule: **not fixed = OPEN**, **proven fixed = FIXED**. `/repair` alone changes nothing.

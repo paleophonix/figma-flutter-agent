@@ -1748,6 +1748,31 @@ class IconSalaryWidget extends StatelessWidget {
     assert "SizedBox.shrink" in patched
 
 
+def test_strip_nested_self_ctor_inside_decorated_container() -> None:
+    from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
+        _is_self_referential_widget_build,
+        _strip_nested_self_widget_ctors,
+    )
+
+    code = """
+import 'package:flutter/material.dart';
+class CloseButtonWidget extends StatelessWidget {
+  const CloseButtonWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(shape: BoxShape.circle),
+      child: const CloseButtonWidget(),
+    );
+  }
+}
+"""
+    assert _is_self_referential_widget_build(code, "CloseButtonWidget")
+    patched = _strip_nested_self_widget_ctors(code, "CloseButtonWidget")
+    assert "const CloseButtonWidget()" not in patched
+    assert "SizedBox.shrink" in patched
+
+
 def test_repair_self_referential_replaces_single_path_ctor_stub() -> None:
     planned = {
         "lib/widgets/cluster1_widget.dart": """

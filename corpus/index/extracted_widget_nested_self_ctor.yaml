@@ -1,0 +1,18 @@
+version: 1
+family_id: extracted_widget_nested_self_ctor
+generated: true
+cases:
+- case_id: 2026-07-07-verbatica-close-button-nested-self-ctor
+  case_file: cases/2026-07-07-verbatica-close-button-nested-self-ctor.yaml
+  title: Extracted widget build nests self ctor inside decorated container
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-close-button-self-recursion
+  status: FIXED
+  observed_at: '2026-07-06'
+  created_at: '2026-07-07T00:15:00Z'
+  updated_at: '2026-07-07T00:15:00Z'
+  summary: CloseButtonWidget build returns Container with BoxDecoration wrapping
+    const CloseButtonWidget(), causing infinite recursion at runtime. The 
+    reconcile gate missed nested self ctors when BoxDecoration chrome blocked 
+    strip.

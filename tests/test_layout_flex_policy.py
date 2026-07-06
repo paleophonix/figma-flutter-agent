@@ -1268,19 +1268,44 @@ def test_decomposed_pin_bottom_viewport_partition_pins_footer() -> None:
     assert compact.rfind("Positioned(", 0, footer_idx) != -1
 
 
-def test_negative_row_spacing_emits_overlap_gap() -> None:
-    """Law: LAW-NEGATIVE-GAP-CONSERVATION — negative Figma gaps become Row spacing."""
-    from figma_flutter_agent.generator.layout.widgets.flex_sizing import _flex_spacing_field
+def test_negative_row_spacing_emits_overlap_via_transform_not_flex_spacing() -> None:
+    """Law: LAW-NEGATIVE-GAP-CONSERVATION — negative gaps use Transform, never Flex.spacing."""
+    from figma_flutter_agent.generator.layout.widgets.flex_sizing import (
+        _flex_spacing_field,
+        flex_children_body,
+    )
 
+    icon_a = CleanDesignTreeNode(
+        id="wifi",
+        name="Wi-Fi",
+        type=NodeType.STACK,
+        sizing=Sizing(width=16.0, height=16.0),
+        children=[],
+    )
+    icon_b = CleanDesignTreeNode(
+        id="cell",
+        name="Cellular",
+        type=NodeType.STACK,
+        sizing=Sizing(width=16.0, height=16.0),
+        children=[],
+    )
     row = CleanDesignTreeNode(
         id="icons",
         name="Wi-Fi Network",
         type=NodeType.ROW,
         sizing=Sizing(width=30.0, height=16.0, height_mode=SizingMode.FIXED),
         spacing=-2.0,
-        children=[],
+        children=[icon_a, icon_b],
     )
-    assert _flex_spacing_field(row) == "spacing: -2.0, "
+    assert _flex_spacing_field(row) == ""
+    body = flex_children_body(row, ["const WifiIcon()", "const CellIcon()"], axis="horizontal")
+    assert "spacing: -" not in body
+    assert "Transform.translate" in body
+    assert "Offset(-2.0, 0.0)" in body
+
+    layout_body = render_node_body(row, uses_svg=False).replace("\n", "")
+    assert "spacing: -" not in layout_body
+    assert "Transform.translate" in layout_body
 
 
 def test_stack_flow_column_hoists_expanded_above_fill_width_sizedbox() -> None:
@@ -1684,6 +1709,51 @@ def test_pin_bottom_scroll_host_uses_bounded_position_for_growable_text() -> Non
     assert "SingleChildScrollView" in compact
     assert "Positioned(left: 24.0" in compact
     assert "SingleChildScrollView(child: Positioned" not in compact
+
+
+def test_scroll_content_root_does_not_suppress_nested_stack_absolute_children() -> None:
+    """Law: LAW-SCROLL-ROOT-SUPPRESSION-SCOPE — flag applies to scroll slot only."""
+    badge = CleanDesignTreeNode(
+        id="badge",
+        name="Badge",
+        type=NodeType.TEXT,
+        text="58%",
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(left=262.0, top=-8.0, width=99.0, height=22.0),
+        sizing=Sizing(width=99.0, height=22.0),
+    )
+    card = CleanDesignTreeNode(
+        id="card",
+        name="Plan Card",
+        type=NodeType.STACK,
+        sizing=Sizing(width=327.0, height=120.0),
+        children=[badge],
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=591.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=221.0, width=375.0, height=591.0),
+        children=[card],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[content, home],
+    )
+    body = render_node_body(screen, uses_svg=False, responsive_enabled=True).replace("\n", "")
+    assert "Positioned(left: 262.0" in body
 
 
 def test_pin_bottom_scroll_host_suppresses_inner_positioned_for_growable_column() -> None:
