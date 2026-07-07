@@ -1,12 +1,33 @@
 {
-  "cacheKey": "331536412aee15fc5bd8a1c4577a24dff86a41f95f2dfe7addf9d2c1fb40c693",
+  "cacheKey": "0f893d9be39b06cfb82670d4f688d20bd878f18c4a646a132d82c7b9175867ca",
   "response": {
     "candidates": [
       {
-        "nodeId": "4408:44896",
-        "widgetName": "OrderProductCard",
-        "reason": "Repeated order item card family with image, title, price, optional details text, and quantity/add controls; appears as multiple near-identical instances.",
+        "nodeId": "I4408:44896;1154:7849",
+        "widgetName": "QuantityStepper",
+        "reason": "Repeated minus/plus counter reused across order items, cutlery, and product cards with the same structure.",
         "confidence": 0.98,
+        "suggestedParams": [
+          "quantity",
+          "isDark"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I4408:44897;1154:7849",
+            "I4408:44898;1154:7849",
+            "I4408:44904;1154:8077",
+            "I4408:44915;1356:10712",
+            "I4408:44916;1356:10673"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "quantity stepper / add-remove control"
+        }
+      },
+      {
+        "nodeId": "4408:44896",
+        "widgetName": "OrderProductItem",
+        "reason": "Repeated order product row family with image, title, price, and optional details; variants differ only by text depth and whether extra detail text is shown.",
+        "confidence": 0.97,
         "suggestedParams": [
           "title",
           "priceText",
@@ -21,66 +42,29 @@
             "4408:44901",
             "4408:44902"
           ],
-          "shapeSimilarity": 0.98,
-          "semanticRole": "Order line item / product card"
-        }
-      },
-      {
-        "nodeId": "I4408:44896;1154:7849",
-        "widgetName": "QuantityStepper",
-        "reason": "Reusable counter control repeated in multiple order product rows and add-on sections; same minus, count, plus structure with only the count/value changing.",
-        "confidence": 0.97,
-        "suggestedParams": [
-          "quantity",
-          "isDark"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "I4408:44897;1154:7849",
-            "I4408:44898;1154:7849",
-            "I4408:44904;1154:8077"
-          ],
-          "shapeSimilarity": 0.95,
-          "semanticRole": "Quantity adjustment control"
+          "shapeSimilarity": 0.96,
+          "semanticRole": "order product list item"
         }
       },
       {
         "nodeId": "4408:44914",
         "widgetName": "ProductSmallCard",
-        "reason": "Repeated horizontal product tile for add-ons/sauces; same image/title layout with price and/or add CTA variants across adjacent cards.",
+        "reason": "Small product tile repeats three times in the swipe carousel with shared image/title layout and variant pricing or add-action content.",
         "confidence": 0.95,
         "suggestedParams": [
           "title",
+          "image",
           "priceText",
-          "previousPriceText",
-          "ctaLabel",
-          "showCta"
+          "oldPriceText",
+          "buttonLabel"
         ],
         "evidence": {
           "similarNodes": [
             "4408:44915",
             "4408:44916"
           ],
-          "shapeSimilarity": 0.93,
-          "semanticRole": "Compact upsell product card"
-        }
-      },
-      {
-        "nodeId": "I4408:44915;1356:10712",
-        "widgetName": "AddProductButton",
-        "reason": "Icon-only add button repeats across product tiles and order controls, sharing the same plus-button micro-pattern.",
-        "confidence": 0.9,
-        "suggestedParams": [
-          "isDark",
-          "isCompact"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "I4408:44916;1356:10673",
-            "I4408:44896;1154:7849;1149:9855"
-          ],
-          "shapeSimilarity": 0.89,
-          "semanticRole": "Increment / add action button"
+          "shapeSimilarity": 0.94,
+          "semanticRole": "compact product promo card"
         }
       }
     ]

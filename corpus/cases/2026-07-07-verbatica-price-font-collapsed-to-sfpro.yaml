@@ -1,0 +1,53 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-price-font-collapsed-to-sfpro
+  title: Verbatica prices render in SF Pro Text because Nekst is collapsed away
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T23:30:00Z'
+  updated_at: '2026-07-07T23:30:00Z'
+  summary: >
+    The plan prices (39,99$, 14,99$, 7,99$) use the Nekst font in Figma. Nekst is present
+    on disk (assets/fonts/nekst_400/500/600.ttf) and declared in pubspec.yaml (family:
+    Nekst), but the emitted price Text binds textTheme.headlineLarge, and app_typography
+    hardcodes fontFamily: 'SF Pro Text' for every theme role. Typography collapse merged
+    the Nekst price style into the dominant SF Pro Text role, so the prices render in a
+    fallback font (looking bold/wrong) while the packaged Nekst family is orphaned.
+    Collapse must preserve each node's Figma font family.
+    User observation: цены не тем шрифтом, должен быть Nekst, он есть на диске.
+
+occurrences:
+  - id: verbatica-paywall-price-font-collapsed
+    family_id: typography_collapse_drops_font_family
+    pipeline_arrow: A3
+    law_id: LAW-FONT-FAMILY-CONSERVATION
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: OPEN
+    owner:
+      module: src/figma_flutter_agent/generator/app_typography_collapse.py
+      symbol: collapse_text_styles_to_theme
+    contract:
+      field: text node fontFamily under theme collapse
+      field_class: fact
+      category: lossy
+      expected: >
+        Each text node keeps its Figma font family; theme roles are keyed per family so a
+        Nekst price is emitted with the Nekst family (packaged and declared), not the
+        dominant SF Pro Text role.
+      actual: >
+        Price Text binds textTheme.headlineLarge (fontFamily 'SF Pro Text'); the Nekst
+        family is dropped and orphaned even though it is on disk and in pubspec.
+    authority_boundary: planned_dart_graph
+    evidence:
+      - kind: source_code
+        path: apps/test/lib/theme/app_typography.dart
+        summary: every text theme role hardcodes fontFamily 'SF Pro Text'.
+      - kind: source_code
+        path: apps/test/pubspec.yaml
+        summary: family Nekst with nekst_400/500/600.ttf is declared and on disk under assets/fonts.

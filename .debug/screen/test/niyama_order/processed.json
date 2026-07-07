@@ -34,7 +34,6 @@
           "backgroundColor": "0x99000000",
           "strokeAlign": "INSIDE"
         },
-        "imageAssetKey": "assets/images/18chip.png",
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "bottom": 671.0,
@@ -282,7 +281,6 @@
                       "strokeAlign": "INSIDE",
                       "clipsContent": true
                     },
-                    "imageAssetKey": "assets/images/photo1.png",
                     "componentRef": "913:17712",
                     "variant": {
                       "componentId": "913:17712",
@@ -306,6 +304,7 @@
                         },
                         "rotation": -0.79,
                         "rotationRad": -0.01,
+                        "imageAssetKey": "assets/icons/vector_913_17711.svg",
                         "accessibilityLabel": "Vector",
                         "layoutPositioning": "ABSOLUTE",
                         "stackPlacement": {
@@ -1480,6 +1479,7 @@
                                           "backgroundColor": "0xFFFFFFFF",
                                           "strokeAlign": "INSIDE"
                                         },
+                                        "imageAssetKey": "assets/icons/vector_910_3261.svg",
                                         "accessibilityLabel": "Vector",
                                         "layoutPositioning": "ABSOLUTE",
                                         "stackPlacement": {
@@ -1751,6 +1751,7 @@
                                           "backgroundColor": "0xFFFFFFFF",
                                           "strokeAlign": "INSIDE"
                                         },
+                                        "imageAssetKey": "assets/icons/vector_910_3248.svg",
                                         "accessibilityLabel": "Vector",
                                         "layoutPositioning": "ABSOLUTE",
                                         "stackPlacement": {
@@ -5452,6 +5453,7 @@
                                     },
                                     "rotation": 0.87,
                                     "rotationRad": 0.02,
+                                    "imageAssetKey": "assets/icons/vector_1162_10106.svg",
                                     "accessibilityLabel": "Vector",
                                     "layoutPositioning": "ABSOLUTE",
                                     "stackPlacement": {
@@ -5738,6 +5740,7 @@
                                   "backgroundColor": "0xFFFFFFFF",
                                   "strokeAlign": "INSIDE"
                                 },
+                                "imageAssetKey": "assets/icons/vector_1003_4475.svg",
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -6027,6 +6030,7 @@
                 "style": {
                   "strokeAlign": "INSIDE"
                 },
+                "imageAssetKey": "assets/images/tableware.png",
                 "componentRef": "1154:8066",
                 "variant": {
                   "componentId": "1154:8066",
@@ -6113,6 +6117,7 @@
                                   "strokeAlign": "INSIDE",
                                   "clipsContent": true
                                 },
+                                "imageAssetKey": "assets/images/guests.png",
                                 "componentRef": "4181:43464",
                                 "variant": {
                                   "componentId": "4181:43464",
@@ -6134,6 +6139,7 @@
                                       "backgroundColor": "0xFFFFFFFF",
                                       "strokeAlign": "INSIDE"
                                     },
+                                    "imageAssetKey": "assets/icons/vector_4181_43463.svg",
                                     "accessibilityLabel": "Vector",
                                     "layoutPositioning": "ABSOLUTE",
                                     "stackPlacement": {
@@ -8428,6 +8434,7 @@
                               "strokeAlign": "INSIDE"
                             },
                             "vectorAssetKey": "assets/icons/vector_913_17711.svg",
+                            "imageAssetKey": "assets/images/promo.png",
                             "componentRef": "913:8948",
                             "clusterId": "component_913_8948",
                             "variant": {

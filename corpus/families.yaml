@@ -1030,3 +1030,24 @@ families:
       figma node id, and a missing raster must degrade with a named placeholder, not
       another node's image.
     status: active
+
+  - id: typography_collapse_drops_font_family
+    title: Typography collapse merges distinct Figma fonts into one, dropping the minority family
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/app_typography_collapse.py
+        symbol: collapse_text_styles_to_theme
+    law_ids:
+      - LAW-FONT-FAMILY-CONSERVATION
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Text style collapse maps every text node onto a shared theme role whose fontFamily
+      is the dominant screen font (SF Pro Text), so nodes that use a different packaged
+      Figma font (Nekst) lose their family and render in the fallback even though the font
+      is on disk and declared in pubspec. Collapse must preserve each node's Figma font
+      family, keying theme roles per family, not merging minority fonts into the dominant one.
+    status: active

@@ -1,10 +1,10 @@
 {
-  "cacheKey": "00f6e8d3b3d22b631a06fd3d725bb71791e5cda53d2049667aec0fa057248704",
+  "cacheKey": "099c59bc323ee22d0732a2c42f91395ddb1ba0bac34f19e78ea73a27ed702254",
   "response": {
     "entries": [
       {
         "clusterId": "component_1007_7119_e1043bbb",
-        "widgetName": "CheckoutActionBarWidget",
+        "widgetName": "OrderBottomBarWidget",
         "paramRenames": {}
       },
       {
@@ -14,7 +14,7 @@
       },
       {
         "clusterId": "component_1154_7859_6271d11b",
-        "widgetName": "OrderItemCardWidget",
+        "widgetName": "OrderProductItemWidget",
         "paramRenames": {}
       },
       {
@@ -24,22 +24,22 @@
       },
       {
         "clusterId": "component_1154_8374_89112a74",
-        "widgetName": "PromoCodeActionCardWidget",
+        "widgetName": "PromoCodeCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_8697_9095f282",
-        "widgetName": "CountBadgeWidget",
+        "widgetName": "PlusEighteenBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10366_754647f7",
-        "widgetName": "AddToOrderButtonWidget",
+        "widgetName": "AddButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10701_1aa13d53",
-        "widgetName": "CompactProductCardWidget",
+        "widgetName": "ProductSmallCardWidget",
         "paramRenames": {}
       },
       {
@@ -49,7 +49,7 @@
       },
       {
         "clusterId": "component_908_4711",
-        "widgetName": "BottomHomeIndicatorWidget",
+        "widgetName": "HomeIndicatorPillWidget",
         "paramRenames": {}
       },
       {
@@ -64,7 +64,7 @@
       },
       {
         "clusterId": "component_913_8948",
-        "widgetName": "ProductIllustrationWidget",
+        "widgetName": "SmallIllustrationWidget",
         "paramRenames": {}
       },
       {
@@ -83,8 +83,8 @@
         "paramRenames": {}
       },
       {
-        "clusterId": "shape_7",
-        "widgetName": "AddToOrderLabelWidget",
+        "clusterId": "shape_4",
+        "widgetName": "PriceLabelWidget",
         "paramRenames": {}
       }
     ]
