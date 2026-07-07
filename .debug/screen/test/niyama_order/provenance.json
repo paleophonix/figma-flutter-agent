@@ -2,6 +2,7 @@
   "featureName": "niyama_order",
   "emitterVersion": "2026.07.1",
   "checkpoints": [
+    "CP0b_reprune",
     "CP1_guards",
     "CP1_normalize",
     "CP2_ir_passes",
@@ -700,9 +701,9 @@
       "evidence": {
         "nav_scroll_host": true,
         "child_type_counts": {
+          "CONTAINER": 1,
           "STACK": 2,
-          "COLUMN": 1,
-          "CONTAINER": 1
+          "COLUMN": 1
         },
         "child_count": 4
       }

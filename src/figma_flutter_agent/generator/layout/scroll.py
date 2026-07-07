@@ -229,12 +229,47 @@ def padding_edge_insets_fitted_to_host(node: CleanDesignTreeNode) -> str | None:
     )
 
 
+def _button_label_min_height(node: CleanDesignTreeNode) -> float | None:
+    """Minimum vertical space required by button label copy (metrics-first)."""
+    from figma_flutter_agent.schemas import NodeType
+
+    def walk(current: CleanDesignTreeNode) -> float | None:
+        if current.type == NodeType.TEXT:
+            metrics = current.text_metrics_frame
+            if metrics is not None and metrics.line_height_px and metrics.line_height_px > 0:
+                return float(metrics.line_height_px)
+            font_size = current.style.font_size
+            line_height = current.style.line_height
+            if font_size is not None and font_size > 0:
+                ratio = line_height if line_height is not None and line_height > 0 else 1.2
+                return float(font_size) * float(ratio)
+            return None
+        best: float | None = None
+        for child in current.children:
+            child_height = walk(child)
+            if child_height is not None and (best is None or child_height > best):
+                best = child_height
+        return best
+
+    return walk(node)
+
+
 def _symmetric_pill_button_padding(node: CleanDesignTreeNode) -> str | None:
     """Horizontal Figma padding with symmetric vertical insets for pill buttons."""
     padding = node.padding
     if padding.top == 0 and padding.bottom == 0 and padding.left == 0 and padding.right == 0:
         return None
     vertical = max(padding.top, padding.bottom)
+    host_height = node.sizing.height
+    label_min = _button_label_min_height(node)
+    if (
+        host_height is not None
+        and float(host_height) > 0
+        and label_min is not None
+        and float(label_min) > 0
+    ):
+        max_vertical = max(0.0, (float(host_height) - float(label_min)) / 2.0)
+        vertical = min(vertical, max_vertical)
     return (
         "const EdgeInsets.fromLTRB("
         f"{format_geometry_literal(padding.left)}, "

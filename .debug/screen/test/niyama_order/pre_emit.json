@@ -7,6 +7,11 @@
       "kind": "nav_scroll_host",
       "children": [
         {
+          "figmaId": "4408:44887",
+          "kind": "auto",
+          "children": []
+        },
+        {
           "figmaId": "4408:44888",
           "kind": "auto",
           "children": [
@@ -279,13 +284,7 @@
                                     {
                                       "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479",
                                       "kind": "stack",
-                                      "children": [
-                                        {
-                                          "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479;910:3261",
-                                          "kind": "auto",
-                                          "children": []
-                                        }
-                                      ]
+                                      "children": []
                                     }
                                   ]
                                 },
@@ -412,13 +411,7 @@
                                     {
                                       "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479",
                                       "kind": "stack",
-                                      "children": [
-                                        {
-                                          "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479;910:3261",
-                                          "kind": "auto",
-                                          "children": []
-                                        }
-                                      ]
+                                      "children": []
                                     }
                                   ]
                                 },
@@ -1064,11 +1057,6 @@
             "flexSpacing": 0.0,
             "gapMode": "uniform"
           }
-        },
-        {
-          "figmaId": "4408:44887",
-          "kind": "auto",
-          "children": []
         }
       ],
       "layoutHints": {

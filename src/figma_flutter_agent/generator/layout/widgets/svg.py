@@ -196,7 +196,9 @@ def _svg_fit_mode(
         and height
         and max(float(width), float(height)) > _ICON_MAX_BOX_FIT_CONTAIN
     ):
-        return "BoxFit.contain"
+        if node.image_asset_key and not node.image_asset_key.lower().endswith(".svg"):
+            return "BoxFit.cover"
+        return "BoxFit.cover"
     if (
         node.style.has_stroke
         and width is not None

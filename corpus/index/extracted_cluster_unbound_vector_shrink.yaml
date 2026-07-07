@@ -13,7 +13,7 @@ cases:
   status: FIXED
   observed_at: '2026-07-07'
   created_at: '2026-07-07T21:30:00Z'
-  updated_at: '2026-07-07T21:45:00Z'
+  updated_at: '2026-07-07T22:00:00Z'
   summary: CutleryInfoWidget cluster materialization aborts when a visible 
     compact icon VECTOR uses a variant leaf id (1162:10248) that was not 
     re-exported, while an on-disk SVG from the same Figma component file key 

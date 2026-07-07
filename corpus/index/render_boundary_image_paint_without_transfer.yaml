@@ -2,6 +2,22 @@ version: 1
 family_id: render_boundary_image_paint_without_transfer
 generated: true
 cases:
+- case_id: 2026-07-07-verbatica-hero-binds-check-vector
+  case_file: cases/2026-07-07-verbatica-hero-binds-check-vector.yaml
+  title: Verbatica hero render-boundary binds descendant check_circle vector, 
+    not the photo
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-hero-binds-check-vector
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T04:00:00Z'
+  updated_at: '2026-07-07T05:00:00Z'
+  summary: The paywall hero render boundary (node 2399:42779 "Img", 393x454) was
+    emitted in _buildBackground as 
+    SvgPicture.asset('assets/icons/vector_2399_42798.svg'), where 2399:42798 is 
+    a nested check_circle vector. The flattened hero raster (portrait.png) must 
+    bind to the boundary ins...
 - case_id: 2026-07-06-verbatica-render-boundary-hero-image
   case_file: cases/2026-07-06-verbatica-render-boundary-hero-image.yaml
   title: Hero wallpaper render boundary emits empty shrink shell

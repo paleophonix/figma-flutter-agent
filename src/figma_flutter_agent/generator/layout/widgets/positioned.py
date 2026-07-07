@@ -378,8 +378,13 @@ def _apply_layout_slot_wraps(
                     layout_fact_column_product_card_footer_margin,
                 )
                 from figma_flutter_agent.parser.interaction import row_hosts_checkbox_label_pair
+                from figma_flutter_agent.parser.interaction.selection import (
+                    layout_fact_payment_plan_trailing_price_cluster,
+                )
 
                 if skip_redundant:
+                    return inner
+                if layout_fact_payment_plan_trailing_price_cluster(node):
                     return inner
                 if row_hosts_checkbox_label_pair(node):
                     height = node.sizing.height

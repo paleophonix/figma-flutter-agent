@@ -1,10 +1,10 @@
 {
-  "cacheKey": "ba1e91898fee0bd071ec637fa402a922be4626cc4540f791be6ccfcb377e5c5f",
+  "cacheKey": "00f6e8d3b3d22b631a06fd3d725bb71791e5cda53d2049667aec0fa057248704",
   "response": {
     "entries": [
       {
         "clusterId": "component_1007_7119_e1043bbb",
-        "widgetName": "PlaceOrderBarWidget",
+        "widgetName": "CheckoutActionBarWidget",
         "paramRenames": {}
       },
       {
@@ -19,7 +19,7 @@
       },
       {
         "clusterId": "component_1154_8066_faf0fa44",
-        "widgetName": "CutleryOptionWidget",
+        "widgetName": "GuestCountWidget",
         "paramRenames": {}
       },
       {
@@ -29,17 +29,17 @@
       },
       {
         "clusterId": "component_1154_8697_9095f282",
-        "widgetName": "PlusEighteenBadgeWidget",
+        "widgetName": "CountBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10366_754647f7",
-        "widgetName": "AddButtonWidget",
+        "widgetName": "AddToOrderButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10701_1aa13d53",
-        "widgetName": "MenuProductCardWidget",
+        "widgetName": "CompactProductCardWidget",
         "paramRenames": {}
       },
       {
@@ -49,7 +49,7 @@
       },
       {
         "clusterId": "component_908_4711",
-        "widgetName": "HomeIndicatorWidget",
+        "widgetName": "BottomHomeIndicatorWidget",
         "paramRenames": {}
       },
       {
@@ -64,7 +64,7 @@
       },
       {
         "clusterId": "component_913_8948",
-        "widgetName": "IllustrationWidget",
+        "widgetName": "ProductIllustrationWidget",
         "paramRenames": {}
       },
       {
@@ -74,17 +74,17 @@
       },
       {
         "clusterId": "component_932_4599_e1043bbb",
-        "widgetName": "PlaceOrderButtonWidget",
+        "widgetName": "CheckoutButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_933_4777",
-        "widgetName": "DividerLineWidget",
+        "widgetName": "SectionDividerWidget",
         "paramRenames": {}
       },
       {
-        "clusterId": "shape_6",
-        "widgetName": "OrderItemPriceWidget",
+        "clusterId": "shape_7",
+        "widgetName": "AddToOrderLabelWidget",
         "paramRenames": {}
       }
     ]

@@ -1,29 +1,29 @@
 
---- dart format @ 2026-07-06T22:47:49.654797+00:00 ---
+--- dart format @ 2026-07-07T00:28:41.917588+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\widgets\cutlery_option_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\widgets\modal_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\widgets\place_order_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\widgets\place_order_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\lib\widgets\promo_code_action_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\test\golden\niyama_order_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hgy449ti\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 20 files (20 changed) in 1.67 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\widgets\bottom_home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\widgets\checkout_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\widgets\checkout_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\widgets\guest_count_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\widgets\promo_code_action_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4wpvm636\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 20 files (20 changed) in 1.64 seconds.
 
---- pub get --offline @ 2026-07-06T22:47:52.633205+00:00 ---
+--- pub get --offline @ 2026-07-07T00:28:45.479699+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -36,28 +36,31 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/2) @ 2026-07-06T22:47:55.106439+00:00 ---
+--- dart analyze (generated) (1/2) @ 2026-07-07T00:28:48.398566+00:00 ---
 exit_code=0
-Analyzing cutlery_option_widget.dart, divider_line_widget.dart, home_indicator_widget.dart, modal_header_widget.dart, order_item_card_widget.dart, place_order_bar_widget.dart...
+Analyzing bottom_home_indicator_widget.dart, checkout_action_bar_widget.dart, checkout_button_widget.dart, guest_count_widget.dart, modal_widget.dart, promo_code_action_card_widget.dart...
 
-warning - lib\widgets\modal_header_widget.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\modal_header_widget.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\order_item_card_widget.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\order_item_card_widget.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-   info - lib\widgets\modal_header_widget.dart:23:511 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\place_order_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\place_order_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\place_order_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\place_order_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\checkout_action_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:16:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:16:3330 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:16:3396 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:16:3484 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3780 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:8976 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:13824 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:26516 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-9 issues found.
+12 issues found.
 
---- dart analyze (generated) (2/2) @ 2026-07-06T22:47:57.586464+00:00 ---
+--- dart analyze (generated) (2/2) @ 2026-07-07T00:28:50.791745+00:00 ---
 exit_code=0
-Analyzing place_order_button_widget.dart, promo_code_action_card_widget.dart...
+Analyzing section_divider_widget.dart...
 No issues found!
 
---- dart analyze (generated) (1/4) @ 2026-07-06T22:48:00.429953+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-07T00:28:53.565422+00:00 ---
 exit_code=0
 Analyzing niyama_order_screen.dart, niyama_order_chunk_0feb67ae.dart, niyama_order_chunk_af4305dd.dart, niyama_order_layout.dart, main.dart, app_colors.dart...
 
@@ -71,17 +74,15 @@ warning - lib\generated\niyama_order_chunk_0feb67ae.dart:12:8 - Unused import: '
 warning - lib\generated\niyama_order_chunk_af4305dd.dart:8:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_chunk_af4305dd.dart:9:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_chunk_af4305dd.dart:10:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:10:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_layout.dart:12:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_layout.dart:13:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-   info - lib\generated\niyama_order_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\niyama_order_layout.dart:35:2059 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\niyama_order_layout.dart:35:2125 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\niyama_order_layout.dart:35:2213 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+warning - lib\generated\niyama_order_layout.dart:16:8 - Unused import: 'package:test/generated/niyama_order_chunk_af4305dd.dart'. Try removing the import directive. - unused_import
 
-17 issues found.
+15 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-06T22:48:02.750071+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-07T00:28:56.018702+00:00 ---
 exit_code=0
 Analyzing app_edge_insets.dart, app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart...
 
@@ -89,94 +90,106 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
 
 1 issue found.
 
---- dart analyze (generated) (3/4) @ 2026-07-06T22:48:05.433827+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-07T00:28:58.629479+00:00 ---
 exit_code=0
-Analyzing app_typography.dart, cutlery_option_widget.dart, divider_line_widget.dart, home_indicator_widget.dart, modal_header_widget.dart, order_item_card_widget.dart...
+Analyzing app_typography.dart, bottom_home_indicator_widget.dart, checkout_action_bar_widget.dart, checkout_button_widget.dart, guest_count_widget.dart, modal_widget.dart...
 
-warning - lib\widgets\modal_header_widget.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\modal_header_widget.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\order_item_card_widget.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\order_item_card_widget.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-   info - lib\widgets\modal_header_widget.dart:23:511 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\checkout_action_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:16:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:16:3330 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:16:3396 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:16:3484 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3780 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:8976 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:13824 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:26516 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-5 issues found.
+12 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-06T22:48:08.272433+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-07T00:29:01.488428+00:00 ---
 exit_code=0
-Analyzing place_order_bar_widget.dart, place_order_button_widget.dart, promo_code_action_card_widget.dart, niyama_order_screen_test.dart, element_coordinate_mapper.dart...
+Analyzing promo_code_action_card_widget.dart, section_divider_widget.dart, niyama_order_screen_test.dart, element_coordinate_mapper.dart...
 
-   info - lib\widgets\place_order_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\place_order_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\place_order_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\place_order_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - test\harness\element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
-5 issues found.
+1 issue found.
 
---- dart format @ 2026-07-06T22:48:10.643848+00:00 ---
+--- dart format @ 2026-07-07T00:29:05.346993+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\test\golden\niyama_order_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vbkixbzr\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 14 files (14 changed) in 0.12 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\widgets\bottom_home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\widgets\checkout_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\widgets\checkout_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\widgets\guest_count_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\widgets\promo_code_action_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dni5339g\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 20 files (20 changed) in 1.52 seconds.
 
---- dart format @ 2026-07-06T22:48:12.958086+00:00 ---
+--- dart format @ 2026-07-07T00:29:08.989676+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\lib\widgets\modal_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\test\golden\niyama_order_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ijxkpczo\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 16 files (16 changed) in 0.36 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\widgets\bottom_home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\widgets\checkout_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\widgets\checkout_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\widgets\guest_count_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\widgets\promo_code_action_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_smnz07z\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 20 files (20 changed) in 1.54 seconds.
 
---- dart format @ 2026-07-06T22:48:20.875341+00:00 ---
+--- dart format @ 2026-07-07T00:29:13.063614+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\features\niyama_order\niyama_order_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\generated\niyama_order_chunk_0feb67ae.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\widgets\cutlery_option_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\widgets\modal_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\widgets\order_item_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\widgets\place_order_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\widgets\place_order_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\lib\widgets\promo_code_action_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\test\golden\niyama_order_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-sm6r_gjf\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 21 files (21 changed) in 5.57 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\generated\niyama_order_chunk_0feb67ae.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\widgets\bottom_home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\widgets\checkout_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\widgets\checkout_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\widgets\guest_count_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\widgets\promo_code_action_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kcrx603z\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 20 files (20 changed) in 1.55 seconds.
 
---- pub get --offline @ 2026-07-06T22:48:23.423994+00:00 ---
+--- pub get --offline @ 2026-07-07T00:29:15.814678+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -189,7 +202,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/4) @ 2026-07-06T22:48:26.094855+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-07T00:29:18.461937+00:00 ---
 exit_code=0
 Analyzing niyama_order_screen.dart, niyama_order_chunk_0feb67ae.dart, niyama_order_chunk_af4305dd.dart, niyama_order_layout.dart, main.dart, app_colors.dart...
 
@@ -203,17 +216,15 @@ warning - lib\generated\niyama_order_chunk_0feb67ae.dart:9:8 - Unused import: 'p
 warning - lib\generated\niyama_order_chunk_af4305dd.dart:8:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_chunk_af4305dd.dart:9:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_chunk_af4305dd.dart:10:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\niyama_order_layout.dart:12:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\niyama_order_layout.dart:13:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\niyama_order_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-   info - lib\generated\niyama_order_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\niyama_order_layout.dart:35:2059 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\niyama_order_layout.dart:35:2125 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\niyama_order_layout.dart:35:2213 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+warning - lib\generated\niyama_order_layout.dart:7:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:9:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:10:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:11:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\niyama_order_layout.dart:13:8 - Unused import: 'package:test/generated/niyama_order_chunk_af4305dd.dart'. Try removing the import directive. - unused_import
 
-17 issues found.
+15 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-06T22:48:28.549032+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-07T00:29:20.739457+00:00 ---
 exit_code=0
 Analyzing app_edge_insets.dart, app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart...
 
@@ -221,31 +232,30 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
 
 1 issue found.
 
---- dart analyze (generated) (3/4) @ 2026-07-06T22:48:31.073795+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-07T00:29:23.426268+00:00 ---
 exit_code=0
-Analyzing app_typography.dart, cutlery_option_widget.dart, divider_line_widget.dart, home_indicator_widget.dart, modal_header_widget.dart, order_item_card_widget.dart...
+Analyzing app_typography.dart, bottom_home_indicator_widget.dart, checkout_action_bar_widget.dart, checkout_button_widget.dart, guest_count_widget.dart, modal_widget.dart...
 
-warning - lib\widgets\modal_header_widget.dart:7:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\modal_header_widget.dart:8:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\order_item_card_widget.dart:7:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\order_item_card_widget.dart:8:8 - Unused import: 'package:test/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-   info - lib\widgets\modal_header_widget.dart:44:46 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:22:50 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:39:54 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\checkout_action_bar_widget.dart:66:47 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\checkout_action_bar_widget.dart:76:57 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:1038 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3055 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3121 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3209 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-5 issues found.
+8 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-06T22:48:33.635662+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-07T00:29:26.351375+00:00 ---
 exit_code=0
-Analyzing place_order_bar_widget.dart, place_order_button_widget.dart, promo_code_action_card_widget.dart, niyama_order_screen_test.dart, element_coordinate_mapper.dart...
+Analyzing promo_code_action_card_widget.dart, section_divider_widget.dart, niyama_order_screen_test.dart, element_coordinate_mapper.dart...
 
-   info - lib\widgets\place_order_bar_widget.dart:22:50 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\place_order_bar_widget.dart:39:54 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\place_order_bar_widget.dart:66:47 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\place_order_bar_widget.dart:76:57 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - test\harness\element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
-5 issues found.
+1 issue found.
 
---- flutter pub get @ 2026-07-06T22:48:37.113600+00:00 ---
+--- flutter pub get @ 2026-07-07T00:29:30.187728+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -257,71 +267,18 @@ Got dependencies!
 4 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-06T22:48:37.114635+00:00 ---
+--- flutter render errors @ 2026-07-07T00:29:30.189320+00:00 ---
 ══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
-The following assertion was thrown during performLayout():
-RenderFlex children have non-zero flex but incoming width constraints are unbounded.
-then will cause the RenderFlex to shrink-wrap the children rather than expanding to fit the maximum
-The affected RenderFlex is:
-  RenderFlex#f4353 relayoutBoundary=up3 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE(creator: Row ← SizedBox ← Row ← OverflowBox ← Align ← ClipRect ← Positioned-[<'figma-I4408_44904_1154_8071'>] ← Stack ← SizedBox ← Column ← Padding ← SizedBox ← ⋯, parentData: <none> (can use size), constraints: BoxConstraints(0.0<=w<=Infinity, h=28.0), size: MISSING, direction: horizontal, mainAxisAlignment: start, mainAxisSize: max, crossAxisAlignment: center, textDirection: ltr, verticalDirection: down, spacing: 0.0)
-The nearest ancestor providing an unbounded width constraint is: RenderFlex#f2c0a relayoutBoundary=up1 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE:
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 192 pixels on the right.
 The relevant error-causing widget was:
-When the exception was thrown, this was the stack:
-The following RenderObject was being processed when the exception was fired: RenderFlex#f4353 relayoutBoundary=up3 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE:
-This RenderObject had the following descendants (showing up to depth 5):
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+The specific RenderFlex in question is: RenderFlex#6be0f OVERFLOWING:
 ════════════════════════════════════════════════════════════════════════════════════════════════════
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/shifted_box.dart:373:12
-Another exception was thrown: A RenderFlex overflowed by 1.00 pixels on the bottom.
-Another exception was thrown: A RenderFlex overflowed by 33 pixels on the right.
-Another exception was thrown: A RenderFlex overflowed by 40 pixels on the right.
-Another exception was thrown: A RenderFlex overflowed by 20 pixels on the bottom.
 Another exception was thrown: A RenderFlex overflowed by 192 pixels on the right.
 Another exception was thrown: A RenderFlex overflowed by 192 pixels on the right.
 Another exception was thrown: A RenderFlex overflowed by 192 pixels on the right.
-Another exception was thrown: ImageCodecException: Failed to detect image file format using the file header.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.

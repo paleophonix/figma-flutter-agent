@@ -7,9 +7,9 @@
       "evidence": {
         "nav_scroll_host": true,
         "child_type_counts": {
+          "CONTAINER": 1,
           "STACK": 2,
-          "COLUMN": 1,
-          "CONTAINER": 1
+          "COLUMN": 1
         },
         "child_count": 4
       },
@@ -267,10 +267,8 @@
       "confidence": 0.7,
       "evidence": {
         "media_badge": true,
-        "child_type_counts": {
-          "VECTOR": 1
-        },
-        "child_count": 1,
+        "child_type_counts": {},
+        "child_count": 0,
         "component_id": "910:3262"
       },
       "rejectReason": "below_confidence_threshold"
@@ -317,10 +315,8 @@
       "confidence": 0.7,
       "evidence": {
         "media_badge": true,
-        "child_type_counts": {
-          "VECTOR": 1
-        },
-        "child_count": 1,
+        "child_type_counts": {},
+        "child_count": 0,
         "component_id": "910:3262"
       },
       "rejectReason": "below_confidence_threshold"

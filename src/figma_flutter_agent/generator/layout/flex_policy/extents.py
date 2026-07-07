@@ -259,6 +259,12 @@ def bind_row_cross_axis_height(
             return widget
     if layout_fact_payment_option_shell_column(node):
         return widget
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_payment_plan_trailing_price_cluster,
+    )
+
+    if layout_fact_payment_plan_trailing_price_cluster(node):
+        return widget
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_should_emit_as_metadata_column,
     )

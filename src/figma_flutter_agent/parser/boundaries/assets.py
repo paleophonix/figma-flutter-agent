@@ -24,6 +24,44 @@ def render_boundary_raster_asset_path(node_id: str) -> str:
     return f"assets/illustrations/render_boundary_{safe_id}.png"
 
 
+def _render_boundary_export_matches_node(node: CleanDesignTreeNode, candidate: str) -> bool:
+    """Return True when ``candidate`` is a legal drawable for ``node`` itself.
+
+    Render boundaries must not bind descendant icon vectors discovered via file-key
+    family fallback (LAW-RENDER-BOUNDARY-IMAGE-PAINT-CONSERVATION).
+    """
+    normalized = candidate.replace("\\", "/").lower()
+    safe_boundary = node.id.replace(":", "_").lower()
+    if normalized.endswith((".png", ".jpg", ".jpeg", ".webp")):
+        return True
+    if f"render_boundary_{safe_boundary}" in normalized:
+        return True
+    stem = Path(normalized).stem.lower()
+    return stem == safe_boundary or stem.endswith(f"_{safe_boundary}")
+
+
+def _discover_exact_raster_for_node(
+    project_dir: Path,
+    node_id: str,
+    *,
+    asset_index: dict[str, str] | None = None,
+) -> str | None:
+    """Resolve only raster exports whose filename stem matches ``node_id``."""
+    if asset_index is not None:
+        for safe_id in _asset_lookup_safe_ids(node_id):
+            resolved = asset_index.get(safe_id)
+            if resolved is not None and resolved.lower().endswith(
+                (".png", ".jpg", ".jpeg", ".webp")
+            ):
+                if _asset_stem_matches_node_id(resolved, safe_id):
+                    return resolved.replace("\\", "/")
+        return None
+    exact = _discover_exact_node_asset(project_dir, node_id)
+    if exact is not None and exact.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+        return exact
+    return None
+
+
 def _render_boundary_asset_candidates(
     node: CleanDesignTreeNode,
     project_dir: Path,
@@ -34,7 +72,7 @@ def _render_boundary_asset_candidates(
     seen: set[str] = set()
 
     def add(path: str | None) -> None:
-        if path and path not in seen:
+        if path and path not in seen and _render_boundary_export_matches_node(node, path):
             seen.add(path)
             candidates.append(path)
 
@@ -44,12 +82,16 @@ def _render_boundary_asset_candidates(
     add(render_boundary_raster_asset_path(node.id))
     add(discover_asset_path_for_node(project_dir, node.id))
     for probe_id in _vector_discovery_node_ids(node):
-        add(discover_asset_path_for_node(project_dir, probe_id))
+        if probe_id == node.id:
+            continue
+        add(_discover_exact_raster_for_node(project_dir, probe_id))
     return candidates
 
 
 def _bind_render_boundary_asset(node: CleanDesignTreeNode, candidate: str) -> None:
     """Attach a resolved export path to vector or raster keys on a boundary node."""
+    if not _render_boundary_export_matches_node(node, candidate):
+        return
     normalized = candidate.replace("\\", "/")
     if normalized.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
         node.image_asset_key = normalized
@@ -125,18 +167,53 @@ def _component_file_key_prefix_safe(node_id: str) -> str | None:
     return f"{file_key}_" if file_key else None
 
 
+_FAMILY_VARIANT_MIN_NUMERIC_DISTANCE = 50
+
+
+def _leaf_figma_numeric_id(node_id: str) -> int | None:
+    """Return the numeric suffix from a Figma node id leaf (``file:123`` -> ``123``)."""
+    leaf = node_id.rsplit(";", maxsplit=1)[-1]
+    if ":" not in leaf:
+        return None
+    try:
+        return int(leaf.rsplit(":", 1)[-1])
+    except ValueError:
+        return None
+
+
+def _numeric_id_from_asset_index_key(safe_id: str) -> int | None:
+    """Return the trailing numeric token from an asset-index safe id."""
+    token = safe_id.rsplit("_", 1)[-1]
+    try:
+        return int(token)
+    except ValueError:
+        return None
+
+
 def lookup_asset_path_for_component_vector_family(
     asset_index: dict[str, str],
     node_id: str,
 ) -> str | None:
-    """Resolve a sibling variant vector export via shared Figma file-key prefix."""
+    """Resolve a sibling variant vector export via shared Figma file-key prefix.
+
+    Adjacent icon-library ids (e.g. ``1162:10099`` vs ``1162:10106``) are distinct
+    glyphs; only distant variant ids may share a baked export (``1162:10248``).
+    """
     prefix = _component_file_key_prefix_safe(node_id)
     if prefix is None:
         return None
+    request_leaf = _leaf_figma_numeric_id(node_id)
     candidates: list[tuple[tuple[int, str], str]] = []
     for safe_id, rel_path in asset_index.items():
         if not safe_id.startswith(prefix):
             continue
+        if request_leaf is not None:
+            export_leaf = _numeric_id_from_asset_index_key(safe_id)
+            if (
+                export_leaf is not None
+                and abs(request_leaf - export_leaf) < _FAMILY_VARIANT_MIN_NUMERIC_DISTANCE
+            ):
+                continue
         candidates.append((_vector_asset_discovery_rank(rel_path), rel_path))
     if not candidates:
         return None
@@ -592,6 +669,8 @@ def resolve_discovered_vector_asset_keys(
     """
 
     def visit(node: CleanDesignTreeNode) -> None:
+        if node.render_boundary:
+            return
         if node.vector_asset_key or not _node_eligible_for_vector_asset_discovery(node):
             return
         if _composite_root_blocks_descendant_vector_promotion(node):

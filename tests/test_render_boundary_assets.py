@@ -220,6 +220,46 @@ def test_resolve_render_boundary_binds_raster_export(tmp_path: Path) -> None:
   assert node.image_asset_key == "assets/illustrations/render_boundary_2399_42779.png"
 
 
+def test_render_boundary_rejects_descendant_icon_vector(tmp_path: Path) -> None:
+    """Law: render boundary must not bind unrelated descendant SVG exports."""
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    (icons / "vector_2399_42798.svg").write_text("<svg></svg>", encoding="utf-8")
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "portrait.png").write_bytes(b"png")
+    node = CleanDesignTreeNode(
+        id="2399:42779",
+        name="Img",
+        type=NodeType.STACK,
+        sizing=Sizing(width=393.0, height=454.0),
+        render_boundary=True,
+        flatten_figma_node_ids=["2399:42780", "2399:42798"],
+        vector_asset_key=render_boundary_asset_path("2399:42779"),
+    )
+    root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
+    resolve_render_boundary_asset_keys(root, tmp_path, AssetManifest(), strict=False)
+    assert node.vector_asset_key is None
+    assert node.image_asset_key is None
+
+
+def test_resolve_discovered_vector_skips_render_boundary(tmp_path: Path) -> None:
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    (icons / "vector_2399_42798.svg").write_text("<svg></svg>", encoding="utf-8")
+    node = CleanDesignTreeNode(
+        id="2399:42779",
+        name="Img",
+        type=NodeType.STACK,
+        sizing=Sizing(width=393.0, height=454.0),
+        render_boundary=True,
+        flatten_figma_node_ids=["2399:42780"],
+    )
+    root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
+    resolve_discovered_vector_asset_keys(root, tmp_path)
+    assert node.vector_asset_key is None
+
+
 def test_unresolved_render_boundary_strict_raises(tmp_path: Path) -> None:
     node = _render_boundary_node("1:boundary")
     root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])

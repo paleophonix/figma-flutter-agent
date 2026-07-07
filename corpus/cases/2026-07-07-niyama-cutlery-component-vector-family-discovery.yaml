@@ -8,7 +8,7 @@ case:
   feature: niyama_order_2
   observed_at: 2026-07-07
   created_at: '2026-07-07T21:30:00Z'
-  updated_at: '2026-07-07T21:45:00Z'
+  updated_at: '2026-07-07T22:00:00Z'
   summary: >
     CutleryInfoWidget cluster materialization aborts when a visible compact icon
     VECTOR uses a variant leaf id (1162:10248) that was not re-exported, while an
@@ -54,11 +54,15 @@ occurrences:
     repair:
       summary: >
         Extend on-disk vector discovery with component file-key prefix family lookup
-        and probe component_ref ids so variant compact icons bind existing exports.
+        for distant variant leaf ids only; skip adjacent icon-library ids so unrelated
+        icons do not bind the wrong SVG export.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
+        - src/figma_flutter_agent/pipeline/local_assets.py
       regression_tests:
         - tests/test_render_boundary_assets.py::test_discover_asset_path_for_component_vector_family_variant
         - tests/test_render_boundary_assets.py::test_resolve_discovered_vector_asset_keys_binds_component_vector_family
+        - tests/test_niyama_order_2_emit_laws.py::test_component_vector_family_skips_adjacent_icon_library_ids
+        - tests/test_niyama_order_2_emit_laws.py::test_semantic_raster_binds_product_thumbnail_by_title_word
       verification:
-        - poetry run pytest -q tests/test_render_boundary_assets.py
+        - poetry run pytest -q tests/test_niyama_order_2_emit_laws.py tests/test_render_boundary_assets.py::test_discover_asset_path_for_component_vector_family_variant

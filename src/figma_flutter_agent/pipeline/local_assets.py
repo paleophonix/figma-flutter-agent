@@ -104,6 +104,11 @@ def _normalize_binding_text(value: str) -> str:
 def _is_raster_binding_target(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.IMAGE:
         return True
+    if node.render_boundary and node.flatten_figma_node_ids:
+        width = node.sizing.width or 0.0
+        height = node.sizing.height or 0.0
+        if width >= 64.0 and height >= 64.0:
+            return True
     if node.type == NodeType.STACK and node.component_ref:
         width = node.sizing.width or 0.0
         height = node.sizing.height or 0.0
@@ -135,24 +140,6 @@ def _component_name_path_labels(name: str | None) -> list[str]:
     if not name:
         return []
     return [part.strip() for part in name.replace("\\", "/").split("/") if part.strip()]
-
-
-def _nearest_component_ref(
-    node_id: str,
-    *,
-    tree_by_id: dict[str, CleanDesignTreeNode],
-    parent_by_id: dict[str, str],
-) -> str | None:
-    current = node_id
-    for _ in range(8):
-        node = tree_by_id.get(current)
-        if node is not None and node.component_ref:
-            return node.component_ref
-        parent_id = parent_by_id.get(current)
-        if parent_id is None:
-            break
-        current = parent_id
-    return None
 
 
 def _collect_binding_labels(
@@ -228,10 +215,12 @@ def _stem_matches_labels(stem: str, labels: list[str]) -> bool:
     return False
 
 
-def _raster_target_size(node: CleanDesignTreeNode) -> tuple[float, float]:
-    width = node.sizing.width or 0.0
-    height = node.sizing.height or 0.0
-    return float(width), float(height)
+def _word_overlap_score(stem: str, labels: list[str]) -> int:
+    stem_words = set(_normalize_binding_text(stem.replace("_", " ")).split())
+    score = 0
+    for label in labels:
+        score += len(stem_words & set(label.split()))
+    return score
 
 
 def _orphan_raster_pairing(
@@ -242,7 +231,7 @@ def _orphan_raster_pairing(
     bound_node_ids: set[str],
     assigned_nodes: set[str],
 ) -> list[AssetManifestEntry]:
-    """Bind lone human-named rasters to lone unbound targets within one component scope."""
+    """Assign remaining human-named rasters to unbound targets with best label overlap."""
     images_dir = project_dir / "assets" / "images"
     if not images_dir.is_dir():
         return []
@@ -255,37 +244,52 @@ def _orphan_raster_pairing(
         if path.suffix.lower() in _RASTER_SUFFIXES
         and node_id_from_asset_stem(path.stem) is None
     ]
+    unbound_targets = [
+        node_id
+        for node_id, node in tree_by_id.items()
+        if node_id not in exclude_node_ids
+        and node_id not in bound_node_ids
+        and node_id not in assigned_nodes
+        and _is_raster_binding_target(node)
+    ]
+    if not orphan_files or not unbound_targets:
+        return []
+    if len(orphan_files) != len(unbound_targets):
+        return []
 
-    groups: dict[str, list[str]] = {}
-    for node_id, node in tree_by_id.items():
-        if node_id in exclude_node_ids or node_id in bound_node_ids or node_id in assigned_nodes:
-            continue
-        if not _is_raster_binding_target(node):
-            continue
-        scope = _nearest_component_ref(
+    entries: list[AssetManifestEntry] = []
+    used_files: set[Path] = set()
+    for node_id in sorted(unbound_targets):
+        labels = _collect_binding_labels(
             node_id,
             tree_by_id=tree_by_id,
             parent_by_id=parent_by_id,
-        ) or node_id.rsplit(";", maxsplit=1)[0]
-        groups.setdefault(scope, []).append(node_id)
-
-    entries: list[AssetManifestEntry] = []
-    for scope, node_ids in groups.items():
-        if len(node_ids) != 1 or len(orphan_files) != 1:
+        )
+        best_path: Path | None = None
+        best_score = 0
+        for path in orphan_files:
+            if path in used_files:
+                continue
+            score = _word_overlap_score(path.stem, labels)
+            if score > best_score:
+                best_score = score
+                best_path = path
+        if best_path is None:
+            for path in orphan_files:
+                if path not in used_files:
+                    best_path = path
+                    break
+        if best_path is None:
             continue
-        node_id = node_ids[0]
-        if node_id in assigned_nodes:
-            continue
-        path = orphan_files[0]
+        used_files.add(best_path)
+        assigned_nodes.add(node_id)
         entries.append(
             AssetManifestEntry(
                 node_id=node_id,
-                asset_path=f"assets/images/{path.name}",
+                asset_path=f"assets/images/{best_path.name}",
                 kind="image",
             )
         )
-        assigned_nodes.add(node_id)
-        orphan_files.pop(0)
     return entries
 
 

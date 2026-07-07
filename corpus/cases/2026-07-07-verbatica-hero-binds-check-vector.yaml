@@ -1,0 +1,69 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-hero-binds-check-vector
+  title: Verbatica hero render-boundary binds descendant check_circle vector, not the photo
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T04:00:00Z'
+  updated_at: '2026-07-07T05:00:00Z'
+  summary: >
+    The paywall hero render boundary (node 2399:42779 "Img", 393x454) was emitted in
+    _buildBackground as SvgPicture.asset('assets/icons/vector_2399_42798.svg'), where
+    2399:42798 is a nested check_circle vector. The flattened hero raster (portrait.png)
+    must bind to the boundary instead; descendant icon SVG family fallback is rejected.
+
+occurrences:
+  - id: verbatica-paywall-hero-binds-check-vector
+    family_id: render_boundary_image_paint_without_transfer
+    pipeline_arrow: A4
+    law_id: LAW-RENDER-BOUNDARY-IMAGE-PAINT-CONSERVATION
+    stage: parser
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/parser/boundaries/assets.py
+      symbol: resolve_render_boundary_asset_keys
+    contract:
+      field: render-boundary hero image drawable asset
+      field_class: fact
+      category: illegal
+      expected: >
+        A render-boundary IMAGE node emits its flattened raster (the photo) or downgrades
+        with a named deviation; it never substitutes a descendant vector (check_circle)
+        as the hero drawable.
+      actual: >
+        _buildBackground emitted SvgPicture.asset(vector_2399_42798.svg) (check_circle) as
+        the 393x454 hero, replacing the portrait photo with a checkmark.
+    authority_boundary: planned_dart_graph
+    evidence:
+      - kind: source_code
+        path: apps/test/lib/generated/verbatica_paywall_layout.dart
+        summary: _buildBackground SvgPicture.asset('assets/icons/vector_2399_42798.svg') at hero 2399:42779.
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/processed.json
+        summary: node 2399:42798 is check_circle, unrelated to the Img render boundary 2399:42779.
+    repair:
+      summary: >
+        Fail-closed render-boundary asset binding: reject descendant/icon SVG exports,
+        skip resolve_discovered_vector on boundaries, semantic/orphan raster bind for
+        flattened hero stacks, BoxFit.cover for wallpaper rasters, plan-row intrinsic
+        width, and CTA vertical padding clamp.
+      changed_files:
+        - src/figma_flutter_agent/parser/boundaries/assets.py
+        - src/figma_flutter_agent/pipeline/local_assets.py
+        - src/figma_flutter_agent/generator/layout/widgets/svg.py
+        - src/figma_flutter_agent/generator/layout/widgets/positioned.py
+        - src/figma_flutter_agent/generator/layout/flex_policy/alignment.py
+        - src/figma_flutter_agent/generator/layout/flex_policy/extents.py
+        - src/figma_flutter_agent/generator/layout/scroll.py
+      regression_tests:
+        - tests/test_render_boundary_assets.py::test_render_boundary_rejects_descendant_icon_vector
+        - tests/test_verbatica_paywall_emit_laws.py
+      verification:
+        - poetry run pytest -q tests/test_render_boundary_assets.py::test_render_boundary_rejects_descendant_icon_vector
+        - poetry run pytest -q tests/test_verbatica_paywall_emit_laws.py

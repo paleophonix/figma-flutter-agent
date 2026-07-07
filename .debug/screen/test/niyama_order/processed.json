@@ -20,6 +20,61 @@
     },
     "children": [
       {
+        "id": "4408:44887",
+        "name": "bg blur",
+        "type": "CONTAINER",
+        "sizing": {
+          "width": 375.0,
+          "height": 812.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "backgroundColor": "0x99000000",
+          "strokeAlign": "INSIDE"
+        },
+        "imageAssetKey": "assets/images/18chip.png",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "bottom": 671.0,
+          "width": 375.0,
+          "height": 812.0
+        },
+        "geometryFrame": {
+          "layoutRect": {
+            "width": 375.0,
+            "height": 812.0
+          },
+          "intrinsicSize": {
+            "width": 375.0,
+            "height": 812.0
+          },
+          "placementAabb": {
+            "width": 375.0,
+            "height": 812.0
+          },
+          "parsedWorldAabb": {
+            "x": -7181.0,
+            "y": -1544.0,
+            "width": 375.0,
+            "height": 812.0
+          },
+          "worldAabb": {
+            "x": -7181.0,
+            "y": -1544.0,
+            "width": 375.0,
+            "height": 812.0
+          },
+          "paintRect": {
+            "x": -7181.0,
+            "y": -1544.0,
+            "width": 375.0,
+            "height": 812.0
+          }
+        }
+      },
+      {
         "id": "4408:44888",
         "name": "Modal",
         "type": "STACK",
@@ -227,6 +282,7 @@
                       "strokeAlign": "INSIDE",
                       "clipsContent": true
                     },
+                    "imageAssetKey": "assets/images/photo1.png",
                     "componentRef": "913:17712",
                     "variant": {
                       "componentId": "913:17712",
@@ -5372,6 +5428,7 @@
                                   "strokeAlign": "INSIDE",
                                   "clipsContent": true
                                 },
+                                "imageAssetKey": "assets/images/promo.png",
                                 "componentRef": "1162:10107",
                                 "variant": {
                                   "componentId": "1162:10107",
@@ -9413,61 +9470,6 @@
             "y": -524.0,
             "width": 375.0,
             "height": 887.0
-          }
-        }
-      },
-      {
-        "id": "4408:44887",
-        "name": "bg blur",
-        "type": "CONTAINER",
-        "sizing": {
-          "width": 375.0,
-          "height": 812.0
-        },
-        "alignment": {
-          "cross": "stretch"
-        },
-        "style": {
-          "backgroundColor": "0x99000000",
-          "strokeAlign": "INSIDE"
-        },
-        "imageAssetKey": "assets/illustrations/sistem_head_4408_44886.svg",
-        "layoutPositioning": "ABSOLUTE",
-        "stackPlacement": {
-          "bottom": 671.0,
-          "width": 375.0,
-          "height": 812.0
-        },
-        "geometryFrame": {
-          "layoutRect": {
-            "width": 375.0,
-            "height": 812.0
-          },
-          "intrinsicSize": {
-            "width": 375.0,
-            "height": 812.0
-          },
-          "placementAabb": {
-            "width": 375.0,
-            "height": 812.0
-          },
-          "parsedWorldAabb": {
-            "x": -7181.0,
-            "y": -1544.0,
-            "width": 375.0,
-            "height": 812.0
-          },
-          "worldAabb": {
-            "x": -7181.0,
-            "y": -1544.0,
-            "width": 375.0,
-            "height": 812.0
-          },
-          "paintRect": {
-            "x": -7181.0,
-            "y": -1544.0,
-            "width": 375.0,
-            "height": 812.0
           }
         }
       }

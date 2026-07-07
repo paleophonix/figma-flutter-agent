@@ -8,7 +8,7 @@ case:
   feature: niyama_order_2
   observed_at: 2026-07-07
   created_at: '2026-07-07T03:45:00Z'
-  updated_at: '2026-07-07T03:45:00Z'
+  updated_at: '2026-07-07T04:00:00Z'
   summary: >
     In niyama_order_2_layout.dart the root Stack is Stack([_buildModal, _buildBgBlur]).
     _buildBgBlur is a translucent scrim Container(375x812, color 0x99000000) for node
@@ -28,7 +28,7 @@ occurrences:
     origin: COMPILER
     blast_radius: B2_SILENT_WRONG_BEHAVIOR
     confidence: high
-    status: OPEN
+    status: FIXED
     owner:
       module: src/figma_flutter_agent/generator/layout/file_methods.py
       symbol: compose_decomposed_root_widget
@@ -49,4 +49,14 @@ occurrences:
         summary: root Stack children are [_buildModal, _buildBgBlur]; _buildBgBlur is Container 375x812 color 0x99000000.
       - kind: debug_artifact
         path: .debug/screen/test/niyama_order_2/processed.json
-        summary: bg blur 3561:42975 has a lower id than Modal 3561:42976 so it is behind in Figma paint order.
+        summary: bg blur 3561:42975 is a full-viewport translucent CONTAINER painted last in clean tree.
+    repair:
+      summary: >
+        Demote full-viewport translucent scrim CONTAINER nodes to backdrop paint order at
+        the layout root in parse-time stack_paint ordering.
+      changed_files:
+        - src/figma_flutter_agent/parser/stack_paint.py
+      regression_tests:
+        - tests/test_stack_paint.py::test_sort_puts_translucent_scrim_backdrop_before_modal_content
+      verification:
+        - poetry run pytest -q tests/test_stack_paint.py::test_sort_puts_translucent_scrim_backdrop_before_modal_content
