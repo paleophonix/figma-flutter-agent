@@ -271,6 +271,7 @@
                       "backgroundColor": "0xFF000000",
                       "strokeAlign": "CENTER"
                     },
+                    "vectorAssetKey": "assets/icons/wifi.svg",
                     "accessibilityLabel": "Wifi",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -343,6 +344,7 @@
                       "backgroundColor": "0xFF000000",
                       "strokeAlign": "CENTER"
                     },
+                    "vectorAssetKey": "assets/icons/connection.svg",
                     "accessibilityLabel": "Cellular Connection",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -422,6 +424,7 @@
                       },
                       "strokeAlign": "CENTER"
                     },
+                    "vectorAssetKey": "assets/icons/battery.svg",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
                       "horizontal": "SCALE",
@@ -510,6 +513,7 @@
                           "strokeAlign": "CENTER",
                           "opacity": 0.4
                         },
+                        "vectorAssetKey": "assets/icons/battery.svg",
                         "accessibilityLabel": "Cap",
                         "layoutPositioning": "ABSOLUTE",
                         "stackPlacement": {

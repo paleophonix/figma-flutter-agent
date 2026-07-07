@@ -1,12 +1,31 @@
 {
-  "cacheKey": "7d8136954bfff524dd1826528c342491f722b030deb29db1a2eee6dab8c8d83c",
+  "cacheKey": "9b9083c6a334e5060f14a5ed83c58d2725c8912615c254c74c1741c1f74b69f3",
   "response": {
     "candidates": [
       {
+        "nodeId": "981:66825",
+        "widgetName": "TranscriptListItem",
+        "reason": "Repeated four times as the main transcript/answer row, with only the body text changing and the same trailing drill-in affordance.",
+        "confidence": 0.96,
+        "suggestedParams": [
+          "bodyText"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "981:66825",
+            "981:66833",
+            "981:66842",
+            "981:66851"
+          ],
+          "shapeSimilarity": 0.97,
+          "semanticRole": "Repeated transcript line item with trailing action/accessory"
+        }
+      },
+      {
         "nodeId": "981:66830",
-        "widgetName": "ContentsTrailing",
-        "reason": "Same Figma component instance repeats 4 times with identical trailing affordance (detail + drill-in), making it a strong reusable subcomponent.",
-        "confidence": 0.99,
+        "widgetName": "TrailingDrillInAffordance",
+        "reason": "The same trailing accessory component is reused four times with identical structure and properties.",
+        "confidence": 0.98,
         "suggestedParams": [],
         "evidence": {
           "similarNodes": [
@@ -16,42 +35,35 @@
             "981:66857"
           ],
           "shapeSimilarity": 1.0,
-          "semanticRole": "trailing accessory / drill-in control"
-        }
-      },
-      {
-        "nodeId": "981:66825",
-        "widgetName": "TranscriptListItem",
-        "reason": "This row pattern repeats 4 times with the same structure and only the primary text changing, so it should be extracted as a reusable list item.",
-        "confidence": 0.94,
-        "suggestedParams": [
-          "title"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "981:66825",
-            "981:66834",
-            "981:66843",
-            "981:66852"
-          ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "transcript list item"
+          "semanticRole": "Repeated trailing detail/drill-in affordance"
         }
       },
       {
         "nodeId": "981:66808",
-        "widgetName": "RewindButton",
-        "reason": "The circular 5-second rewind control appears twice with identical structure inside the playback controls, indicating a reusable button component.",
-        "confidence": 0.81,
-        "suggestedParams": [],
+        "widgetName": "TransportControlButton",
+        "reason": "Circular playback control is duplicated in the transport row with the same visual structure, making it a good reusable control widget.",
+        "confidence": 0.84,
+        "suggestedParams": [
+          "iconLabel"
+        ],
         "evidence": {
           "similarNodes": [
             "981:66808",
             "981:66816"
           ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "media rewind control"
+          "shapeSimilarity": 0.95,
+          "semanticRole": "Playback transport control button"
         }
+      },
+      {
+        "nodeId": "981:66862",
+        "widgetName": "PrimaryActionButton",
+        "reason": "Full-width primary CTA button is a clear reusable control for actions like checking answers.",
+        "confidence": 0.87,
+        "suggestedParams": [
+          "label"
+        ],
+        "evidence": null
       }
     ]
   }

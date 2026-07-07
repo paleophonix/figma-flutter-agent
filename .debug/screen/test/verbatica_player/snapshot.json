@@ -1,0 +1,41 @@
+{
+  "file_key": "lEHPMZJRHVKXlMhqtnOkBT",
+  "node_id": "981:66795",
+  "feature_name": "verbatica_player",
+  "tree_hash": "cd986f8eb667d9b3a959785f7e2d33dc5653506d091d7ee1f606462ae21eb205",
+  "colors_hash": "f3826d644bb0fb0a682143522fcf5f0c5c455f40eab90c8916dc77a48c137a50",
+  "typography_hash": "dd3838cdaa31bba79652164949756dd576db30735030c3f2ce9571595c141ef8",
+  "spacing_hash": "b12c1a54eff2160438cbb7cd7ae522d99071ed559db73cd84c6baaf013d1594e",
+  "file_hashes": {
+    "lib/widgets/verify_button_widget.dart": "3d3ec293e135372ac82115e6fd531d87a92e840568be55b0b013975be6607575",
+    "lib/widgets/dynamic_island_status_bar_widget.dart": "6d94685bbcec97413b51efde1948ed557e77da1dfb928ff04228089cb97b41ca",
+    "lib/widgets/player_navigation_bar_widget.dart": "b8195922da7c5a81e948d1a34f3f3aaa8b96926543410079d53c25afa711600c",
+    "lib/widgets/home_indicator_widget.dart": "f3d5f79020e15c294be8ff72f635561a80e6adbb121fddd224fccf76b036b8b1",
+    "lib/widgets/playback_controls_widget.dart": "bfaaba84a1cd9226773c8934e74ef1998078fba42b9ef674f76c9f977e25046d",
+    "lib/widgets/battery_widget.dart": "1d21d643b2677184980fee41fb2cfc84b61bb7251131b12819ddf534c2e15586",
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "b06509bb7a36c498c59d7d1ffa266b64251dcbfc5b02bb968b1c40225a01bcf7",
+    "lib/theme/app_spacing.dart": "d8a713d3f19e9c2ad593ceaca158c06d31a13e3d1bd42e97e0cceaaef1657bc4",
+    "lib/theme/app_typography.dart": "09221f1c0521471540b6528377f2f07f06890faeaaa9caa6e2bc8cfd0ccdc67d",
+    "lib/theme/app_radius.dart": "42f3421b77efb26c615016fe24d6076d68f3092bbdce9c5f8b39c713bfdbb9ae",
+    "lib/theme/app_edge_insets.dart": "2d84505a17f2d78d3d8181d581bb0c225d7d7d7346fc38b65774584be1f937ae",
+    "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
+    "lib/theme/app_theme.dart": "1d835ce8a58e7d895b416846fcf4137f4a805eef1269288cdc2d30b4af4412e0",
+    "lib/generated/verbatica_player_layout.dart": "73ce6c177b8df083c599ee2ed63c653fc27ceab08c64bc76c3b7f0e5608ed37c",
+    "lib/features/verbatica_player/verbatica_player_screen.dart": "e260ecb1de924f68d4531770ee6ad41579c19a1f6d81f608f241365964e82e43",
+    "test/golden/verbatica_player_screen_test.dart": "e2e676aa9163ea4ac4a22c18646b59cb7cef0c696129f97a8e86a7e0e51c798e",
+    "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
+    "lib/main.dart": "dc58440cd46d2379836ad1475f550f720fc95cbf578b6acf7a18ee389a244b9c"
+  },
+  "layout_region_hash": "2049c9ffb202099705cdc3dfb0943b2e620356cfb6c4eeadb89ff9fe334c2f7f",
+  "cluster_hashes": {
+    "cluster_0": "8d12846d93f19eb36d169659683b7d54aca43e74cb4defc48d899c207d0b59b0",
+    "cluster_1": "fa2294a4cefccd99a99019ec1ec94076ded8d2608012207fa7b6d7b3ca6d2ae6",
+    "component_38_5773_8a12212d": "58b3599c8d20517b3e7489108d44e8449ea3aeba8399d7e79f1f8791f3817050",
+    "cluster_3": "e32ed910795460aa4172bcd7b24ffa117c06824976e8801f64a44c6d51f6c48d"
+  },
+  "reference_image_hash": null,
+  "emitter_version": "2026.07.1",
+  "version": 1,
+  "updated_at": "2026-07-07T14:27:48.049020+00:00"
+}

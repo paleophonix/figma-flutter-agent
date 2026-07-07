@@ -1,20 +1,20 @@
 {
-  "cacheKey": "bdf256bb78487f809348d64262a7b6ea766348c812111c66506784f81367a2e7",
+  "cacheKey": "d135cd7a631dba98c4b4a0cee91801433ecab11cc43bbecebf5d56dc2e7d0841",
   "response": {
     "entries": [
       {
         "clusterId": "component_111_16846_79147318",
-        "widgetName": "CheckAnswerButtonWidget",
+        "widgetName": "VerifyButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_118_6158_f8acca7f",
-        "widgetName": "StatusBarDynamicIslandWidget",
+        "widgetName": "DynamicIslandStatusBarWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_185_29821_f78f254f",
-        "widgetName": "PlayerTopBarWidget",
+        "widgetName": "PlayerNavigationBarWidget",
         "paramRenames": {}
       },
       {
@@ -24,32 +24,32 @@
       },
       {
         "clusterId": "component_38_5610_bcd9ea9d",
-        "widgetName": "BackNavigationButtonWidget",
+        "widgetName": "BackNavigationWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_38_5773_8a12212d",
-        "widgetName": "DetailDisclosureWidget",
+        "widgetName": "TrailingDisclosureWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_54_3907_58c331e9",
-        "widgetName": "CloseButtonWidget",
+        "widgetName": "PlaybackControlsWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_0",
-        "widgetName": "Rewind5SecondsButtonWidget",
+        "widgetName": "SkipBack5SecondsButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_1",
-        "widgetName": "AudioQuestionTitleWidget",
+        "widgetName": "TranscriptListItemWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_2",
-        "widgetName": "TranscriptItemWidget",
+        "widgetName": "TranscriptRowWidget",
         "paramRenames": {}
       },
       {
@@ -59,12 +59,12 @@
       },
       {
         "clusterId": "shape_4",
-        "widgetName": "DisclosureAccessoryWidget",
+        "widgetName": "TrailingAccessoryGrabberWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_6",
-        "widgetName": "DisclosureChevronWidget",
+        "widgetName": "DisclosureIndicatorWidget",
         "paramRenames": {}
       }
     ]

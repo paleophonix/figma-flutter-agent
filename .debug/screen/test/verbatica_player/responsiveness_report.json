@@ -1,0 +1,18 @@
+{
+  "root_layout": "column",
+  "positioned_root_children": 0,
+  "responsive_flow_sections": 0,
+  "scrollable": false,
+  "bottom_panel_mode": "absolute_top",
+  "tier": "reflowed",
+  "verdict": "skip",
+  "law": null,
+  "responsive_enabled": false,
+  "tall_content": false,
+  "fallback_scrollable": false,
+  "preview_capture_scrollable": false,
+  "preview_interactive_scrollable": false,
+  "active_branch_interactive_dev": "fallback",
+  "active_branch_golden_capture": "fallback",
+  "effective_scrollable": false
+}
