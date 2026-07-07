@@ -1,17 +1,17 @@
 {
-  "cacheKey": "0dd169dc9b14d6c8157ad17d80dde01aa7946e6443b58aaa7dd1afa70e7bb61c",
+  "cacheKey": "c15318894124ac9681a1ee0c758e05dffccc1eca512f7fcb513298cdbda587f7",
   "response": {
     "candidates": [
       {
         "nodeId": "3561:42990",
         "widgetName": "OrderProductItem",
-        "reason": "Repeated 4 times with the same product-row structure; only the text content and optional modifier block change.",
+        "reason": "Repeated 4 times as the same order-product card group with image, title, price, optional modifiers, and divider; strong reusable list-item pattern.",
         "confidence": 0.98,
         "suggestedParams": [
-          "titleText",
-          "unitPriceText",
-          "detailText",
-          "imageAsset"
+          "itemName",
+          "quantityPriceText",
+          "modifierLines",
+          "imageUrl"
         ],
         "evidence": {
           "similarNodes": [
@@ -21,14 +21,14 @@
             "3561:42993"
           ],
           "shapeSimilarity": 0.99,
-          "semanticRole": "Repeated order line item with image, title, price, and optional modifiers"
+          "semanticRole": "ordered menu item row"
         }
       },
       {
         "nodeId": "3561:43000",
-        "widgetName": "InfoValueCard",
-        "reason": "Repeated key-value summary card used for order details; same layout appears multiple times with different labels and values.",
-        "confidence": 0.97,
+        "widgetName": "OrderInfoRow",
+        "reason": "Repeated 5 times as a uniform label/value summary row with a trailing divider and minor value-color differences.",
+        "confidence": 0.99,
         "suggestedParams": [
           "labelText",
           "valueText",
@@ -42,56 +42,50 @@
             "3561:43003",
             "3561:43004"
           ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "Repeated order summary row with left label and right-aligned value"
+          "shapeSimilarity": 0.98,
+          "semanticRole": "order summary detail row"
         }
       },
       {
         "nodeId": "3561:43011",
         "widgetName": "AddressInfoCard",
-        "reason": "Same address-style card appears twice with only icon and copy changing, making it a reusable detail card.",
+        "reason": "Repeated 2 times with the same address/card structure; reusable detail card with optional leading icon and two text lines.",
         "confidence": 0.91,
         "suggestedParams": [
-          "iconName",
-          "addressText",
-          "subtitleText"
+          "streetText",
+          "cityText",
+          "leadingIcon"
         ],
         "evidence": {
           "similarNodes": [
             "3561:43011",
             "3561:43012"
           ],
-          "shapeSimilarity": 0.96,
-          "semanticRole": "Address detail card with icon and multiline text"
+          "shapeSimilarity": 0.94,
+          "semanticRole": "address/location info card"
         }
       },
       {
-        "nodeId": "3561:43006",
-        "widgetName": "OrderActionBar",
-        "reason": "Footer action area combines two large buttons and is structurally reusable as a paired-action bar.",
-        "confidence": 0.78,
-        "suggestedParams": [
-          "primaryLabel",
-          "secondaryLabel"
-        ],
+        "nodeId": "I3561:42990;1406:11919",
+        "widgetName": "SectionDivider",
+        "reason": "Divider line is reused across the repeated order items and info rows; strong shared structural element from the repeated divider cluster.",
+        "confidence": 0.96,
+        "suggestedParams": [],
         "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 0.84,
-          "semanticRole": "Two-action footer bar with paired buttons"
-        }
-      },
-      {
-        "nodeId": "3561:42985",
-        "widgetName": "BonusCounterBadge",
-        "reason": "Small numeric badge component for the bonus count; a compact reusable atomic widget even though it appears once here.",
-        "confidence": 0.6,
-        "suggestedParams": [
-          "badgeText"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 0.86,
-          "semanticRole": "Compact numeric bonus badge"
+          "similarNodes": [
+            "I3561:42990;1406:11919",
+            "I3561:42991;1406:11919",
+            "I3561:42992;1406:11919",
+            "I3561:42993;1406:11919",
+            "I3561:43000;1311:8997",
+            "I3561:43001;1311:8997",
+            "I3561:43002;1311:8997",
+            "I3561:43003;1311:8997",
+            "I3561:43004;1311:8997",
+            "I3561:43011;1435:15491"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "full-width divider line"
         }
       }
     ]

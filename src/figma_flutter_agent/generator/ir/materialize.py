@@ -129,6 +129,7 @@ def materialize_screen_code_from_ir(
             build_figma_id_to_widget_name,
             drop_extracted_widgets_for_inline_hosts,
             materialize_extracted_widgets,
+            promote_screen_ir_extracted_hosts,
             remap_screen_ir_extracted_refs,
         )
 
@@ -151,6 +152,14 @@ def materialize_screen_code_from_ir(
             project_dir=project_dir,
             tokens=tokens,
         )
+        figma_id_map = build_figma_id_to_widget_name(generation.extracted_widgets)
+        if generation.screen_ir is not None and figma_id_map:
+            promoted_ir = promote_screen_ir_extracted_hosts(
+                generation.screen_ir,
+                figma_id_to_widget_name=figma_id_map,
+            )
+            if promoted_ir is not generation.screen_ir:
+                generation = generation.model_copy(update={"screen_ir": promoted_ir})
         widgets = materialize_extracted_widgets(
             generation.extracted_widgets,
             clean_tree=clean_tree,

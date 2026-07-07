@@ -36,6 +36,7 @@ from figma_flutter_agent.schemas import (
     ScreenIr,
     WidgetIrKind,
     WidgetIrNode,
+    WidgetIrRef,
 )
 
 
@@ -149,6 +150,38 @@ def remap_screen_ir_extracted_refs(
     if screen_ir.root is None:
         return screen_ir
     return screen_ir.model_copy(update={"root": _remap(screen_ir.root)})
+
+
+def promote_screen_ir_extracted_hosts(
+    screen_ir: ScreenIr,
+    *,
+    figma_id_to_widget_name: dict[str, str],
+) -> ScreenIr:
+    """Upgrade screen IR nodes that have extracted widget blueprints to ``kind=extracted``."""
+    if screen_ir.root is None or not figma_id_to_widget_name:
+        return screen_ir
+    changed = False
+
+    def _promote(node: WidgetIrNode) -> WidgetIrNode:
+        nonlocal changed
+        mapped = figma_id_to_widget_name.get(node.figma_id or "")
+        if mapped and node.kind != WidgetIrKind.EXTRACTED:
+            changed = True
+            return node.model_copy(
+                update={
+                    "kind": WidgetIrKind.EXTRACTED,
+                    "ref": WidgetIrRef(widget_name=mapped),
+                    "children": [],
+                }
+            )
+        if not node.children:
+            return node
+        return node.model_copy(update={"children": [_promote(child) for child in node.children]})
+
+    new_root = _promote(screen_ir.root)
+    if not changed:
+        return screen_ir
+    return screen_ir.model_copy(update={"root": new_root})
 
 
 def disambiguate_extracted_widget_name_collisions(

@@ -1,0 +1,65 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-render-boundary-phantom-vector-key
+  title: Render-boundary raster bind leaves stale planned SVG key and blocks IR validate
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T13:30:00Z'
+  updated_at: '2026-07-07T13:35:00Z'
+  summary: >
+    Paywall hero Img 2399:42779 carries both imageAssetKey portrait.png (on disk)
+    and a collapse-planned vectorAssetKey render_boundary_2399_42779.svg (missing).
+    resolve_render_boundary_asset_keys binds the raster but does not prune the stale
+    SVG placeholder; IR validate fails closed during LLM finalize.
+
+occurrences:
+  - id: verbatica-paywall-phantom-render-boundary-svg
+    family_id: render_boundary_image_paint_without_transfer
+    pipeline_arrow: A4
+    law_id: LAW-RENDER-BOUNDARY-IMAGE-PAINT-CONSERVATION
+    stage: parser
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/parser/boundaries/assets.py
+      symbol: resolve_render_boundary_asset_keys
+    contract:
+      field: render-boundary drawable asset keys
+      field_class: fact
+      category: illegal
+      expected: >
+        After a render boundary binds an on-disk raster export, any sibling asset key
+        without a backing file is cleared before IR validate; generation must not abort
+        on collapse-planned SVG placeholders.
+      actual: >
+        Raster bind left vectorAssetKey render_boundary_2399_42779.svg while
+        imageAssetKey portrait.png was valid; _validate_asset_paths raised
+        GenerationError and aborted codegen before writeback.
+    authority_boundary: asset_manifest
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/processed.json
+        summary: node 2399:42779 has dual vectorAssetKey + imageAssetKey; SVG missing on disk.
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/run.meta.json
+        summary: last_error references missing render_boundary_2399_42779.svg under apps/test.
+    repair:
+      summary: >
+        Prune missing-on-disk vector/image keys immediately after render-boundary bind
+        and when a pre-bound raster already exists; regression asserts phantom SVG cleared
+        and validate_screen_ir passes for raster-only boundaries.
+      changed_files:
+        - src/figma_flutter_agent/parser/boundaries/assets.py
+        - tests/test_render_boundary_assets.py
+        - tests/test_verbatica_paywall_emit_laws.py
+      regression_tests:
+        - tests/test_render_boundary_assets.py::test_resolve_render_boundary_binds_raster_export
+        - tests/test_verbatica_paywall_emit_laws.py::test_verbatica_processed_hero_has_no_wrong_vector_after_asset_passes
+      verification:
+        - poetry run pytest tests/test_render_boundary_assets.py::test_resolve_render_boundary_binds_raster_export -q
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py::test_verbatica_processed_hero_has_no_wrong_vector_after_asset_passes -q

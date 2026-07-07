@@ -188,10 +188,23 @@ def run_cp0b_reprune(
     from figma_flutter_agent.debug.provenance import get_provenance_recorder
 
     baseline = deep_copy_clean_tree(tree)
+    pre_counts = conservation_node_multiset(baseline)
     prune_fn()
+    post_counts = conservation_node_multiset(tree)
     recorder = get_provenance_recorder()
     if recorder is not None:
         recorder.note_checkpoint("CP0b_reprune")
+        for node_id, before in pre_counts.items():
+            after = post_counts.get(node_id, 0)
+            if before != after:
+                recorder.record_mutation(
+                    checkpoint="CP0b_reprune",
+                    transform="dedup_reprune",
+                    node_id=node_id,
+                    field="multiset_count",
+                    old=before,
+                    new=after,
+                )
     if allowed_removed_ids:
         record_omission_permits(
             allowed_removed_ids,

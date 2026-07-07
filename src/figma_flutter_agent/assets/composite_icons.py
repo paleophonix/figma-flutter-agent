@@ -327,6 +327,13 @@ def layout_fact_compact_vector_icon_shape(node: CleanDesignTreeNode) -> bool:
     return width <= _MAX_COMPOSITE_ICON_WIDTH and height <= _MAX_COMPOSITE_ICON_HEIGHT
 
 
+def layout_fact_role_named_raster_icon_host(node: CleanDesignTreeNode) -> bool:
+    """Compact icon host with a role-named PNG drawable on the host node."""
+    if not node.image_asset_key or node.image_asset_key.lower().endswith(".svg"):
+        return False
+    return layout_fact_compact_vector_icon_shape(node)
+
+
 def layout_fact_compact_vector_icon_export_node(node: CleanDesignTreeNode) -> bool:
     """True when a compact single-vector icon should render as one ``SvgPicture``."""
     from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant

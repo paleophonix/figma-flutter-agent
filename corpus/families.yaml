@@ -463,6 +463,8 @@ families:
         symbol: assert_visible_vectors_bound
       - module: src/figma_flutter_agent/parser/boundaries/assets.py
         symbol: resolve_pruned_cluster_instance_assets
+      - module: src/figma_flutter_agent/parser/boundaries/assets.py
+        symbol: discover_role_named_svg
     law_ids:
       - VisibleVectorAssetConservationLaw
     default_blast_radius: B3_BLOCKING
@@ -575,6 +577,8 @@ families:
         symbol: prune_duplicated_cluster_subtrees
       - module: src/figma_flutter_agent/parser/dedup/prune.py
         symbol: _would_drop_unbound_visible_vectors
+      - module: src/figma_flutter_agent/parser/boundaries/ids.py
+        symbol: collect_descendant_conservation_ids
       - module: src/figma_flutter_agent/parser/dedup/hydrate.py
         symbol: hydrate_pruned_cluster_instances
     law_ids:

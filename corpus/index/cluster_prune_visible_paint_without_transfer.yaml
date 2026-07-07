@@ -2,6 +2,21 @@ version: 1
 family_id: cluster_prune_visible_paint_without_transfer
 generated: true
 cases:
+- case_id: 2026-07-07-niyama-cluster-prune-nested-flatten-reprune
+  case_file: cases/2026-07-07-niyama-cluster-prune-nested-flatten-reprune.yaml
+  title: CP0b reprune drops nested flatten metadata from pruned cluster stubs
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-nested-flatten-reprune-multiset
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T13:45:00Z'
+  updated_at: '2026-07-07T13:50:00Z'
+  summary: Second CP0b cluster reprune on niyama_order collapsed a duplicate 
+    parent cluster while a live child was already a pruned stub with 
+    flatten_figma_node_ids. Dedup used collect_descendant_figma_ids (live 
+    children only), so nested flatten ids vanished from the conservation 
+    multise...
 - case_id: 2026-07-07-niyama-cluster-prune-late-image-cp0b-multiset
   case_file: cases/2026-07-07-niyama-cluster-prune-late-image-cp0b-multiset.yaml
   title: Late raster bind unlocks cluster prune and breaks CP0b multiset

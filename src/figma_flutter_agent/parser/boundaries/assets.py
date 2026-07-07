@@ -22,6 +22,11 @@ _COMPONENT_LEAF_RASTER_ALIASES: dict[str, str] = {
     "knife_fork": "tableware",
 }
 
+_COMPONENT_LEAF_SVG_ALIASES: dict[str, str] = {
+    "cellular-connection": "connection",
+    "cap": "battery",
+}
+
 _VARIANT_VALUE_RASTER_ALIASES: dict[str, str] = {
     "delivered": "meal",
 }
@@ -31,8 +36,8 @@ def _normalize_role_token(value: str) -> str:
     return value.strip().lower().replace(" ", "-").replace("_", "-")
 
 
-def _component_icon_raster_stems(node: CleanDesignTreeNode) -> list[str]:
-    """Collect human-named raster stems from component variant and icon naming."""
+def _component_icon_role_stems(node: CleanDesignTreeNode) -> list[str]:
+    """Collect human-named icon stems from variant metadata and node labels."""
     stems: list[str] = []
     seen: set[str] = set()
 
@@ -57,23 +62,170 @@ def _component_icon_raster_stems(node: CleanDesignTreeNode) -> list[str]:
             add(part)
     for part in (node.name or "").split("/"):
         add(part)
+    add(node.accessibility_label or "")
+    return stems
 
+
+def _expand_icon_role_stems(stems: list[str], aliases: dict[str, str]) -> list[str]:
+    """Append alias stems while preserving first-match priority order."""
     expanded: list[str] = []
+    seen: set[str] = set()
     for stem in stems:
-        expanded.append(stem)
-        alias = _COMPONENT_LEAF_RASTER_ALIASES.get(stem.replace("_", "-"))
-        if alias:
-            expanded.append(alias.replace("-", "_"))
+        for candidate in (stem,):
+            if candidate in seen:
+                continue
+            seen.add(candidate)
+            expanded.append(candidate)
+            alias = aliases.get(candidate.replace("_", "-"))
+            if alias is None:
+                continue
+            aliased = alias.replace("-", "_")
+            if aliased in seen:
+                continue
+            seen.add(aliased)
+            expanded.append(aliased)
     return expanded
 
 
 def discover_role_named_raster(project_dir: Path, node: CleanDesignTreeNode) -> str | None:
     """Resolve role-named PNG exports (``location.png``, ``meal.png``) for icon hosts."""
-    for stem in _component_icon_raster_stems(node):
+    for stem in _expand_icon_role_stems(
+        _component_icon_role_stems(node),
+        _COMPONENT_LEAF_RASTER_ALIASES,
+    ):
         candidate = project_dir / "assets" / "images" / f"{stem}.png"
         if candidate.is_file():
             return f"assets/images/{candidate.name}".replace("\\", "/")
     return None
+
+
+def discover_role_named_svg(project_dir: Path, node: CleanDesignTreeNode) -> str | None:
+    """Resolve role-named SVG exports (``wifi.svg``, ``connection.svg``) for icon vectors."""
+    for stem in _expand_icon_role_stems(
+        _component_icon_role_stems(node),
+        _COMPONENT_LEAF_SVG_ALIASES,
+    ):
+        candidate = project_dir / "assets" / "icons" / f"{stem}.svg"
+        if candidate.is_file():
+            return f"assets/icons/{candidate.name}".replace("\\", "/")
+    return None
+
+
+def _bound_asset_is_icon_family_alias(
+    node: CleanDesignTreeNode,
+    asset_path: str,
+    project_dir: Path,
+    *,
+    asset_index: dict[str, str] | None = None,
+) -> bool:
+    """Return True when ``asset_path`` is a sibling icon-library export, not this node's."""
+    if asset_index is not None:
+        exact = _lookup_exact_node_asset(asset_index, node.id)
+        if exact is not None and exact.replace("\\", "/") == asset_path.replace("\\", "/"):
+            return False
+    else:
+        exact = _discover_exact_node_asset(project_dir, node.id)
+        if exact is not None and exact.replace("\\", "/") == asset_path.replace("\\", "/"):
+            return False
+    lowered = asset_path.lower().replace("\\", "/")
+    if not lowered.endswith(".svg"):
+        return False
+    stem = Path(lowered).stem.lower()
+    for safe_id in _asset_lookup_safe_ids(node.id):
+        token = safe_id.lower()
+        if stem == token or stem.endswith(f"_{token}"):
+            return False
+    return True
+
+
+def reconcile_role_raster_over_icon_family_alias(
+    node: CleanDesignTreeNode,
+    project_dir: Path,
+    *,
+    asset_index: dict[str, str] | None = None,
+) -> None:
+    """Prefer role-named SVG/PNG drawables over unrelated icon-library SVG aliases."""
+    role_svg = discover_role_named_svg(project_dir, node)
+    if role_svg is not None:
+        bound = node.vector_asset_key or node.image_asset_key
+        if bound is None or _bound_asset_is_icon_family_alias(
+            node,
+            bound,
+            project_dir,
+            asset_index=asset_index,
+        ):
+            node.vector_asset_key = role_svg
+            node.image_asset_key = None
+        return
+    role_raster = discover_role_named_raster(project_dir, node)
+    if role_raster is None:
+        return
+    bound = node.vector_asset_key or node.image_asset_key
+    if bound is None:
+        node.vector_asset_key = None
+        node.image_asset_key = role_raster
+        return
+    if bound.replace("\\", "/") == role_raster:
+        node.vector_asset_key = None
+        return
+    if _bound_asset_is_icon_family_alias(node, bound, project_dir, asset_index=asset_index):
+        node.vector_asset_key = None
+        node.image_asset_key = role_raster
+
+
+def propagate_compact_icon_raster_keys(tree: CleanDesignTreeNode) -> None:
+    """Copy parent role-named PNG keys onto compact icon vector leaves."""
+    from figma_flutter_agent.assets.composite_icons import layout_fact_compact_vector_icon_shape
+    from figma_flutter_agent.schemas import NodeType
+
+    def visit(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
+        if parent is not None and parent.image_asset_key:
+            if not parent.image_asset_key.lower().endswith(".svg"):
+                if layout_fact_compact_vector_icon_shape(parent):
+                    if (
+                        node.type == NodeType.VECTOR
+                        and not node.image_asset_key
+                        and not node.vector_asset_key
+                    ):
+                        node.image_asset_key = parent.image_asset_key
+        for child in node.children:
+            visit(child, node)
+
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree_with_parent
+
+    walk_clean_tree_with_parent(tree, visit)
+
+
+def apply_semantic_image_manifest_bindings(
+    tree: CleanDesignTreeNode,
+    project_dir: Path,
+) -> None:
+    """Attach semantic PNG bindings from the on-disk manifest onto unbound raster targets."""
+    from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
+    from figma_flutter_agent.schemas import NodeType
+
+    manifest = local_asset_manifest_from_project(project_dir, clean_tree=tree)
+    bindings = {
+        entry.node_id: entry.asset_path
+        for entry in manifest.entries
+        if entry.kind == "image" and entry.asset_path.lower().endswith(".png")
+    }
+    if not bindings:
+        return
+
+    def visit(node: CleanDesignTreeNode) -> None:
+        if node.image_asset_key or node.id not in bindings:
+            for child in node.children:
+                visit(child)
+            return
+        if node.type == NodeType.IMAGE:
+            node.image_asset_key = bindings[node.id]
+        for child in node.children:
+            visit(child)
+
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(tree, visit, phase="assets_semantic_manifest")
 
 
 def render_boundary_asset_path(node_id: str) -> str:
@@ -137,7 +289,8 @@ def _render_boundary_asset_candidates(
     candidates: list[str] = []
     seen: set[str] = set()
     binding_by_node_id = {
-        bound_id: filename for filename, bound_id in load_project_asset_bindings(project_dir).items()
+        bound_id: filename
+        for filename, bound_id in load_project_asset_bindings(project_dir).items()
     }
 
     def add(path: str | None) -> None:
@@ -172,6 +325,17 @@ def _bind_render_boundary_asset(node: CleanDesignTreeNode, candidate: str) -> No
         node.image_asset_key = normalized
     else:
         node.vector_asset_key = normalized
+
+
+def _prune_missing_render_boundary_asset_keys(
+    node: CleanDesignTreeNode,
+    project_dir: Path,
+) -> None:
+    """Drop stale planned asset keys that are not backed by on-disk exports."""
+    for attr in ("vector_asset_key", "image_asset_key"):
+        asset_key = getattr(node, attr)
+        if asset_key and not (project_dir / Path(asset_key)).is_file():
+            setattr(node, attr, None)
 
 
 def _register_asset_index_entry(
@@ -605,6 +769,11 @@ def resolve_missing_image_asset_keys(
         return None
 
     def visit(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
+        reconcile_role_raster_over_icon_family_alias(
+            node,
+            project_dir,
+            asset_index=asset_index,
+        )
         if node.render_boundary and not node.image_asset_key:
             for probe_id in _vector_discovery_node_ids(node):
                 discovered = discover_asset_path_for_node(
@@ -673,6 +842,8 @@ def resolve_missing_image_asset_keys(
     from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 
     walk_clean_tree(tree, propagate_avatar_parent_keys, phase="assets_avatar_propagate")
+    propagate_compact_icon_raster_keys(tree)
+    apply_semantic_image_manifest_bindings(tree, project_dir)
 
 
 def _resolve_filter_raster_fallback_keys(
@@ -773,7 +944,14 @@ def resolve_discovered_vector_asset_keys(
     def visit(node: CleanDesignTreeNode) -> None:
         if node.render_boundary:
             return
-        if node.vector_asset_key or not _node_eligible_for_vector_asset_discovery(node):
+        if not _node_eligible_for_vector_asset_discovery(node):
+            return
+        reconcile_role_raster_over_icon_family_alias(
+            node,
+            project_dir,
+            asset_index=asset_index,
+        )
+        if node.vector_asset_key or node.image_asset_key:
             return
         if _composite_root_blocks_descendant_vector_promotion(node):
             return
@@ -793,6 +971,10 @@ def resolve_discovered_vector_asset_keys(
         from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
 
         if subtree_has_text_descendant(node):
+            return
+        role_svg = discover_role_named_svg(project_dir, node)
+        if role_svg is not None:
+            node.vector_asset_key = role_svg
             return
         role_raster = discover_role_named_raster(project_dir, node)
         if role_raster is not None:
@@ -893,8 +1075,10 @@ def resolve_render_boundary_asset_keys(
         for candidate in candidates:
             if (project_dir / Path(candidate)).is_file():
                 _bind_render_boundary_asset(node, candidate)
+                _prune_missing_render_boundary_asset_keys(node, project_dir)
                 return
         if node.image_asset_key and (project_dir / Path(node.image_asset_key)).is_file():
+            _prune_missing_render_boundary_asset_keys(node, project_dir)
             return
         unresolved.append(node.id)
         if not strict:

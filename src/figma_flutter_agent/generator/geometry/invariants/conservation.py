@@ -216,7 +216,7 @@ def check_node_multiset_preserved(
     missing = sorted(set(expected) - set(actual))
     extra = sorted(set(actual) - set(expected))
     count_mismatch = [
-        f"{node_id}: {expected[node_id]} -> {actual[node_id]}"
+        (node_id, expected[node_id], actual[node_id])
         for node_id in sorted(set(expected) | set(actual))
         if expected[node_id] != actual[node_id]
     ]
@@ -226,14 +226,21 @@ def check_node_multiset_preserved(
     if extra:
         detail_parts.append(f"extra={extra[:6]}")
     if count_mismatch:
-        detail_parts.append(f"count_mismatch={count_mismatch[:6]}")
+        detail_parts.append(
+            "count_mismatch=["
+            + ", ".join(
+                f"'{node_id}: {before} -> {after}'"
+                for node_id, before, after in count_mismatch[:6]
+            )
+            + "]"
+        )
     culprit = (
         missing[0]
         if missing
         else (
             extra[0]
             if extra
-            else (count_mismatch[0].split(":")[0] if count_mismatch else baseline.id)
+            else (count_mismatch[0][0] if count_mismatch else baseline.id)
         )
     )
     return [

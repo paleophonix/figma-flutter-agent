@@ -167,9 +167,11 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
             ):
                 return
             from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
-            from figma_flutter_agent.parser.boundaries.ids import collect_descendant_figma_ids
+            from figma_flutter_agent.parser.boundaries.ids import (
+                collect_descendant_conservation_ids,
+            )
 
-            flattened = collect_descendant_figma_ids(node)
+            flattened = collect_descendant_conservation_ids(node)
             asset = primary_vector_asset(node) or node.vector_asset_key
             if asset is None:
                 forward, backward = cluster_assets.get(cluster_id, (None, None))

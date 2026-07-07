@@ -1,10 +1,10 @@
 {
-  "cacheKey": "b689b6bf90aab9a1e166b0cd62a41c61a2018008ac30e3149af282485046c310",
+  "cacheKey": "4c5bab3d2fb9b38484fef3c89f787b9848fcbe1660fdd4197e614684f5772ba7",
   "response": {
     "entries": [
       {
         "clusterId": "component_3481_34334_871e00fd",
-        "widgetName": "BonusCountWidget",
+        "widgetName": "BonusPointsWidget",
         "paramRenames": {}
       },
       {
@@ -19,7 +19,7 @@
       },
       {
         "clusterId": "component_3481_34494",
-        "widgetName": "ModalHeaderWidget",
+        "widgetName": "OrderModalHeaderWidget",
         "paramRenames": {}
       },
       {
@@ -34,7 +34,7 @@
       },
       {
         "clusterId": "component_3481_34893",
-        "widgetName": "DividerLineWidget",
+        "widgetName": "SectionDividerWidget",
         "paramRenames": {}
       },
       {
@@ -54,22 +54,22 @@
       },
       {
         "clusterId": "component_3481_35165_7cbfe998",
-        "widgetName": "OrderCommentCardWidget",
+        "widgetName": "InfoWithIconCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35212_0f40abd8",
-        "widgetName": "OrderSummaryRowWidget",
+        "widgetName": "KeyValueCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35218_9ad9ee27",
-        "widgetName": "LeaveReviewButtonWidget",
+        "widgetName": "LargeActionButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35229_81156683",
-        "widgetName": "OrderActionsBarWidget",
+        "widgetName": "OrderActionBarWidget",
         "paramRenames": {}
       }
     ]

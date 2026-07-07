@@ -109,6 +109,26 @@ def test_multiset_count_mismatch_reports_count_detail() -> None:
     assert "count_mismatch=['vec-1: 1 -> 2']" in violations[0].detail
 
 
+def test_multiset_count_mismatch_culprit_preserves_figma_instance_ids() -> None:
+    baseline = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(
+                id="I4408:44896;1154:7849",
+                name="Stepper",
+                type=NodeType.STACK,
+            ),
+        ],
+    )
+    doubled = deep_copy_clean_tree(baseline)
+    doubled.children[0].flatten_figma_node_ids = ["I4408:44896;1154:7849"]
+    violations = check_node_multiset_preserved(baseline, doubled)
+    assert len(violations) == 1
+    assert violations[0].node_id == "I4408:44896;1154:7849"
+
+
 def test_stack_paint_order_violation_detected() -> None:
     clean = CleanDesignTreeNode(
         id="stack:root",

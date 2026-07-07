@@ -289,6 +289,7 @@ def render_stack(
     from figma_flutter_agent.assets.composite_icons import (
         is_composite_icon_export_node,
         layout_fact_compact_vector_icon_export_node,
+        layout_fact_role_named_raster_icon_host,
     )
     from figma_flutter_agent.generator.layout.flex_policy import (
         stack_hosts_notification_badge_overlay,
@@ -334,7 +335,9 @@ def render_stack(
         and not has_raster_photo_fill
         and not stack_hosts_notification_badge_overlay(node)
         and (
-            is_composite_icon_export_node(node) or layout_fact_compact_vector_icon_export_node(node)
+            is_composite_icon_export_node(node)
+            or layout_fact_compact_vector_icon_export_node(node)
+            or layout_fact_role_named_raster_icon_host(node)
         )
     ):
         from ..svg import _render_exported_vector

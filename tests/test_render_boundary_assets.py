@@ -218,6 +218,9 @@ def test_resolve_render_boundary_binds_raster_export(tmp_path: Path) -> None:
   unresolved = resolve_render_boundary_asset_keys(root, tmp_path, AssetManifest())
   assert unresolved == []
   assert node.image_asset_key == "assets/illustrations/render_boundary_2399_42779.png"
+  assert node.vector_asset_key is None
+  screen_ir = default_screen_ir(root)
+  validate_screen_ir(screen_ir, root, project_dir=tmp_path)
 
 
 def test_render_boundary_rejects_descendant_icon_vector(tmp_path: Path) -> None:

@@ -1423,6 +1423,7 @@
                               "borderRadius": 12.0,
                               "strokeAlign": "INSIDE"
                             },
+                            "imageAssetKey": "assets/images/ramen-chicken.png",
                             "accessibilityLabel": "Img",
                             "geometryFrame": {
                               "localTransform": {
@@ -2078,6 +2079,7 @@
                               "borderRadius": 12.0,
                               "strokeAlign": "INSIDE"
                             },
+                            "imageAssetKey": "assets/images/tomyam.png",
                             "accessibilityLabel": "Img",
                             "geometryFrame": {
                               "localTransform": {
@@ -7390,6 +7392,7 @@
                                   "backgroundColor": "0xFFFFFFFF",
                                   "strokeAlign": "INSIDE"
                                 },
+                                "imageAssetKey": "assets/images/location.png",
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -7931,6 +7934,7 @@
                                   "backgroundColor": "0xFFFFFFFF",
                                   "strokeAlign": "INSIDE"
                                 },
+                                "imageAssetKey": "assets/images/seat.png",
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {

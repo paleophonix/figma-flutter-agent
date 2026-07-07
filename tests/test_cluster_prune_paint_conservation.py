@@ -1,9 +1,14 @@
 """Regression tests for LAW-CLUSTER-PRUNE-PAINT-CONSERVATION."""
 
 from copy import deepcopy
+from pathlib import Path
 
 from figma_flutter_agent.generator.geometry.invariants.conservation import (
     conservation_node_multiset,
+)
+from figma_flutter_agent.parser.boundaries.ids import (
+    collect_descendant_conservation_ids,
+    collect_descendant_figma_ids,
 )
 from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
@@ -175,3 +180,85 @@ def test_late_image_asset_does_not_unlock_prune_when_child_vectors_remain() -> N
     assert before == after
     assert duplicate.children
     assert duplicate.children[0].children
+
+
+def test_collect_descendant_conservation_ids_includes_nested_flatten_metadata() -> None:
+    """Dedup flatten transfer must re-home ids from nested pruned stubs."""
+    nested_flatten_ids = [
+        "I4408:44898;1154:7849;1149:9855;1149:9481",
+        "I4408:44898;1154:7849;1149:9855;1149:9481;910:3248",
+    ]
+    pruned_stub = CleanDesignTreeNode(
+        id="stepper-pruned",
+        name="Stepper",
+        type=NodeType.STACK,
+        flatten_figma_node_ids=list(nested_flatten_ids),
+        children=[],
+    )
+    parent = CleanDesignTreeNode(
+        id="row-duplicate",
+        name="OrderRow",
+        type=NodeType.STACK,
+        children=[pruned_stub],
+    )
+    assert collect_descendant_figma_ids(parent) == ["stepper-pruned"]
+    transferred = collect_descendant_conservation_ids(parent)
+    assert transferred[:1] == ["stepper-pruned"]
+    assert set(transferred) == {"stepper-pruned", *nested_flatten_ids}
+
+
+def test_niyama_order_double_cp0b_reprune_preserves_multiset() -> None:
+    """Planning runs CP0b twice; nested flatten transfer must keep multiset stable."""
+    from figma_flutter_agent.assets.screen_frame import build_screen_frame_exclude_ids
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+        activate_conservation_session,
+    )
+    from figma_flutter_agent.generator.subtree import (
+        collect_subtree_widget_specs,
+        replace_extracted_subtree_nodes_with_refs,
+    )
+    from figma_flutter_agent.parser.boundaries.assets import (
+        resolve_missing_image_asset_keys,
+        resolve_pruned_cluster_instance_assets,
+        resolve_render_boundary_asset_keys,
+    )
+    from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
+    from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
+    from figma_flutter_agent.stages import parse_figma_frame
+    from figma_flutter_agent.stages.assets import finalize_screen_assets
+
+    dump = Path("e:/@dev/figma-flutter-agent/.debug/screen/test/niyama_order/raw.json")
+    project = Path("e:/@dev/figma-flutter-agent/apps/test")
+    if not dump.is_file():
+        return
+
+    activate_conservation_session()
+    fetch = load_fetch_result_from_dump(dump, file_key="dummy", node_id="4408:44885")
+    parsed = parse_figma_frame(fetch)
+    exclude = build_screen_frame_exclude_ids(fetch.node_id, set())
+    manifest = local_asset_manifest_from_project(
+        project,
+        exclude_node_ids=exclude,
+        clean_tree=parsed.clean_tree,
+    )
+    finalize_screen_assets(
+        project_dir=project,
+        clean_tree=parsed.clean_tree,
+        destination_trees={},
+        manifest=manifest,
+        primary_node_id=fetch.node_id,
+        destination_node_ids=set(),
+    )
+    resolve_render_boundary_asset_keys(parsed.clean_tree, project, manifest, strict=False)
+    resolve_missing_image_asset_keys(parsed.clean_tree, project)
+    resolve_pruned_cluster_instance_assets(parsed.clean_tree, project)
+
+    subtree_specs = collect_subtree_widget_specs(
+        parsed.clean_tree,
+        widget_suffix="Widget",
+    )
+    replace_extracted_subtree_nodes_with_refs(parsed.clean_tree, subtree_specs)
+    prune_generation_layout_tree(parsed.clean_tree, extracted_subtree_node_ids=frozenset())
+
+    replace_extracted_subtree_nodes_with_refs(parsed.clean_tree, subtree_specs)
+    prune_generation_layout_tree(parsed.clean_tree, extracted_subtree_node_ids=frozenset())

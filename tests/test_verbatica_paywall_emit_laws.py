@@ -145,6 +145,7 @@ def test_verbatica_processed_hero_has_no_wrong_vector_after_asset_passes() -> No
     """Integration guard: fresh parse + assets must not bind check_circle onto hero."""
     from figma_flutter_agent.assets.screen_frame import build_screen_frame_exclude_ids
     from figma_flutter_agent.parser.boundaries.assets import (
+        render_boundary_asset_path,
         resolve_missing_image_asset_keys,
         resolve_render_boundary_asset_keys,
     )
@@ -192,6 +193,7 @@ def test_verbatica_processed_hero_has_no_wrong_vector_after_asset_passes() -> No
     node = hero(parsed.clean_tree)
     assert node is not None
     assert node.vector_asset_key != "assets/icons/vector_2399_42798.svg"
+    assert node.vector_asset_key != render_boundary_asset_path(node.id)
     portrait_entries = [
         entry
         for entry in manifest.entries

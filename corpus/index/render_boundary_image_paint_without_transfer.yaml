@@ -9,14 +9,30 @@ cases:
   project: test
   feature: niyama_order_2
   occurrence_id: niyama-order2-icons-shrink-shells
-  status: FIXED
+  status: OPEN
   observed_at: '2026-07-07'
   created_at: '2026-07-07T14:00:00Z'
-  updated_at: '2026-07-07T23:10:00Z'
+  updated_at: '2026-07-07T16:05:00Z'
   summary: In niyama_order_2 the top meal illustration ("Img") and several 
     vector icons (location, guest/seat, cutlery) emit Semantics(label, 
     SizedBox.shrink()) — empty shells — even though the drawables (meal.png and 
-    the icon SVGs) exist on disk under assets/images and assets/icons. The...
+    the icon SVGs) exist on disk under assets/images and assets/icons. Bat...
+- case_id: 2026-07-07-verbatica-render-boundary-phantom-vector-key
+  case_file: cases/2026-07-07-verbatica-render-boundary-phantom-vector-key.yaml
+  title: Render-boundary raster bind leaves stale planned SVG key and blocks IR 
+    validate
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-phantom-render-boundary-svg
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T13:30:00Z'
+  updated_at: '2026-07-07T13:35:00Z'
+  summary: Paywall hero Img 2399:42779 carries both imageAssetKey portrait.png 
+    (on disk) and a collapse-planned vectorAssetKey 
+    render_boundary_2399_42779.svg (missing). resolve_render_boundary_asset_keys
+    binds the raster but does not prune the stale SVG placeholder; IR validate 
+    fails clo...
 - case_id: 2026-07-06-verbatica-render-boundary-hero-image
   case_file: cases/2026-07-06-verbatica-render-boundary-hero-image.yaml
   title: Hero wallpaper render boundary emits empty shrink shell

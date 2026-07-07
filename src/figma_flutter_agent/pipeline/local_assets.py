@@ -34,6 +34,7 @@ _GENERIC_NODE_NAMES = frozenset(
 )
 _BINDING_LABEL_ANCESTOR_LIMIT = 3
 _BINDING_SUBTREE_TEXT_MAX_DEPTH = 2
+_BINDING_PRODUCT_ROW_TEXT_MAX_DEPTH = 6
 _VARIANT_VALUE_BINDING_ALIASES: dict[str, list[str]] = {
     "delivered": ["meal"],
 }
@@ -148,6 +149,14 @@ def _component_name_path_labels(name: str | None) -> list[str]:
     return [part.strip() for part in name.replace("\\", "/").split("/") if part.strip()]
 
 
+def _row_has_product_labels(row: CleanDesignTreeNode) -> bool:
+    """Return True when a row subtree carries human-readable product copy."""
+    return any(
+        label.strip()
+        for label in _subtree_text_labels(row, max_depth=_BINDING_PRODUCT_ROW_TEXT_MAX_DEPTH)
+    )
+
+
 def _nearest_product_row_scope(
     node_id: str,
     *,
@@ -169,14 +178,7 @@ def _nearest_product_row_scope(
                 and (child.type == NodeType.IMAGE or _is_raster_binding_target(child))
                 for child in parent.children
             )
-            has_text = any(
-                child.type == NodeType.TEXT
-                or any(
-                    grandchild.type == NodeType.TEXT and (grandchild.text or "").strip()
-                    for grandchild in child.children
-                )
-                for child in parent.children
-            )
+            has_text = _row_has_product_labels(parent)
             if has_media and has_text:
                 return parent
         current = parent_id
@@ -221,7 +223,10 @@ def _collect_binding_labels(
         parent_by_id=parent_by_id,
     )
     if scope is not None:
-        for text_label in _subtree_text_labels(scope, max_depth=_BINDING_SUBTREE_TEXT_MAX_DEPTH):
+        for text_label in _subtree_text_labels(
+            scope,
+            max_depth=_BINDING_PRODUCT_ROW_TEXT_MAX_DEPTH,
+        ):
             add_label(text_label)
     current = node_id
     for _ in range(_BINDING_LABEL_ANCESTOR_LIMIT):
@@ -263,8 +268,15 @@ def _stem_matches_labels(stem: str, labels: list[str]) -> bool:
         if stem_words & label_words:
             return True
         words = label.split()
-        if words and (words[0].startswith(token) or token.startswith(words[0])):
-            return True
+        if words:
+            first = words[0]
+            if (
+                len(token) >= 4
+                and len(first) >= 3
+                and not first.isdigit()
+                and (first.startswith(token) or token.startswith(first))
+            ):
+                return True
     return False
 
 
@@ -375,19 +387,26 @@ def _semantic_raster_bindings(
         token = _normalize_binding_text(path.stem.replace("_", " "))
         if not token:
             continue
+        best_node_id: str | None = None
+        best_score = 0
         for node_id, labels in candidates.items():
             if node_id in assigned_nodes:
                 continue
-            if _stem_matches_labels(path.stem, labels):
-                entries.append(
-                    AssetManifestEntry(
-                        node_id=node_id,
-                        asset_path=f"assets/images/{path.name}",
-                        kind="image",
-                    )
+            score = _word_overlap_score(path.stem, labels)
+            if score <= 0 and _stem_matches_labels(path.stem, labels):
+                score = 1
+            if score > best_score:
+                best_score = score
+                best_node_id = node_id
+        if best_node_id is not None and best_score > 0:
+            entries.append(
+                AssetManifestEntry(
+                    node_id=best_node_id,
+                    asset_path=f"assets/images/{path.name}",
+                    kind="image",
                 )
-                assigned_nodes.add(node_id)
-                break
+            )
+            assigned_nodes.add(best_node_id)
     entries.extend(
         _orphan_raster_pairing(
             project_dir,

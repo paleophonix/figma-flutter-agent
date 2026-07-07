@@ -126,9 +126,22 @@ def _neutral_secondary_cta_painted_shell_style(node: CleanDesignTreeNode) -> boo
     return spread <= 16
 
 
+def _accent_secondary_cta_painted_shell_style(node: CleanDesignTreeNode) -> bool:
+    """Return True for translucent accent-filled secondary CTA shells."""
+    if node.style.gradient is not None:
+        return False
+    channels = _argb_rgb_channels(node.style.background_color)
+    if channels is None:
+        return False
+    red, green, blue = channels
+    return red >= 150 and green >= 120 and blue <= 120 and green >= blue
+
+
 def _painted_cta_shell_style(node: CleanDesignTreeNode) -> bool:
-    return _primary_cta_painted_shell_style(node) or _neutral_secondary_cta_painted_shell_style(
-        node
+    return (
+        _primary_cta_painted_shell_style(node)
+        or _neutral_secondary_cta_painted_shell_style(node)
+        or _accent_secondary_cta_painted_shell_style(node)
     )
 
 
@@ -170,29 +183,52 @@ def layout_fact_primary_cta_painted_row_shell(node: CleanDesignTreeNode) -> bool
     return node.type == NodeType.ROW and layout_fact_painted_cta_action_shell(node)
 
 
+def _figma_text_line_height_px(node: CleanDesignTreeNode) -> float | None:
+    """Return measured line box height in px from Figma font size and line-height ratio."""
+    font_size = node.style.font_size
+    if font_size is None:
+        return None
+    ratio = node.style.line_height
+    if ratio is None or ratio <= 0:
+        ratio = 1.27
+    elif ratio > 4.0:
+        return float(ratio)
+    return float(font_size) * float(ratio)
+
+
 def layout_fact_narrow_centered_figma_single_line_title(
     node: CleanDesignTreeNode,
     parent_node: CleanDesignTreeNode | None,
 ) -> bool:
     """Return True when centered title must stay single-line in a narrow header column."""
-    if node.type != NodeType.TEXT or parent_node is None:
-        return False
-    if parent_node.type != NodeType.COLUMN:
+    if node.type != NodeType.TEXT:
         return False
     if (node.style.text_align or "").upper() != "CENTER":
+        return False
+    label = (node.text or "").strip()
+    if len(label) < 8:
+        return False
+    font_size = node.style.font_size
+    text_height = node.sizing.height
+    text_width = node.sizing.width
+    line_height_px = _figma_text_line_height_px(node)
+    if font_size is not None and text_height is not None and line_height_px is not None:
+        if (
+            text_width is not None
+            and float(text_width) <= 200.0
+            and float(text_height) <= line_height_px * 1.35
+        ):
+            return True
+    if parent_node is None or parent_node.type != NodeType.COLUMN:
         return False
     parent_width = parent_node.sizing.width
     if parent_width is None or float(parent_width) > 200.0:
         return False
-    font_size = node.style.font_size
-    text_height = node.sizing.height
-    if font_size is None or text_height is None:
+    if font_size is None or text_height is None or line_height_px is None:
         return False
-    line_height = node.style.line_height or float(font_size) * 1.27
-    if float(text_height) > float(line_height) * 1.3:
+    if float(text_height) > line_height_px * 1.3:
         return False
-    label = (node.text or "").strip()
-    return len(label) >= 8
+    return True
 
 
 def layout_fact_primary_cta_label_in_painted_shell(
