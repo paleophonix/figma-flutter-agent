@@ -623,6 +623,8 @@ families:
     owners:
       - module: src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
         symbol: collect_illegal_flex_parent_data_host_spans
+      - module: src/figma_flutter_agent/generator/layout/file_methods.py
+        symbol: method_node_suppresses_compose_flex_fill
       - module: src/figma_flutter_agent/generator/layout/widgets/finalize.py
         symbol: _wrap_min_touch_target
       - module: src/figma_flutter_agent/generator/dart/static_contract_gates.py
