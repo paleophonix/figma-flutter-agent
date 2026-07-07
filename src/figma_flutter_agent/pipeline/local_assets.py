@@ -104,11 +104,55 @@ def _normalize_binding_text(value: str) -> str:
 def _is_raster_binding_target(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.IMAGE:
         return True
+    if node.type == NodeType.STACK and node.component_ref:
+        width = node.sizing.width or 0.0
+        height = node.sizing.height or 0.0
+        if 20.0 <= width <= 48.0 and 20.0 <= height <= 48.0:
+            return True
     if node.type != NodeType.CONTAINER or node.children:
         return False
     width = node.sizing.width or 0.0
     height = node.sizing.height or 0.0
     return width >= 64.0 and height >= 64.0
+
+
+def _subtree_text_labels(node: CleanDesignTreeNode, *, max_depth: int) -> list[str]:
+    labels: list[str] = []
+
+    def walk(current: CleanDesignTreeNode, depth: int) -> None:
+        if depth > max_depth:
+            return
+        if current.type == NodeType.TEXT:
+            labels.append(current.text or current.name or "")
+        for child in current.children:
+            walk(child, depth + 1)
+
+    walk(node, 0)
+    return labels
+
+
+def _component_name_path_labels(name: str | None) -> list[str]:
+    if not name:
+        return []
+    return [part.strip() for part in name.replace("\\", "/").split("/") if part.strip()]
+
+
+def _nearest_component_ref(
+    node_id: str,
+    *,
+    tree_by_id: dict[str, CleanDesignTreeNode],
+    parent_by_id: dict[str, str],
+) -> str | None:
+    current = node_id
+    for _ in range(8):
+        node = tree_by_id.get(current)
+        if node is not None and node.component_ref:
+            return node.component_ref
+        parent_id = parent_by_id.get(current)
+        if parent_id is None:
+            break
+        current = parent_id
+    return None
 
 
 def _collect_binding_labels(
@@ -128,6 +172,18 @@ def _collect_binding_labels(
             seen.add(normalized)
             labels.append(normalized)
 
+    target = tree_by_id.get(node_id)
+    if target is not None:
+        if target.name and target.name.lower() not in _GENERIC_NODE_NAMES:
+            add_label(target.name)
+        add_label(target.accessibility_label)
+        if target.variant is not None:
+            add_label(target.variant.component_name)
+            for part in _component_name_path_labels(target.variant.component_name):
+                add_label(part)
+            for value in target.variant.variant_properties.values():
+                add_label(str(value))
+
     current = node_id
     for _ in range(8):
         parent_id = parent_by_id.get(current)
@@ -138,6 +194,16 @@ def _collect_binding_labels(
             break
         if parent.name and parent.name.lower() not in _GENERIC_NODE_NAMES:
             add_label(parent.name)
+        for part in _component_name_path_labels(parent.name):
+            add_label(part)
+        if parent.variant is not None:
+            add_label(parent.variant.component_name)
+            for part in _component_name_path_labels(parent.variant.component_name):
+                add_label(part)
+            for value in parent.variant.variant_properties.values():
+                add_label(str(value))
+        for text_label in _subtree_text_labels(parent, max_depth=6):
+            add_label(text_label)
         for child in parent.children:
             if child.type == NodeType.TEXT:
                 add_label(child.text or child.name)
@@ -149,13 +215,78 @@ def _stem_matches_labels(stem: str, labels: list[str]) -> bool:
     token = _normalize_binding_text(stem.replace("_", " "))
     if not token:
         return False
+    stem_words = set(token.split())
     for label in labels:
         if token in label or label in token:
+            return True
+        label_words = set(label.split())
+        if stem_words & label_words:
             return True
         words = label.split()
         if words and (words[0].startswith(token) or token.startswith(words[0])):
             return True
     return False
+
+
+def _raster_target_size(node: CleanDesignTreeNode) -> tuple[float, float]:
+    width = node.sizing.width or 0.0
+    height = node.sizing.height or 0.0
+    return float(width), float(height)
+
+
+def _orphan_raster_pairing(
+    project_dir: Path,
+    *,
+    clean_tree: CleanDesignTreeNode,
+    exclude_node_ids: frozenset[str],
+    bound_node_ids: set[str],
+    assigned_nodes: set[str],
+) -> list[AssetManifestEntry]:
+    """Bind lone human-named rasters to lone unbound targets within one component scope."""
+    images_dir = project_dir / "assets" / "images"
+    if not images_dir.is_dir():
+        return []
+
+    tree_by_id = index_clean_tree(clean_tree)
+    parent_by_id = build_parent_map(clean_tree)
+    orphan_files = [
+        path
+        for path in sorted(images_dir.iterdir())
+        if path.suffix.lower() in _RASTER_SUFFIXES
+        and node_id_from_asset_stem(path.stem) is None
+    ]
+
+    groups: dict[str, list[str]] = {}
+    for node_id, node in tree_by_id.items():
+        if node_id in exclude_node_ids or node_id in bound_node_ids or node_id in assigned_nodes:
+            continue
+        if not _is_raster_binding_target(node):
+            continue
+        scope = _nearest_component_ref(
+            node_id,
+            tree_by_id=tree_by_id,
+            parent_by_id=parent_by_id,
+        ) or node_id.rsplit(";", maxsplit=1)[0]
+        groups.setdefault(scope, []).append(node_id)
+
+    entries: list[AssetManifestEntry] = []
+    for scope, node_ids in groups.items():
+        if len(node_ids) != 1 or len(orphan_files) != 1:
+            continue
+        node_id = node_ids[0]
+        if node_id in assigned_nodes:
+            continue
+        path = orphan_files[0]
+        entries.append(
+            AssetManifestEntry(
+                node_id=node_id,
+                asset_path=f"assets/images/{path.name}",
+                kind="image",
+            )
+        )
+        assigned_nodes.add(node_id)
+        orphan_files.pop(0)
+    return entries
 
 
 def _semantic_raster_bindings(
@@ -208,6 +339,15 @@ def _semantic_raster_bindings(
                 )
                 assigned_nodes.add(node_id)
                 break
+    entries.extend(
+        _orphan_raster_pairing(
+            project_dir,
+            clean_tree=clean_tree,
+            exclude_node_ids=exclude_node_ids,
+            bound_node_ids=bound_node_ids,
+            assigned_nodes=assigned_nodes,
+        )
+    )
     return entries
 
 

@@ -1,0 +1,19 @@
+version: 1
+family_id: root_stack_backdrop_paints_over_content
+generated: true
+cases:
+- case_id: 2026-07-07-niyama-order-2-backdrop-scrim-over-content
+  case_file: cases/2026-07-07-niyama-order-2-backdrop-scrim-over-content.yaml
+  title: Order-completed modal fully dimmed — backdrop scrim painted over 
+    content
+  project: test
+  feature: niyama_order_2
+  occurrence_id: niyama-order-2-backdrop-scrim-over-content
+  status: OPEN
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T03:45:00Z'
+  updated_at: '2026-07-07T03:45:00Z'
+  summary: In niyama_order_2_layout.dart the root Stack is Stack([_buildModal, 
+    _buildBgBlur]). _buildBgBlur is a translucent scrim Container(375x812, color
+    0x99000000) for node "bg blur" (3561:42975), whose Figma id is below "Modal"
+    (3561:42976) and is painted first (behind) in Figma. Em...

@@ -269,6 +269,44 @@ def test_docked_full_width_footer_row_paints_above_scroll_content() -> None:
     assert ordered[-1].id == "footer"
 
 
+def test_sort_puts_translucent_scrim_backdrop_before_modal_content() -> None:
+    """Full-viewport dim scrims paint behind rounded modal sheets."""
+    scrim = CleanDesignTreeNode(
+        id="scrim",
+        name="bg blur",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=375.0, height=812.0),
+        style=NodeStyle(background_color="0x99000000"),
+        stack_placement=StackPlacement(bottom=879.0, width=375.0, height=812.0),
+    )
+    modal = CleanDesignTreeNode(
+        id="modal",
+        name="Modal",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=1651.0),
+        style=NodeStyle(
+            background_color="0xFF1C1C1E",
+            border_radius_corners={
+                "topLeft": 16.0,
+                "topRight": 16.0,
+                "bottomRight": 0.0,
+                "bottomLeft": 0.0,
+            },
+        ),
+        stack_placement=StackPlacement(top=40.0, width=375.0, height=1651.0),
+        children=[
+            CleanDesignTreeNode(
+                id="head",
+                name="Head",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=52.0),
+            )
+        ],
+    )
+    ordered = sort_absolute_stack_children([modal, scrim], is_layout_root=True)
+    assert [child.id for child in ordered] == ["scrim", "modal"]
+
+
 def test_viewport_chrome_paints_above_content_sheet() -> None:
     """Home indicator and status chrome must paint above growable content cards."""
     content_sheet = CleanDesignTreeNode(

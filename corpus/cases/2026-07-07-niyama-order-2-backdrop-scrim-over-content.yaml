@@ -1,0 +1,52 @@
+version: 1
+
+case:
+  id: 2026-07-07-niyama-order-2-backdrop-scrim-over-content
+  title: Order-completed modal fully dimmed — backdrop scrim painted over content
+  case_kind: regression
+  project: test
+  feature: niyama_order_2
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T03:45:00Z'
+  updated_at: '2026-07-07T03:45:00Z'
+  summary: >
+    In niyama_order_2_layout.dart the root Stack is Stack([_buildModal, _buildBgBlur]).
+    _buildBgBlur is a translucent scrim Container(375x812, color 0x99000000) for node
+    "bg blur" (3561:42975), whose Figma id is below "Modal" (3561:42976) and is painted
+    first (behind) in Figma. Emitting it as the last Stack child makes Flutter paint the
+    60% black scrim over the entire modal, so the whole order-completed sheet looks
+    dimmed, product images are invisible and detail rows wash out. Root stack
+    decomposition must preserve Figma paint order so backdrops stay behind content.
+    User observation: order2 everything shaded, images not visible, details missing.
+
+occurrences:
+  - id: niyama-order-2-backdrop-scrim-over-content
+    family_id: root_stack_backdrop_paints_over_content
+    pipeline_arrow: A3
+    law_id: LAW-STACK-PAINT-ORDER-CONSERVATION
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: OPEN
+    owner:
+      module: src/figma_flutter_agent/generator/layout/file_methods.py
+      symbol: compose_decomposed_root_widget
+    contract:
+      field: root stack child paint order
+      field_class: fact
+      category: illegal
+      expected: >
+        The root Stack children preserve Figma paint order, so the bg-blur backdrop
+        (lower z-order) is emitted first (behind) and the Modal content is on top.
+      actual: >
+        Stack([_buildModal, _buildBgBlur]) paints the 0x99000000 scrim over the modal,
+        dimming the whole screen and hiding images and detail rows.
+    authority_boundary: planned_dart_graph
+    evidence:
+      - kind: source_code
+        path: apps/test/lib/generated/niyama_order_2_layout.dart
+        summary: root Stack children are [_buildModal, _buildBgBlur]; _buildBgBlur is Container 375x812 color 0x99000000.
+      - kind: debug_artifact
+        path: .debug/screen/test/niyama_order_2/processed.json
+        summary: bg blur 3561:42975 has a lower id than Modal 3561:42976 so it is behind in Figma paint order.

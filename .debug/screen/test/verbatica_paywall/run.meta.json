@@ -1,8 +1,8 @@
 {
   "feature": "verbatica_paywall",
-  "pipeline_run_id": "2b3689693c6f",
-  "candidate_build_run_id": "2b3689693c6f",
-  "committed_build_run_id": "2b3689693c6f",
+  "pipeline_run_id": "c52f0e4cc8fd",
+  "candidate_build_run_id": "c52f0e4cc8fd",
+  "committed_build_run_id": "c52f0e4cc8fd",
   "writeback": "committed",
   "written_files": [
     "lib/features/verbatica_paywall/verbatica_paywall_screen.dart",
@@ -29,10 +29,11 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-06T22:28:36.267813+00:00",
+  "captured_at": "2026-07-07T00:04:57.716628+00:00",
   "runMetaSchemaVersion": "2",
   "status": "completed",
+  "cached_ir_verdict": "compatible",
   "clean_tree_hash": "7f9597b374e7c5216254576db5ca98a916a42c39f06d4bd924c9bee53c40afc6",
   "generation_config_hash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
-  "run_started_at": "2026-07-06T22:24:32.676331+00:00"
+  "run_started_at": "2026-07-07T00:04:12.145571+00:00"
 }

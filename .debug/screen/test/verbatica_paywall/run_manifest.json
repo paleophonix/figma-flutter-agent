@@ -1,9 +1,9 @@
 {
   "feature": "verbatica_paywall",
-  "pipeline_run_id": "2b3689693c6f",
-  "candidate_build_run_id": "2b3689693c6f",
-  "committed_build_run_id": "2b3689693c6f",
-  "served_build_run_id": "2b3689693c6f",
+  "pipeline_run_id": "c52f0e4cc8fd",
+  "candidate_build_run_id": "c52f0e4cc8fd",
+  "committed_build_run_id": "c52f0e4cc8fd",
+  "served_build_run_id": "c52f0e4cc8fd",
   "writeback": "committed",
   "served_probe_present": true,
   "verdict": "CAPTURE_PENDING",

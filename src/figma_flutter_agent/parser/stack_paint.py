@@ -14,6 +14,34 @@ _DEFAULT_VIEWPORT_HEIGHT = 896.0
 
 
 _FULL_BLEED_BACKDROP_VIEWPORT_RATIO = 0.75
+_SCRIM_ALPHA_MAX = 0xFE
+
+
+def _background_color_alpha(color: str | None) -> int | None:
+    """Return the alpha byte from an ``0xAARRGGBB`` paint color, if present."""
+    if not color or not color.startswith("0x") or len(color) < 4:
+        return None
+    try:
+        return int(color[2:4], 16)
+    except ValueError:
+        return None
+
+
+def _is_full_bleed_translucent_scrim(
+    node: CleanDesignTreeNode,
+    *,
+    viewport_width: float,
+    viewport_height: float,
+) -> bool:
+    """Full-viewport translucent fill layers that must paint behind modal content."""
+    if node.type != NodeType.CONTAINER or node.children:
+        return False
+    alpha = _background_color_alpha(node.style.background_color)
+    if alpha is None or alpha <= 0 or alpha >= _SCRIM_ALPHA_MAX:
+        return False
+    area = _stack_child_area(node)
+    viewport_area = viewport_width * viewport_height
+    return viewport_area > 0.0 and area >= viewport_area * _FULL_BLEED_BACKDROP_VIEWPORT_RATIO
 
 
 def _is_viewport_chrome_band_node(node: CleanDesignTreeNode) -> bool:
@@ -320,6 +348,11 @@ def _sort_positioned_stack_subset(
             viewport_width=viewport_width,
             viewport_height=viewport_height,
             area_threshold=area_threshold,
+        )
+        or _is_full_bleed_translucent_scrim(
+            child,
+            viewport_width=viewport_width,
+            viewport_height=viewport_height,
         )
     ]
     content_sheets = [

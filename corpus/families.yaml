@@ -956,3 +956,24 @@ families:
       row_flex_child_must_not_force_infinite_width gate only catches literal
       width: double.infinity, not Expanded under OverflowBox.
     status: active
+
+  - id: root_stack_backdrop_paints_over_content
+    title: Root stack backdrop scrim emitted after content inverts paint order
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/file_methods.py
+        symbol: compose_decomposed_root_widget
+    law_ids:
+      - LAW-STACK-PAINT-ORDER-CONSERVATION
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      A modal backdrop scrim/blur layer whose Figma id/z-order is below the content
+      (painted first, behind) is emitted as the last child of the root Stack, so Flutter
+      paints the translucent scrim over the whole modal. The screen appears fully dimmed
+      and images/detail rows are obscured. Root stack decomposition must preserve Figma
+      paint order so backdrops stay behind foreground content.
+    status: active
