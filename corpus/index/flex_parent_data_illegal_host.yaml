@@ -2,6 +2,19 @@ version: 1
 family_id: flex_parent_data_illegal_host
 generated: true
 cases:
+- case_id: 2026-07-07-verbatica-player-decomposed-flex-illegal-host
+  case_file: cases/2026-07-07-verbatica-player-decomposed-flex-illegal-host.yaml
+  title: Expanded under Align in decomposed phone-shell body method
+  project: test
+  feature: verbatica_player
+  occurrence_id: verbatica-player-decomposed-expanded-under-align
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T14:30:00Z'
+  updated_at: '2026-07-07T14:30:00Z'
+  summary: LAW-FLEX-DECOMPOSED-SLOT — decomposed growable-panel methods emitted 
+    Expanded while compose wrapped the method call in SizedBox/Align, crashing 
+    layout and hiding player content at runtime.
 - case_id: 2026-07-06-verbatica-flex-parent-data-illegal-host
   case_file: cases/2026-07-06-verbatica-flex-parent-data-illegal-host.yaml
   title: Flexible under Center on payment radio after min touch target wrap

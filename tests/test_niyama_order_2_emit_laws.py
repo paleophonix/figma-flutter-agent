@@ -356,7 +356,7 @@ def test_offline_emit_laws_from_debug_bundle(debug_root: Path) -> None:
 
     screen_ir = ScreenIr.model_validate(pre["screenIr"])
     norm = normalize_clean_tree(tree, screen_ir=screen_ir)
-    layout = render_layout_file(
+    files = render_layout_file(
         norm,
         feature_name="niyama_order_2",
         uses_svg=True,
@@ -364,7 +364,70 @@ def test_offline_emit_laws_from_debug_bundle(debug_root: Path) -> None:
         package_name="test",
         de_archetype_pass=True,
         responsive_enabled=False,
-    )["lib/generated/niyama_order_2_layout.dart"]
+    )
+    layout = files["lib/generated/niyama_order_2_layout.dart"]
     assert "maxLines: 1" in layout
     assert "vector_1162_10106" not in layout
     assert layout.count("SizedBox.shrink()") <= 3
+
+    from figma_flutter_agent.validation.emit_conservation import (
+        find_missing_text_survivors,
+        find_unmaterialized_chunk_refs,
+    )
+
+    missing_text = find_missing_text_survivors(norm, files)
+    assert "Детали" not in missing_text
+    assert find_unmaterialized_chunk_refs(files) == []
+
+
+def test_semantic_raster_binding_node_first_assigns_distinct_orphans(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "ramen-chicken.png").write_bytes(b"png")
+    (images / "tomyam.png").write_bytes(b"png")
+    img_a = CleanDesignTreeNode(
+        id="1:img-a",
+        name="Img",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=76.0, height=76.0),
+    )
+    title_a = CleanDesignTreeNode(
+        id="1:title-a",
+        name="Title",
+        type=NodeType.TEXT,
+        text="Вок рамен с курицей",
+    )
+    img_b = CleanDesignTreeNode(
+        id="1:img-b",
+        name="Img",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=76.0, height=76.0),
+    )
+    title_b = CleanDesignTreeNode(
+        id="1:title-b",
+        name="Title",
+        type=NodeType.TEXT,
+        text="Том Ям",
+    )
+    row_a = CleanDesignTreeNode(
+        id="1:row-a",
+        name="Card",
+        type=NodeType.ROW,
+        children=[img_a, title_a],
+    )
+    row_b = CleanDesignTreeNode(
+        id="1:row-b",
+        name="Card",
+        type=NodeType.ROW,
+        children=[img_b, title_b],
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Order",
+        type=NodeType.COLUMN,
+        children=[row_a, row_b],
+    )
+    manifest = local_asset_manifest_from_project(tmp_path, clean_tree=root)
+    bound = {entry.node_id: entry.asset_path for entry in manifest.entries if entry.kind == "image"}
+    assert bound["1:img-a"] == "assets/images/ramen-chicken.png"
+    assert bound["1:img-b"] == "assets/images/tomyam.png"

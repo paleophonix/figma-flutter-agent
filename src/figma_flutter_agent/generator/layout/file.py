@@ -10,7 +10,9 @@ from figma_flutter_agent.generator.layout.cupertino import wrap_layout_root
 from figma_flutter_agent.generator.layout.file_methods import (
     chunk_dart_file_stem,
     compose_decomposed_root_widget,
+    method_node_suppresses_compose_flex_fill,
     plan_layout_methods,
+    strip_top_level_flex_parent_data,
 )
 from figma_flutter_agent.generator.layout.file_preamble import (
     build_scaler_preamble,
@@ -170,6 +172,8 @@ def render_layout_file(
                     scroll_content_root=scroll_content_root,
                     **render_kwargs,
                 )
+                if method_node_suppresses_compose_flex_fill(method.node, render_tree):
+                    body = strip_top_level_flex_parent_data(body)
                 scaler = build_scaler_preamble(body)
                 blocks.append(
                     f"  Widget {method.name}(BuildContext context) {{\n{scaler}    return {body};\n  }}\n"

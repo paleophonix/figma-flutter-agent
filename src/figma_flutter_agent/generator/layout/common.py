@@ -246,6 +246,7 @@ def is_short_centered_glyph_text(node: object) -> bool:
 ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
 ARTBOARD_PREVIEW_HEIGHT_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT"
 ARTBOARD_CAPTURE_MODE_DEFINE = "FIGMA_FLUTTER_ARTBOARD_CAPTURE_MODE"
+BROWSER_VIEWPORT_FRAME_DEFINE = "FIGMA_FLUTTER_BROWSER_VIEWPORT_FRAME"
 ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth = double.tryParse(
     const String.fromEnvironment('{ARTBOARD_PREVIEW_WIDTH_DEFINE}'),
   ) ??
@@ -256,8 +257,26 @@ ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth 
       0;
   static final bool _artboardCaptureMode =
       const String.fromEnvironment('{ARTBOARD_CAPTURE_MODE_DEFINE}', defaultValue: '') == '1';
+  static const bool _browserViewportFrame = bool.fromEnvironment(
+    '{BROWSER_VIEWPORT_FRAME_DEFINE}',
+    defaultValue: false,
+  );
 """
 ARTBOARD_PREVIEW_LAYOUT_MARKER = "_artboardPreviewWidth"
+
+
+def live_browser_viewport_frame(*, child: str) -> str:
+    """Wrap a live browser viewport shell with a dev-only border."""
+    return (
+        "_browserViewportFrame "
+        "? DecoratedBox("
+        "decoration: BoxDecoration("
+        "border: Border.all(color: Color(0xFF808080), width: 1.0)"
+        "), "
+        f"child: {child}"
+        ") "
+        f": {child}"
+    )
 
 
 def bottom_chrome_pinned_live_viewport(
@@ -271,19 +290,24 @@ def bottom_chrome_pinned_live_viewport(
     ``bottom_chrome_pinned_outside_scroll``: docked tab bars stay viewport-fixed;
     per-layer pin-bottom scroll hosts own scrollable content bands.
     """
-    return (
-        "LayoutBuilder("
-        "builder: (context, constraints) {"
-        f"final viewportHeight = constraints.maxHeight.isFinite && "
-        f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
-        "return SizedBox("
+    viewport = (
+        "SizedBox("
         f"width: {width_token}, "
         "height: viewportHeight, "
         "child: SingleChildScrollView("
         "clipBehavior: Clip.none, "
         f"child: SizedBox(width: {width_token}, height: {height_token}, "
         f"child: {stack_widget}"
-        ")));"
+        ")"
+        ")"
+        ")"
+    )
+    return (
+        "LayoutBuilder("
+        "builder: (context, constraints) {"
+        f"final viewportHeight = constraints.maxHeight.isFinite && "
+        f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
+        f"return {live_browser_viewport_frame(child=viewport)};"
         "},"
         ")"
     )
@@ -298,12 +322,8 @@ def bottom_chrome_viewport_partition_live(
 ) -> str:
     """Pin interactive bottom chrome to the viewport while the artboard scrolls."""
     pinned = ", ".join(pinned_layers)
-    return (
-        "LayoutBuilder("
-        "builder: (context, constraints) {"
-        f"final viewportHeight = constraints.maxHeight.isFinite && "
-        f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
-        "return SizedBox("
+    viewport = (
+        "SizedBox("
         f"width: {width_token}, "
         "height: viewportHeight, "
         "child: Stack(clipBehavior: Clip.none, children: ["
@@ -317,7 +337,14 @@ def bottom_chrome_viewport_partition_live(
         "),"
         f"{pinned}"
         "])"
-        ");"
+        ")"
+    )
+    return (
+        "LayoutBuilder("
+        "builder: (context, constraints) {"
+        f"final viewportHeight = constraints.maxHeight.isFinite && "
+        f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
+        f"return {live_browser_viewport_frame(child=viewport)};"
         "},"
         ")"
     )
@@ -335,9 +362,10 @@ def static_artboard_viewport(
     Used for static preview fallbacks when artboard dart-defines are absent so
     ``constraints.maxWidth`` cannot widen phone shells and column roots.
     """
+    viewport = f"SizedBox(width: {width_token}, height: {height_token}, child: {child})"
     return (
         f"Align(alignment: {alignment}, "
-        f"child: SizedBox(width: {width_token}, height: {height_token}, child: {child}))"
+        f"child: {live_browser_viewport_frame(child=viewport)})"
     )
 
 
@@ -359,18 +387,21 @@ def live_scroll_stack_viewport(
         )
     else:
         scroll_child = f"SizedBox(width: constraints.maxWidth, child: {stack_widget})"
-    return (
-        "LayoutBuilder("
-        "builder: (context, constraints) {"
-        f"final viewportHeight = constraints.maxHeight.isFinite && "
-        f"constraints.maxHeight > 0 ? constraints.maxHeight : {artboard_height_token};"
-        "return SizedBox("
+    viewport = (
+        "SizedBox("
         "width: constraints.maxWidth, "
         "height: viewportHeight, "
         "child: SingleChildScrollView("
         f"child: {scroll_child}"
         ")"
-        ");"
+        ")"
+    )
+    return (
+        "LayoutBuilder("
+        "builder: (context, constraints) {"
+        f"final viewportHeight = constraints.maxHeight.isFinite && "
+        f"constraints.maxHeight > 0 ? constraints.maxHeight : {artboard_height_token};"
+        f"return {live_browser_viewport_frame(child=viewport)};"
         "},"
         ")"
     )
@@ -560,6 +591,18 @@ def artboard_interactive_scroll_preview(*, scroll_child: str) -> str:
     )
 
 
+def artboard_preview_viewport_frame(*, child: str) -> str:
+    """Wrap a preview viewport with a dev-only border in browser wizard preview."""
+    return (
+        "DecoratedBox("
+        "decoration: BoxDecoration("
+        "border: Border.all(color: Color(0xFF808080), width: 1.0)"
+        "), "
+        f"child: {child}"
+        ")"
+    )
+
+
 def artboard_static_wizard_preview(
     *,
     scroll_child: str,
@@ -572,10 +615,8 @@ def artboard_static_wizard_preview(
     that would hide hoisted ambient background layers behind the artboard.
     """
     if viewport_pin_bottom_chrome:
-        return (
-            "Align("
-            "alignment: Alignment.bottomCenter, "
-            "child: ClipRect("
+        viewport = (
+            "ClipRect("
             "child: SizedBox("
             "width: _artboardPreviewWidth, "
             "height: constraints.maxHeight.isFinite && constraints.maxHeight > 0 "
@@ -585,11 +626,15 @@ def artboard_static_wizard_preview(
             f"child: {scroll_child}"
             ")"
             ")"
+        )
+        return (
+            "Align("
+            "alignment: Alignment.bottomCenter, "
+            f"child: {artboard_preview_viewport_frame(child=viewport)}"
             ")"
         )
-    return (
-        "Center("
-        "child: ClipRect("
+    viewport = (
+        "ClipRect("
         "child: SizedBox("
         "width: _artboardPreviewWidth, "
         "height: _artboardPreviewHeight, "
@@ -598,8 +643,8 @@ def artboard_static_wizard_preview(
         ")"
         ")"
         ")"
-        ")"
     )
+    return f"Center(child: {artboard_preview_viewport_frame(child=viewport)})"
 
 
 def wrap_artboard_preview_layout_builder(

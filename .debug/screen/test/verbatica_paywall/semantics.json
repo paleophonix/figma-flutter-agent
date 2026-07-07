@@ -1,20 +1,6 @@
 {
   "accepted": [
     {
-      "figmaId": "2399:42778",
-      "kind": "nav_scroll_host",
-      "confidence": 0.86,
-      "evidence": {
-        "nav_scroll_host": true,
-        "child_type_counts": {
-          "STACK": 1,
-          "COLUMN": 3
-        },
-        "child_count": 4
-      },
-      "rejectReason": null
-    },
-    {
       "figmaId": "2399:42786",
       "kind": "button_filled",
       "confidence": 0.86,
@@ -229,6 +215,6 @@
   "legacySemanticTypeDetected": [],
   "nameSignalUsed": [],
   "llmAnnotationUsed": [],
-  "acceptedCount": 5,
-  "totalDecisions": 16
+  "acceptedCount": 4,
+  "totalDecisions": 15
 }

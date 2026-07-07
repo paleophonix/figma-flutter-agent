@@ -13,6 +13,7 @@ _DEFAULT_ARTBOARD_SIZE = (390, 844)
 ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
 ARTBOARD_PREVIEW_HEIGHT_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT"
 ARTBOARD_CAPTURE_MODE_DEFINE = "FIGMA_FLUTTER_ARTBOARD_CAPTURE_MODE"
+BROWSER_VIEWPORT_FRAME_DEFINE = "FIGMA_FLUTTER_BROWSER_VIEWPORT_FRAME"
 CHROME_PREVIEW_WEB_HOST = "127.0.0.1"
 
 
@@ -137,6 +138,11 @@ def chrome_web_build_flags() -> list[str]:
     only to ``flutter run`` dev-server binds.
     """
     return ["--no-web-resources-cdn"]
+
+
+def chrome_browser_viewport_frame_define() -> str:
+    """Return a dart-define that draws a viewport border in browser wizard preview."""
+    return f"--dart-define={BROWSER_VIEWPORT_FRAME_DEFINE}=true"
 
 
 def chrome_preview_dart_defines(

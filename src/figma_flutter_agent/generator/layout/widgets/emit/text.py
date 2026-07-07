@@ -79,7 +79,18 @@ def render_text_node(
     from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
     from figma_flutter_agent.parser.interaction.icons import (
         layout_fact_stack_vertical_icon_label_chip_tile,
+        private_use_glyph_icon_expr,
     )
+
+    glyph_icon = private_use_glyph_icon_expr(node, parent_node=parent_node)
+    if glyph_icon is not None:
+        return _finalize_widget(
+            node,
+            glyph_icon,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
 
     align = text_align_expr(node.style)
     align_suffix = f", textAlign: {align}" if align else ""

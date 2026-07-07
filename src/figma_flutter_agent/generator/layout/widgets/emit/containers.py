@@ -720,7 +720,11 @@ class render_misc:
             }:
                 inner = f"Container(decoration: {box_decoration}, child: {inner})"
             return _finalize_widget(
-                node, inner, parent_type=parent_type, scroll_content_root=scroll_content_root
+                node,
+                inner,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
             )
 
         if uses_svg and _should_prefer_exported_svg(node):
@@ -743,13 +747,21 @@ class render_misc:
         leaf_surface = _render_leaf_surface(node)
         if leaf_surface is not None:
             return _finalize_widget(
-                node, leaf_surface, parent_type=parent_type, scroll_content_root=scroll_content_root
+                node,
+                leaf_surface,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
             )
 
         glyph = _render_stroke_glyph_fallback(node)
         if glyph is not None:
             return _finalize_widget(
-                node, glyph, parent_type=parent_type, scroll_content_root=scroll_content_root
+                node,
+                glyph,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
             )
 
         from figma_flutter_agent.generator.layout.spacer import dimensioned_spacer_widget_expr
@@ -760,6 +772,7 @@ class render_misc:
                 node,
                 spacer,
                 parent_type=parent_type,
+                parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
 
@@ -767,6 +780,7 @@ class render_misc:
             node,
             "const SizedBox.shrink()",
             parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 

@@ -1,0 +1,56 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-player-decomposed-flex-illegal-host
+  title: Expanded under Align in decomposed phone-shell body method
+  case_kind: regression
+  project: test
+  feature: verbatica_player
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T14:30:00Z'
+  updated_at: '2026-07-07T14:30:00Z'
+  summary: >
+    LAW-FLEX-DECOMPOSED-SLOT — decomposed growable-panel methods emitted Expanded while
+    compose wrapped the method call in SizedBox/Align, crashing layout and hiding player
+    content at runtime.
+
+occurrences:
+  - id: verbatica-player-decomposed-expanded-under-align
+    family_id: flex_parent_data_illegal_host
+    pipeline_arrow: A3
+    law_id: LAW-FLEX-PARENT-DATA-HOST
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/file_methods.py
+      symbol: method_node_suppresses_compose_flex_fill
+    contract:
+      field: flex_parent_data_wrapper
+      field_class: intent
+      category: illegal
+      expected: >
+        Decomposed phone-shell growable slots must not return Expanded when compose owns
+        bounded vertical extent and optional outer Expanded on the method call.
+      actual: >
+        _buildFeature returned Expanded(child: Column(...)) under
+        SizedBox(height: 610, child: Align(child: _buildFeature(context))).
+    authority_boundary: emitter
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_player/screen.dart
+        summary: >
+          LayoutBuilder child Expanded under Align; last.log ParentDataWidget illegal host.
+    repair:
+      summary: >
+        Strip top-level Expanded from decomposed growable-panel method bodies when compose
+        owns phone-shell flex fill; regression tests in test_verbatica_player_emit_laws.py.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/file_methods.py
+        - src/figma_flutter_agent/generator/layout/file.py
+      regression_tests:
+        - tests/test_verbatica_player_emit_laws.py::test_decomposed_growable_slot_suppresses_top_level_expanded
+      verification:
+        - poetry run pytest tests/test_verbatica_player_emit_laws.py::test_decomposed_growable_slot_suppresses_top_level_expanded -q

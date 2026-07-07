@@ -1,10 +1,10 @@
 {
-  "cacheKey": "9ae293c4855be4b2df3bdb8e0425fc074a316592923b533f8f17636f40556a91",
+  "cacheKey": "6400f891e1260d35ae0d54c444ab680447472b7f81c1082a99e750ca55e184fc",
   "response": {
     "entries": [
       {
         "clusterId": "component_111_16846_ed645bd8",
-        "widgetName": "SubscribeFreeTrialButtonWidget",
+        "widgetName": "SubscribeButtonWidget",
         "paramRenames": {}
       },
       {
@@ -14,37 +14,37 @@
       },
       {
         "clusterId": "component_118_7511_24ebf3ca",
-        "widgetName": "TertiaryActionButtonWidget",
+        "widgetName": "PaywallTertiaryActionButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23327",
-        "widgetName": "CellularSignalWidget",
+        "widgetName": "CellularSignalIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23343",
-        "widgetName": "WifiSignalWidget",
+        "widgetName": "WifiStatusIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23346",
-        "widgetName": "BatteryStatusWidget",
+        "widgetName": "BatteryStatusIconWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23393_de98d704",
-        "widgetName": "StatusBarContentWidget",
+        "widgetName": "StatusInfoWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23556_de98d704",
-        "widgetName": "StatusBarWidget",
+        "widgetName": "PaywallTopBarWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_54_3907_58c331e9",
-        "widgetName": "CloseIconButtonWidget",
+        "widgetName": "CloseButtonWidget",
         "paramRenames": {}
       },
       {

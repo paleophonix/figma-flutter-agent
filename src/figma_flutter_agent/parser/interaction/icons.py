@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.style import dart_color_expr
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from .shared import (
@@ -577,6 +579,54 @@ def layout_fact_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
         elif width <= _STROKE_AXIS_MAX_THICKNESS and height >= _STROKE_AXIS_MIN_SPAN:
             vertical += 1
     return horizontal >= 1 and vertical >= 1
+
+
+def is_private_use_area_glyph(text: str) -> bool:
+    """Return True when ``text`` uses the Unicode private-use area (SF Symbol exports)."""
+    stripped = text.strip()
+    if not stripped:
+        return False
+    return any(0xE000 <= ord(char) <= 0xF8FF for char in stripped)
+
+
+def _compact_dismiss_icon_host(node: CleanDesignTreeNode) -> bool:
+    """Compact circular/square hosts that carry dismiss SF Symbol glyphs."""
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    span_w = float(width)
+    span_h = float(height)
+    if not (_COMPACT_ICON_ACTION_MIN <= span_w <= _COMPACT_ICON_ACTION_MAX):
+        return False
+    if not (_COMPACT_ICON_ACTION_MIN <= span_h <= _COMPACT_ICON_ACTION_MAX):
+        return False
+    radius = node.style.border_radius
+    if radius is not None and float(radius) >= min(span_w, span_h) * 0.4:
+        return True
+    return abs(span_w - span_h) <= 2.0
+
+
+def private_use_glyph_icon_expr(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> str | None:
+    """Map private-use glyph text to portable Material icons inside compact hosts."""
+    if node.type != NodeType.TEXT or not is_private_use_area_glyph(node.text or ""):
+        return None
+    host = parent_node
+    if host is None:
+        return None
+    if host.type not in {NodeType.BUTTON, NodeType.STACK, NodeType.ROW}:
+        return None
+    if not _compact_dismiss_icon_host(host) and host.type != NodeType.BUTTON:
+        return None
+    color = dart_color_expr(node.style, fallback="Theme.of(context).colorScheme.primary")
+    size_lit = format_geometry_literal(
+        min(float(node.sizing.height or 20.0), float(node.style.font_size or 20.0))
+    )
+    return f"Icon(Icons.close, color: {color}, size: {size_lit})"
 
 
 def layout_fact_stroke_minus_icon(node: CleanDesignTreeNode) -> bool:

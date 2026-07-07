@@ -47,6 +47,10 @@ class GeneratedScreenShell extends StatelessWidget {{
       0;
   static final bool _artboardCaptureMode =
       const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_CAPTURE_MODE', defaultValue: '') == '1';
+  static const bool _browserViewportFrame = bool.fromEnvironment(
+    'FIGMA_FLUTTER_BROWSER_VIEWPORT_FRAME',
+    defaultValue: false,
+  );
 
   @override
   Widget build(BuildContext context) {{
@@ -77,13 +81,21 @@ class GeneratedScreenShell extends StatelessWidget {{
               : media.width;
           final horizontalPadding = AppBreakpoints.horizontalPadding(width);
           final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
+          final framedChild = _browserViewportFrame
+              ? DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Color(0xFF808080), width: 1.0),
+                  ),
+                  child: child,
+                )
+              : child;
           return Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: contentMaxWidth),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: child,
+                child: framedChild,
               ),
             ),
           );

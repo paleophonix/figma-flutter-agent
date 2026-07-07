@@ -1,32 +1,50 @@
 {
-  "cacheKey": "8f10c792cc76e99b2d168ae5783aabd023a26de4074583580a0f3b27cb8a5160",
+  "cacheKey": "2281c4db2e138b7731a9f6c83a3cbccb2eaaf4278c7cd6b611702ab5ddb0fb77",
   "response": {
     "candidates": [
       {
-        "nodeId": "2399:42788",
-        "widgetName": "SubscriptionPlanOption",
-        "reason": "Repeated subscription-plan row pattern with title, monthly price, total price, and check icon across three options.",
-        "confidence": 0.97,
+        "nodeId": "2399:42789",
+        "widgetName": "PricingPlanOptionRow",
+        "reason": "Three nearly identical plan rows repeat in the pricing section, differing mainly by term, prices, and the optional savings badge.",
+        "confidence": 0.98,
         "suggestedParams": [
-          "durationText",
-          "totalPriceText",
-          "pricePerMonthText",
-          "badgeText"
+          "termLabel",
+          "monthlyPriceLabel",
+          "totalPriceLabel",
+          "savingsLabel",
+          "isSelected"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42801",
-            "2399:42812"
+            "2399:42802",
+            "2399:42813"
           ],
-          "shapeSimilarity": 0.96,
-          "semanticRole": "subscription plan option row"
+          "shapeSimilarity": 0.99,
+          "semanticRole": "subscription plan selection row"
+        }
+      },
+      {
+        "nodeId": "2399:42838",
+        "widgetName": "TertiaryActionButton",
+        "reason": "This tertiary button component is reused twice with different labels and heights, making it a good shared action widget.",
+        "confidence": 0.91,
+        "suggestedParams": [
+          "label",
+          "isCompact"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "2399:42839"
+          ],
+          "shapeSimilarity": 0.88,
+          "semanticRole": "secondary paywall action button"
         }
       },
       {
         "nodeId": "2399:42837",
-        "widgetName": "PrimaryPaywallCtaButton",
-        "reason": "Primary call-to-action button with a title and subtitle stacked inside the same button container.",
-        "confidence": 0.94,
+        "widgetName": "PrimarySubscribeButton",
+        "reason": "Prominent primary CTA button for the paywall; the component is already isolated and suitable for reuse across subscription screens.",
+        "confidence": 0.78,
         "suggestedParams": [
           "title",
           "subtitle"
@@ -34,70 +52,7 @@
         "evidence": {
           "similarNodes": [],
           "shapeSimilarity": null,
-          "semanticRole": "primary subscription CTA button"
-        }
-      },
-      {
-        "nodeId": "2399:42838",
-        "widgetName": "SecondaryPaywallActionButton",
-        "reason": "Same button component is used for the two secondary actions, differing mainly by label and height.",
-        "confidence": 0.95,
-        "suggestedParams": [
-          "label",
-          "buttonHeight"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "2399:42839"
-          ],
-          "shapeSimilarity": 1.0,
-          "semanticRole": "secondary action button"
-        }
-      },
-      {
-        "nodeId": "2399:42783",
-        "widgetName": "StatusBar",
-        "reason": "Standard mobile status bar system component, already isolated as a reusable component in the tree.",
-        "confidence": 0.99,
-        "suggestedParams": [
-          "timeText",
-          "showCamera",
-          "showDate",
-          "showBatteryTime"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "device status bar"
-        }
-      },
-      {
-        "nodeId": "2399:42786",
-        "widgetName": "CloseButton",
-        "reason": "Standalone trailing close icon button used in the header area.",
-        "confidence": 0.98,
-        "suggestedParams": [
-          "iconLabel"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "dismiss/close button"
-        }
-      },
-      {
-        "nodeId": "2399:42843",
-        "widgetName": "HomeIndicator",
-        "reason": "iPhone home indicator system element, suitable as a reusable device chrome widget.",
-        "confidence": 0.99,
-        "suggestedParams": [
-          "orientation",
-          "mode"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "system home indicator"
+          "semanticRole": "primary subscription call to action"
         }
       }
     ]

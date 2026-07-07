@@ -19,6 +19,7 @@ from figma_flutter_agent.dev.flutter_app_log import (
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.preview_size import (
     CHROME_PREVIEW_WEB_HOST,
+    chrome_browser_viewport_frame_define,
     chrome_preview_dart_defines,
     chrome_preview_web_launch_url,
     chrome_preview_web_url,
@@ -181,6 +182,8 @@ def _append_chrome_preview_flags(
     window_offset_x: int = 0,
 ) -> None:
     """Extend ``flutter run`` argv with Chrome preview flags for one window."""
+    if is_chrome_device(device_id):
+        run_cmd.append(chrome_browser_viewport_frame_define())
     if preview_size is None or not is_chrome_device(device_id):
         return
     artboard_width, artboard_height = preview_size

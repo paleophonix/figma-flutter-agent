@@ -254,9 +254,11 @@ def test_flattened_back_arrow_export_emits_tap_target() -> None:
 def test_wizard_preview_does_not_paint_opaque_artboard_overlay() -> None:
     preview = artboard_static_wizard_preview(scroll_child="child")
     assert "ColoredBox(color: Color(0xFF1E1E1E)" not in preview
+    assert "Border.all(color: Color(0xFF808080)" in preview
     wrapped = wrap_artboard_preview_layout_builder(
         preview_child="SizedBox(width: previewW, height: previewH, child: child)",
         fallback="child",
         scroll_child="SizedBox(width: previewW, height: previewH, child: child)",
     )
     assert "ColoredBox(color: Color(0xFF1E1E1E)" not in wrapped
+    assert "Border.all(color: Color(0xFF808080)" in wrapped

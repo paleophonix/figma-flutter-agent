@@ -518,6 +518,8 @@ def test_bottom_chrome_viewport_partition_live_balanced_delimiters() -> None:
         width_token="430.0",
         height_token="932.0",
     )
+    assert "_browserViewportFrame" in wrapper
+    assert "Border.all(color: Color(0xFF808080)" in wrapper
     snippet = f"Widget build(BuildContext context) {{ return {wrapper}; }}"
     assert validate_dart_delimiters(snippet) is None
 

@@ -12,7 +12,7 @@ from figma_flutter_agent.generator.layout.widgets import (
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.parser.render_bounds import stack_needs_soft_clip
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 MAX_INLINE_LAYOUT_DEPTH = 7
 
@@ -85,6 +85,39 @@ def chunk_dart_file_stem(feature_name: str, class_name: str) -> str:
     """Return the file stem for a chunk Dart file."""
     suffix = class_name.lower().removeprefix("figmachunk")
     return f"{feature_name}_chunk_{suffix}"
+
+
+def method_node_suppresses_compose_flex_fill(
+    node: CleanDesignTreeNode,
+    render_tree: CleanDesignTreeNode,
+) -> bool:
+    """Return True when compose owns flex fill for a decomposed phone-shell slot.
+
+    Decomposed builder methods for FILL-height growable panels must not emit a
+    top-level ``Expanded`` when compose wraps the method call in a bounded slot
+    (``SizedBox`` / ``Align`` and optional outer ``Expanded``).
+    """
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_is_growable_panel,
+    )
+
+    _ = render_tree
+    return (
+        stack_child_is_growable_panel(node)
+        and node.sizing.height_mode == SizingMode.FILL
+    )
+
+
+def strip_top_level_flex_parent_data(widget: str) -> str:
+    """Remove a single outer ``Expanded``/``Flexible`` wrapper from ``widget``."""
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        _unwrap_flex_parent_data_wrapper,
+    )
+
+    unwrapped = _unwrap_flex_parent_data_wrapper(widget.strip())
+    if unwrapped is None:
+        return widget
+    return unwrapped[1]
 
 
 def plan_layout_methods(tree: CleanDesignTreeNode) -> list[LayoutMethod] | None:

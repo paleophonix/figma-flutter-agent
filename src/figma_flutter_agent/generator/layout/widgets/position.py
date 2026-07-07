@@ -148,6 +148,30 @@ def _layout_rect_edge_origin(node: CleanDesignTreeNode) -> tuple[float | None, f
     return left, top
 
 
+def _synthesize_stack_placement_from_geometry(
+    node: CleanDesignTreeNode,
+) -> StackPlacement | None:
+    """Build a ``StackPlacement`` from conserved geometry when Figma omitted pins."""
+    left, top = _layout_rect_edge_origin(node)
+    if left is None or top is None:
+        return None
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        frame = node.geometry_frame
+        if frame is not None and frame.layout_rect is not None:
+            width = frame.layout_rect.width
+            height = frame.layout_rect.height
+    if width is None or height is None:
+        return None
+    return StackPlacement(
+        left=left,
+        top=top,
+        width=float(width),
+        height=float(height),
+    )
+
+
 def placement_dual_horizontal_insets_overconstrain(
     placement: StackPlacement,
     parent_width: float | None,

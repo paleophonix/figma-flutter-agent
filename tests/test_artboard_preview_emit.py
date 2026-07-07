@@ -14,6 +14,8 @@ def test_wrap_artboard_preview_uses_class_static_fields() -> None:
     assert "if (_artboardCaptureMode)" in wrapped
     assert "ClipRect(child: SizedBox(" in wrapped
     assert "Center(" in wrapped
+    assert "DecoratedBox(" in wrapped
+    assert "Border.all(color: Color(0xFF808080)" in wrapped
     assert "SingleChildScrollView(" in wrapped
     assert "double.fromEnvironment" not in wrapped
     assert "String.fromEnvironment" not in wrapped

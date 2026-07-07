@@ -146,8 +146,23 @@ def _wrap_render_boundary_tap(node: CleanDesignTreeNode, widget: str) -> str:
     )
 
 
+def _node_effective_opacity_zero(node: CleanDesignTreeNode) -> bool:
+    """Return True when a node's own opacity makes the subtree non-visible."""
+    opacity = node.style.opacity
+    return opacity is not None and opacity <= 0.0
+
+
+def _wrap_zero_opacity(node: CleanDesignTreeNode, widget: str) -> str:
+    """Drop paint and hit targets for fully transparent Figma frames."""
+    if not _node_effective_opacity_zero(node):
+        return widget
+    return "const SizedBox.shrink()"
+
+
 def _wrap_group_opacity(node: CleanDesignTreeNode, widget: str) -> str:
     """Apply frame opacity to the whole subtree (FID-12)."""
+    if node.extracted_widget_ref:
+        return widget
     opacity = node.style.opacity
     if opacity is None or opacity >= 1.0 - 1e-6 or opacity <= 0.0:
         return widget
@@ -185,7 +200,8 @@ def _finalize_widget(
     fill_parent: bool = False,
     scroll_content_root: bool = False,
 ) -> str:
-    wrapped = _wrap_accessibility(node, widget)
+    wrapped = _wrap_zero_opacity(node, widget)
+    wrapped = _wrap_accessibility(node, wrapped)
     wrapped = _wrap_group_opacity(node, wrapped)
     wrapped = _wrap_content_layer_blur(node, wrapped)
     wrapped = _wrap_min_touch_target(node, wrapped)

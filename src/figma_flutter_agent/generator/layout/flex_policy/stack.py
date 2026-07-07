@@ -1031,6 +1031,22 @@ def stack_should_emit_mixed_inflow_column_overlay(stack: CleanDesignTreeNode) ->
     absolute = [child for child in stack.children if stack_child_is_absolute_overlay(child)]
     if not inflow or not absolute:
         return False
+    if len(inflow) == 1:
+        from figma_flutter_agent.generator.layout.widgets.position import (
+            _layout_rect_edge_origin,
+        )
+
+        inflow_left, inflow_top = _layout_rect_edge_origin(inflow[0])
+        if inflow_left is not None and inflow_top is not None:
+            for abs_child in absolute:
+                abs_left, abs_top = _layout_rect_edge_origin(abs_child)
+                if (
+                    abs_left is not None
+                    and abs_top is not None
+                    and abs(abs_top - inflow_top) <= 1.0
+                    and abs_left > inflow_left + 1.0
+                ):
+                    return False
     if len(inflow) < 2 and (stack.spacing or 0.0) <= 0.0:
         return False
     return tree_children_are_vertically_sequential(inflow)
@@ -1048,6 +1064,22 @@ def stack_should_emit_coalesced_inflow_fallback(stack: CleanDesignTreeNode) -> b
     absolute = [child for child in stack.children if stack_child_is_absolute_overlay(child)]
     if not inflow or not absolute:
         return False
+    if len(inflow) == 1:
+        from figma_flutter_agent.generator.layout.widgets.position import (
+            _layout_rect_edge_origin,
+        )
+
+        inflow_left, inflow_top = _layout_rect_edge_origin(inflow[0])
+        if inflow_left is not None and inflow_top is not None:
+            for abs_child in absolute:
+                abs_left, abs_top = _layout_rect_edge_origin(abs_child)
+                if (
+                    abs_left is not None
+                    and abs_top is not None
+                    and abs(abs_top - inflow_top) <= 1.0
+                    and abs_left > inflow_left + 1.0
+                ):
+                    return False
     if len(inflow) < 2 and (stack.spacing or 0.0) <= 0.0:
         return False
     return tree_children_are_vertically_sequential(inflow)

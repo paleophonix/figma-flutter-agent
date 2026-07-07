@@ -377,36 +377,46 @@ def _semantic_raster_bindings(
         if labels:
             candidates[node_id] = labels
 
+    orphan_files = [
+        path
+        for path in sorted(images_dir.iterdir())
+        if path.suffix.lower() in _RASTER_SUFFIXES
+        and node_id_from_asset_stem(path.stem) is None
+        and _normalize_binding_text(path.stem.replace("_", " "))
+    ]
     entries: list[AssetManifestEntry] = []
     assigned_nodes: set[str] = set()
-    for path in sorted(images_dir.iterdir()):
-        if path.suffix.lower() not in _RASTER_SUFFIXES:
-            continue
-        if node_id_from_asset_stem(path.stem) is not None:
-            continue
-        token = _normalize_binding_text(path.stem.replace("_", " "))
-        if not token:
-            continue
-        best_node_id: str | None = None
+    assigned_files: set[Path] = set()
+
+    def _binding_score(labels: list[str], path: Path) -> int:
+        score = _word_overlap_score(path.stem, labels)
+        if score <= 0 and _stem_matches_labels(path.stem, labels):
+            return 1
+        return score
+
+    # ponytail: node-first greedy claims best unused orphan raster per target.
+    for node_id in sorted(candidates):
+        labels = candidates[node_id]
+        best_path: Path | None = None
         best_score = 0
-        for node_id, labels in candidates.items():
-            if node_id in assigned_nodes:
+        for path in orphan_files:
+            if path in assigned_files:
                 continue
-            score = _word_overlap_score(path.stem, labels)
-            if score <= 0 and _stem_matches_labels(path.stem, labels):
-                score = 1
+            score = _binding_score(labels, path)
             if score > best_score:
                 best_score = score
-                best_node_id = node_id
-        if best_node_id is not None and best_score > 0:
-            entries.append(
-                AssetManifestEntry(
-                    node_id=best_node_id,
-                    asset_path=f"assets/images/{path.name}",
-                    kind="image",
-                )
+                best_path = path
+        if best_path is None or best_score <= 0:
+            continue
+        entries.append(
+            AssetManifestEntry(
+                node_id=node_id,
+                asset_path=f"assets/images/{best_path.name}",
+                kind="image",
             )
-            assigned_nodes.add(best_node_id)
+        )
+        assigned_nodes.add(node_id)
+        assigned_files.add(best_path)
     entries.extend(
         _orphan_raster_pairing(
             project_dir,

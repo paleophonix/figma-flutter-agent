@@ -20,7 +20,9 @@ from figma_flutter_agent.dev.flutter_launch import wait_for_tcp_listen
 from figma_flutter_agent.dev.preview_size import (
     ARTBOARD_PREVIEW_HEIGHT_DEFINE,
     ARTBOARD_PREVIEW_WIDTH_DEFINE,
+    BROWSER_VIEWPORT_FRAME_DEFINE,
     CHROME_PREVIEW_WEB_HOST,
+    chrome_browser_viewport_frame_define,
     chrome_live_launch_flags,
     chrome_preview_dart_defines,
     chrome_preview_launch_flags,
@@ -161,6 +163,12 @@ def test_chrome_web_build_flags_omit_run_only_hostname() -> None:
 
     assert chrome_web_build_flags() == ["--no-web-resources-cdn"]
     assert "--web-hostname" not in " ".join(chrome_web_build_flags())
+
+
+def test_chrome_browser_viewport_frame_define() -> None:
+    assert chrome_browser_viewport_frame_define() == (
+        f"--dart-define={BROWSER_VIEWPORT_FRAME_DEFINE}=true"
+    )
 
 
 def test_chrome_preview_dart_defines() -> None:

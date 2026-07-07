@@ -185,6 +185,33 @@ def _apply_stack_position(
     placement = node.stack_placement
     if placement is None and node.layout_positioning == "ABSOLUTE":
         placement = StackPlacement(left=node.offset_x, top=node.offset_y)
+    if placement is None and parent_node is not None and parent_node.type == NodeType.STACK:
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            stack_child_is_absolute_overlay,
+        )
+        from figma_flutter_agent.generator.layout.widgets.position import (
+            _layout_rect_edge_origin,
+            _synthesize_stack_placement_from_geometry,
+        )
+
+        has_absolute_sibling = any(
+            stack_child_is_absolute_overlay(sibling)
+            for sibling in parent_node.children
+            if sibling.id != node.id
+        )
+        if has_absolute_sibling and not stack_child_is_absolute_overlay(node):
+            placement = _synthesize_stack_placement_from_geometry(node)
+            if placement is None:
+                left, top = _layout_rect_edge_origin(node)
+                width = node.sizing.width
+                height = node.sizing.height
+                if left is not None and top is not None:
+                    placement = StackPlacement(
+                        left=left,
+                        top=top,
+                        width=width,
+                        height=height,
+                    )
     if placement is None:
         return widget
     if parent_node is not None:

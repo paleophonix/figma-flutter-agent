@@ -2,6 +2,7 @@
   "featureName": "verbatica_paywall",
   "emitterVersion": "2026.07.1",
   "checkpoints": [
+    "CP0b_reprune",
     "CP1_guards",
     "CP1_normalize",
     "CP2_ir_passes",
@@ -209,56 +210,6 @@
       "policy": null
     },
     {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "sectionize",
-      "nodeId": "2399:42778",
-      "field": "type",
-      "old": "STACK",
-      "new": "COLUMN",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "sectionize",
-      "nodeId": "2399:42778",
-      "field": "layout_evidence",
-      "old": null,
-      "new": {
-        "sections": 3,
-        "bands": 3,
-        "bottom_chrome": 1,
-        "top_chrome": 0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "sectionize",
-      "nodeId": "2399:42778",
-      "field": "children_count",
-      "old": 5,
-      "new": 4,
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42778",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "2399:42778",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "2399:42786",
@@ -404,19 +355,6 @@
     }
   ],
   "decisions": [
-    {
-      "nodeId": "2399:42778",
-      "kind": "nav_scroll_host",
-      "confidence": 0.86,
-      "evidence": {
-        "nav_scroll_host": true,
-        "child_type_counts": {
-          "STACK": 1,
-          "COLUMN": 3
-        },
-        "child_count": 4
-      }
-    },
     {
       "nodeId": "2399:42786",
       "kind": "button_filled",
