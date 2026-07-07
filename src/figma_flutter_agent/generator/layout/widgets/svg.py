@@ -376,7 +376,22 @@ def _layout_slot_raster_emit_dimensions(
 
     expanded_width, expanded_height = expanded_layout_dimensions(node, layout_width, layout_height)
     placement = node.stack_placement
+    sizing_width = node.sizing.width
+    sizing_height = node.sizing.height
     if placement is None:
+        if (
+            sizing_width is not None
+            and sizing_height is not None
+            and float(sizing_width) > 0
+            and float(sizing_height) > 0
+            and expanded_width is not None
+            and expanded_height is not None
+            and (
+                float(expanded_width) > float(sizing_width) + 0.5
+                or float(expanded_height) > float(sizing_height) + 0.5
+            )
+        ):
+            return layout_width, layout_height
         return expanded_width, expanded_height
     slot_width = placement.width
     slot_height = placement.height

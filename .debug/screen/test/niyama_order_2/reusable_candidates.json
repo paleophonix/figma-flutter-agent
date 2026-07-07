@@ -1,138 +1,86 @@
 {
-  "cacheKey": "837fad565ece902854fa5a2b8055e034fe6e205127fe176e49f2eb1e83817066",
+  "cacheKey": "c6b76cd49d4d328a5bdc121cc90debd3e3571c03aaab9751355e1c350e6d55c3",
   "response": {
     "candidates": [
       {
         "nodeId": "3561:42990",
         "widgetName": "OrderProductItem",
-        "reason": "Repeated 4 times as the same component group for each ordered dish row, with mostly varying title/price/comment text.",
-        "confidence": 0.97,
+        "reason": "Repeated 4 times with the same card/row structure for product lines, only text content changes.",
+        "confidence": 0.98,
         "suggestedParams": [
           "productName",
-          "unitPriceText",
-          "noteText",
-          "showNote"
+          "quantityPriceText",
+          "notesText"
         ],
         "evidence": {
           "similarNodes": [
+            "3561:42990",
             "3561:42991",
             "3561:42992",
             "3561:42993"
           ],
           "shapeSimilarity": 0.99,
-          "semanticRole": "Order item row"
+          "semanticRole": "Order line item"
         }
       },
       {
         "nodeId": "3561:43000",
-        "widgetName": "OrderInfoRow",
-        "reason": "Repeated 5 times as a consistent two-column summary row in the order details section.",
-        "confidence": 0.98,
+        "widgetName": "OrderDetailRow",
+        "reason": "Repeated 5 times as a consistent label/value summary row with minor value color differences.",
+        "confidence": 0.99,
         "suggestedParams": [
-          "label",
-          "value",
+          "labelText",
+          "valueText",
           "valueColor"
         ],
         "evidence": {
           "similarNodes": [
+            "3561:43000",
             "3561:43001",
             "3561:43002",
             "3561:43003",
             "3561:43004"
           ],
           "shapeSimilarity": 1.0,
-          "semanticRole": "Order summary row"
+          "semanticRole": "Key/value detail row"
         }
       },
       {
         "nodeId": "3561:43011",
-        "widgetName": "AddressInfoCardWithIcon",
-        "reason": "One of a repeated 2-item component group; shared structure with text block plus trailing icon for location/table entries.",
-        "confidence": 0.9,
+        "widgetName": "AddressInfoCard",
+        "reason": "Repeated 2 times with the same address card layout and only icon/text content changing.",
+        "confidence": 0.97,
         "suggestedParams": [
-          "line1",
-          "line2",
+          "titleText",
+          "subtitleText",
           "iconName"
         ],
         "evidence": {
           "similarNodes": [
+            "3561:43011",
             "3561:43012"
           ],
           "shapeSimilarity": 0.98,
-          "semanticRole": "Address/info card with icon"
+          "semanticRole": "Address/location info card"
         }
       },
       {
-        "nodeId": "3561:43005",
-        "widgetName": "CommentInfoCard",
-        "reason": "Distinct reusable card for the comment/details area, with label and multi-line body text.",
-        "confidence": 0.78,
+        "nodeId": "I3561:43006;1026:6468",
+        "widgetName": "BottomActionButton",
+        "reason": "Two sibling buttons share the same size and structure, differing mainly by label and color styling.",
+        "confidence": 0.89,
         "suggestedParams": [
-          "label",
-          "bodyText"
+          "labelText",
+          "textColor",
+          "backgroundColor"
         ],
         "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "Comment/details card"
-        }
-      },
-      {
-        "nodeId": "3561:42994",
-        "widgetName": "SectionHeaderWithIcon",
-        "reason": "Standalone componentized section header combining a cutlery icon and title text.",
-        "confidence": 0.72,
-        "suggestedParams": [
-          "title",
-          "iconName"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "Section header with leading icon"
-        }
-      },
-      {
-        "nodeId": "3561:42979",
-        "widgetName": "StatusBadge",
-        "reason": "Componentized info label badge used to show order status state in the header area.",
-        "confidence": 0.66,
-        "suggestedParams": [
-          "statusText"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "Status badge"
-        }
-      },
-      {
-        "nodeId": "3561:42985",
-        "widgetName": "BonusCounterBadge",
-        "reason": "Small reusable counter/bonus pill with numeric value and compact styling.",
-        "confidence": 0.64,
-        "suggestedParams": [
-          "countText"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "Numeric badge"
-        }
-      },
-      {
-        "nodeId": "3561:43006",
-        "widgetName": "OrderActionBar",
-        "reason": "Reusable bottom action bar pattern with two large actions and a home indicator.",
-        "confidence": 0.69,
-        "suggestedParams": [
-          "primaryActionLabel",
-          "secondaryActionLabel"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "Bottom action bar"
+          "similarNodes": [
+            "I3561:43006;1026:6468",
+            "I3561:43006;1026:6469"
+          ],
+          "shapeSimilarity": 0.94,
+          "semanticRole": "Primary/secondary action button"
         }
       }
     ]

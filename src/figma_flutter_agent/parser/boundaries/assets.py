@@ -193,13 +193,19 @@ def _numeric_id_from_asset_index_key(safe_id: str) -> int | None:
 def lookup_asset_path_for_component_vector_family(
     asset_index: dict[str, str],
     node_id: str,
+    *,
+    component_ref: str | None = None,
 ) -> str | None:
     """Resolve a sibling variant vector export via shared Figma file-key prefix.
 
     Adjacent icon-library ids (e.g. ``1162:10099`` vs ``1162:10106``) are distinct
     glyphs; only distant variant ids may share a baked export (``1162:10248``).
+    When ``component_ref`` is set, family discovery keys off the published component
+    file key instead of the instance-path leaf id so unrelated icon-library exports
+    cannot alias across component families.
     """
-    prefix = _component_file_key_prefix_safe(node_id)
+    prefix_source = component_ref or node_id
+    prefix = _component_file_key_prefix_safe(prefix_source)
     if prefix is None:
         return None
     request_leaf = _leaf_figma_numeric_id(node_id)
@@ -223,13 +229,19 @@ def lookup_asset_path_for_component_vector_family(
 def lookup_asset_path_for_node(
     asset_index: dict[str, str],
     node_id: str,
+    *,
+    component_ref: str | None = None,
 ) -> str | None:
     """Resolve one node id against a pre-built :func:`build_asset_node_index` map."""
     for safe_id in _asset_lookup_safe_ids(node_id):
         resolved = asset_index.get(safe_id)
         if resolved is not None:
             return resolved
-    return lookup_asset_path_for_component_vector_family(asset_index, node_id)
+    return lookup_asset_path_for_component_vector_family(
+        asset_index,
+        node_id,
+        component_ref=component_ref,
+    )
 
 
 def _asset_stem_matches_node_id(asset_path: str, safe_id: str) -> bool:
@@ -273,13 +285,18 @@ def discover_asset_path_for_node(
     node_id: str,
     *,
     asset_index: dict[str, str] | None = None,
+    component_ref: str | None = None,
 ) -> str | None:
     """Find an on-disk SVG/PNG export for a Figma node id (any filename suffix)."""
     if asset_index is not None:
         exact = _lookup_exact_node_asset(asset_index, node_id)
         if exact is not None:
             return exact
-        return lookup_asset_path_for_node(asset_index, node_id)
+        return lookup_asset_path_for_node(
+            asset_index,
+            node_id,
+            component_ref=component_ref,
+        )
     exact = _discover_exact_node_asset(project_dir, node_id)
     if exact is not None:
         return exact
@@ -304,6 +321,7 @@ def discover_asset_path_for_node(
     family = lookup_asset_path_for_component_vector_family(
         build_asset_node_index(project_dir),
         node_id,
+        component_ref=component_ref,
     )
     return family
 
@@ -471,6 +489,7 @@ def _discover_filter_raster_fallback_path(
             project_dir,
             node_id,
             asset_index=asset_index,
+            component_ref=node.component_ref,
         )
         if discovered is not None and discovered.endswith(".png"):
             return discovered.replace("\\", "/")
@@ -495,6 +514,7 @@ def resolve_missing_image_asset_keys(
                 project_dir,
                 probe_id,
                 asset_index=asset_index,
+                component_ref=node.component_ref,
             )
             if discovered is not None and discovered.endswith((".png", ".jpg", ".webp")):
                 return discovered.replace("\\", "/")
@@ -503,6 +523,7 @@ def resolve_missing_image_asset_keys(
                 project_dir,
                 parent.id,
                 asset_index=asset_index,
+                component_ref=parent.component_ref or node.component_ref,
             )
             if discovered is not None and discovered.endswith((".png", ".jpg", ".webp")):
                 return discovered.replace("\\", "/")
@@ -515,6 +536,7 @@ def resolve_missing_image_asset_keys(
                     project_dir,
                     probe_id,
                     asset_index=asset_index,
+                    component_ref=node.component_ref,
                 )
                 if discovered is not None and discovered.lower().endswith(
                     (".png", ".jpg", ".jpeg", ".webp")
@@ -553,6 +575,7 @@ def resolve_missing_image_asset_keys(
                 project_dir,
                 node.id,
                 asset_index=asset_index,
+                component_ref=node.component_ref,
             )
             if discovered is not None:
                 node.image_asset_key = discovered.replace("\\", "/")

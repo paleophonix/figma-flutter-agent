@@ -7,6 +7,11 @@
       "kind": "auto",
       "children": [
         {
+          "figmaId": "3561:42975",
+          "kind": "container",
+          "children": []
+        },
+        {
           "figmaId": "3561:42976",
           "kind": "auto",
           "children": [
@@ -943,11 +948,6 @@
         {
           "figmaId": "3561:42974",
           "kind": "stack",
-          "children": []
-        },
-        {
-          "figmaId": "3561:42975",
-          "kind": "container",
           "children": []
         }
       ]

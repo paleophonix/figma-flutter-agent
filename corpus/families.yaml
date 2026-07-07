@@ -977,3 +977,26 @@ families:
       and images/detail rows are obscured. Root stack decomposition must preserve Figma
       paint order so backdrops stay behind foreground content.
     status: active
+
+  - id: image_asset_bound_to_wrong_node
+    title: Render-boundary image asset bound to the wrong node
+    pipeline_arrows:
+      - A4
+      - A3
+    owning_stage: parser
+    owners:
+      - module: src/figma_flutter_agent/parser/boundaries/assets.py
+        symbol: resolve_render_boundary_asset_keys
+    law_ids:
+      - LAW-IMAGE-ASSET-NODE-IDENTITY
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Render-boundary image drawables are assigned to nodes by position/order instead of
+      node identity, so images shuffle across sibling rows (a sushi photo lands on the
+      soy-sauce row) and a node whose own raster is missing falls back to an unrelated
+      cross-screen placeholder (portrait.png). Asset-to-node binding must key on the
+      figma node id, and a missing raster must degrade with a named placeholder, not
+      another node's image.
+    status: active

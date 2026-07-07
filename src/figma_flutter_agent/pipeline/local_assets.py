@@ -32,6 +32,11 @@ _GENERIC_NODE_NAMES = frozenset(
         "fallback-image.svg fill",
     }
 )
+_BINDING_LABEL_ANCESTOR_LIMIT = 3
+_BINDING_SUBTREE_TEXT_MAX_DEPTH = 2
+_PRODUCT_ROW_MEDIA_CHILD_TYPES = frozenset(
+    {NodeType.IMAGE, NodeType.STACK, NodeType.CONTAINER}
+)
 _CYRILLIC_TRANSLIT = str.maketrans(
     {
         "а": "a",
@@ -142,6 +147,41 @@ def _component_name_path_labels(name: str | None) -> list[str]:
     return [part.strip() for part in name.replace("\\", "/").split("/") if part.strip()]
 
 
+def _nearest_product_row_scope(
+    node_id: str,
+    *,
+    tree_by_id: dict[str, CleanDesignTreeNode],
+    parent_by_id: dict[str, str],
+) -> CleanDesignTreeNode | None:
+    """Return the closest product image+title row ancestor for label scoping."""
+    current = node_id
+    for _ in range(12):
+        parent_id = parent_by_id.get(current)
+        if parent_id is None:
+            break
+        parent = tree_by_id.get(parent_id)
+        if parent is None:
+            break
+        if parent.type == NodeType.ROW:
+            has_media = any(
+                child.type in _PRODUCT_ROW_MEDIA_CHILD_TYPES
+                and (child.type == NodeType.IMAGE or _is_raster_binding_target(child))
+                for child in parent.children
+            )
+            has_text = any(
+                child.type == NodeType.TEXT
+                or any(
+                    grandchild.type == NodeType.TEXT and (grandchild.text or "").strip()
+                    for grandchild in child.children
+                )
+                for child in parent.children
+            )
+            if has_media and has_text:
+                return parent
+        current = parent_id
+    return None
+
+
 def _collect_binding_labels(
     node_id: str,
     *,
@@ -171,8 +211,16 @@ def _collect_binding_labels(
             for value in target.variant.variant_properties.values():
                 add_label(str(value))
 
+    scope = _nearest_product_row_scope(
+        node_id,
+        tree_by_id=tree_by_id,
+        parent_by_id=parent_by_id,
+    )
+    if scope is not None:
+        for text_label in _subtree_text_labels(scope, max_depth=_BINDING_SUBTREE_TEXT_MAX_DEPTH):
+            add_label(text_label)
     current = node_id
-    for _ in range(8):
+    for _ in range(_BINDING_LABEL_ANCESTOR_LIMIT):
         parent_id = parent_by_id.get(current)
         if parent_id is None:
             break
@@ -189,8 +237,6 @@ def _collect_binding_labels(
                 add_label(part)
             for value in parent.variant.variant_properties.values():
                 add_label(str(value))
-        for text_label in _subtree_text_labels(parent, max_depth=6):
-            add_label(text_label)
         for child in parent.children:
             if child.type == NodeType.TEXT:
                 add_label(child.text or child.name)
@@ -254,8 +300,6 @@ def _orphan_raster_pairing(
     ]
     if not orphan_files or not unbound_targets:
         return []
-    if len(orphan_files) != len(unbound_targets):
-        return []
 
     entries: list[AssetManifestEntry] = []
     used_files: set[Path] = set()
@@ -274,12 +318,7 @@ def _orphan_raster_pairing(
             if score > best_score:
                 best_score = score
                 best_path = path
-        if best_path is None:
-            for path in orphan_files:
-                if path not in used_files:
-                    best_path = path
-                    break
-        if best_path is None:
+        if best_path is None or best_score <= 0:
             continue
         used_files.add(best_path)
         assigned_nodes.add(node_id)

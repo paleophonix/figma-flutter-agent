@@ -329,6 +329,30 @@ def render_stack(
                 scroll_content_root=scroll_content_root,
             )
     if (
+        node.image_asset_key
+        and not node.image_asset_key.lower().endswith(".svg")
+        and not has_raster_photo_fill
+        and not stack_hosts_notification_badge_overlay(node)
+        and (
+            is_composite_icon_export_node(node) or layout_fact_compact_vector_icon_export_node(node)
+        )
+    ):
+        from ..svg import _render_exported_vector
+
+        raster_widget = _render_exported_vector(node, uses_svg=uses_svg)
+        if raster_widget is not None:
+            fill_parent = _should_center_in_parent_stack(node, parent_node)
+            if fill_parent:
+                raster_widget = _wrap_centered_stack_child(node, raster_widget)
+            return _finalize_widget(
+                node,
+                raster_widget,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                fill_parent=fill_parent,
+                scroll_content_root=scroll_content_root,
+            )
+    if (
         uses_svg
         and node.vector_asset_key
         and not has_raster_photo_fill

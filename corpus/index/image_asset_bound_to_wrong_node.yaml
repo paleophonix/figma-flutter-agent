@@ -1,0 +1,18 @@
+version: 1
+family_id: image_asset_bound_to_wrong_node
+generated: true
+cases:
+- case_id: 2026-07-07-niyama-image-node-misbind
+  case_file: cases/2026-07-07-niyama-image-node-misbind.yaml
+  title: Product images shuffled — sushi photo on soy-sauce row, girl on sushi
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-image-node-misbind
+  status: OPEN
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T05:00:00Z'
+  updated_at: '2026-07-07T05:00:00Z'
+  summary: In niyama_order the product row images are bound to the wrong nodes. 
+    sussi.png (a sushi photo) is emitted on the "Соевый Соус" (soy sauce) row, 
+    while the actual sushi product "Окинава Монтерей" falls back to portrait.png
+    (a paywall hero photo from another screen). Image bindin...

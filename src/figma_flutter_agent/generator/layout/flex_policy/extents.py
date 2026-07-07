@@ -470,6 +470,10 @@ def _row_cross_axis_pin_already_applied(widget: str, height_lit: str) -> bool:
 
 def _pin_row_cross_axis_height_inner(inner: str, height_lit: str) -> str:
     """Add a finite cross-axis height inside a ROW flex child expression."""
+    import re
+
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
     trimmed = inner.lstrip()
     prefix = inner[: len(inner) - len(trimmed)]
     if trimmed.startswith("SizedBox("):
@@ -481,6 +485,12 @@ def _pin_row_cross_axis_height_inner(inner: str, height_lit: str) -> str:
             if ", height:" in head:
                 return inner
             if "width:" in head:
+                width_match = re.search(r"width:\s*([\d.]+)", head)
+                if width_match is not None:
+                    width_val = float(width_match.group(1))
+                    height_val = float(height_lit)
+                    if width_val > height_val + 0.5:
+                        height_lit = format_geometry_literal(width_val)
                 return f"{prefix}{head}, height: {height_lit}, child: {tail}"
     return f"{prefix}SizedBox(height: {height_lit}, child: {inner})"
 

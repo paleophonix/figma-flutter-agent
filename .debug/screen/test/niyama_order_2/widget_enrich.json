@@ -1,5 +1,5 @@
 {
-  "cacheKey": "a7101c446fa577a3651e72766c20747bd04d9cba78c4e7dd425f345f26c7c708",
+  "cacheKey": "b1e001c447b598661186d41fb53ecae05be238e82c13b29f1622767d18f0d326",
   "response": {
     "entries": [
       {
@@ -24,7 +24,7 @@
       },
       {
         "clusterId": "component_3481_34558",
-        "widgetName": "SystemStatusBarWidget",
+        "widgetName": "StatusBarWidget",
         "paramRenames": {}
       },
       {
@@ -34,32 +34,32 @@
       },
       {
         "clusterId": "component_3481_34893",
-        "widgetName": "SectionDividerWidget",
+        "widgetName": "DividerLineWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_34945_bffe9c04",
-        "widgetName": "OrderProductItemWidget",
+        "widgetName": "OrderItemWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35010_49f9e897",
-        "widgetName": "CutleryInfoWidget",
+        "widgetName": "CutleryOptionWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35156",
-        "widgetName": "DeliveryStatusBadgeWidget",
+        "widgetName": "OrderStatusBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35165_7cbfe998",
-        "widgetName": "DetailInfoCardWidget",
+        "widgetName": "CommentCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35212_0f40abd8",
-        "widgetName": "DetailRowCardWidget",
+        "widgetName": "OrderInfoRowWidget",
         "paramRenames": {}
       },
       {

@@ -287,7 +287,39 @@ def horizontal_scroll_product_tile(node: CleanDesignTreeNode) -> bool:
         return True
     if layout_fact_stack_category_component_tile(node):
         return True
+    if layout_fact_stack_component_catalog_product_tile(node):
+        return True
     return card_has_edge_to_edge_hero_stack(node)
+
+
+def layout_fact_stack_component_catalog_product_tile(node: CleanDesignTreeNode) -> bool:
+    """Component-backed vertical product cards used in horizontal upsell carousels."""
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_stack_category_component_tile,
+    )
+
+    if node.type != NodeType.STACK:
+        return False
+    if layout_fact_stack_category_component_tile(node):
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    span_w = float(width)
+    span_h = float(height)
+    if not (100.0 <= span_w <= 200.0 and 150.0 <= span_h <= 300.0):
+        return False
+    if node.component_ref is None and node.variant is None:
+        return False
+    has_image = any(
+        item.type == NodeType.IMAGE or item.image_asset_key
+        for item in _descendant_nodes(node, max_depth=4)
+    )
+    has_title = any(
+        item.type == NodeType.TEXT and (item.text or "").strip() for item in node.children
+    )
+    return has_image and has_title
 
 
 def layout_fact_stack_detail_hero_banner_host(node: CleanDesignTreeNode) -> bool:
