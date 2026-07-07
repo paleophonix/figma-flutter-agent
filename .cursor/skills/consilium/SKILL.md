@@ -57,6 +57,8 @@ emit-law / fixture pytest alone is not corpus signoff
 consilium does not override corpus-law.mdc
 ```
 
+**Screen close-out:** when the user says the screen is ready, consilium should list all `OPEN` cases for `project`+`feature` (index scan) and confirm the repair plan closes **all** except user-named exceptions («кроме …»).
+
 ## Anti-patching (mandatory)
 
 Every consilium verdict must explicitly audit anti-patching. **REVERT REQUIRED** or **REQUEST CHANGES** if any item fails.

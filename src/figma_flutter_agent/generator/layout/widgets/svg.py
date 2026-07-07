@@ -404,9 +404,10 @@ def _layout_slot_raster_emit_dimensions(
         or expanded_height is None
     ):
         return expanded_width, expanded_height
-    if float(expanded_width) > float(slot_width) + 0.5 or float(
-        expanded_height
-    ) > float(slot_height) + 0.5:
+    if (
+        float(expanded_width) > float(slot_width) + 0.5
+        or float(expanded_height) > float(slot_height) + 0.5
+    ):
         return layout_width, layout_height
     return expanded_width, expanded_height
 

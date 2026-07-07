@@ -112,19 +112,87 @@ def _primary_cta_painted_shell_style(node: CleanDesignTreeNode) -> bool:
     return blue >= 120 and red <= 140 and green <= 160
 
 
-def layout_fact_primary_cta_painted_row_shell(node: CleanDesignTreeNode) -> bool:
-    """Return True when a painted ROW is a primary CTA host (full-surface tap target)."""
-    if node.type != NodeType.ROW:
+def _neutral_secondary_cta_painted_shell_style(node: CleanDesignTreeNode) -> bool:
+    """Return True for dark neutral filled secondary CTA shells (e.g. ``0xFF3A3A3C``)."""
+    if node.style.gradient is not None:
+        return False
+    channels = _argb_rgb_channels(node.style.background_color)
+    if channels is None:
+        return False
+    red, green, blue = channels
+    if max(red, green, blue) > 100 or min(red, green, blue) < 28:
+        return False
+    spread = max(red, green, blue) - min(red, green, blue)
+    return spread <= 16
+
+
+def _painted_cta_shell_style(node: CleanDesignTreeNode) -> bool:
+    return _primary_cta_painted_shell_style(node) or _neutral_secondary_cta_painted_shell_style(
+        node
+    )
+
+
+def _painted_cta_shell_label(node: CleanDesignTreeNode) -> str | None:
+    """Return short CTA label text when ``node`` is a painted action shell."""
+    text_children = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if len(text_children) == 1:
+        return (text_children[0].text or "").strip()
+    from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
+
+    text_nodes = [
+        item
+        for item in _descendant_nodes(node, 4)
+        if item.type == NodeType.TEXT and (item.text or "").strip()
+    ]
+    if len(text_nodes) != 1:
+        return None
+    return (text_nodes[0].text or "").strip()
+
+
+def layout_fact_painted_cta_action_shell(node: CleanDesignTreeNode) -> bool:
+    """Return True when a painted shell is a full-surface CTA tap host."""
+    if node.type not in {NodeType.ROW, NodeType.COLUMN, NodeType.CONTAINER, NodeType.STACK}:
         return False
     if not _primary_cta_painted_shell_height_ok(node.sizing.height):
         return False
-    if not _primary_cta_painted_shell_style(node):
+    if not _painted_cta_shell_style(node):
         return False
-    text_children = [child for child in node.children if child.type == NodeType.TEXT]
-    if len(text_children) != 1:
-        return False
-    label = (text_children[0].text or "").strip()
+    label = _painted_cta_shell_label(node)
     return bool(label) and len(label) <= 32
+
+
+def layout_fact_primary_cta_painted_row_shell(node: CleanDesignTreeNode) -> bool:
+    """Return True when a painted ROW is a primary CTA host (full-surface tap target)."""
+    return node.type == NodeType.ROW and layout_fact_painted_cta_action_shell(node)
+
+
+def layout_fact_narrow_centered_figma_single_line_title(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """Return True when centered title must stay single-line in a narrow header column."""
+    if node.type != NodeType.TEXT or parent_node is None:
+        return False
+    if parent_node.type != NodeType.COLUMN:
+        return False
+    if (node.style.text_align or "").upper() != "CENTER":
+        return False
+    parent_width = parent_node.sizing.width
+    if parent_width is None or float(parent_width) > 200.0:
+        return False
+    font_size = node.style.font_size
+    text_height = node.sizing.height
+    if font_size is None or text_height is None:
+        return False
+    line_height = node.style.line_height or float(font_size) * 1.27
+    if float(text_height) > float(line_height) * 1.3:
+        return False
+    label = (node.text or "").strip()
+    return len(label) >= 8
 
 
 def layout_fact_primary_cta_label_in_painted_shell(
@@ -136,14 +204,14 @@ def layout_fact_primary_cta_label_in_painted_shell(
         return False
     if parent_node.type not in {NodeType.ROW, NodeType.COLUMN, NodeType.CONTAINER}:
         return False
-    if layout_fact_primary_cta_painted_row_shell(parent_node):
+    if layout_fact_painted_cta_action_shell(parent_node):
         return False
     label = (node.text or "").strip()
     if not label or len(label) > 32:
         return False
     if not _primary_cta_painted_shell_height_ok(parent_node.sizing.height):
         return False
-    return _primary_cta_painted_shell_style(parent_node)
+    return _painted_cta_shell_style(parent_node)
 
 
 def subtree_has_actionable_accent_text(node: CleanDesignTreeNode, *, max_depth: int = 12) -> bool:

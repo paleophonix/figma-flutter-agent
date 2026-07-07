@@ -2,6 +2,21 @@ version: 1
 family_id: compact_component_leaf_vector_export_gap
 generated: true
 cases:
+- case_id: 2026-07-07-niyama-icon-component-ref-alias
+  case_file: cases/2026-07-07-niyama-icon-component-ref-alias.yaml
+  title: Guest Users icon aliases to Ticket vector via instance-path family 
+    discovery
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-icon-component-ref-alias
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T10:50:00Z'
+  updated_at: '2026-07-07T10:50:00Z'
+  summary: Promo and Guests rows both emitted vector_1162_10106.svg. Users leaf 
+    4181:43463 had no on-disk export; family discovery keyed off instance-path 
+    file key 1162_ and picked the Ticket export. Promo STACK already had 
+    promo.png but compact icon emit preferred nested vector over bou...
 - case_id: 2026-07-06-niyama-nested-compact-icon-export-root
   case_file: cases/2026-07-06-niyama-nested-compact-icon-export-root.yaml
   title: Quantity stepper defers compact drawable export to nested Icons 

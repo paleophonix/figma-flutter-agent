@@ -436,6 +436,10 @@ families:
         symbol: collect_exportable_nodes
       - module: src/figma_flutter_agent/assets/vector_binding.py
         symbol: collect_unbound_visible_vector_ids
+      - module: src/figma_flutter_agent/parser/boundaries/assets.py
+        symbol: lookup_asset_path_for_component_vector_family
+      - module: src/figma_flutter_agent/generator/layout/widgets/emit/stack.py
+        symbol: render_stack
     law_ids:
       - CompactComponentDrawableCoverageLaw
     default_blast_radius: B3_BLOCKING
@@ -728,10 +732,10 @@ families:
     owners:
       - module: src/figma_flutter_agent/parser/boundaries/assets.py
         symbol: resolve_render_boundary_asset_keys
-      - module: src/figma_flutter_agent/generator/background/detection.py
-        symbol: is_screen_wallpaper_node
-      - module: src/figma_flutter_agent/generator/background/render.py
-        symbol: render_ambient_decorative_node
+      - module: src/figma_flutter_agent/parser/boundaries/assets.py
+        symbol: discover_role_named_raster
+      - module: src/figma_flutter_agent/pipeline/local_assets.py
+        symbol: local_asset_manifest_from_project
     law_ids:
       - LAW-RENDER-BOUNDARY-IMAGE-PAINT-CONSERVATION
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
@@ -957,6 +961,28 @@ families:
       width: double.infinity, not Expanded under OverflowBox.
     status: active
 
+  - id: horizontal_scroll_product_tile_miss
+    title: Horizontal scroll carrier misses component-backed catalog product tiles
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/parser/interaction/product.py
+        symbol: horizontal_scroll_product_tile
+      - module: src/figma_flutter_agent/generator/layout/scroll.py
+        symbol: horizontal_scroll_item_carrier
+    law_ids:
+      - LAW-HORIZONTAL-SCROLL-PRODUCT-TILE
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      A wide product carrier row inside a Swipe stack hosts multiple component-backed
+      catalog tiles, but horizontal_scroll_product_tile only recognizes CARD-shaped
+      children. The host is misclassified as a detail hero banner and collapses to a
+      single raster wallpaper instead of ListView.horizontal card children.
+    status: active
+
   - id: root_stack_backdrop_paints_over_content
     title: Root stack backdrop scrim emitted after content inverts paint order
     pipeline_arrows:
@@ -987,6 +1013,10 @@ families:
     owners:
       - module: src/figma_flutter_agent/parser/boundaries/assets.py
         symbol: resolve_render_boundary_asset_keys
+      - module: src/figma_flutter_agent/pipeline/local_assets.py
+        symbol: _semantic_raster_bindings
+      - module: src/figma_flutter_agent/pipeline/local_assets.py
+        symbol: _orphan_raster_pairing
     law_ids:
       - LAW-IMAGE-ASSET-NODE-IDENTITY
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR

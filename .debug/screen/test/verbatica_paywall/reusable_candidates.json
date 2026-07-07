@@ -1,34 +1,44 @@
 {
-  "cacheKey": "38d49080bb2d3dc0aa2b6de1fb8bf36b840b3779c0fc7d94d52e64a5b150d724",
+  "cacheKey": "19015c8b44c83ee169de47a1094bca213661c1cc384ccd76bfbc095ad47daa5e",
   "response": {
     "candidates": [
       {
-        "nodeId": "2399:42788",
-        "widgetName": "SubscriptionPlanOption",
-        "reason": "Three plan rows share the same card-like structure: duration, monthly price, total price, and a trailing check icon; the first variant also adds an optional savings badge.",
-        "confidence": 0.98,
+        "nodeId": "2399:42789",
+        "widgetName": "SubscriptionPlanOptionRow",
+        "reason": "Three pricing rows share the same structure for term, total price, monthly price, and selection indicator; the first row only adds a savings badge.",
+        "confidence": 0.97,
         "suggestedParams": [
-          "planDurationLabel",
-          "monthlyPriceLabel",
-          "totalPriceLabel",
-          "savingsLabel",
-          "showSavingsBadge",
-          "isSelected"
+          "termLabel",
+          "totalPrice",
+          "monthlyPrice",
+          "isSelected",
+          "badgeText"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42801",
-            "2399:42812"
+            "2399:42802",
+            "2399:42813"
           ],
-          "shapeSimilarity": 0.97,
-          "semanticRole": "Selectable subscription plan option"
+          "shapeSimilarity": 0.95,
+          "semanticRole": "subscription plan selector item"
         }
+      },
+      {
+        "nodeId": "2399:42837",
+        "widgetName": "SubscribeCallToActionButton",
+        "reason": "Primary paywall CTA with title and supporting trial text is a reusable action pattern.",
+        "confidence": 0.93,
+        "suggestedParams": [
+          "title",
+          "subtitle"
+        ],
+        "evidence": null
       },
       {
         "nodeId": "2399:42838",
         "widgetName": "TertiaryActionButton",
-        "reason": "Repeated tertiary action button family with the same component ref and only the label/compact sizing varying between instances.",
-        "confidence": 0.93,
+        "reason": "Tertiary button family is repeated for the two lower paywall actions with the same component group and similar structure.",
+        "confidence": 0.92,
         "suggestedParams": [
           "label",
           "isCompact"
@@ -37,36 +47,43 @@
           "similarNodes": [
             "2399:42839"
           ],
-          "shapeSimilarity": 0.99,
-          "semanticRole": "Secondary CTA / text button"
-        }
-      },
-      {
-        "nodeId": "2399:42837",
-        "widgetName": "PrimarySubscriptionCtaButton",
-        "reason": "Primary CTA button component with stacked title and helper text, suitable for a reusable paywall subscribe action.",
-        "confidence": 0.9,
-        "suggestedParams": [
-          "title",
-          "helperText"
-        ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "Primary subscription CTA button"
+          "shapeSimilarity": 0.98,
+          "semanticRole": "secondary subscription action"
         }
       },
       {
         "nodeId": "2399:42786",
-        "widgetName": "TrailingCloseButton",
-        "reason": "Standalone close button component used in the top-right of the paywall header; reusable across modal and overlay screens.",
-        "confidence": 0.78,
-        "suggestedParams": [],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "Trailing close icon button"
-        }
+        "widgetName": "CloseIconButton",
+        "reason": "Standard trailing close control can be reused across modal and paywall screens.",
+        "confidence": 0.86,
+        "suggestedParams": [
+          "iconGlyph"
+        ],
+        "evidence": null
+      },
+      {
+        "nodeId": "2399:42783",
+        "widgetName": "PaywallStatusBar",
+        "reason": "System status bar component is reusable across mobile screens and appears as a dedicated component here.",
+        "confidence": 0.84,
+        "suggestedParams": [
+          "timeText",
+          "showCamera",
+          "showBattery"
+        ],
+        "evidence": null
+      },
+      {
+        "nodeId": "2399:42843",
+        "widgetName": "HomeIndicator",
+        "reason": "Reusable iPhone home indicator shell for full-screen mobile layouts.",
+        "confidence": 0.9,
+        "suggestedParams": [
+          "device",
+          "orientation",
+          "mode"
+        ],
+        "evidence": null
       }
     ]
   }

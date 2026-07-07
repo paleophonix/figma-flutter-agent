@@ -1,35 +1,35 @@
 {
-  "cacheKey": "3ea2cb5a739eb0bcfff29644a7e85322a146fdb8dbadbaae4b7da0421fef7ee2",
+  "cacheKey": "9ae293c4855be4b2df3bdb8e0425fc074a316592923b533f8f17636f40556a91",
   "response": {
     "entries": [
       {
         "clusterId": "component_111_16846_ed645bd8",
-        "widgetName": "PaywallSubscribeButtonWidget",
+        "widgetName": "SubscribeFreeTrialButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_111_17496",
-        "widgetName": "IPhoneHomeIndicatorWidget",
+        "widgetName": "HomeIndicatorWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_118_7511_24ebf3ca",
-        "widgetName": "PaywallFreeTrialButtonWidget",
+        "widgetName": "TertiaryActionButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23327",
-        "widgetName": "StatusBarSignalIconWidget",
+        "widgetName": "CellularSignalWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23343",
-        "widgetName": "StatusBarWifiIconWidget",
+        "widgetName": "WifiSignalWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23346",
-        "widgetName": "StatusBarBatteryIconWidget",
+        "widgetName": "BatteryStatusWidget",
         "paramRenames": {}
       },
       {
@@ -39,17 +39,17 @@
       },
       {
         "clusterId": "component_282_23556_de98d704",
-        "widgetName": "IPhoneStatusBarWidget",
+        "widgetName": "StatusBarWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_54_3907_58c331e9",
-        "widgetName": "PaywallCloseButtonWidget",
+        "widgetName": "CloseIconButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_0",
-        "widgetName": "SelectedPlanCheckIconWidget",
+        "widgetName": "CheckCircleIconWidget",
         "paramRenames": {}
       }
     ]

@@ -34,9 +34,10 @@ _GENERIC_NODE_NAMES = frozenset(
 )
 _BINDING_LABEL_ANCESTOR_LIMIT = 3
 _BINDING_SUBTREE_TEXT_MAX_DEPTH = 2
-_PRODUCT_ROW_MEDIA_CHILD_TYPES = frozenset(
-    {NodeType.IMAGE, NodeType.STACK, NodeType.CONTAINER}
-)
+_VARIANT_VALUE_BINDING_ALIASES: dict[str, list[str]] = {
+    "delivered": ["meal"],
+}
+_PRODUCT_ROW_MEDIA_CHILD_TYPES = frozenset({NodeType.IMAGE, NodeType.STACK, NodeType.CONTAINER})
 _CYRILLIC_TRANSLIT = str.maketrans(
     {
         "а": "a",
@@ -210,6 +211,9 @@ def _collect_binding_labels(
                 add_label(part)
             for value in target.variant.variant_properties.values():
                 add_label(str(value))
+                alias_key = _normalize_binding_text(str(value))
+                for alias in _VARIANT_VALUE_BINDING_ALIASES.get(alias_key, []):
+                    add_label(alias)
 
     scope = _nearest_product_row_scope(
         node_id,
@@ -237,6 +241,9 @@ def _collect_binding_labels(
                 add_label(part)
             for value in parent.variant.variant_properties.values():
                 add_label(str(value))
+                alias_key = _normalize_binding_text(str(value))
+                for alias in _VARIANT_VALUE_BINDING_ALIASES.get(alias_key, []):
+                    add_label(alias)
         for child in parent.children:
             if child.type == NodeType.TEXT:
                 add_label(child.text or child.name)
@@ -287,8 +294,7 @@ def _orphan_raster_pairing(
     orphan_files = [
         path
         for path in sorted(images_dir.iterdir())
-        if path.suffix.lower() in _RASTER_SUFFIXES
-        and node_id_from_asset_stem(path.stem) is None
+        if path.suffix.lower() in _RASTER_SUFFIXES and node_id_from_asset_stem(path.stem) is None
     ]
     unbound_targets = [
         node_id

@@ -65,3 +65,7 @@ poetry run figma-flutter defects validate
 Promotion funnel: `inbox → corpus → fixtures → blocking`. Details: `corpus/README.md`, arrow routing: `pipeline-contracts.mdc`.
 
 **Procedure:** `.cursor/skills/corpus/SKILL.md` — mandatory on `/diagnose` and `/repair`.
+
+## Screen close-out
+
+Cases bind to a screen via `case.project` + `case.feature`. When the user says the screen is ready or «закрой кейсы экрана», the agent **closes all remaining `OPEN` cases** for that pair (index scan → `FIXED` + `repair` + validate) **except** cases the user explicitly excludes («кроме …»). See corpus skill § Screen close-out.

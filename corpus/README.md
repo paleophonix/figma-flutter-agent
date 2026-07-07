@@ -46,7 +46,8 @@ for family in doc.families:
 Diagnose/repair skills map root causes to `family_id` from this file. Cases reference families and must pass `figma-flutter defects validate`.
 
 - **`/diagnose`:** write or update cases with `status: OPEN` when mechanism is classified.
-- **`/repair`:** stay `OPEN` while trying; `FIXED` only with proof + `repair` block. Failed attempts: still `OPEN`, note in `summary`. Close without fix: `WONT_FIX` or `DEFERRED_BY_POLICY`.
+- **`/repair`:** stay `OPEN` while trying; `FIXED` only with proof + `repair` block.
+- **Screen ready (user):** close all `OPEN` for `case.project` + `case.feature` via index scan — except user-named exclusions (`кроме …`). See corpus skill § Screen close-out.
 
 Product owner supplies chat observations; agents maintain YAML and run `defects validate`.
 

@@ -2,6 +2,21 @@ version: 1
 family_id: render_boundary_image_paint_without_transfer
 generated: true
 cases:
+- case_id: 2026-07-07-niyama-order2-icons-shrink-shells
+  case_file: cases/2026-07-07-niyama-order2-icons-shrink-shells.yaml
+  title: order2 top meal image and location/guest/cutlery icons emit empty 
+    shrink shells
+  project: test
+  feature: niyama_order_2
+  occurrence_id: niyama-order2-icons-shrink-shells
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T14:00:00Z'
+  updated_at: '2026-07-07T23:10:00Z'
+  summary: In niyama_order_2 the top meal illustration ("Img") and several 
+    vector icons (location, guest/seat, cutlery) emit Semantics(label, 
+    SizedBox.shrink()) — empty shells — even though the drawables (meal.png and 
+    the icon SVGs) exist on disk under assets/images and assets/icons. The...
 - case_id: 2026-07-07-verbatica-hero-binds-check-vector
   case_file: cases/2026-07-07-verbatica-hero-binds-check-vector.yaml
   title: Verbatica hero render-boundary binds descendant check_circle vector, 

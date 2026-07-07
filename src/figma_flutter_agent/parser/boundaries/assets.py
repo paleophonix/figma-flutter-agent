@@ -11,6 +11,70 @@ from figma_flutter_agent.schemas import AssetManifest, CleanDesignTreeNode
 
 _ASSET_SCAN_FOLDERS = ("icons", "illustrations", "images")
 
+_COMPONENT_LEAF_RASTER_ALIASES: dict[str, str] = {
+    "map": "location",
+    "book-reader": "seat",
+    "book_reader": "seat",
+    "users": "guests",
+    "user": "guests",
+    "cutlery": "tableware",
+    "knife-fork": "tableware",
+    "knife_fork": "tableware",
+}
+
+_VARIANT_VALUE_RASTER_ALIASES: dict[str, str] = {
+    "delivered": "meal",
+}
+
+
+def _normalize_role_token(value: str) -> str:
+    return value.strip().lower().replace(" ", "-").replace("_", "-")
+
+
+def _component_icon_raster_stems(node: CleanDesignTreeNode) -> list[str]:
+    """Collect human-named raster stems from component variant and icon naming."""
+    stems: list[str] = []
+    seen: set[str] = set()
+
+    def add(raw: str) -> None:
+        token = _normalize_role_token(raw)
+        if not token:
+            return
+        stem = token.replace("-", "_")
+        if stem in seen:
+            return
+        seen.add(stem)
+        stems.append(stem)
+
+    if node.variant is not None:
+        for value in node.variant.variant_properties.values():
+            normalized = _normalize_role_token(str(value))
+            alias = _VARIANT_VALUE_RASTER_ALIASES.get(normalized)
+            if alias:
+                add(alias)
+            add(str(value))
+        for part in (node.variant.component_name or "").split("/"):
+            add(part)
+    for part in (node.name or "").split("/"):
+        add(part)
+
+    expanded: list[str] = []
+    for stem in stems:
+        expanded.append(stem)
+        alias = _COMPONENT_LEAF_RASTER_ALIASES.get(stem.replace("_", "-"))
+        if alias:
+            expanded.append(alias.replace("-", "_"))
+    return expanded
+
+
+def discover_role_named_raster(project_dir: Path, node: CleanDesignTreeNode) -> str | None:
+    """Resolve role-named PNG exports (``location.png``, ``meal.png``) for icon hosts."""
+    for stem in _component_icon_raster_stems(node):
+        candidate = project_dir / "assets" / "images" / f"{stem}.png"
+        if candidate.is_file():
+            return f"assets/images/{candidate.name}".replace("\\", "/")
+    return None
+
 
 def render_boundary_asset_path(node_id: str) -> str:
     """Relative Flutter asset path reserved for a render-boundary SVG export."""
@@ -569,7 +633,7 @@ def resolve_missing_image_asset_keys(
         if (
             not node.image_asset_key
             and not node.children
-            and node.type in {NodeType.CONTAINER, NodeType.IMAGE}
+            and node.type in {NodeType.CONTAINER, NodeType.IMAGE, NodeType.VECTOR}
         ):
             discovered = discover_asset_path_for_node(
                 project_dir,
@@ -579,6 +643,10 @@ def resolve_missing_image_asset_keys(
             )
             if discovered is not None:
                 node.image_asset_key = discovered.replace("\\", "/")
+        if not node.image_asset_key and not node.vector_asset_key:
+            role_raster = discover_role_named_raster(project_dir, node)
+            if role_raster is not None:
+                node.image_asset_key = role_raster
 
     from figma_flutter_agent.parser.tree_walk import walk_clean_tree_with_parent
 
@@ -704,6 +772,7 @@ def resolve_discovered_vector_asset_keys(
                 project_dir,
                 node_id,
                 asset_index=asset_index,
+                component_ref=node.component_ref,
             )
             if discovered is not None:
                 candidates.append(discovered.replace("\\", "/"))
@@ -713,6 +782,10 @@ def resolve_discovered_vector_asset_keys(
         from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
 
         if subtree_has_text_descendant(node):
+            return
+        role_raster = discover_role_named_raster(project_dir, node)
+        if role_raster is not None:
+            node.image_asset_key = role_raster
             return
         promoted = _best_descendant_vector_asset(node)
         if promoted is not None:

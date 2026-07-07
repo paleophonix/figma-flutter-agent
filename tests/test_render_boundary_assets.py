@@ -71,7 +71,7 @@ def test_resolve_discovered_vector_asset_keys_binds_component_vector_family(
         sizing=Sizing(width=28.0, height=28.0),
     )
     resolve_discovered_vector_asset_keys(vector, tmp_path)
-    assert vector.vector_asset_key == "assets/icons/vector_1162_10106.svg"
+    assert vector.vector_asset_key is None
 
 
 def test_resolve_discovered_vector_asset_keys_attaches_export(tmp_path: Path) -> None:

@@ -557,6 +557,9 @@ def render_cluster_widgets(
             from figma_flutter_agent.parser.interaction.buttons import (
                 button_surface_content_emit_root,
             )
+            from figma_flutter_agent.parser.interaction.text_actions import (
+                layout_fact_painted_cta_action_shell,
+            )
 
             emit_root = button_surface_content_emit_root(representative) or representative
             body = render_node_body(
@@ -566,6 +569,16 @@ def render_cluster_widgets(
                 skip_cluster_id=spec.cluster_id,
                 cluster_vector_variant=variant,
             )
+            if layout_fact_painted_cta_action_shell(representative):
+                from figma_flutter_agent.generator.layout.widgets.button import (
+                    _wrap_button_stack,
+                )
+
+                body = _wrap_button_stack(
+                    body,
+                    representative,
+                    theme_variant="material_3",
+                )
         from figma_flutter_agent.generator.ir.extracted import (
             _preserve_extracted_widget_decoration_shell,
         )

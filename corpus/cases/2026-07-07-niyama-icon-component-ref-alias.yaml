@@ -17,10 +17,10 @@ case:
 
 occurrences:
   - id: niyama-order-icon-component-ref-alias
-    family_id: extracted_cluster_unbound_vector_shrink
-    pipeline_arrow: A4
-    law_id: VisibleVectorAssetConservationLaw
-    stage: parser
+    family_id: compact_component_leaf_vector_export_gap
+    pipeline_arrow: A2
+    law_id: CompactComponentDrawableCoverageLaw
+    stage: assets
     origin: COMPILER
     blast_radius: B2_SILENT_WRONG_BEHAVIOR
     confidence: high

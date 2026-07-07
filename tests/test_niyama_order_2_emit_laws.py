@@ -6,8 +6,14 @@ from pathlib import Path
 
 from figma_flutter_agent.parser.boundaries.assets import (
     discover_asset_path_for_node,
+    discover_role_named_raster,
     lookup_asset_path_for_component_vector_family,
+    resolve_discovered_vector_asset_keys,
 )
+from figma_flutter_agent.parser.interaction.text_actions import (
+    layout_fact_painted_cta_action_shell,
+)
+from figma_flutter_agent.parser.richtext import resolve_uniform_text_override_color
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -28,9 +34,64 @@ def test_component_vector_family_skips_adjacent_icon_library_ids(tmp_path: Path)
     assert discover_asset_path_for_node(tmp_path, map_variant) is None
     cutlery_variant = "I3561:42994;1406:12001;1162:10248"
     assert (
-        lookup_asset_path_for_component_vector_family(asset_index, cutlery_variant)
-        == "assets/icons/vector_1162_10106.svg"
+        lookup_asset_path_for_component_vector_family(
+            asset_index,
+            cutlery_variant,
+            component_ref="3481:34993",
+        )
+        is None
     )
+    assert (
+        discover_asset_path_for_node(
+            tmp_path,
+            cutlery_variant,
+            asset_index=asset_index,
+            component_ref="3481:34993",
+        )
+        is None
+    )
+
+
+def test_discover_role_named_raster_maps_icon_component_to_png(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "location.png").write_bytes(b"png")
+    vector = CleanDesignTreeNode(
+        id="1:map",
+        name="Vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=28.0, height=28.0),
+        variant=ComponentVariant(
+            component_id="1435:18098",
+            component_name="Icons/28/Map",
+            variant_properties={"Icons": "28/Map"},
+        ),
+    )
+    assert discover_role_named_raster(tmp_path, vector) == "assets/images/location.png"
+
+
+def test_resolve_discovered_vector_prefers_role_raster_over_family_alias(tmp_path: Path) -> None:
+    icons = tmp_path / "assets" / "icons"
+    images = tmp_path / "assets" / "images"
+    icons.mkdir(parents=True)
+    images.mkdir(parents=True)
+    (icons / "vector_1162_10106.svg").write_text("<svg></svg>", encoding="utf-8")
+    (images / "tableware.png").write_bytes(b"png")
+    vector = CleanDesignTreeNode(
+        id="I3561:42994;1406:12001;1162:10248",
+        name="Vector",
+        type=NodeType.VECTOR,
+        component_ref="3481:34993",
+        sizing=Sizing(width=28.0, height=28.0),
+        variant=ComponentVariant(
+            component_id="1406:12001",
+            component_name="Icons/28/Cutlery",
+            variant_properties={"Icons": "28/Cutlery"},
+        ),
+    )
+    resolve_discovered_vector_asset_keys(vector, tmp_path)
+    assert vector.vector_asset_key is None
+    assert vector.image_asset_key == "assets/images/tableware.png"
 
 
 def test_semantic_raster_binds_product_thumbnail_by_title_word(tmp_path: Path) -> None:
@@ -77,3 +138,65 @@ def test_semantic_raster_binds_product_thumbnail_by_title_word(tmp_path: Path) -
     assert len(image_entries) == 1
     assert image_entries[0].node_id == "1:img"
     assert image_entries[0].asset_path == "assets/images/ramen-chicken.png"
+
+
+def test_delivered_variant_binds_meal_raster(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "meal.png").write_bytes(b"png")
+    img = CleanDesignTreeNode(
+        id="1:meal",
+        name="Img",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=96.0, height=96.0),
+        variant=ComponentVariant(
+            component_id="1406:13315",
+            component_name="Order status",
+            variant_properties={"Order status": "Delivered"},
+        ),
+    )
+    root = CleanDesignTreeNode(id="1:root", name="Header", type=NodeType.STACK, children=[img])
+    manifest = local_asset_manifest_from_project(tmp_path, clean_tree=root)
+    bound = {entry.node_id: entry.asset_path for entry in manifest.entries if entry.kind == "image"}
+    assert bound.get("1:meal") == "assets/images/meal.png"
+
+
+def test_layout_fact_painted_cta_action_shell_accepts_neutral_gray_container() -> None:
+    shell = CleanDesignTreeNode(
+        id="1:cta",
+        name="Button",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=343.0, height=48.0),
+        style=NodeStyle(background_color="0xFF3A3A3C"),
+        children=[
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Оставить отзыв",
+            ),
+        ],
+    )
+    assert layout_fact_painted_cta_action_shell(shell)
+
+
+def test_resolve_uniform_text_override_color_reads_single_override_id() -> None:
+    node = {
+        "type": "TEXT",
+        "characters": "1 x 459 ₽",
+        "characterStyleOverrides": [3, 3, 3, 3, 3, 3, 3, 3, 3],
+        "styleOverrideTable": {
+            "3": {
+                "fills": [
+                    {
+                        "type": "SOLID",
+                        "color": {"r": 0.556, "g": 0.556, "b": 0.576},
+                        "opacity": 1.0,
+                    }
+                ]
+            }
+        },
+    }
+    color = resolve_uniform_text_override_color(node)
+    assert color is not None
+    assert color.upper().endswith("8E8E93")

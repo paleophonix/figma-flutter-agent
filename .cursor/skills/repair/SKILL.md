@@ -9,7 +9,7 @@ description: >-
 
 @.claude/prompts/debug-common.md
 
-**Mandatory corpus:** Read and follow `.cursor/skills/corpus/SKILL.md` before any `src/` change. Emit-law pytest ≠ corpus done. Consilium "none strong" defers blocking only.
+**Mandatory corpus:** Read and follow `.cursor/skills/corpus/SKILL.md` before any `src/` change. On user screen-ready / close-cases → close all `OPEN` for `project`+`feature` except user-named exceptions.
 
 # Debug Repair Skill
 
@@ -191,6 +191,15 @@ WONT_FIX | DEFERRED_BY_POLICY — rare; explicit only
 ```
 
 Then: `status: FIXED`, fill `repair.*` when proof is conclusive (see corpus skill).
+
+### Screen close-out (user: «экран готов» / «закрой кейсы»)
+
+When the user declares a screen ready or asks to close corpus for `project` + `feature`:
+
+1. Follow **`.cursor/skills/corpus/SKILL.md`** § Screen close-out — enumerate `OPEN` via index, not case glob.
+2. Promote **all** non-excepted cases to `FIXED` in the same session — do not stop after the first.
+3. **Honor user exceptions** verbatim («кроме …», named `case_id`, named mechanism).
+4. End with `defects index --write` + `defects validate` + close-out report block.
 
 ### Step 5 — Continue Until Done Or Blocked
 

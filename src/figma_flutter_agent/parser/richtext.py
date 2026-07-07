@@ -10,6 +10,36 @@ from figma_flutter_agent.parser.typography import resolve_font_weight
 from figma_flutter_agent.schemas import TextSpanPart
 
 
+def resolve_uniform_text_override_color(node: dict[str, Any]) -> str | None:
+    """Return SOLID fill color when every character shares one non-base override style.
+
+    Args:
+        node: Raw Figma TEXT node dictionary.
+
+    Returns:
+        ARGB hex when a uniform ``characterStyleOverrides`` entry supplies a fill color.
+    """
+    if node.get("type") != "TEXT":
+        return None
+    characters = str(node.get("characters") or "")
+    overrides = node.get("characterStyleOverrides")
+    if not isinstance(overrides, list) or len(overrides) != len(characters):
+        return None
+    if len(set(overrides)) != 1:
+        return None
+    style_id = overrides[0]
+    if not style_id:
+        return None
+    override = (node.get("styleOverrideTable") or {}).get(str(style_id), {})
+    for fill in override.get("fills") or []:
+        if fill.get("type") == "SOLID" and fill.get("color"):
+            return solid_paint_to_argb_hex(
+                fill["color"],
+                paint_opacity=float(fill.get("opacity", 1.0)),
+            )
+    return None
+
+
 def extract_text_span_parts(node: dict[str, Any]) -> list[TextSpanPart] | None:
     """Build text span parts when ``characterStyleOverrides`` vary within one TEXT node.
 

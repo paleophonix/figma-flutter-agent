@@ -72,9 +72,30 @@ corpus/index/<family_id>.yaml     → scan rows: case_id, project, feature, stat
 corpus/cases/<case_id>.yaml       → open ONE file for the chosen row
 ```
 
-Pick row: same `project`+`feature` first → `OPEN` → `FIXED` with `repair` → `observed_at` desc.
+Pick row: same `project`+`feature` first → `OPEN` → `FIXED` with `repair` → **`updated_at` desc** (then `observed_at`).
 
 `corpus/index/` is **generated** — never hand-edit.
+
+### Screen binding (`project` + `feature`)
+
+Each case header ties to one screen:
+
+```text
+case.project  → .debug/screen/<project>/
+case.feature  → .debug/screen/<project>/<feature>/
+```
+
+One screen has **many** cases (one per mechanism). Status is per **occurrence**, not per screen.
+
+**Enumerate OPEN cases for a screen** (never glob `corpus/cases/`):
+
+```text
+for each corpus/index/<family_id>.yaml:
+  for each row in cases:
+    if row.project == <project> and row.feature == <feature> and row.status == OPEN:
+      collect row.case_id (dedupe)
+open corpus/cases/<case_id>.yaml only for collected ids
+```
 
 ---
 
@@ -117,6 +138,29 @@ symptom class would not recur on same law
 Then: `status: FIXED`, fill `repair.summary`, `changed_files`, `regression_tests`, `verification`.
 
 `/repair` alone closes nothing. Max **2** repair attempts per item without fresh `/diagnose`.
+
+### Screen close-out — close all remaining OPEN (user sign-off)
+
+When the user says the **screen is ready**, **close corpus cases**, or names `project` + `feature`
+(e.g. «limbo / mobile_sub_plans готов», «закрой кейсы экрана»):
+
+1. **Enumerate** all `OPEN` rows for that `project` + `feature` via index scan (see Screen binding).
+2. **User exceptions:** if the user says «кроме …», «оставь OPEN …», «не трогай case …» — **skip** those `case_id` / mechanism names; keep `OPEN`.
+3. **Close each non-excepted case** to `FIXED`:
+   - Prefer compiler proof (`regression_tests`, law tests) when the batch fix already landed.
+   - When the user explicitly approved **visual sufficiency** for the screen, `repair.verification` may cite product sign-off + `.debug/screen/<project>/<feature>/figma.png` vs `flutter_render.png` (or fresh regen) — still fill `repair.summary` per mechanism.
+   - Bump `case.updated_at` on every edit.
+4. Run Step 4 (`defects index --write` + `validate`) once after the batch.
+5. **Report:**
+
+```text
+Screen corpus close-out: <project>/<feature>
+  FIXED: <case_id> …
+  LEFT OPEN (user exception): …
+  LEFT OPEN (no proof): … — ask user
+```
+
+Do **not** stop after the first `FIXED` while other non-excepted `OPEN` rows remain for the same screen.
 
 ---
 
@@ -163,4 +207,7 @@ Corpus recorded:
 
 Corpus deferred:
   - reason: unclassified | needs_evidence | infra (/debug flow)
+
+Screen corpus close-out: <project>/<feature>
+  FIXED: … | LEFT OPEN (user exception): … | LEFT OPEN (no proof): …
 ```

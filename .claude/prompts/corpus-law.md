@@ -22,7 +22,9 @@ corpus/index/<family_id>.yaml     → scan rows: case_id, project, feature, stat
 corpus/cases/<case_id>.yaml       → open ONE file for the chosen row
 ```
 
-Pick row: same `project`+`feature` first → `OPEN` → `FIXED` with `repair` → `observed_at` desc.
+Pick row: same `project`+`feature` first → `OPEN` → `FIXED` with `repair` → **`updated_at` desc** (then `observed_at`).
+
+**Screen close-out:** user says screen ready → close all `OPEN` for that `project`+`feature` except «кроме …» exceptions. Index scan only — see corpus skill.
 
 ## Status (binary)
 

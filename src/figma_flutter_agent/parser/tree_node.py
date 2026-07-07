@@ -152,6 +152,11 @@ def extract_style(
                     paint_opacity=float(fill.get("opacity", 1.0)),
                 )
                 break
+        from figma_flutter_agent.parser.richtext import resolve_uniform_text_override_color
+
+        uniform_color = resolve_uniform_text_override_color(node)
+        if uniform_color is not None:
+            style.text_color = uniform_color
 
     dev_mode_css: dict[str, str] | None = None
     if dev_mode_dump is not None:

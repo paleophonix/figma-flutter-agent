@@ -217,12 +217,21 @@ def render_text_node(
                 parent_node is not None
                 and layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
             )
+            from figma_flutter_agent.parser.interaction.text_actions import (
+                layout_fact_narrow_centered_figma_single_line_title,
+            )
+
+            narrow_centered_title = layout_fact_narrow_centered_figma_single_line_title(
+                node,
+                parent_node,
+            )
             single_line_clipped_label = (
                 guard_label_row
                 or metadata_rail
                 or bounded_single_line_label_slot
                 or step_title_label
                 or catalog_chip_label
+                or narrow_centered_title
             )
             if payment_subtitle and "\n" not in (node.text or ""):
                 trailing = text_widget_trailing_params(

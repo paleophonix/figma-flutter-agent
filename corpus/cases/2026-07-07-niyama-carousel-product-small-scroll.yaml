@@ -17,9 +17,9 @@ case:
 
 occurrences:
   - id: niyama-order-carousel-product-small-scroll
-    family_id: flex_child_under_unbounded_width_crash
+    family_id: horizontal_scroll_product_tile_miss
     pipeline_arrow: A3
-    law_id: LAW-FLEX-CHILD-BOUNDED-WIDTH
+    law_id: LAW-HORIZONTAL-SCROLL-PRODUCT-TILE
     stage: emitter
     origin: COMPILER
     blast_radius: B2_SILENT_WRONG_BEHAVIOR
@@ -30,7 +30,7 @@ occurrences:
       symbol: horizontal_scroll_product_tile
     contract:
       field: horizontal scroll carrier tile recognition
-      field_class: derived
+      field_class: intent
       category: lossy
       expected: >
         Component-backed Product small catalog stacks inside a wide product carrier row

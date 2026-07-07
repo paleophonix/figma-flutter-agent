@@ -8,13 +8,12 @@ case:
   feature: niyama_order_2
   observed_at: 2026-07-07
   created_at: '2026-07-07T21:30:00Z'
-  updated_at: '2026-07-07T22:00:00Z'
+  updated_at: '2026-07-07T23:10:00Z'
   summary: >
-    CutleryInfoWidget cluster materialization aborts when a visible compact icon
-    VECTOR uses a variant leaf id (1162:10248) that was not re-exported, while an
-    on-disk SVG from the same Figma component file key (vector_1162_10106.svg) already
-    exists from a sibling variant on another screen. Node-id-only discovery misses the
-    family export and raises MissingVectorAssetError before writeback.
+    CutleryInfoWidget cluster materialization must not bind a sibling icon-library SVG
+    (vector_1162_10106 lock glyph) when the component_ref file key differs. Role-named
+    raster discovery (tableware.png) and component_ref-gated family lookup replace
+    silent wrong-vector alias for compact icon variants.
 
 occurrences:
   - id: niyama-order-2-cutlery-variant-vector-family
@@ -53,16 +52,13 @@ occurrences:
         summary: On-disk export from sibling variant 1162:10106 in same component file key.
     repair:
       summary: >
-        Extend on-disk vector discovery with component file-key prefix family lookup
-        for distant variant leaf ids only; skip adjacent icon-library ids so unrelated
-        icons do not bind the wrong SVG export.
+        Pass component_ref into resolve_discovered_vector_asset_keys family lookup so
+        unrelated icon-library exports cannot alias; prefer discover_role_named_raster
+        (Cutlery→tableware.png) over distant file-key SVG family fallback.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
-        - src/figma_flutter_agent/pipeline/local_assets.py
       regression_tests:
-        - tests/test_render_boundary_assets.py::test_discover_asset_path_for_component_vector_family_variant
-        - tests/test_render_boundary_assets.py::test_resolve_discovered_vector_asset_keys_binds_component_vector_family
+        - tests/test_niyama_order_2_emit_laws.py::test_resolve_discovered_vector_prefers_role_raster_over_family_alias
         - tests/test_niyama_order_2_emit_laws.py::test_component_vector_family_skips_adjacent_icon_library_ids
-        - tests/test_niyama_order_2_emit_laws.py::test_semantic_raster_binds_product_thumbnail_by_title_word
       verification:
-        - poetry run pytest -q tests/test_niyama_order_2_emit_laws.py tests/test_render_boundary_assets.py::test_discover_asset_path_for_component_vector_family_variant
+        - poetry run pytest -q tests/test_niyama_order_2_emit_laws.py::test_resolve_discovered_vector_prefers_role_raster_over_family_alias

@@ -64,9 +64,11 @@ corpus/index/<family_id>.yaml     → scan rows
 corpus/cases/<case_id>.yaml       → open ONE file for chosen row
 ```
 
-Pick row: same `project`+`feature` → `OPEN` → `FIXED` with `repair` → `observed_at` desc.
+Pick row: same `project`+`feature` → `OPEN` → `FIXED` with `repair` → `updated_at` desc.
 
----
+**Screen binding:** `case.project` + `case.feature` = `.debug/screen/<project>/<feature>/`. Enumerate screen `OPEN` via index rows (never glob cases).
+
+**Screen close-out:** user says screen ready / «закрой кейсы» → `FIXED` all `OPEN` for that pair **except** user «кроме …» exceptions; then index + validate. Full rules: `.cursor/skills/corpus/SKILL.md`.
 
 ## Step 3 — Write or update case YAML
 
