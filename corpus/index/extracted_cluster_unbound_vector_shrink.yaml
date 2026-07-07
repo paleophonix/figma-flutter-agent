@@ -19,6 +19,20 @@ cases:
     key differs. Role-named raster discovery (tableware.png) and 
     component_ref-gated family lookup replace silent wrong-vector alias for 
     co...
+- case_id: 2026-07-07-verbatica-plan-radio-cluster-pruned-vector
+  case_file: cases/2026-07-07-verbatica-plan-radio-cluster-pruned-vector.yaml
+  title: Third plan radio cluster pruned without vector drawable
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-plan-radio-cluster-pruned
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T12:00:00Z'
+  updated_at: '2026-07-07T12:01:00Z'
+  summary: Plan row trailing check_circle cluster_0 duplicate 2399:42821 is 
+    cluster-pruned (no children, no vectorAssetKey) while sibling instances 
+    retain the radio vector. Emit degrades to Semantics(SizedBox.shrink()) and 
+    the third plan shows no radio.
 - case_id: 2026-07-06-verbatica-status-icon-unbound-vector
   case_file: cases/2026-07-06-verbatica-status-icon-unbound-vector.yaml
   title: Status bar icon clusters fail with missing vector asset error

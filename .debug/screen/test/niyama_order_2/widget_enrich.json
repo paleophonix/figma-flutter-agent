@@ -1,5 +1,5 @@
 {
-  "cacheKey": "b1e001c447b598661186d41fb53ecae05be238e82c13b29f1622767d18f0d326",
+  "cacheKey": "b689b6bf90aab9a1e166b0cd62a41c61a2018008ac30e3149af282485046c310",
   "response": {
     "entries": [
       {
@@ -24,7 +24,7 @@
       },
       {
         "clusterId": "component_3481_34558",
-        "widgetName": "StatusBarWidget",
+        "widgetName": "SystemStatusBarWidget",
         "paramRenames": {}
       },
       {
@@ -39,7 +39,7 @@
       },
       {
         "clusterId": "component_3481_34945_bffe9c04",
-        "widgetName": "OrderItemWidget",
+        "widgetName": "OrderProductItemWidget",
         "paramRenames": {}
       },
       {
@@ -54,22 +54,22 @@
       },
       {
         "clusterId": "component_3481_35165_7cbfe998",
-        "widgetName": "CommentCardWidget",
+        "widgetName": "OrderCommentCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35212_0f40abd8",
-        "widgetName": "OrderInfoRowWidget",
+        "widgetName": "OrderSummaryRowWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35218_9ad9ee27",
-        "widgetName": "LargeActionButtonWidget",
+        "widgetName": "LeaveReviewButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35229_81156683",
-        "widgetName": "OrderActionBarWidget",
+        "widgetName": "OrderActionsBarWidget",
         "paramRenames": {}
       }
     ]

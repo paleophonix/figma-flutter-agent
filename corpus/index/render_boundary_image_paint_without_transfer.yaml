@@ -17,6 +17,19 @@ cases:
     vector icons (location, guest/seat, cutlery) emit Semantics(label, 
     SizedBox.shrink()) — empty shells — even though the drawables (meal.png and 
     the icon SVGs) exist on disk under assets/images and assets/icons. The...
+- case_id: 2026-07-06-verbatica-render-boundary-hero-image
+  case_file: cases/2026-07-06-verbatica-render-boundary-hero-image.yaml
+  title: Hero wallpaper render boundary emits empty shrink shell
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-hero-render-boundary-empty
+  status: FIXED
+  observed_at: '2026-07-06'
+  created_at: '2026-07-06T18:35:00Z'
+  updated_at: '2026-07-07T12:00:00Z'
+  summary: Paywall hero Img 2399:42779 is flattened to a render boundary without
+    imageAssetKey; ambient wallpaper emit produced SizedBox.shrink and the 
+    decomposed stack path omitted Positioned.fill wallpaper lead.
 - case_id: 2026-07-07-verbatica-hero-binds-check-vector
   case_file: cases/2026-07-07-verbatica-hero-binds-check-vector.yaml
   title: Verbatica hero render-boundary binds descendant check_circle vector, 
@@ -33,16 +46,3 @@ cases:
     SvgPicture.asset('assets/icons/vector_2399_42798.svg'), where 2399:42798 is 
     a nested check_circle vector. The flattened hero raster (portrait.png) must 
     bind to the boundary ins...
-- case_id: 2026-07-06-verbatica-render-boundary-hero-image
-  case_file: cases/2026-07-06-verbatica-render-boundary-hero-image.yaml
-  title: Hero wallpaper render boundary emits empty shrink shell
-  project: test
-  feature: verbatica_paywall
-  occurrence_id: verbatica-paywall-hero-render-boundary-empty
-  status: FIXED
-  observed_at: '2026-07-06'
-  created_at: '2026-07-06T18:35:00Z'
-  updated_at: '2026-07-07T02:30:00Z'
-  summary: Paywall hero Img 2399:42779 is flattened to a render boundary without
-    imageAssetKey; ambient wallpaper emit produced SizedBox.shrink and the 
-    decomposed stack path omitted Positioned.fill wallpaper lead.

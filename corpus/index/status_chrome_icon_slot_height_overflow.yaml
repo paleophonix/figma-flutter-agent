@@ -11,7 +11,7 @@ cases:
   status: FIXED
   observed_at: '2026-07-07'
   created_at: '2026-07-07T01:20:00Z'
-  updated_at: '2026-07-07T02:30:00Z'
+  updated_at: '2026-07-07T12:00:00Z'
   summary: 'In StatusBarContentWidget the Battery icon slot is emitted as SizedBox(height:
     52) because the Figma Battery ROW (I2399:42783;266:1499;266:1647) is parsed 16x52
     while it only wraps a 16x16 Battery STACK. The status-bar Column (icon row 52

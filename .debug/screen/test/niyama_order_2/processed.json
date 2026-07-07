@@ -34,7 +34,6 @@
           "backgroundColor": "0x99000000",
           "strokeAlign": "INSIDE"
         },
-        "imageAssetKey": "assets/images/18chip.png",
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "bottom": 879.0,
@@ -305,6 +304,7 @@
                         },
                         "rotation": -0.79,
                         "rotationRad": -0.01,
+                        "imageAssetKey": "assets/icons/vector_913_17711.svg",
                         "accessibilityLabel": "Vector",
                         "layoutPositioning": "ABSOLUTE",
                         "stackPlacement": {
@@ -538,6 +538,7 @@
                   "borderRadius": 100.0,
                   "strokeAlign": "INSIDE"
                 },
+                "imageAssetKey": "assets/images/meal.png",
                 "componentRef": "3481:35156",
                 "variant": {
                   "componentId": "3481:35156",
@@ -561,6 +562,7 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "imageAssetKey": "assets/images/meal.png",
                     "accessibilityLabel": "emoji",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -1421,7 +1423,6 @@
                               "borderRadius": 12.0,
                               "strokeAlign": "INSIDE"
                             },
-                            "imageAssetKey": "assets/images/ramen-chicken.png",
                             "accessibilityLabel": "Img",
                             "geometryFrame": {
                               "localTransform": {
@@ -2077,7 +2078,6 @@
                               "borderRadius": 12.0,
                               "strokeAlign": "INSIDE"
                             },
-                            "imageAssetKey": "assets/images/tomyam.png",
                             "accessibilityLabel": "Img",
                             "geometryFrame": {
                               "localTransform": {
@@ -3697,6 +3697,7 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "imageAssetKey": "assets/images/tableware.png",
                     "componentRef": "3481:35010",
                     "variant": {
                       "componentId": "3481:35010",
@@ -3783,6 +3784,7 @@
                                       "strokeAlign": "INSIDE",
                                       "clipsContent": true
                                     },
+                                    "imageAssetKey": "assets/images/tableware.png",
                                     "componentRef": "3481:34993",
                                     "variant": {
                                       "componentId": "3481:34993",
@@ -3804,6 +3806,7 @@
                                           "backgroundColor": "0xFFFFFFFF",
                                           "strokeAlign": "INSIDE"
                                         },
+                                        "imageAssetKey": "assets/icons/vector_1162_10106.svg",
                                         "accessibilityLabel": "Vector",
                                         "layoutPositioning": "ABSOLUTE",
                                         "stackPlacement": {
@@ -7365,6 +7368,7 @@
                               "strokeAlign": "INSIDE",
                               "clipsContent": true
                             },
+                            "imageAssetKey": "assets/images/location.png",
                             "componentRef": "3481:35099",
                             "variant": {
                               "componentId": "3481:35099",
@@ -7905,6 +7909,7 @@
                               "strokeAlign": "INSIDE",
                               "clipsContent": true
                             },
+                            "imageAssetKey": "assets/images/seat.png",
                             "componentRef": "3481:35101",
                             "variant": {
                               "componentId": "3481:35101",

@@ -461,6 +461,8 @@ families:
         symbol: _raise_for_unbound_cluster_vector_shell
       - module: src/figma_flutter_agent/assets/vector_binding.py
         symbol: assert_visible_vectors_bound
+      - module: src/figma_flutter_agent/parser/boundaries/assets.py
+        symbol: resolve_pruned_cluster_instance_assets
     law_ids:
       - VisibleVectorAssetConservationLaw
     default_blast_radius: B3_BLOCKING
@@ -642,6 +644,8 @@ families:
         symbol: compose_decomposed_root_widget
       - module: src/figma_flutter_agent/generator/layout/flex_policy/stack.py
         symbol: stack_should_flow_as_column
+      - module: src/figma_flutter_agent/generator/ir/passes/sectionize.py
+        symbol: evaluate_root_sectionize
     law_ids:
       - LAW-ARTBOARD-WALLPAPER-PRESERVES-STACK
     default_blast_radius: B3_BLOCKING
@@ -1039,6 +1043,8 @@ families:
     owners:
       - module: src/figma_flutter_agent/generator/app_typography_collapse.py
         symbol: collapse_text_styles_to_theme
+      - module: src/figma_flutter_agent/generator/layout/style/text_helpers.py
+        symbol: _text_style_delta_fields
     law_ids:
       - LAW-FONT-FAMILY-CONSERVATION
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR

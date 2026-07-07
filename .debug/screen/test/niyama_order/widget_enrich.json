@@ -1,15 +1,15 @@
 {
-  "cacheKey": "099c59bc323ee22d0732a2c42f91395ddb1ba0bac34f19e78ea73a27ed702254",
+  "cacheKey": "fb81079b6de784950214bee1cbb9d58aa4e195994724a2059f74a75c6c51619f",
   "response": {
     "entries": [
       {
         "clusterId": "component_1007_7119_e1043bbb",
-        "widgetName": "OrderBottomBarWidget",
+        "widgetName": "OrderActionBarWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1149_9467_afa6f842",
-        "widgetName": "QuantityStepperWidget",
+        "widgetName": "QuantityControlWidget",
         "paramRenames": {}
       },
       {
@@ -19,27 +19,27 @@
       },
       {
         "clusterId": "component_1154_8066_faf0fa44",
-        "widgetName": "GuestCountWidget",
+        "widgetName": "GuestCountRowWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_8374_89112a74",
-        "widgetName": "PromoCodeCardWidget",
+        "widgetName": "PromoCodeActionCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_8697_9095f282",
-        "widgetName": "PlusEighteenBadgeWidget",
+        "widgetName": "AgeRatingBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10366_754647f7",
-        "widgetName": "AddButtonWidget",
+        "widgetName": "AddProductButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10701_1aa13d53",
-        "widgetName": "ProductSmallCardWidget",
+        "widgetName": "CompactProductCardWidget",
         "paramRenames": {}
       },
       {
@@ -49,7 +49,7 @@
       },
       {
         "clusterId": "component_908_4711",
-        "widgetName": "HomeIndicatorPillWidget",
+        "widgetName": "BottomHomeIndicatorWidget",
         "paramRenames": {}
       },
       {
@@ -64,17 +64,17 @@
       },
       {
         "clusterId": "component_913_8948",
-        "widgetName": "SmallIllustrationWidget",
+        "widgetName": "SmallProductIllustrationWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_919_5311",
-        "widgetName": "ModalHeaderWidget",
+        "widgetName": "ModalSheetHeaderWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_932_4599_e1043bbb",
-        "widgetName": "CheckoutButtonWidget",
+        "widgetName": "PlaceOrderButtonWidget",
         "paramRenames": {}
       },
       {
@@ -84,7 +84,7 @@
       },
       {
         "clusterId": "shape_4",
-        "widgetName": "PriceLabelWidget",
+        "widgetName": "TitlePriceRowWidget",
         "paramRenames": {}
       }
     ]

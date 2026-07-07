@@ -1,8 +1,8 @@
 {
   "feature": "niyama_order_2",
-  "pipeline_run_id": "3f6bb3c13b17",
-  "candidate_build_run_id": "3f6bb3c13b17",
-  "committed_build_run_id": "3f6bb3c13b17",
+  "pipeline_run_id": "0828ee6aa144",
+  "candidate_build_run_id": "0828ee6aa144",
+  "committed_build_run_id": "0828ee6aa144",
   "writeback": "committed",
   "written_files": [
     "lib/features/niyama_order_2/niyama_order_2_screen.dart",
@@ -17,25 +17,21 @@
     "lib/theme/app_spacing.dart",
     "lib/theme/app_theme.dart",
     "lib/theme/app_typography.dart",
-    "lib/widgets/close_icon_widget.dart",
-    "lib/widgets/comment_card_widget.dart",
     "lib/widgets/cutlery_option_widget.dart",
     "lib/widgets/divider_line_widget.dart",
-    "lib/widgets/large_action_button_widget.dart",
     "lib/widgets/modal_header_widget.dart",
-    "lib/widgets/order_action_bar_widget.dart",
-    "lib/widgets/order_info_row_widget.dart",
-    "lib/widgets/order_item_widget.dart",
+    "lib/widgets/order_actions_bar_widget.dart",
+    "lib/widgets/order_product_item_widget.dart",
     "lib/widgets/order_status_badge_widget.dart",
     "test/golden/niyama_order_2_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-07T10:37:44.041324+00:00",
+  "captured_at": "2026-07-07T12:14:56.919022+00:00",
   "runMetaSchemaVersion": "2",
   "status": "completed",
   "cached_ir_verdict": "incompatible",
-  "clean_tree_hash": "04717b95db49a5977c1edd669900fdd653ddea4a0a3765e3138ce051b986ff89",
+  "clean_tree_hash": "eabd54e1f20e3346acb6aeccd459d35119dbe910d7e85a243cb73b9dd8470853",
   "generation_config_hash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
-  "run_started_at": "2026-07-07T10:35:41.217161+00:00"
+  "run_started_at": "2026-07-07T12:13:38.568399+00:00"
 }

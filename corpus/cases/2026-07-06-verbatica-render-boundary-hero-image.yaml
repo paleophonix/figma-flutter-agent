@@ -8,7 +8,7 @@ case:
   feature: verbatica_paywall
   observed_at: 2026-07-06
   created_at: '2026-07-06T18:35:00Z'
-  updated_at: '2026-07-07T02:30:00Z'
+  updated_at: '2026-07-07T12:00:00Z'
   summary: >
     Paywall hero Img 2399:42779 is flattened to a render boundary without
     imageAssetKey; ambient wallpaper emit produced SizedBox.shrink and the
@@ -48,14 +48,15 @@ occurrences:
         summary: _buildBackground Stack contains SizedBox.shrink only.
     repair:
       summary: >
-        resolve_render_boundary_asset_keys binds raster exports (PNG) to imageAssetKey for
-        collapsed render boundaries and probes flattened descendant ids; is_screen_wallpaper_node
-        accepts image-only wallpaper keys so ambient layers emit when the hero is raster-backed.
+        resolve_render_boundary_asset_keys binds raster exports via manifest, flattened
+        descendant ids, and reverse .figma-bindings.json lookups; portrait.png binds hero
+        2399:42779 for offline test project emit.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
         - src/figma_flutter_agent/generator/background/detection.py
+        - apps/test/assets/images/.figma-bindings.json
       regression_tests:
-        - tests/test_render_boundary_assets.py::test_resolve_render_boundary_binds_raster_export
-        - tests/test_welcome_sleep_wallpaper.py::test_screen_wallpaper_node_accepts_raster_boundary_key
+        - tests/test_verbatica_paywall_emit_laws.py::test_render_boundary_candidates_use_figma_bindings_for_flatten_ids
+        - tests/test_verbatica_paywall_emit_laws.py::test_verbatica_processed_hero_has_no_wrong_vector_after_asset_passes
       verification:
-        - poetry run pytest tests/test_render_boundary_assets.py::test_resolve_render_boundary_binds_raster_export tests/test_welcome_sleep_wallpaper.py::test_screen_wallpaper_node_accepts_raster_boundary_key -q
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py -q -k "render_boundary or hero"

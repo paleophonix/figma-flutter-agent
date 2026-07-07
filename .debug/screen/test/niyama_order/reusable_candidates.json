@@ -1,70 +1,74 @@
 {
-  "cacheKey": "0f893d9be39b06cfb82670d4f688d20bd878f18c4a646a132d82c7b9175867ca",
+  "cacheKey": "fb6765d43cf55bf1994d3f802c25a739909aae7e50ba36a32c2d6dca55777fa6",
   "response": {
     "candidates": [
       {
         "nodeId": "I4408:44896;1154:7849",
         "widgetName": "QuantityStepper",
-        "reason": "Repeated minus/plus counter reused across order items, cutlery, and product cards with the same structure.",
+        "reason": "Repeated minus/value/plus control across multiple order items and variants, with only the displayed count and icon state changing.",
         "confidence": 0.98,
         "suggestedParams": [
-          "quantity",
-          "isDark"
+          "quantityText",
+          "isDark",
+          "onDecrement",
+          "onIncrement"
         ],
         "evidence": {
           "similarNodes": [
+            "I4408:44896;1154:7849",
             "I4408:44897;1154:7849",
             "I4408:44898;1154:7849",
-            "I4408:44904;1154:8077",
-            "I4408:44915;1356:10712",
-            "I4408:44916;1356:10673"
+            "I4408:44904;1154:8077"
           ],
           "shapeSimilarity": 0.99,
-          "semanticRole": "quantity stepper / add-remove control"
+          "semanticRole": "quantity stepper with decrement, value, and increment actions"
         }
       },
       {
         "nodeId": "4408:44896",
         "widgetName": "OrderProductItem",
-        "reason": "Repeated order product row family with image, title, price, and optional details; variants differ only by text depth and whether extra detail text is shown.",
-        "confidence": 0.97,
+        "reason": "The order product card family repeats several times with the same image-title-price-quantity structure and divider treatment, varying only text content and occasional detail rows.",
+        "confidence": 0.96,
         "suggestedParams": [
-          "title",
+          "titleText",
           "priceText",
-          "detailsText",
-          "quantity",
-          "showDetails"
+          "detailText",
+          "quantityText",
+          "showDetailRow",
+          "showDivider"
         ],
         "evidence": {
           "similarNodes": [
+            "4408:44896",
             "4408:44897",
             "4408:44898",
             "4408:44901",
             "4408:44902"
           ],
-          "shapeSimilarity": 0.96,
-          "semanticRole": "order product list item"
+          "shapeSimilarity": 0.94,
+          "semanticRole": "order summary list item with image, title, price, and quantity controls"
         }
       },
       {
         "nodeId": "4408:44914",
         "widgetName": "ProductSmallCard",
-        "reason": "Small product tile repeats three times in the swipe carousel with shared image/title layout and variant pricing or add-action content.",
-        "confidence": 0.95,
+        "reason": "The horizontal product tiles repeat in the swipe carousel with the same image/title/action layout while price and promo fields vary between instances.",
+        "confidence": 0.92,
         "suggestedParams": [
-          "title",
-          "image",
-          "priceText",
-          "oldPriceText",
-          "buttonLabel"
+          "titleText",
+          "currentPriceText",
+          "previousPriceText",
+          "actionLabel",
+          "showPreviousPrice"
         ],
         "evidence": {
           "similarNodes": [
+            "4408:44914",
             "4408:44915",
             "4408:44916"
           ],
-          "shapeSimilarity": 0.94,
-          "semanticRole": "compact product promo card"
+          "shapeSimilarity": 0.91,
+          "semanticRole": "compact product tile with image, title, pricing, and add action"
         }
       }
     ]

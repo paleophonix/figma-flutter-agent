@@ -8,10 +8,10 @@ cases:
   project: test
   feature: verbatica_paywall
   occurrence_id: verbatica-paywall-price-font-collapsed
-  status: OPEN
+  status: FIXED
   observed_at: '2026-07-07'
   created_at: '2026-07-07T23:30:00Z'
-  updated_at: '2026-07-07T23:30:00Z'
+  updated_at: '2026-07-08T12:00:00Z'
   summary: "The plan prices (39,99$, 14,99$, 7,99$) use the Nekst font in Figma. Nekst
     is present on disk (assets/fonts/nekst_400/500/600.ttf) and declared in pubspec.yaml
     (family: Nekst), but the emitted price Text binds textTheme.headlineLarge, and

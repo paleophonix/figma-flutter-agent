@@ -8,7 +8,7 @@ case:
   feature: verbatica_paywall
   observed_at: 2026-07-07
   created_at: '2026-07-07T01:20:00Z'
-  updated_at: '2026-07-07T02:30:00Z'
+  updated_at: '2026-07-07T12:00:00Z'
   summary: >
     In StatusBarContentWidget the Battery icon slot is emitted as SizedBox(height: 52)
     because the Figma Battery ROW (I2399:42783;266:1499;266:1647) is parsed 16x52 while
@@ -55,12 +55,16 @@ occurrences:
         summary: A RenderFlex overflowed by 36 pixels on the bottom at status_bar_content_widget.dart:18.
     repair:
       summary: >
-        bind_row_cross_axis_height clamps inflated single-child icon-wrapper ROWs to the
-        inner stack/vector intrinsic (16px) instead of the Figma wrapper height (52px),
-        so status-bar Columns fit their fixed 40px host without overflow.
+        Status chrome spaceBetween stacks emit inflow siblings as Row (not Column) when
+        absolute notch overlays exist; bind_row_cross_axis_height also clamps inflated
+        multi-icon status ROW height to icon intrinsics.
       changed_files:
+        - src/figma_flutter_agent/generator/layout/flex_policy/stack.py
+        - src/figma_flutter_agent/generator/layout/widgets/emit/stack.py
         - src/figma_flutter_agent/generator/layout/flex_policy/extents.py
       regression_tests:
+        - tests/test_verbatica_paywall_emit_laws.py::test_status_chrome_space_between_inflow_emits_horizontal_row
+        - tests/test_verbatica_paywall_emit_laws.py::test_row_cross_axis_height_clamps_status_icon_cluster_row
         - tests/test_intrinsic_sizing_policy.py::test_row_cross_axis_height_clamps_inflated_icon_wrapper_row
       verification:
-        - poetry run pytest tests/test_intrinsic_sizing_policy.py::test_row_cross_axis_height_clamps_inflated_icon_wrapper_row -q
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py -q -k status_chrome tests/test_intrinsic_sizing_policy.py::test_row_cross_axis_height_clamps_inflated_icon_wrapper_row -q

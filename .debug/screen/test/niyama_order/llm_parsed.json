@@ -21,13 +21,7 @@
                     {
                       "figmaId": "4408:44911",
                       "kind": "auto",
-                      "children": [],
-                      "overrides": {
-                        "text": "Добавить к заказу?",
-                        "accessibilityLabel": "Добавить к заказу?",
-                        "textColor": "color1",
-                        "fontSize": 22.0
-                      }
+                      "children": []
                     }
                   ]
                 },
@@ -41,239 +35,207 @@
                       "children": [
                         {
                           "figmaId": "4408:44914",
-                          "kind": "extracted",
-                          "children": [],
-                          "ref": {
-                            "widgetName": "ProductSmallAddCardWidget",
-                            "namedArgs": {}
-                          }
-                        },
-                        {
-                          "figmaId": "4408:44915",
-                          "kind": "extracted",
-                          "children": [],
-                          "ref": {
-                            "widgetName": "ProductSmallDefaultCardWidget",
-                            "namedArgs": {}
-                          }
-                        },
-                        {
-                          "figmaId": "4408:44916",
-                          "kind": "extracted",
-                          "children": [],
-                          "ref": {
-                            "widgetName": "ProductSmallPromoCardWidget",
-                            "namedArgs": {}
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "figmaId": "4408:44917",
-              "kind": "extracted",
-              "children": [],
-              "ref": {
-                "widgetName": "AddBarWidget",
-                "namedArgs": {}
-              }
-            }
-          ]
-        },
-        {
-          "figmaId": "4408:44887",
-          "kind": "auto",
-          "children": []
-        },
-        {
-          "figmaId": "4408:44888",
-          "kind": "auto",
-          "children": [
-            {
-              "figmaId": "4408:44889",
-              "kind": "extracted",
-              "children": [],
-              "ref": {
-                "widgetName": "ModalHeaderWidget",
-                "namedArgs": {}
-              }
-            },
-            {
-              "figmaId": "4408:44890",
-              "kind": "auto",
-              "children": [
-                {
-                  "figmaId": "4408:44891",
-                  "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "4408:44892",
-                      "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "4408:44893",
-                          "kind": "auto",
-                          "children": [],
-                          "overrides": {
-                            "text": "Заказ на 1 826 ₽",
-                            "accessibilityLabel": "Заказ на 1 826 ₽",
-                            "textColor": "color1",
-                            "fontSize": 22.0
-                          }
-                        },
-                        {
-                          "figmaId": "4408:44894",
                           "kind": "auto",
                           "children": [
                             {
-                              "figmaId": "I4408:44894;1154:8698",
+                              "figmaId": "I4408:44914;1356:10663",
                               "kind": "auto",
-                              "children": [],
-                              "overrides": {
-                                "text": "+18",
-                                "accessibilityLabel": "+18",
-                                "textColor": "color1",
-                                "fontSize": 15.0
-                              }
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44914;1356:10661",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44914;1356:10662",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44914;1356:10660",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44914;1356:10664",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I4408:44914;1356:10664;1356:10367",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "4408:44915",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I4408:44915;1356:10711",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44915;1356:10706",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44915;1356:10705",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44915;1356:10708",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I4408:44915;1356:10710",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "I4408:44915;1356:10712",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I4408:44915;1356:10712;910:3253",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I4408:44915;1356:10712;910:3253;910:3248",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "4408:44916",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I4408:44916;1356:10672",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44916;1356:10667",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44916;1356:10668",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44916;1356:10666",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "I4408:44916;1356:10669",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I4408:44916;1356:10670",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "I4408:44916;1356:10671",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "I4408:44916;1356:10673",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I4408:44916;1356:10673;910:3253",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I4408:44916;1356:10673;910:3253;910:3248",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
                             }
                           ]
                         }
                       ]
-                    },
-                    {
-                      "figmaId": "4408:44895",
-                      "kind": "auto",
-                      "children": [],
-                      "overrides": {
-                        "text": "💥 Скидка 260 ₽",
-                        "accessibilityLabel": "💥 Скидка 260 ₽",
-                        "textColor": "color4",
-                        "fontSize": 15.0
-                      }
                     }
                   ]
                 },
                 {
-                  "figmaId": "4408:44896",
-                  "kind": "extracted",
-                  "children": [],
-                  "ref": {
-                    "widgetName": "OrderProductCardOkinawaWidget",
-                    "namedArgs": {}
-                  }
-                },
-                {
-                  "figmaId": "4408:44897",
-                  "kind": "extracted",
-                  "children": [],
-                  "ref": {
-                    "widgetName": "OrderProductCardWokRamenWidget",
-                    "namedArgs": {}
-                  }
-                },
-                {
-                  "figmaId": "4408:44898",
-                  "kind": "extracted",
-                  "children": [],
-                  "ref": {
-                    "widgetName": "OrderProductCardTomYamWidget",
-                    "namedArgs": {}
-                  }
-                },
-                {
-                  "figmaId": "4408:44899",
-                  "kind": "auto",
-                  "children": [],
-                  "overrides": {
-                    "text": "Дополнительно",
-                    "accessibilityLabel": "Дополнительно",
-                    "textColor": "color1",
-                    "fontSize": 17.0
-                  }
-                },
-                {
-                  "figmaId": "4408:44900",
+                  "figmaId": "4408:44917",
                   "kind": "auto",
                   "children": [
                     {
-                      "figmaId": "4408:44901",
-                      "kind": "extracted",
-                      "children": [],
-                      "ref": {
-                        "widgetName": "OrderProductCardWasabiWidget",
-                        "namedArgs": {}
-                      }
-                    },
-                    {
-                      "figmaId": "4408:44902",
-                      "kind": "extracted",
-                      "children": [],
-                      "ref": {
-                        "widgetName": "OrderProductCardSoyWidget",
-                        "namedArgs": {}
-                      }
-                    },
-                    {
-                      "figmaId": "4408:44903",
-                      "kind": "extracted",
-                      "children": [],
-                      "ref": {
-                        "widgetName": "PromoActionCardWidget",
-                        "namedArgs": {}
-                      }
-                    },
-                    {
-                      "figmaId": "4408:44904",
-                      "kind": "extracted",
-                      "children": [],
-                      "ref": {
-                        "widgetName": "CutleryRowWidget",
-                        "namedArgs": {}
-                      }
-                    }
-                  ]
-                },
-                {
-                  "figmaId": "4408:44905",
-                  "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "4408:44906",
+                      "figmaId": "I4408:44917;1007:7123",
                       "kind": "auto",
-                      "children": [],
-                      "overrides": {
-                        "text": "На 1 персону полагается: 50 мл. соевого соуса! Вы можете заказать дополнительные порции приправ.",
-                        "accessibilityLabel": "На 1 персону полагается: 50 мл. соевого соуса! Вы можете заказать дополнительные порции приправ.",
-                        "textColor": "color1",
-                        "fontSize": 13.0
-                      }
+                      "children": [
+                        {
+                          "figmaId": "I4408:44917;1007:7123;908:4710",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
                     },
                     {
-                      "figmaId": "4408:44907",
+                      "figmaId": "I4408:44917;1026:6403",
                       "kind": "auto",
-                      "children": [],
-                      "overrides": {
-                        "text": "Заказать еще",
-                        "accessibilityLabel": "Заказать еще",
-                        "textColor": "color4",
-                        "fontSize": 12.0
-                      }
+                      "children": [
+                        {
+                          "figmaId": "I4408:44917;1026:6371",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I4408:44917;1026:6371;932:4600",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
               ]
             },
             {
-              "figmaId": "4408:44886",
+              "figmaId": "4408:44887",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "4408:44888",
               "kind": "extracted",
               "children": [],
               "ref": {
-                "widgetName": "StatusBarWidget",
+                "widgetName": "ModalWidget",
                 "namedArgs": {}
               }
+            },
+            {
+              "figmaId": "4408:44886",
+              "kind": "auto",
+              "children": []
             }
           ]
         }
@@ -289,18 +251,20 @@
     "stateByFigmaId": {},
     "adaptiveRules": [],
     "semanticSummary": {
-      "screenRole": "order_customization_modal",
+      "screenRole": "checkout_addons_overlay",
       "confidence": 0.97,
-      "explanation": "Full-screen order customization flow with product carousel, modal add-ons list, and checkout CTA.",
-      "warnings": []
+      "explanation": "Absolute-positioned order customization overlay with a modal product editor, promotional action card, add-on carousel, and fixed checkout bar.",
+      "warnings": [
+        "Stack-root overlay composition with multiple independently positioned sections."
+      ]
     },
     "semanticVerdicts": [
       {
         "nodeId": "I4408:44889;919:5313",
         "role": "button",
-        "subtype": "icon_button",
+        "subtype": "close",
         "controlNodeId": "I4408:44889;919:5313",
-        "boundaryNodeId": "4408:44888",
+        "boundaryNodeId": "I4408:44889;919:5313",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
@@ -315,55 +279,23 @@
           "isMultiline": false,
           "maxLines": 1,
           "obscureText": false,
-          "actionKind": "close",
+          "actionKind": "dismiss",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "44x44_touch_target"
+          "minimum_44x44_touch_target"
         ],
         "options": [],
-        "confidence": 0.96,
+        "confidence": 0.99,
         "proposedEffects": [
           "dismiss_modal"
         ],
-        "explanation": "Top-right close affordance for the modal sheet."
-      },
-      {
-        "nodeId": "I4408:44917;1026:6371",
-        "role": "button",
-        "subtype": "primary_cta",
-        "controlNodeId": "I4408:44917;1026:6371",
-        "boundaryNodeId": "4408:44917",
-        "labelNodeIds": [
-          "I4408:44917;1026:6371;932:4600"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "button",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "checkout",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "full_width_cta"
-        ],
-        "options": [],
-        "confidence": 0.98,
-        "proposedEffects": [
-          "submit_order"
-        ],
-        "explanation": "Primary checkout action in the add bar."
+        "explanation": "Top-right close affordance for the modal overlay."
       },
       {
         "nodeId": "4408:44903",
         "role": "button",
-        "subtype": "action_card",
+        "subtype": "promo_action",
         "controlNodeId": "4408:44903",
         "boundaryNodeId": "4408:44903",
         "labelNodeIds": [
@@ -382,531 +314,378 @@
           "isMultiline": false,
           "maxLines": 1,
           "obscureText": false,
-          "actionKind": "promo_code",
+          "actionKind": "apply_promo",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "icon_leading_text_trailing_arrow"
+          "icon_label_arrow_affordance"
         ],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "open_promo_entry"
+        ],
+        "explanation": "Tappable promo code action card with icon, label, and arrow affordance."
+      },
+      {
+        "nodeId": "I4408:44917;1026:6371",
+        "role": "button",
+        "subtype": "checkout",
+        "controlNodeId": "I4408:44917;1026:6371",
+        "boundaryNodeId": "I4408:44917;1026:6371",
+        "labelNodeIds": [
+          "I4408:44917;1026:6371;932:4600"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "checkout",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "full_width_primary_action"
+        ],
+        "options": [],
+        "confidence": 0.99,
+        "proposedEffects": [
+          "submit_order"
+        ],
+        "explanation": "Primary checkout CTA in the fixed bottom bar."
+      },
+      {
+        "nodeId": "I4408:44896;1154:7849",
+        "role": "button",
+        "subtype": "quantity_stepper",
+        "controlNodeId": "I4408:44896;1154:7849",
+        "boundaryNodeId": "I4408:44896;1154:7849",
+        "labelNodeIds": [
+          "I4408:44896;1154:7849;1149:9469"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I4408:44896;1154:7849;1149:9469"
+        ],
+        "decorationNodeIds": [
+          "I4408:44896;1154:7849;1149:9856",
+          "I4408:44896;1154:7849;1149:9856;1149:9479",
+          "I4408:44896;1154:7849;1149:9855",
+          "I4408:44896;1154:7849;1149:9855;1149:9481"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": 2,
+          "actionKind": "adjust_quantity",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "quantity_stepper_horizontal"
+        ],
+        "value": 2,
         "options": [],
         "confidence": 0.9,
         "proposedEffects": [
-          "open_promo_code_flow"
+          "increase_or_decrease_item_count"
         ],
-        "explanation": "Action card that launches promo code application."
+        "explanation": "Inline quantity control for the main order item."
+      },
+      {
+        "nodeId": "I4408:44897;1154:7849",
+        "role": "button",
+        "subtype": "quantity_stepper",
+        "controlNodeId": "I4408:44897;1154:7849",
+        "boundaryNodeId": "I4408:44897;1154:7849",
+        "labelNodeIds": [
+          "I4408:44897;1154:7849;1149:9469"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I4408:44897;1154:7849;1149:9469"
+        ],
+        "decorationNodeIds": [
+          "I4408:44897;1154:7849;1149:9856",
+          "I4408:44897;1154:7849;1149:9856;1149:9479",
+          "I4408:44897;1154:7849;1149:9855",
+          "I4408:44897;1154:7849;1149:9855;1149:9481"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": 1,
+          "actionKind": "adjust_quantity",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "quantity_stepper_horizontal"
+        ],
+        "value": 1,
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "increase_or_decrease_item_count"
+        ],
+        "explanation": "Inline quantity control for a secondary order item."
+      },
+      {
+        "nodeId": "I4408:44898;1154:7849",
+        "role": "button",
+        "subtype": "quantity_stepper",
+        "controlNodeId": "I4408:44898;1154:7849",
+        "boundaryNodeId": "I4408:44898;1154:7849",
+        "labelNodeIds": [
+          "I4408:44898;1154:7849;1149:9469"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I4408:44898;1154:7849;1149:9469"
+        ],
+        "decorationNodeIds": [
+          "I4408:44898;1154:7849;1149:9856",
+          "I4408:44898;1154:7849;1149:9856;1149:9479",
+          "I4408:44898;1154:7849;1149:9855",
+          "I4408:44898;1154:7849;1149:9855;1149:9481"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": 1,
+          "actionKind": "adjust_quantity",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "quantity_stepper_horizontal"
+        ],
+        "value": 1,
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "increase_or_decrease_item_count"
+        ],
+        "explanation": "Inline quantity control for another order item."
+      },
+      {
+        "nodeId": "I4408:44904;1154:8077",
+        "role": "button",
+        "subtype": "add_product",
+        "controlNodeId": "I4408:44904;1154:8077",
+        "boundaryNodeId": "I4408:44904;1154:8077",
+        "labelNodeIds": [
+          "I4408:44904;1162:10181"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I4408:44904;1162:10180",
+          "I4408:44904;1162:10180;4181:43463"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "add_item",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "icon_label_horizontal"
+        ],
+        "options": [],
+        "confidence": 0.93,
+        "proposedEffects": [
+          "increase_cutlery_quantity"
+        ],
+        "explanation": "Add control for the cutlery add-on row."
+      },
+      {
+        "nodeId": "I4408:44914;1356:10664",
+        "role": "button",
+        "subtype": "add_item",
+        "controlNodeId": "I4408:44914;1356:10664",
+        "boundaryNodeId": "I4408:44914;1356:10664",
+        "labelNodeIds": [
+          "I4408:44914;1356:10664;1356:10367"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "add_item",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "small_card_cta"
+        ],
+        "options": [],
+        "confidence": 0.92,
+        "proposedEffects": [
+          "add_item_to_order"
+        ],
+        "explanation": "CTA for the sauces carousel card."
+      },
+      {
+        "nodeId": "I4408:44915;1356:10712",
+        "role": "button",
+        "subtype": "add_item",
+        "controlNodeId": "I4408:44915;1356:10712",
+        "boundaryNodeId": "I4408:44915;1356:10712",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I4408:44915;1356:10712;910:3253",
+          "I4408:44915;1356:10712;910:3253;910:3248"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "add_item",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "icon_only_small_cta"
+        ],
+        "options": [],
+        "confidence": 0.92,
+        "proposedEffects": [
+          "add_item_to_order"
+        ],
+        "explanation": "Icon-only add control on a product card."
+      },
+      {
+        "nodeId": "I4408:44916;1356:10673",
+        "role": "button",
+        "subtype": "add_item",
+        "controlNodeId": "I4408:44916;1356:10673",
+        "boundaryNodeId": "I4408:44916;1356:10673",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I4408:44916;1356:10673;910:3253",
+          "I4408:44916;1356:10673;910:3253;910:3248"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "actionKind": "add_item",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "icon_only_small_cta"
+        ],
+        "options": [],
+        "confidence": 0.92,
+        "proposedEffects": [
+          "add_item_to_order"
+        ],
+        "explanation": "Icon-only add control on the promo product card."
       }
     ]
   },
   "extractedWidgets": [
     {
-      "widgetName": "StatusBarWidget",
+      "widgetName": "ModalWidget",
       "widgetIr": {
-        "figmaId": "4408:44886",
-        "kind": "auto",
-        "children": []
-      }
-    },
-    {
-      "widgetName": "ProductSmallAddCardWidget",
-      "widgetIr": {
-        "figmaId": "4408:44914",
+        "figmaId": "4408:44888",
         "kind": "auto",
         "children": [
           {
-            "figmaId": "I4408:44914;1356:10663",
-            "kind": "auto",
-            "children": []
-          },
-          {
-            "figmaId": "I4408:44914;1356:10662",
-            "kind": "auto",
-            "children": []
-          },
-          {
-            "figmaId": "I4408:44914;1356:10661",
-            "kind": "auto",
-            "children": []
-          },
-          {
-            "figmaId": "I4408:44914;1356:10660",
-            "kind": "auto",
-            "children": [],
-            "overrides": {
-              "text": "Соусы",
-              "accessibilityLabel": "Соусы",
-              "textColor": "color1",
-              "fontSize": 15.0
-            }
-          },
-          {
-            "figmaId": "I4408:44914;1356:10664",
+            "figmaId": "4408:44905",
             "kind": "auto",
             "children": [
               {
-                "figmaId": "I4408:44914;1356:10664;1356:10367",
-                "kind": "auto",
-                "children": [],
-                "overrides": {
-                  "text": "Добавить",
-                  "accessibilityLabel": "Добавить",
-                  "textColor": "color3",
-                  "fontSize": 15.0
-                }
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "widgetName": "ProductSmallDefaultCardWidget",
-      "widgetIr": {
-        "figmaId": "4408:44915",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I4408:44915;1356:10711",
-            "kind": "auto",
-            "children": []
-          },
-          {
-            "figmaId": "I4408:44915;1356:10708",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44915;1356:10710",
-                "kind": "auto",
-                "children": [],
-                "overrides": {
-                  "text": "499 ₽",
-                  "accessibilityLabel": "499 ₽",
-                  "textColor": "color1",
-                  "fontSize": 15.0
-                }
-              }
-            ]
-          },
-          {
-            "figmaId": "I4408:44915;1356:10706",
-            "kind": "auto",
-            "children": []
-          },
-          {
-            "figmaId": "I4408:44915;1356:10705",
-            "kind": "auto",
-            "children": [],
-            "overrides": {
-              "text": "Облепиха-манго",
-              "accessibilityLabel": "Облепиха-манго",
-              "textColor": "color1",
-              "fontSize": 15.0
-            }
-          },
-          {
-            "figmaId": "I4408:44915;1356:10712",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44915;1356:10712;910:3253",
-                "kind": "auto",
-                "children": []
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "widgetName": "ProductSmallPromoCardWidget",
-      "widgetIr": {
-        "figmaId": "4408:44916",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I4408:44916;1356:10672",
-            "kind": "auto",
-            "children": []
-          },
-          {
-            "figmaId": "I4408:44916;1356:10669",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44916;1356:10670",
-                "kind": "auto",
-                "children": [],
-                "overrides": {
-                  "text": "519",
-                  "accessibilityLabel": "519",
-                  "textColor": "color1",
-                  "fontSize": 15.0
-                }
-              },
-              {
-                "figmaId": "I4408:44916;1356:10671",
-                "kind": "auto",
-                "children": [],
-                "overrides": {
-                  "text": "459 ₽",
-                  "accessibilityLabel": "459 ₽",
-                  "textColor": "color4",
-                  "fontSize": 15.0
-                }
-              }
-            ]
-          },
-          {
-            "figmaId": "I4408:44916;1356:10667",
-            "kind": "auto",
-            "children": []
-          },
-          {
-            "figmaId": "I4408:44916;1356:10666",
-            "kind": "auto",
-            "children": [],
-            "overrides": {
-              "text": "Филадельфия",
-              "accessibilityLabel": "Филадельфия",
-              "textColor": "color1",
-              "fontSize": 15.0
-            }
-          },
-          {
-            "figmaId": "I4408:44916;1356:10673",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44916;1356:10673;910:3253",
-                "kind": "auto",
-                "children": []
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "widgetName": "AddBarWidget",
-      "widgetIr": {
-        "figmaId": "4408:44917",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I4408:44917;1026:6403",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44917;1026:6371",
-                "kind": "auto",
-                "children": [
-                  {
-                    "figmaId": "I4408:44917;1026:6371;932:4600",
-                    "kind": "auto",
-                    "children": [],
-                    "overrides": {
-                      "text": "Оформить заказ на 1 367 ₽",
-                      "accessibilityLabel": "Оформить заказ на 1 367 ₽",
-                      "textColor": "color3",
-                      "fontSize": 17.0
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "figmaId": "I4408:44917;1007:7123",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44917;1007:7123;908:4710",
-                "kind": "auto",
-                "children": []
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "widgetName": "ModalHeaderWidget",
-      "widgetIr": {
-        "figmaId": "4408:44889",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I4408:44889;919:5313",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44889;919:5313;913:17731",
-                "kind": "auto",
-                "children": [
-                  {
-                    "figmaId": "I4408:44889;919:5313;913:17731;913:17711",
-                    "kind": "auto",
-                    "children": []
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "figmaId": "I4408:44889;919:5312",
-            "kind": "auto",
-            "children": []
-          }
-        ]
-      }
-    },
-    {
-      "widgetName": "OrderProductCardOkinawaWidget",
-      "widgetIr": {
-        "figmaId": "4408:44896",
-        "kind": "auto",
-        "children": [
-          {
-            "figmaId": "I4408:44896;1154:7850",
-            "kind": "auto",
-            "children": []
-          },
-          {
-            "figmaId": "I4408:44896;1154:7841",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44896;1154:7842",
+                "figmaId": "4408:44906",
                 "kind": "auto",
                 "children": []
               },
               {
-                "figmaId": "I4408:44896;1154:7843",
+                "figmaId": "4408:44907",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          },
+          {
+            "figmaId": "4408:44900",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "4408:44901",
                 "kind": "auto",
                 "children": [
                   {
-                    "figmaId": "I4408:44896;1154:7844",
+                    "figmaId": "I4408:44901;1154:7841",
                     "kind": "auto",
                     "children": [
                       {
-                        "figmaId": "I4408:44896;1154:7845",
+                        "figmaId": "I4408:44901;1154:7842",
                         "kind": "auto",
-                        "children": [
-                          {
-                            "figmaId": "I4408:44896;1902:25381",
-                            "kind": "auto",
-                            "children": [
-                              {
-                                "figmaId": "I4408:44896;1154:7846",
-                                "kind": "auto",
-                                "children": [],
-                                "overrides": {
-                                  "text": "Окинава Монтерей",
-                                  "accessibilityLabel": "Окинава Монтерей",
-                                  "textColor": "color1",
-                                  "fontSize": 17.0
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "figmaId": "I4408:44896;1902:25583",
-                            "kind": "auto",
-                            "children": [
-                              {
-                                "figmaId": "I4408:44896;1154:7847",
-                                "kind": "auto",
-                                "children": [],
-                                "overrides": {
-                                  "text": "918 ₽",
-                                  "accessibilityLabel": "918 ₽",
-                                  "textColor": "color1",
-                                  "fontSize": 17.0
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "figmaId": "I4408:44896;1154:7849",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "I4408:44896;1154:7849;1149:9856",
-                        "kind": "auto",
-                        "children": [
-                          {
-                            "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479",
-                            "kind": "auto",
-                            "children": [
-                              {
-                                "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479;910:3261",
-                                "kind": "auto",
-                                "children": []
-                              }
-                            ]
-                          }
-                        ]
+                        "children": []
                       },
                       {
-                        "figmaId": "I4408:44896;1154:7849;1149:9469",
-                        "kind": "auto",
-                        "children": [],
-                        "overrides": {
-                          "text": "2",
-                          "accessibilityLabel": "2",
-                          "textColor": "color1",
-                          "fontSize": 17.0
-                        }
-                      },
-                      {
-                        "figmaId": "I4408:44896;1154:7849;1149:9855",
+                        "figmaId": "I4408:44901;1154:7843",
                         "kind": "auto",
                         "children": [
                           {
-                            "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481",
+                            "figmaId": "I4408:44901;1154:7844",
                             "kind": "auto",
                             "children": [
                               {
-                                "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481;910:3249",
-                                "kind": "auto",
-                                "children": []
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "figmaId": "4408:44897",
-            "kind": "auto",
-            "children": [
-              {
-                "figmaId": "I4408:44897;1154:7850",
-                "kind": "auto",
-                "children": []
-              },
-              {
-                "figmaId": "I4408:44897;1154:7841",
-                "kind": "auto",
-                "children": [
-                  {
-                    "figmaId": "I4408:44897;1154:7842",
-                    "kind": "auto",
-                    "children": []
-                  },
-                  {
-                    "figmaId": "I4408:44897;1154:7843",
-                    "kind": "auto",
-                    "children": [
-                      {
-                        "figmaId": "I4408:44897;1154:7844",
-                        "kind": "auto",
-                        "children": [
-                          {
-                            "figmaId": "I4408:44897;1154:7845",
-                            "kind": "auto",
-                            "children": [
-                              {
-                                "figmaId": "I4408:44897;1902:25381",
+                                "figmaId": "I4408:44901;1154:7845",
                                 "kind": "auto",
                                 "children": [
                                   {
-                                    "figmaId": "I4408:44897;1154:7846",
-                                    "kind": "auto",
-                                    "children": [],
-                                    "overrides": {
-                                      "text": "Вок рамен с курицей\nв кисло-сладком соусе",
-                                      "accessibilityLabel": "Вок рамен с курицей\nв кисло-сладком соусе",
-                                      "textColor": "color1",
-                                      "fontSize": 17.0
-                                    },
-                                    "isMultiline": true,
-                                    "maxLines": 2
-                                  }
-                                ]
-                              },
-                              {
-                                "figmaId": "I4408:44897;1902:25583",
-                                "kind": "auto",
-                                "children": [
-                                  {
-                                    "figmaId": "I4408:44897;1154:7847",
-                                    "kind": "auto",
-                                    "children": [],
-                                    "overrides": {
-                                      "text": "359 ₽",
-                                      "accessibilityLabel": "359 ₽",
-                                      "textColor": "color1",
-                                      "fontSize": 17.0
-                                    }
-                                  }
-                                ]
-                              },
-                              {
-                                "figmaId": "I4408:44897;7752:55704",
-                                "kind": "auto",
-                                "children": [
-                                  {
-                                    "figmaId": "I4408:44897;7752:54884",
-                                    "kind": "auto",
-                                    "children": [],
-                                    "overrides": {
-                                      "text": "+ Острый соус\n+ Фокача с песто - Тверская колбаска",
-                                      "accessibilityLabel": "+ Острый соус\n+ Фокача с песто - Тверская колбаска",
-                                      "textColor": "color2",
-                                      "fontSize": 13.0
-                                    },
-                                    "isMultiline": true,
-                                    "maxLines": 3
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            "figmaId": "I4408:44897;1154:7849",
-                            "kind": "auto",
-                            "children": [
-                              {
-                                "figmaId": "I4408:44897;1154:7849;1149:9856",
-                                "kind": "auto",
-                                "children": [
-                                  {
-                                    "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479",
-                                    "kind": "auto",
-                                    "children": []
-                                  }
-                                ]
-                              },
-                              {
-                                "figmaId": "I4408:44897;1154:7849;1149:9469",
-                                "kind": "auto",
-                                "children": [],
-                                "overrides": {
-                                  "text": "1",
-                                  "accessibilityLabel": "1",
-                                  "textColor": "color1",
-                                  "fontSize": 17.0
-                                }
-                              },
-                              {
-                                "figmaId": "I4408:44897;1154:7849;1149:9855",
-                                "kind": "auto",
-                                "children": [
-                                  {
-                                    "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481",
+                                    "figmaId": "I4408:44901;1902:25381",
                                     "kind": "auto",
                                     "children": [
                                       {
-                                        "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481;910:3249",
+                                        "figmaId": "I4408:44901;1154:7846",
+                                        "kind": "auto",
+                                        "children": []
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "figmaId": "I4408:44901;1902:25583",
+                                    "kind": "auto",
+                                    "children": [
+                                      {
+                                        "figmaId": "I4408:44901;1154:7847",
                                         "kind": "auto",
                                         "children": []
                                       }
@@ -915,669 +694,221 @@
                                 ]
                               }
                             ]
+                          },
+                          {
+                            "figmaId": "I4408:44901;1154:7850",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "I4408:44901;1154:7850;933:4776",
+                                "kind": "auto",
+                                "children": []
+                              }
+                            ]
                           }
                         ]
                       },
                       {
-                        "figmaId": "4408:44898",
+                        "figmaId": "4408:44902",
                         "kind": "auto",
                         "children": [
                           {
-                            "figmaId": "I4408:44898;1154:7850",
-                            "kind": "auto",
-                            "children": []
-                          },
-                          {
-                            "figmaId": "I4408:44898;1154:7841",
+                            "figmaId": "I4408:44902;1154:7841",
                             "kind": "auto",
                             "children": [
                               {
-                                "figmaId": "I4408:44898;1154:7842",
+                                "figmaId": "I4408:44902;1154:7842",
                                 "kind": "auto",
                                 "children": []
                               },
                               {
-                                "figmaId": "I4408:44898;1154:7843",
+                                "figmaId": "I4408:44902;1154:7843",
                                 "kind": "auto",
                                 "children": [
                                   {
-                                    "figmaId": "I4408:44898;1154:7844",
+                                    "figmaId": "I4408:44902;1154:7844",
                                     "kind": "auto",
                                     "children": [
                                       {
-                                        "figmaId": "I4408:44898;1154:7845",
+                                        "figmaId": "I4408:44902;1154:7845",
                                         "kind": "auto",
                                         "children": [
                                           {
-                                            "figmaId": "I4408:44898;1902:25381",
+                                            "figmaId": "I4408:44902;1902:25381",
                                             "kind": "auto",
                                             "children": [
                                               {
-                                                "figmaId": "I4408:44898;1154:7846",
+                                                "figmaId": "I4408:44902;1154:7846",
                                                 "kind": "auto",
-                                                "children": [],
-                                                "overrides": {
-                                                  "text": "Том Ям",
-                                                  "accessibilityLabel": "Том Ям",
-                                                  "textColor": "color1",
-                                                  "fontSize": 17.0
-                                                }
+                                                "children": []
                                               }
                                             ]
                                           },
                                           {
-                                            "figmaId": "I4408:44898;1902:25583",
+                                            "figmaId": "I4408:44902;1902:25583",
                                             "kind": "auto",
                                             "children": [
                                               {
-                                                "figmaId": "I4408:44898;1154:7847",
+                                                "figmaId": "I4408:44902;1154:7847",
                                                 "kind": "auto",
-                                                "children": [],
-                                                "overrides": {
-                                                  "text": "399 ₽",
-                                                  "accessibilityLabel": "399 ₽",
-                                                  "textColor": "color1",
-                                                  "fontSize": 17.0
-                                                }
-                                              }
-                                            ]
-                                          },
-                                          {
-                                            "figmaId": "I4408:44898;7752:55704",
-                                            "kind": "auto",
-                                            "children": [
-                                              {
-                                                "figmaId": "I4408:44898;7752:54884",
-                                                "kind": "auto",
-                                                "children": [],
-                                                "overrides": {
-                                                  "text": "+ Острый соус",
-                                                  "accessibilityLabel": "+ Острый соус",
-                                                  "textColor": "color2",
-                                                  "fontSize": 13.0
-                                                }
+                                                "children": []
                                               }
                                             ]
                                           }
                                         ]
-                                      },
-                                      {
-                                        "figmaId": "I4408:44898;1154:7849",
-                                        "kind": "auto",
-                                        "children": []
                                       }
                                     ]
                                   },
                                   {
-                                    "figmaId": "4408:44899",
-                                    "kind": "auto",
-                                    "children": [],
-                                    "overrides": {
-                                      "text": "Дополнительно",
-                                      "accessibilityLabel": "Дополнительно",
-                                      "textColor": "color1",
-                                      "fontSize": 17.0
-                                    }
-                                  },
-                                  {
-                                    "figmaId": "4408:44900",
+                                    "figmaId": "I4408:44902;1154:7850",
                                     "kind": "auto",
                                     "children": [
                                       {
-                                        "figmaId": "4408:44901",
+                                        "figmaId": "I4408:44902;1154:7850;933:4776",
                                         "kind": "auto",
                                         "children": []
-                                      },
-                                      {
-                                        "figmaId": "4408:44902",
-                                        "kind": "auto",
-                                        "children": []
-                                      },
-                                      {
-                                        "figmaId": "4408:44903",
-                                        "kind": "auto",
-                                        "children": []
-                                      },
-                                      {
-                                        "figmaId": "4408:44904",
-                                        "kind": "auto",
-                                        "children": []
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "figmaId": "4408:44905",
-                                    "kind": "auto",
-                                    "children": [
-                                      {
-                                        "figmaId": "4408:44906",
-                                        "kind": "auto",
-                                        "children": [],
-                                        "overrides": {
-                                          "text": "На 1 персону полагается: 50 мл. соевого соуса! Вы можете заказать дополнительные порции приправ.",
-                                          "accessibilityLabel": "На 1 персону полагается: 50 мл. соевого соуса! Вы можете заказать дополнительные порции приправ.",
-                                          "textColor": "color1",
-                                          "fontSize": 13.0
-                                        }
-                                      },
-                                      {
-                                        "figmaId": "4408:44907",
-                                        "kind": "auto",
-                                        "children": [],
-                                        "overrides": {
-                                          "text": "Заказать еще",
-                                          "accessibilityLabel": "Заказать еще",
-                                          "textColor": "color4",
-                                          "fontSize": 12.0
-                                        }
                                       }
                                     ]
                                   }
                                 ]
-                              }
-                            ]
-                          },
-                          {
-                            "figmaId": "4408:44890",
-                            "kind": "auto",
-                            "children": [
+                              },
                               {
-                                "figmaId": "4408:44891",
+                                "figmaId": "4408:44903",
                                 "kind": "auto",
                                 "children": [
                                   {
-                                    "figmaId": "4408:44892",
+                                    "figmaId": "I4408:44903;1315:9811",
                                     "kind": "auto",
                                     "children": [
                                       {
-                                        "figmaId": "4408:44893",
-                                        "kind": "auto",
-                                        "children": [],
-                                        "overrides": {
-                                          "text": "Заказ на 1 826 ₽",
-                                          "accessibilityLabel": "Заказ на 1 826 ₽",
-                                          "textColor": "color1",
-                                          "fontSize": 22.0
-                                        }
-                                      },
-                                      {
-                                        "figmaId": "4408:44894",
+                                        "figmaId": "I4408:44903;1159:8235",
                                         "kind": "auto",
                                         "children": [
                                           {
-                                            "figmaId": "I4408:44894;1154:8698",
-                                            "kind": "auto",
-                                            "children": [],
-                                            "overrides": {
-                                              "text": "+18",
-                                              "accessibilityLabel": "+18",
-                                              "textColor": "color1",
-                                              "fontSize": 15.0
-                                            }
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "figmaId": "4408:44895",
-                                    "kind": "auto",
-                                    "children": [],
-                                    "overrides": {
-                                      "text": "💥 Скидка 260 ₽",
-                                      "accessibilityLabel": "💥 Скидка 260 ₽",
-                                      "textColor": "color4",
-                                      "fontSize": 15.0
-                                    }
-                                  },
-                                  {
-                                    "figmaId": "4408:44896",
-                                    "kind": "auto",
-                                    "children": [
-                                      {
-                                        "figmaId": "I4408:44896;1154:7850",
-                                        "kind": "auto",
-                                        "children": []
-                                      },
-                                      {
-                                        "figmaId": "I4408:44896;1154:7841",
-                                        "kind": "auto",
-                                        "children": [
-                                          {
-                                            "figmaId": "I4408:44896;1154:7842",
-                                            "kind": "auto",
-                                            "children": []
-                                          },
-                                          {
-                                            "figmaId": "I4408:44896;1154:7843",
+                                            "figmaId": "I4408:44903;1159:8160",
                                             "kind": "auto",
                                             "children": [
                                               {
-                                                "figmaId": "I4408:44896;1154:7844",
+                                                "figmaId": "I4408:44903;1159:8160;933:4776",
+                                                "kind": "auto",
+                                                "children": []
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "figmaId": "I4408:44903;1162:9965",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "I4408:44903;1162:9863",
                                                 "kind": "auto",
                                                 "children": [
                                                   {
-                                                    "figmaId": "I4408:44896;1154:7845",
+                                                    "figmaId": "I4408:44903;1162:9863;1162:10106",
                                                     "kind": "auto",
-                                                    "children": [
-                                                      {
-                                                        "figmaId": "I4408:44896;1902:25381",
-                                                        "kind": "auto",
-                                                        "children": [
-                                                          {
-                                                            "figmaId": "I4408:44896;1154:7846",
-                                                            "kind": "auto",
-                                                            "children": [],
-                                                            "overrides": {
-                                                              "text": "Окинава Монтерей",
-                                                              "accessibilityLabel": "Окинава Монтерей",
-                                                              "textColor": "color1",
-                                                              "fontSize": 17.0
-                                                            }
-                                                          }
-                                                        ]
-                                                      },
-                                                      {
-                                                        "figmaId": "I4408:44896;1902:25583",
-                                                        "kind": "auto",
-                                                        "children": [
-                                                          {
-                                                            "figmaId": "I4408:44896;1154:7847",
-                                                            "kind": "auto",
-                                                            "children": [],
-                                                            "overrides": {
-                                                              "text": "918 ₽",
-                                                              "accessibilityLabel": "918 ₽",
-                                                              "textColor": "color1",
-                                                              "fontSize": 17.0
-                                                            }
-                                                          }
-                                                        ]
-                                                      }
-                                                    ]
-                                                  },
-                                                  {
-                                                    "figmaId": "I4408:44896;1154:7849",
-                                                    "kind": "auto",
-                                                    "children": [
-                                                      {
-                                                        "figmaId": "I4408:44896;1154:7849;1149:9856",
-                                                        "kind": "auto",
-                                                        "children": [
-                                                          {
-                                                            "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479",
-                                                            "kind": "auto",
-                                                            "children": [
-                                                              {
-                                                                "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479;910:3261",
-                                                                "kind": "auto",
-                                                                "children": []
-                                                              }
-                                                            ]
-                                                          }
-                                                        ]
-                                                      },
-                                                      {
-                                                        "figmaId": "I4408:44896;1154:7849;1149:9469",
-                                                        "kind": "auto",
-                                                        "children": [],
-                                                        "overrides": {
-                                                          "text": "2",
-                                                          "accessibilityLabel": "2",
-                                                          "textColor": "color1",
-                                                          "fontSize": 17.0
-                                                        }
-                                                      },
-                                                      {
-                                                        "figmaId": "I4408:44896;1154:7849;1149:9855",
-                                                        "kind": "auto",
-                                                        "children": [
-                                                          {
-                                                            "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481",
-                                                            "kind": "auto",
-                                                            "children": [
-                                                              {
-                                                                "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481;910:3249",
-                                                                "kind": "auto",
-                                                                "children": []
-                                                              }
-                                                            ]
-                                                          }
-                                                        ]
-                                                      }
-                                                    ]
+                                                    "children": []
                                                   }
                                                 ]
                                               },
                                               {
-                                                "figmaId": "4408:44897",
+                                                "figmaId": "I4408:44903;1315:9349",
                                                 "kind": "auto",
                                                 "children": [
                                                   {
-                                                    "figmaId": "I4408:44897;1154:7850",
+                                                    "figmaId": "I4408:44903;1154:8380",
                                                     "kind": "auto",
                                                     "children": []
-                                                  },
-                                                  {
-                                                    "figmaId": "I4408:44897;1154:7841",
-                                                    "kind": "auto",
-                                                    "children": [
-                                                      {
-                                                        "figmaId": "I4408:44897;1154:7842",
-                                                        "kind": "auto",
-                                                        "children": []
-                                                      },
-                                                      {
-                                                        "figmaId": "I4408:44897;1154:7843",
-                                                        "kind": "auto",
-                                                        "children": [
-                                                          {
-                                                            "figmaId": "I4408:44897;1154:7844",
-                                                            "kind": "auto",
-                                                            "children": [
-                                                              {
-                                                                "figmaId": "I4408:44897;1154:7845",
-                                                                "kind": "auto",
-                                                                "children": [
-                                                                  {
-                                                                    "figmaId": "I4408:44897;1902:25381",
-                                                                    "kind": "auto",
-                                                                    "children": [
-                                                                      {
-                                                                        "figmaId": "I4408:44897;1154:7846",
-                                                                        "kind": "auto",
-                                                                        "children": [],
-                                                                        "overrides": {
-                                                                          "text": "Вок рамен с курицей\nв кисло-сладком соусе",
-                                                                          "accessibilityLabel": "Вок рамен с курицей\nв кисло-сладком соусе",
-                                                                          "textColor": "color1",
-                                                                          "fontSize": 17.0
-                                                                        },
-                                                                        "isMultiline": true,
-                                                                        "maxLines": 2
-                                                                      }
-                                                                    ]
-                                                                  },
-                                                                  {
-                                                                    "figmaId": "I4408:44897;1902:25583",
-                                                                    "kind": "auto",
-                                                                    "children": [
-                                                                      {
-                                                                        "figmaId": "I4408:44897;1154:7847",
-                                                                        "kind": "auto",
-                                                                        "children": [],
-                                                                        "overrides": {
-                                                                          "text": "359 ₽",
-                                                                          "accessibilityLabel": "359 ₽",
-                                                                          "textColor": "color1",
-                                                                          "fontSize": 17.0
-                                                                        }
-                                                                      }
-                                                                    ]
-                                                                  },
-                                                                  {
-                                                                    "figmaId": "I4408:44897;7752:55704",
-                                                                    "kind": "auto",
-                                                                    "children": [
-                                                                      {
-                                                                        "figmaId": "I4408:44897;7752:54884",
-                                                                        "kind": "auto",
-                                                                        "children": [],
-                                                                        "overrides": {
-                                                                          "text": "+ Острый соус\n+ Фокача с песто - Тверская колбаска",
-                                                                          "accessibilityLabel": "+ Острый соус\n+ Фокача с песто - Тверская колбаска",
-                                                                          "textColor": "color2",
-                                                                          "fontSize": 13.0
-                                                                        },
-                                                                        "isMultiline": true,
-                                                                        "maxLines": 3
-                                                                      }
-                                                                    ]
-                                                                  }
-                                                                ]
-                                                              },
-                                                              {
-                                                                "figmaId": "I4408:44897;1154:7849",
-                                                                "kind": "auto",
-                                                                "children": [
-                                                                  {
-                                                                    "figmaId": "I4408:44897;1154:7849;1149:9856",
-                                                                    "kind": "auto",
-                                                                    "children": [
-                                                                      {
-                                                                        "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479",
-                                                                        "kind": "auto",
-                                                                        "children": []
-                                                                      }
-                                                                    ]
-                                                                  },
-                                                                  {
-                                                                    "figmaId": "I4408:44897;1154:7849;1149:9469",
-                                                                    "kind": "auto",
-                                                                    "children": [],
-                                                                    "overrides": {
-                                                                      "text": "1",
-                                                                      "accessibilityLabel": "1",
-                                                                      "textColor": "color1",
-                                                                      "fontSize": 17.0
-                                                                    }
-                                                                  },
-                                                                  {
-                                                                    "figmaId": "I4408:44897;1154:7849;1149:9855",
-                                                                    "kind": "auto",
-                                                                    "children": [
-                                                                      {
-                                                                        "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481",
-                                                                        "kind": "auto",
-                                                                        "children": [
-                                                                          {
-                                                                            "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481;910:3249",
-                                                                            "kind": "auto",
-                                                                            "children": []
-                                                                          }
-                                                                        ]
-                                                                      }
-                                                                    ]
-                                                                  }
-                                                                ]
-                                                              },
-                                                              {
-                                                                "figmaId": "4408:44898",
-                                                                "kind": "auto",
-                                                                "children": [
-                                                                  {
-                                                                    "figmaId": "I4408:44898;1154:7850",
-                                                                    "kind": "auto",
-                                                                    "children": []
-                                                                  },
-                                                                  {
-                                                                    "figmaId": "I4408:44898;1154:7841",
-                                                                    "kind": "auto",
-                                                                    "children": [
-                                                                      {
-                                                                        "figmaId": "I4408:44898;1154:7842",
-                                                                        "kind": "auto",
-                                                                        "children": []
-                                                                      },
-                                                                      {
-                                                                        "figmaId": "I4408:44898;1154:7843",
-                                                                        "kind": "auto",
-                                                                        "children": [
-                                                                          {
-                                                                            "figmaId": "I4408:44898;1154:7844",
-                                                                            "kind": "auto",
-                                                                            "children": [
-                                                                              {
-                                                                                "figmaId": "I4408:44898;1154:7845",
-                                                                                "kind": "auto",
-                                                                                "children": [
-                                                                                  {
-                                                                                    "figmaId": "I4408:44898;1902:25381",
-                                                                                    "kind": "auto",
-                                                                                    "children": [
-                                                                                      {
-                                                                                        "figmaId": "I4408:44898;1154:7846",
-                                                                                        "kind": "auto",
-                                                                                        "children": [],
-                                                                                        "overrides": {
-                                                                                          "text": "Том Ям",
-                                                                                          "accessibilityLabel": "Том Ям",
-                                                                                          "textColor": "color1",
-                                                                                          "fontSize": 17.0
-                                                                                        }
-                                                                                      }
-                                                                                    ]
-                                                                                  },
-                                                                                  {
-                                                                                    "figmaId": "I4408:44898;1902:25583",
-                                                                                    "kind": "auto",
-                                                                                    "children": [
-                                                                                      {
-                                                                                        "figmaId": "I4408:44898;1154:7847",
-                                                                                        "kind": "auto",
-                                                                                        "children": [],
-                                                                                        "overrides": {
-                                                                                          "text": "399 ₽",
-                                                                                          "accessibilityLabel": "399 ₽",
-                                                                                          "textColor": "color1",
-                                                                                          "fontSize": 17.0
-                                                                                        }
-                                                                                      }
-                                                                                    ]
-                                                                                  },
-                                                                                  {
-                                                                                    "figmaId": "I4408:44898;7752:55704",
-                                                                                    "kind": "auto",
-                                                                                    "children": [
-                                                                                      {
-                                                                                        "figmaId": "I4408:44898;7752:54884",
-                                                                                        "kind": "auto",
-                                                                                        "children": [],
-                                                                                        "overrides": {
-                                                                                          "text": "+ Острый соус",
-                                                                                          "accessibilityLabel": "+ Острый соус",
-                                                                                          "textColor": "color2",
-                                                                                          "fontSize": 13.0
-                                                                                        }
-                                                                                      }
-                                                                                    ]
-                                                                                  }
-                                                                                ]
-                                                                              },
-                                                                              {
-                                                                                "figmaId": "I4408:44898;1154:7849",
-                                                                                "kind": "auto",
-                                                                                "children": []
-                                                                              }
-                                                                            ]
-                                                                          },
-                                                                          {
-                                                                            "figmaId": "4408:44901",
-                                                                            "kind": "auto",
-                                                                            "children": []
-                                                                          },
-                                                                          {
-                                                                            "figmaId": "4408:44902",
-                                                                            "kind": "auto",
-                                                                            "children": []
-                                                                          },
-                                                                          {
-                                                                            "figmaId": "4408:44903",
-                                                                            "kind": "auto",
-                                                                            "children": []
-                                                                          },
-                                                                          {
-                                                                            "figmaId": "4408:44904",
-                                                                            "kind": "auto",
-                                                                            "children": []
-                                                                          }
-                                                                        ]
-                                                                      },
-                                                                      {
-                                                                        "figmaId": "4408:44917",
-                                                                        "kind": "auto",
-                                                                        "children": [
-                                                                          {
-                                                                            "figmaId": "I4408:44917;1026:6403",
-                                                                            "kind": "auto",
-                                                                            "children": [
-                                                                              {
-                                                                                "figmaId": "I4408:44917;1026:6371",
-                                                                                "kind": "auto",
-                                                                                "children": [
-                                                                                  {
-                                                                                    "figmaId": "I4408:44917;1026:6371;932:4600",
-                                                                                    "kind": "auto",
-                                                                                    "children": [],
-                                                                                    "overrides": {
-                                                                                      "text": "Оформить заказ на 1 367 ₽",
-                                                                                      "accessibilityLabel": "Оформить заказ на 1 367 ₽",
-                                                                                      "textColor": "color3",
-                                                                                      "fontSize": 17.0
-                                                                                    }
-                                                                                  }
-                                                                                ]
-                                                                              }
-                                                                            ]
-                                                                          },
-                                                                          {
-                                                                            "figmaId": "I4408:44917;1007:7123",
-                                                                            "kind": "auto",
-                                                                            "children": [
-                                                                              {
-                                                                                "figmaId": "I4408:44917;1007:7123;908:4710",
-                                                                                "kind": "auto",
-                                                                                "children": []
-                                                                              }
-                                                                            ]
-                                                                          }
-                                                                        ]
-                                                                      },
-                                                                      {
-                                                                        "figmaId": "4408:44889",
-                                                                        "kind": "auto",
-                                                                        "children": [
-                                                                          {
-                                                                            "figmaId": "I4408:44889;919:5313",
-                                                                            "kind": "auto",
-                                                                            "children": [
-                                                                              {
-                                                                                "figmaId": "I4408:44889;919:5313;913:17731",
-                                                                                "kind": "auto",
-                                                                                "children": [
-                                                                                  {
-                                                                                    "figmaId": "I4408:44889;919:5313;913:17731;913:17711",
-                                                                                    "kind": "auto",
-                                                                                    "children": []
-                                                                                  }
-                                                                                ]
-                                                                              }
-                                                                            ]
-                                                                          },
-                                                                          {
-                                                                            "figmaId": "I4408:44889;919:5312",
-                                                                            "kind": "auto",
-                                                                            "children": []
-                                                                          }
-                                                                        ]
-                                                                      }
-                                                                    ]
-                                                                  }
-                                                                ]
-                                                              }
-                                                            ]
-                                                          }
-                                                        ]
-                                                      }
-                                                    ]
                                                   }
                                                 ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "figmaId": "I4408:44903;1154:8385",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "I4408:44903;1154:8385;1003:4475",
+                                                "kind": "auto",
+                                                "children": []
                                               }
                                             ]
                                           }
                                         ]
                                       }
                                     ]
+                                  },
+                                  {
+                                    "figmaId": "I4408:44903;1154:7850",
+                                    "kind": "auto",
+                                    "children": [
+                                      {
+                                        "figmaId": "I4408:44903;1154:7850;933:4776",
+                                        "kind": "auto",
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "figmaId": "4408:44904",
+                                "kind": "auto",
+                                "children": [
+                                  {
+                                    "figmaId": "I4408:44904;1159:8273",
+                                    "kind": "auto",
+                                    "children": [
+                                      {
+                                        "figmaId": "I4408:44904;1154:8071",
+                                        "kind": "auto",
+                                        "children": [
+                                          {
+                                            "figmaId": "I4408:44904;1162:10179",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "I4408:44904;1162:10180",
+                                                "kind": "auto",
+                                                "children": [
+                                                  {
+                                                    "figmaId": "I4408:44904;1162:10180;4181:43463",
+                                                    "kind": "auto",
+                                                    "children": []
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "figmaId": "I4408:44904;1162:10181",
+                                                "kind": "auto",
+                                                "children": []
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "figmaId": "I4408:44904;1154:8077",
+                                            "kind": "auto",
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "figmaId": "4408:44905",
+                                "kind": "auto",
+                                "children": [
+                                  {
+                                    "figmaId": "4408:44906",
+                                    "kind": "auto",
+                                    "children": []
+                                  },
+                                  {
+                                    "figmaId": "4408:44907",
+                                    "kind": "auto",
+                                    "children": []
                                   }
                                 ]
                               }
@@ -1588,42 +919,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "figmaId": "4408:44901",
-                "kind": "extracted",
-                "children": [],
-                "ref": {
-                  "widgetName": "OrderProductCardWasabiWidget",
-                  "namedArgs": {}
-                }
-              },
-              {
-                "figmaId": "4408:44902",
-                "kind": "extracted",
-                "children": [],
-                "ref": {
-                  "widgetName": "OrderProductCardSoyWidget",
-                  "namedArgs": {}
-                }
-              },
-              {
-                "figmaId": "4408:44903",
-                "kind": "extracted",
-                "children": [],
-                "ref": {
-                  "widgetName": "PromoActionCardWidget",
-                  "namedArgs": {}
-                }
-              },
-              {
-                "figmaId": "4408:44904",
-                "kind": "extracted",
-                "children": [],
-                "ref": {
-                  "widgetName": "CutleryRowWidget",
-                  "namedArgs": {}
-                }
               }
             ]
           }
@@ -1632,7 +927,7 @@
     }
   ],
   "irCacheFingerprintVersion": "1",
-  "cleanTreeHash": "dd9f9f7387425f2a513a5ca7b29df347b794c0c3735bea0eb62a0be9e3d895ab",
+  "cleanTreeHash": "2c126e3763fa0ad1ac0b8378a32aeb5f4e8919adb228f8af1b809b3787df0d5b",
   "cleanRootFigmaId": "4408:44885",
   "cleanRootType": "STACK",
   "cleanRootWidth": 375.0,
