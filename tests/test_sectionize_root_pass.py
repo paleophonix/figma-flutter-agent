@@ -483,6 +483,37 @@ def test_sectionize_product_detail_fixture_without_fitted_box_scale_down() -> No
     assert len(plan.scroll_sections) >= 1
 
 
+def test_evaluate_root_sectionize_rejects_wallpaper_overlay_slot_without_asset() -> None:
+    """Law: render_boundary wallpaper slot must veto root STACK→COLUMN sectionize."""
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Img",
+        type=NodeType.STACK,
+        render_boundary=True,
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(right=-33.0, width=393.0, height=454.0),
+        sizing=Sizing(width=393.0, height=454.0, height_mode=SizingMode.FIXED),
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        stack_placement=StackPlacement(top=70.0, width=360.0, height=600.0),
+        sizing=Sizing(width=360.0, height=600.0, height_mode=SizingMode.FIXED),
+        children=[],
+    )
+    root = CleanDesignTreeNode(
+        id="screen",
+        name="Paywall",
+        type=NodeType.STACK,
+        sizing=Sizing(width=360.0, height=780.0, height_mode=SizingMode.FIXED),
+        children=[hero, content],
+    )
+    plan = evaluate_root_sectionize(root, responsive_reflow_enabled=True)
+    assert plan.activated is False
+    assert plan.reject_reason == "wallpaper_overlay_artboard"
+
+
 def test_sectionize_rejects_dense_absolute_overlay_artboard() -> None:
     """Law: FixedArtboardStackPreservationLaw — dense overlay dashboards stay STACK."""
     import json

@@ -757,6 +757,7 @@ def render_stack(
         stack_flow_child_vertical_extent_wrap,
         stack_pill_button_wrap_spacing,
         stack_should_emit_coalesced_inflow_fallback,
+        stack_should_emit_horizontal_inflow_row,
         stack_should_emit_mixed_inflow_column_overlay,
         stack_should_flow_as_centered_wrap,
         stack_should_flow_as_column,
@@ -928,6 +929,52 @@ def render_stack(
         stack_widget = (
             f"Column({main_axis}crossAxisAlignment: CrossAxisAlignment.stretch, children: [{body}])"
         )
+    elif stack_should_emit_horizontal_inflow_row(node):
+        from figma_flutter_agent.generator.background.detection import (
+            is_decorative_absolute_background_overlay,
+        )
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            stack_child_is_absolute_overlay,
+            stack_flow_column_child_sort_key,
+        )
+        from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+            repair_flex_parent_data_order,
+        )
+
+        ordered_pairs = sorted(
+            emitted_pairs,
+            key=lambda pair: stack_flow_column_child_sort_key(pair[0]),
+        )
+        inflow_widgets: list[str] = []
+        background_overlays: list[str] = []
+        foreground_overlays: list[str] = []
+        for child, widget in ordered_pairs:
+            repaired = repair_flex_parent_data_order(widget)
+            if stack_child_is_absolute_overlay(child):
+                if is_decorative_absolute_background_overlay(child):
+                    background_overlays.append(repaired)
+                else:
+                    foreground_overlays.append(repaired)
+                continue
+            flow_widget = stack_flow_child_horizontal_wrap(child, repaired, parent_node=node)
+            if column_child_should_center_hug(node, child):
+                flow_widget = column_center_hug_child_wrap(node, child, flow_widget)
+            inflow_widgets.append(repair_flex_parent_data_order(flow_widget))
+        inflow_body = ", ".join(inflow_widgets) or "const SizedBox.shrink()"
+        inflow_row = (
+            "Row("
+            "mainAxisAlignment: MainAxisAlignment.spaceBetween, "
+            "crossAxisAlignment: CrossAxisAlignment.center, "
+            f"children: [{inflow_body}]"
+            ")"
+        )
+        stack_clip = (
+            "Clip.none" if not is_layout_root or stack_needs_soft_clip(node) else "Clip.hardEdge"
+        )
+        body = ", ".join([*background_overlays, inflow_row, *foreground_overlays]) or (
+            "const SizedBox.shrink()"
+        )
+        stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
     elif stack_should_emit_mixed_inflow_column_overlay(
         node
     ) or stack_should_emit_coalesced_inflow_fallback(node):

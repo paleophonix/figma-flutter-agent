@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from figma_flutter_agent.generator.background.detection import root_has_wallpaper_overlay_slot
 from figma_flutter_agent.generator.ir.passes.geometry import (
     _OVERLAP_TOLERANCE_PX,
     child_layout_height,
@@ -274,6 +275,11 @@ def evaluate_root_sectionize(
         return SectionizePlan(activated=False, reject_reason="responsive_disabled")
     if root.type != NodeType.STACK or len(root.children) < 2:
         return SectionizePlan(activated=False, reject_reason="not_stack_or_too_few_children")
+    if root_has_wallpaper_overlay_slot(root):
+        return SectionizePlan(
+            activated=False,
+            reject_reason="wallpaper_overlay_artboard",
+        )
     if stack_dense_absolute_overlays_preserve_stack(root):
         return SectionizePlan(
             activated=False,

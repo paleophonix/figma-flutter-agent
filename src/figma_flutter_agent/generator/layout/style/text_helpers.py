@@ -303,6 +303,12 @@ def _text_style_delta_fields(
         if style.font_size is not None and style.font_size > 0:
             spacing = min(spacing, float(style.font_size) * 0.12)
         parts.append(f"letterSpacing: {format_micro_style_literal(spacing)}")
+    if (
+        style.font_family
+        and bundled_font_families is not None
+        and style.font_family in bundled_font_families
+    ):
+        parts.append(f"fontFamily: '{style.font_family}'")
     return parts
 
 

@@ -78,6 +78,27 @@ def bottom_nav_active_tab_icon_band_height(node: CleanDesignTreeNode) -> float:
     return float(node.sizing.height or 46.0)
 
 
+def button_is_pill_with_label_column(node: CleanDesignTreeNode) -> bool:
+    """Pill CTA whose label copy lives in a centered inner ``COLUMN`` (multi-line stack)."""
+    if node.type != NodeType.BUTTON:
+        return False
+    height = node.sizing.height
+    radius = node.style.border_radius
+    if height is None or radius is None or float(height) <= 0:
+        return False
+    if float(radius) < float(height) * 0.35:
+        return False
+    if len(node.children) != 1 or node.children[0].type != NodeType.COLUMN:
+        return False
+    label_column = node.children[0]
+    text_children = [
+        child
+        for child in label_column.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    return bool(text_children)
+
+
 def button_is_pill_with_centered_label(node: CleanDesignTreeNode) -> bool:
     """Pill-shaped button whose sole child is centered label copy."""
     if node.type != NodeType.BUTTON:

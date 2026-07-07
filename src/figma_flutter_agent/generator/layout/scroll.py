@@ -303,6 +303,7 @@ def wrap_flex_auto_layout_padding(
     from figma_flutter_agent.generator.layout.common import layout_fact_centered_glyph_badge
     from figma_flutter_agent.generator.layout.flex_policy import (
         button_is_pill_with_centered_label,
+        button_is_pill_with_label_column,
         layout_fact_column_tight_stack_text_host,
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
@@ -321,10 +322,11 @@ def wrap_flex_auto_layout_padding(
         and layout_fact_nav_stepper_row(parent_node)
     ):
         return widget
-    if button_is_pill_with_centered_label(node):
+    if button_is_pill_with_centered_label(node) or button_is_pill_with_label_column(node):
         height = node.sizing.height
         if (
-            height is not None
+            button_is_pill_with_centered_label(node)
+            and height is not None
             and float(height) > 0
             and len(node.children) == 1
             and node.children[0].type == NodeType.TEXT

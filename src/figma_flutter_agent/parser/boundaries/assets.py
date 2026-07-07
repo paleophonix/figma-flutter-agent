@@ -132,8 +132,13 @@ def _render_boundary_asset_candidates(
     manifest_paths: dict[str, str],
 ) -> list[str]:
     """Ordered on-disk export paths for one render-boundary node."""
+    from figma_flutter_agent.pipeline.local_assets import load_project_asset_bindings
+
     candidates: list[str] = []
     seen: set[str] = set()
+    binding_by_node_id = {
+        bound_id: filename for filename, bound_id in load_project_asset_bindings(project_dir).items()
+    }
 
     def add(path: str | None) -> None:
         if path and path not in seen and _render_boundary_export_matches_node(node, path):
@@ -149,6 +154,12 @@ def _render_boundary_asset_candidates(
         if probe_id == node.id:
             continue
         add(_discover_exact_raster_for_node(project_dir, probe_id))
+        bound_filename = binding_by_node_id.get(probe_id)
+        if bound_filename:
+            add(f"assets/images/{bound_filename}".replace("\\", "/"))
+    bound_filename = binding_by_node_id.get(node.id)
+    if bound_filename:
+        add(f"assets/images/{bound_filename}".replace("\\", "/"))
     return candidates
 
 
@@ -824,8 +835,21 @@ def resolve_pruned_cluster_instance_assets(
             paths.append(discovered)
         return paths
 
+    cluster_vector_keys: dict[str, str] = {}
+
+    def collect_cluster_vectors(node: CleanDesignTreeNode) -> None:
+        if not node.cluster_id or not node.vector_asset_key:
+            return
+        existing = cluster_vector_keys.get(node.cluster_id)
+        if existing is None or (node.children and not existing):
+            cluster_vector_keys[node.cluster_id] = node.vector_asset_key
+
     def visit(node: CleanDesignTreeNode) -> None:
         if node.cluster_id and not node.children:
+            inherited = cluster_vector_keys.get(node.cluster_id)
+            if inherited is not None and not node.vector_asset_key:
+                node.vector_asset_key = inherited
+                return
             resolved: str | None = None
             candidate_ids: list[str] = []
             for node_id in node.flatten_figma_node_ids or ():
@@ -843,6 +867,7 @@ def resolve_pruned_cluster_instance_assets(
 
     from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 
+    walk_clean_tree(tree, collect_cluster_vectors)
     walk_clean_tree(tree, visit)
 
 

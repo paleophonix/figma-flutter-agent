@@ -989,6 +989,24 @@ def stack_child_is_absolute_overlay(child: CleanDesignTreeNode) -> bool:
     return child.layout_positioning == "ABSOLUTE"
 
 
+def stack_should_emit_horizontal_inflow_row(stack: CleanDesignTreeNode) -> bool:
+    """Emit side-by-side inflow children as ``Row`` inside a ``Stack`` with absolute overlays.
+
+    Status chrome and similar ``spaceBetween`` stacks place clock and icon groups on one
+    horizontal band; coercing them into a ``Column`` stacks icons above the clock.
+    """
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    alignment = stack.alignment
+    if alignment is None or alignment.main != "spaceBetween":
+        return False
+    inflow = [child for child in stack.children if not stack_child_is_absolute_overlay(child)]
+    absolute = [child for child in stack.children if stack_child_is_absolute_overlay(child)]
+    if len(inflow) < 2 or not absolute:
+        return False
+    return not tree_children_are_vertically_sequential(inflow)
+
+
 def stack_should_emit_mixed_inflow_column_overlay(stack: CleanDesignTreeNode) -> bool:
     """True when in-flow siblings must ``Column``-flow inside a ``Stack`` with absolute overlays.
 
@@ -1020,6 +1038,8 @@ def stack_should_emit_mixed_inflow_column_overlay(stack: CleanDesignTreeNode) ->
 
 def stack_should_emit_coalesced_inflow_fallback(stack: CleanDesignTreeNode) -> bool:
     """Emit one inflow ``Column`` when absolute decor blocked mixed-inflow routing."""
+    if stack_should_emit_horizontal_inflow_row(stack):
+        return False
     if stack_should_emit_mixed_inflow_column_overlay(stack):
         return False
     if stack.type != NodeType.STACK or len(stack.children) < 2:
@@ -1030,7 +1050,7 @@ def stack_should_emit_coalesced_inflow_fallback(stack: CleanDesignTreeNode) -> b
         return False
     if len(inflow) < 2 and (stack.spacing or 0.0) <= 0.0:
         return False
-    return True
+    return tree_children_are_vertically_sequential(inflow)
 
 
 def stack_should_emit_surface_decoration(

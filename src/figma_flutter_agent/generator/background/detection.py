@@ -44,6 +44,26 @@ def artboard_bleed_placement_exempt(
     return _is_ambient_background_child(child)
 
 
+def root_has_wallpaper_overlay_slot(root: CleanDesignTreeNode) -> bool:
+    """Return True when the artboard root must stay ``STACK`` for wallpaper/overlay slots.
+
+    Veto root sectionize before raster binding: a ``render_boundary`` absolute slot
+    must not be dropped when converting the artboard to a responsive ``COLUMN``.
+    """
+    if root.type != NodeType.STACK:
+        return False
+    for child in root.children:
+        if is_screen_wallpaper_node(child, root):
+            return True
+        if child.render_boundary and (
+            child.stack_placement is not None or child.layout_positioning == "ABSOLUTE"
+        ):
+            return True
+        if is_decorative_absolute_background_overlay(child):
+            return True
+    return False
+
+
 def is_screen_wallpaper_node(node: CleanDesignTreeNode, root: CleanDesignTreeNode) -> bool:
     """Oversized collapsed illustration that must render as cover wallpaper only."""
     if not node.render_boundary or not (node.vector_asset_key or node.image_asset_key):

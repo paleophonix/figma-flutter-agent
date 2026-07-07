@@ -14,6 +14,28 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMod
 _ROW_TEXT_LINE_BOX_FRAME_RATIO = 0.85
 _COMPACT_ICON_SLOT_MAX_CROSS_EXTENT = 32.0
 _INFLATED_ICON_WRAPPER_HEIGHT_RATIO = 1.25
+_STATUS_CHROME_BAR_MAX_HEIGHT = 48.0
+
+
+def _row_status_chrome_icon_cluster_cross_extent(node: CleanDesignTreeNode) -> float | None:
+    """Clamp inflated status-icon ROW height to the tallest icon child intrinsic."""
+    if node.type != NodeType.ROW:
+        return None
+    row_height = node.sizing.height
+    if row_height is None or float(row_height) <= _STATUS_CHROME_BAR_MAX_HEIGHT:
+        return None
+    child_heights: list[float] = []
+    for child in node.children:
+        if child.type in {NodeType.STACK, NodeType.VECTOR, NodeType.IMAGE, NodeType.ROW}:
+            child_height = child.sizing.height
+            if child_height is not None and 0.0 < float(child_height) <= _COMPACT_ICON_SLOT_MAX_CROSS_EXTENT:
+                child_heights.append(float(child_height))
+    if not child_heights:
+        return None
+    intrinsic = max(child_heights)
+    if float(row_height) <= intrinsic * _INFLATED_ICON_WRAPPER_HEIGHT_RATIO:
+        return None
+    return intrinsic
 
 
 def _row_compact_icon_wrapper_cross_extent(node: CleanDesignTreeNode) -> float | None:
@@ -309,7 +331,9 @@ def bind_row_cross_axis_height(
                     )
         return widget
     height = node.sizing.height
-    compact_extent = _row_compact_icon_wrapper_cross_extent(node)
+    compact_extent = _row_status_chrome_icon_cluster_cross_extent(node)
+    if compact_extent is None:
+        compact_extent = _row_compact_icon_wrapper_cross_extent(node)
     if compact_extent is not None:
         height = compact_extent
     if parent_row is not None and node.type == NodeType.TEXT:
