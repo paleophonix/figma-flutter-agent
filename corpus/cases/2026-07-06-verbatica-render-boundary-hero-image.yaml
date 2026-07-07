@@ -8,7 +8,7 @@ case:
   feature: verbatica_paywall
   observed_at: 2026-07-06
   created_at: '2026-07-06T18:35:00Z'
-  updated_at: '2026-07-07T12:00:00Z'
+  updated_at: '2026-07-08T15:00:00Z'
   summary: >
     Paywall hero Img 2399:42779 is flattened to a render boundary without
     imageAssetKey; ambient wallpaper emit produced SizedBox.shrink and the
@@ -49,8 +49,8 @@ occurrences:
     repair:
       summary: >
         resolve_render_boundary_asset_keys binds raster exports via manifest, flattened
-        descendant ids, and reverse .figma-bindings.json lookups; portrait.png binds hero
-        2399:42779 for offline test project emit.
+        descendant ids, and reverse .figma-bindings.json lookups; rejects degenerate
+        placeholder PNG stubs below minimum export dimensions via raster_asset_export_viable.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
         - src/figma_flutter_agent/generator/background/detection.py
@@ -58,5 +58,6 @@ occurrences:
       regression_tests:
         - tests/test_verbatica_paywall_emit_laws.py::test_render_boundary_candidates_use_figma_bindings_for_flatten_ids
         - tests/test_verbatica_paywall_emit_laws.py::test_verbatica_processed_hero_has_no_wrong_vector_after_asset_passes
+        - tests/test_verbatica_paywall_emit_laws.py::test_degenerate_raster_stub_not_bound_to_render_boundary
       verification:
         - poetry run pytest tests/test_verbatica_paywall_emit_laws.py -q -k "render_boundary or hero"

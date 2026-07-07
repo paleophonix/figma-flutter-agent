@@ -15,7 +15,11 @@ from figma_flutter_agent.generator.layout.scroll import _symmetric_pill_button_p
 from figma_flutter_agent.generator.layout.style.text_emit import text_style_expr
 from figma_flutter_agent.generator.layout.widgets.positioned import _apply_layout_slot_wraps
 from figma_flutter_agent.generator.layout.widgets.svg import _svg_fit_mode
-from figma_flutter_agent.parser.boundaries.assets import resolve_pruned_cluster_instance_assets
+from figma_flutter_agent.parser.boundaries.assets import (
+    raster_asset_export_viable,
+    resolve_pruned_cluster_instance_assets,
+    resolve_render_boundary_asset_keys,
+)
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 from figma_flutter_agent.schemas import (
     Alignment,
@@ -361,6 +365,68 @@ def test_pruned_cluster_inherits_vector_from_populated_sibling() -> None:
     )
     resolve_pruned_cluster_instance_assets(root, Path("."))
     assert pruned.vector_asset_key == "assets/icons/vector_check.svg"
+
+
+def test_pruned_cluster_inherits_vector_from_child_glyph_only() -> None:
+    populated = CleanDesignTreeNode(
+        id="radio-full",
+        name="check_circle",
+        type=NodeType.ROW,
+        cluster_id="cluster_0",
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_2399_42811.svg",
+            )
+        ],
+    )
+    pruned = CleanDesignTreeNode(
+        id="radio-pruned",
+        name="check_circle",
+        type=NodeType.ROW,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=24.0, height=24.0),
+        children=[],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.ROW,
+        children=[populated, pruned],
+    )
+    resolve_pruned_cluster_instance_assets(root, Path("."))
+    assert pruned.vector_asset_key == "assets/icons/vector_2399_42811.svg"
+
+
+def test_degenerate_raster_stub_not_bound_to_render_boundary(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    stub = images / "portrait.png"
+    stub.write_bytes(
+        b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01"
+        b"\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89"
+        b"\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01"
+        b"\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
+    )
+    (images / ".figma-bindings.json").write_text(
+        '{"bindings": {"portrait.png": "2399:42780"}}',
+        encoding="utf-8",
+    )
+    assert not raster_asset_export_viable(stub)
+    hero = CleanDesignTreeNode(
+        id="2399:42779",
+        name="Img",
+        type=NodeType.STACK,
+        render_boundary=True,
+        flatten_figma_node_ids=["2399:42780"],
+        sizing=Sizing(width=393.0, height=454.0),
+    )
+    root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[hero])
+    unresolved = resolve_render_boundary_asset_keys(root, tmp_path, None, strict=False)
+    assert hero.image_asset_key is None
+    assert "2399:42779" in unresolved
 
 
 def test_pill_button_with_label_column_matches_padding_law() -> None:

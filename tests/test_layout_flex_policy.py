@@ -1268,6 +1268,83 @@ def test_decomposed_pin_bottom_viewport_partition_pins_footer() -> None:
     assert compact.rfind("Positioned(", 0, footer_idx) != -1
 
 
+def test_wallpaper_pin_bottom_suppresses_nested_content_scrollers() -> None:
+    """Law: LAW-SINGLE-SCROLL-HERO-SCROLLS-WITH-CONTENT — one outer scroll host."""
+    from figma_flutter_agent.generator.layout.file_methods import (
+        LayoutMethod,
+        compose_decomposed_root_widget,
+    )
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        apply_pin_bottom_chrome_to_stack_layers,
+    )
+
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Status",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=360.0, height=70.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(bottom=710.0, width=360.0, height=70.0),
+        children=[],
+    )
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Hero",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=360.0, height=202.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=98.0, bottom=480.0, width=360.0, height=202.0),
+        children=[],
+    )
+    plans = CleanDesignTreeNode(
+        id="plans",
+        name="Plans",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=360.0, height=363.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=300.0, bottom=117.0, width=360.0, height=363.0),
+        children=[],
+    )
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Footer",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=360.0, height=189.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=591.0, width=360.0, height=189.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Paywall",
+        type=NodeType.STACK,
+        sizing=Sizing(width=360.0, height=780.0, height_mode=SizingMode.FIXED),
+        children=[status, hero, plans, footer],
+    )
+    widgets = [f"_buildFeature{i}(context)" for i in ("", "2", "3", "4")]
+    layered = apply_pin_bottom_chrome_to_stack_layers(
+        screen,
+        screen.children,
+        widgets,
+        unified_wallpaper_scroll=True,
+    )
+    joined = ", ".join(layered)
+    assert "SingleChildScrollView" not in joined
+
+    methods = [
+        LayoutMethod(name="_buildFeature", node=status),
+        LayoutMethod(name="_buildFeature2", node=hero),
+        LayoutMethod(name="_buildFeature3", node=plans),
+        LayoutMethod(name="_buildFeature4", node=footer),
+    ]
+    layout = compose_decomposed_root_widget(
+        screen,
+        methods,
+        responsive_enabled=False,
+        artboard_background_lead="_buildBackground(context)",
+    )
+    compact = layout.replace(" ", "")
+    assert "bottom:189.0,child:SingleChildScrollView" not in compact
+    assert "top:300.0,bottom:189.0,child:SingleChildScrollView" not in compact
+    assert "_buildBackground(context)" in layout
+
+
 def test_negative_row_spacing_emits_overlap_via_transform_not_flex_spacing() -> None:
     """Law: LAW-NEGATIVE-GAP-CONSERVATION — negative gaps use Transform, never Flex.spacing."""
     from figma_flutter_agent.generator.layout.widgets.flex_sizing import (

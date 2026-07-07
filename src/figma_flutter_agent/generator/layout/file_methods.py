@@ -390,6 +390,7 @@ def compose_decomposed_root_widget(
                     child_nodes,
                     child_widgets,
                     allow_outward_paint=allow_outward_paint,
+                    unified_wallpaper_scroll=artboard_background_lead is not None,
                 )
                 if pin_bottom_chrome
                 else child_widgets

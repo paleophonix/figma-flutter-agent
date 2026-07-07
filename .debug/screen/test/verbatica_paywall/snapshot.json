@@ -10,7 +10,7 @@
     "lib/widgets/subscribe_button_widget.dart": "5369e0b400b8194f54b37093b72393fb82231a4ad4bbb36132125b52b87520e1",
     "lib/widgets/home_indicator_widget.dart": "81f93078236ae67201432f46ac7dccee3a087bae344bfed343df7e43373236c1",
     "lib/widgets/paywall_tertiary_action_button_widget.dart": "9fcd04861821bf3155c6964fa45bf17c0e2ddb97ed0f62f68da7726d66be77df",
-    "lib/widgets/feature_widget.dart": "bd8d4e52fda454212ebed5e172201597c5c916ffd7383ef680268d538f02cd83",
+    "lib/widgets/feature_widget.dart": "fb0a1148cef1410dc515e9d156dd2e525322f1b9b22ec2758b2772aed34d4706",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "bccf10c9ee887275b22eed1cc4de102c4df21423f4e0a130c892479293112645",
     "lib/theme/app_spacing.dart": "0517071e3da4d991f950070f0795470658b64a6f9be996c089ced7f9f4cf05c6",
@@ -19,7 +19,7 @@
     "lib/theme/app_edge_insets.dart": "aaeb9146daa5e498a875990e15314d2ec895873c600f367b9269fa16950f2ece",
     "lib/theme/app_elevation.dart": "45b0cdd0a1240245407bdaab9b3527436cb24d4eb34315cec6ca701be4c95896",
     "lib/theme/app_theme.dart": "08707d7adf00e0166921c73866ee527b28160225f8c8c0a67f949e30881ef7f5",
-    "lib/generated/verbatica_paywall_layout.dart": "f5de9c991a42df31a8b075b2d00a3864bccb18eef1acf258115768431e13dc1b",
+    "lib/generated/verbatica_paywall_layout.dart": "4672ca4b9d529a46bc6c4031d3874236ead1ee4f62f7e3f4271917f51f0f8042",
     "lib/features/verbatica_paywall/verbatica_paywall_screen.dart": "42d15a0bc4ca28199ac8ba19fcd7fe2d3cb573a74d5cefb1cf0febcbe56a75bd",
     "test/golden/verbatica_paywall_screen_test.dart": "2d2c1f5e40865d3eb3d87ae4a30329baaef6c5936e7b5a322772ef7822bfdda2",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -33,6 +33,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 10,
-  "updated_at": "2026-07-07T15:01:51.901872+00:00"
+  "version": 11,
+  "updated_at": "2026-07-07T16:54:51.113555+00:00"
 }

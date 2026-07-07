@@ -233,6 +233,7 @@ def apply_pin_bottom_chrome_to_stack_layers(
     child_widgets: list[str],
     *,
     allow_outward_paint: bool = False,
+    unified_wallpaper_scroll: bool = False,
 ) -> list[str]:
     """Wrap non-bottom stack layers in a fill scroll host for docked bottom chrome."""
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -240,6 +241,18 @@ def apply_pin_bottom_chrome_to_stack_layers(
         stack_flow_child_is_shared_scroll_body,
         stack_uses_shared_body_scroll_host,
     )
+
+    if unified_wallpaper_scroll:
+        pinned: list[str] = []
+        for child, widget in zip(child_nodes, child_widgets, strict=True):
+            pinned.append(
+                _position_pin_bottom_stack_layer(
+                    child,
+                    widget,
+                    parent_stack=stack_node,
+                )
+            )
+        return pinned
 
     if layout_fact_stack_numeric_glyph_overlay_host(stack_node):
         return child_widgets

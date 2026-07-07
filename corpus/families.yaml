@@ -743,6 +743,8 @@ families:
       - module: src/figma_flutter_agent/parser/boundaries/assets.py
         symbol: resolve_render_boundary_asset_keys
       - module: src/figma_flutter_agent/parser/boundaries/assets.py
+        symbol: raster_asset_export_viable
+      - module: src/figma_flutter_agent/parser/boundaries/assets.py
         symbol: discover_role_named_raster
       - module: src/figma_flutter_agent/pipeline/local_assets.py
         symbol: local_asset_manifest_from_project
@@ -1062,4 +1064,26 @@ families:
       Figma font (Nekst) lose their family and render in the fallback even though the font
       is on disk and declared in pubspec. Collapse must preserve each node's Figma font
       family, keying theme roles per family, not merging minority fonts into the dominant one.
+    status: active
+
+  - id: nested_scroll_pins_hero_band
+    title: Root nested scroll pins the hero band instead of one unified scroll
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/file_methods.py
+        symbol: compose_decomposed_root_widget
+    law_ids:
+      - LAW-SINGLE-SCROLL-HERO-SCROLLS-WITH-CONTENT
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      The decomposed root emits an outer SingleChildScrollView wrapping a fixed-height
+      Stack where the hero band is Positioned.fill (non-scroll) and the content lives in
+      nested Positioned SingleChildScrollViews. The hero therefore stays pinned while the
+      content scrolls in its own inner scroller, and nested scrollers double-scroll. A
+      scroll screen must be one unified scroll (hero band as a normal-flow child that
+      scrolls away with the content), not a pinned backdrop plus nested content scrollers.
     status: active

@@ -10,6 +10,25 @@ from loguru import logger
 from figma_flutter_agent.schemas import AssetManifest, CleanDesignTreeNode
 
 _ASSET_SCAN_FOLDERS = ("icons", "illustrations", "images")
+_MIN_RASTER_EXPORT_SIDE_PX = 8
+
+
+def raster_asset_export_viable(path: Path) -> bool:
+    """Return False for degenerate placeholder rasters (e.g. 1x1 PNG stubs)."""
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return False
+    if len(data) < 32:
+        return False
+    lowered = path.suffix.lower()
+    if lowered == ".png" and data[:8] == b"\x89PNG\r\n\x1a\n":
+        width = int.from_bytes(data[16:20], "big")
+        height = int.from_bytes(data[20:24], "big")
+        return width >= _MIN_RASTER_EXPORT_SIDE_PX and height >= _MIN_RASTER_EXPORT_SIDE_PX
+    if lowered in {".jpg", ".jpeg", ".webp"}:
+        return len(data) >= 256
+    return True
 
 _COMPONENT_LEAF_RASTER_ALIASES: dict[str, str] = {
     "map": "location",
@@ -334,7 +353,15 @@ def _prune_missing_render_boundary_asset_keys(
     """Drop stale planned asset keys that are not backed by on-disk exports."""
     for attr in ("vector_asset_key", "image_asset_key"):
         asset_key = getattr(node, attr)
-        if asset_key and not (project_dir / Path(asset_key)).is_file():
+        if not asset_key:
+            continue
+        asset_path = project_dir / Path(asset_key)
+        if not asset_path.is_file():
+            setattr(node, attr, None)
+            continue
+        if asset_key.lower().endswith((".png", ".jpg", ".jpeg", ".webp")) and not raster_asset_export_viable(
+            asset_path
+        ):
             setattr(node, attr, None)
 
 
@@ -1019,12 +1046,20 @@ def resolve_pruned_cluster_instance_assets(
 
     cluster_vector_keys: dict[str, str] = {}
 
+    def _cluster_instance_vector_key(node: CleanDesignTreeNode) -> str | None:
+        if node.vector_asset_key:
+            return node.vector_asset_key
+        return _best_descendant_vector_asset(node)
+
     def collect_cluster_vectors(node: CleanDesignTreeNode) -> None:
-        if not node.cluster_id or not node.vector_asset_key:
+        if not node.cluster_id:
+            return
+        vector_key = _cluster_instance_vector_key(node)
+        if not vector_key:
             return
         existing = cluster_vector_keys.get(node.cluster_id)
         if existing is None or (node.children and not existing):
-            cluster_vector_keys[node.cluster_id] = node.vector_asset_key
+            cluster_vector_keys[node.cluster_id] = vector_key
 
     def visit(node: CleanDesignTreeNode) -> None:
         if node.cluster_id and not node.children:
@@ -1039,7 +1074,11 @@ def resolve_pruned_cluster_instance_assets(
             candidate_ids.append(node.id)
             for node_id in candidate_ids:
                 for candidate in candidate_paths(node_id):
-                    if (project_dir / Path(candidate)).is_file():
+                    candidate_path = project_dir / Path(candidate)
+                    if candidate_path.is_file() and (
+                        not candidate.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+                        or raster_asset_export_viable(candidate_path)
+                    ):
                         resolved = candidate.replace("\\", "/")
                         break
                 if resolved is not None:
@@ -1073,13 +1112,24 @@ def resolve_render_boundary_asset_keys(
             return
         candidates = _render_boundary_asset_candidates(node, project_dir, manifest_paths)
         for candidate in candidates:
-            if (project_dir / Path(candidate)).is_file():
-                _bind_render_boundary_asset(node, candidate)
-                _prune_missing_render_boundary_asset_keys(node, project_dir)
-                return
-        if node.image_asset_key and (project_dir / Path(node.image_asset_key)).is_file():
+            candidate_path = project_dir / Path(candidate)
+            if not candidate_path.is_file():
+                continue
+            if candidate.lower().endswith(
+                (".png", ".jpg", ".jpeg", ".webp")
+            ) and not raster_asset_export_viable(candidate_path):
+                continue
+            _bind_render_boundary_asset(node, candidate)
             _prune_missing_render_boundary_asset_keys(node, project_dir)
             return
+        if node.image_asset_key:
+            image_path = project_dir / Path(node.image_asset_key)
+            if image_path.is_file() and (
+                not node.image_asset_key.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+                or raster_asset_export_viable(image_path)
+            ):
+                _prune_missing_render_boundary_asset_keys(node, project_dir)
+                return
         unresolved.append(node.id)
         if not strict:
             node.vector_asset_key = None
