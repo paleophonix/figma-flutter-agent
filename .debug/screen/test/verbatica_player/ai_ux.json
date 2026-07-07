@@ -1,8 +1,9 @@
 {
   "layoutTier": null,
   "aiUxSuggestions": [
-    "Layout nesting depth is 10; consider flattening groups for simpler Flutter widget trees.",
-    "Found 13 distinct spacing values; align to design tokens for consistency."
+    "Layout nesting depth is 11; consider flattening groups for simpler Flutter widget trees.",
+    "Found 14 distinct spacing values; align to design tokens for consistency.",
+    "1 interactive nodes may be below 48dp touch targets: _Controls/Trailing/Close Button"
   ],
   "accessibilityWarnings": [],
   "animationSuggestions": [

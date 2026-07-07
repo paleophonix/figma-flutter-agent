@@ -18,19 +18,23 @@ def _would_drop_unbound_visible_vectors(
 ) -> bool:
     """True when pruning would remove visible VECTOR paint without a drawable transfer."""
     effective_image = image_asset_key if image_asset_key is not None else node.image_asset_key
-    if asset is not None or node.vector_asset_key or effective_image:
-        return False
     effective_text = text if text is not None else node.text
-    if (effective_text or "").strip():
-        return False
+    effective_vector = asset if asset is not None else node.vector_asset_key
     from figma_flutter_agent.assets.vector_binding import _vector_has_visible_paint
 
-    def walk(current: CleanDesignTreeNode) -> bool:
+    def subtree_has_visible_vectors(current: CleanDesignTreeNode) -> bool:
         if _vector_has_visible_paint(current):
             return True
-        return any(walk(child) for child in current.children)
+        return any(subtree_has_visible_vectors(child) for child in current.children)
 
-    return walk(node)
+    if not subtree_has_visible_vectors(node):
+        return False
+    if effective_vector is not None:
+        return False
+    child_vectors = any(subtree_has_visible_vectors(child) for child in node.children)
+    if (effective_text or "").strip() and not child_vectors:
+        return False
+    return child_vectors or effective_image is None
 
 
 def prune_top_level_cluster_duplicates(root: CleanDesignTreeNode) -> None:

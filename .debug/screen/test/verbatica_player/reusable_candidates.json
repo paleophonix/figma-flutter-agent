@@ -1,0 +1,58 @@
+{
+  "cacheKey": "7d8136954bfff524dd1826528c342491f722b030deb29db1a2eee6dab8c8d83c",
+  "response": {
+    "candidates": [
+      {
+        "nodeId": "981:66830",
+        "widgetName": "ContentsTrailing",
+        "reason": "Same Figma component instance repeats 4 times with identical trailing affordance (detail + drill-in), making it a strong reusable subcomponent.",
+        "confidence": 0.99,
+        "suggestedParams": [],
+        "evidence": {
+          "similarNodes": [
+            "981:66830",
+            "981:66839",
+            "981:66848",
+            "981:66857"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "trailing accessory / drill-in control"
+        }
+      },
+      {
+        "nodeId": "981:66825",
+        "widgetName": "TranscriptListItem",
+        "reason": "This row pattern repeats 4 times with the same structure and only the primary text changing, so it should be extracted as a reusable list item.",
+        "confidence": 0.94,
+        "suggestedParams": [
+          "title"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "981:66825",
+            "981:66834",
+            "981:66843",
+            "981:66852"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "transcript list item"
+        }
+      },
+      {
+        "nodeId": "981:66808",
+        "widgetName": "RewindButton",
+        "reason": "The circular 5-second rewind control appears twice with identical structure inside the playback controls, indicating a reusable button component.",
+        "confidence": 0.81,
+        "suggestedParams": [],
+        "evidence": {
+          "similarNodes": [
+            "981:66808",
+            "981:66816"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "media rewind control"
+        }
+      }
+    ]
+  }
+}

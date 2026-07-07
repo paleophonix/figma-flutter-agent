@@ -46,6 +46,8 @@
           "strokeAlign": "INSIDE",
           "clipsContent": true
         },
+        "vectorAssetKey": "assets/illustrations/render_boundary_2399_42779.svg",
+        "imageAssetKey": "assets/images/portrait.png",
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "right": -33.0,
@@ -381,6 +383,7 @@
                                 },
                                 "vectorAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1645;346_8257.svg",
                                 "vectorSvgPathCount": 1,
+                                "imageAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1645;346_8257.svg",
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -511,6 +514,7 @@
                                 },
                                 "vectorAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1646;339_8061.svg",
                                 "vectorSvgPathCount": 1,
+                                "imageAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1646;339_8061.svg",
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -703,6 +707,7 @@
                                 },
                                 "vectorAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1648;348_8871.svg",
                                 "vectorSvgPathCount": 3,
+                                "imageAssetKey": "assets/icons/vector_I2399_42783;266_1499;266_1648;348_8871.svg",
                                 "accessibilityLabel": "Base",
                                 "layoutPositioning": "ABSOLUTE",
                                 "stackPlacement": {
@@ -2122,6 +2127,7 @@
                             },
                             "vectorAssetKey": "assets/icons/vector_2399_42798.svg",
                             "vectorSvgPathCount": 2,
+                            "imageAssetKey": "assets/icons/vector_2399_42798.svg",
                             "accessibilityLabel": "check_circle",
                             "geometryFrame": {
                               "layoutRect": {
@@ -2864,6 +2870,7 @@
                             },
                             "vectorAssetKey": "assets/icons/vector_2399_42811.svg",
                             "vectorSvgPathCount": 1,
+                            "imageAssetKey": "assets/icons/vector_2399_42811.svg",
                             "accessibilityLabel": "Ellipse 697",
                             "geometryFrame": {
                               "layoutRect": {
@@ -4692,6 +4699,7 @@
                 "style": {
                   "strokeAlign": "INSIDE"
                 },
+                "imageAssetKey": "assets/images/portrait.png",
                 "componentRef": "111:17496",
                 "variant": {
                   "componentId": "111:17496",

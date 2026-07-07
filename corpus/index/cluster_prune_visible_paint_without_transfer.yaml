@@ -2,6 +2,20 @@ version: 1
 family_id: cluster_prune_visible_paint_without_transfer
 generated: true
 cases:
+- case_id: 2026-07-07-niyama-cluster-prune-late-image-cp0b-multiset
+  case_file: cases/2026-07-07-niyama-cluster-prune-late-image-cp0b-multiset.yaml
+  title: Late raster bind unlocks cluster prune and breaks CP0b multiset
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-late-image-cp0b-multiset
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T12:40:00Z'
+  updated_at: '2026-07-07T12:40:00Z'
+  summary: After CP0_parse hydrate leaves inline children on duplicate component
+    instances, asset finalize binds imageAssetKey on the cluster root. 
+    CP0b_reprune paint guard treated any parent raster as drawable transfer and 
+    cleared children, dropping descendant node ids (inv_node_multise...
 - case_id: 2026-07-06-niyama-plus-icon-prune-paint-loss
   case_file: cases/2026-07-06-niyama-plus-icon-prune-paint-loss.yaml
   title: Plus icon cluster pruned to empty stack without drawable transfer

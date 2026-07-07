@@ -8,7 +8,7 @@
       "children": [
         {
           "figmaId": "4408:44887",
-          "kind": "container",
+          "kind": "auto",
           "children": []
         },
         {
@@ -58,8 +58,7 @@
                         {
                           "figmaId": "4408:44893",
                           "kind": "text",
-                          "children": [],
-                          "wrap": "flexibleLoose"
+                          "children": []
                         },
                         {
                           "figmaId": "4408:44894",
@@ -68,8 +67,7 @@
                             {
                               "figmaId": "I4408:44894;1154:8698",
                               "kind": "text",
-                              "children": [],
-                              "wrap": "flexibleLoose"
+                              "children": []
                             }
                           ]
                         }
@@ -114,8 +112,7 @@
                                         {
                                           "figmaId": "I4408:44896;1154:7846",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     },
@@ -126,8 +123,7 @@
                                         {
                                           "figmaId": "I4408:44896;1154:7847",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     }
@@ -159,8 +155,7 @@
                                 {
                                   "figmaId": "I4408:44896;1154:7849;1149:9469",
                                   "kind": "text",
-                                  "children": [],
-                                  "wrap": "expanded"
+                                  "children": []
                                 },
                                 {
                                   "figmaId": "I4408:44896;1154:7849;1149:9855",
@@ -230,8 +225,7 @@
                                         {
                                           "figmaId": "I4408:44897;1154:7846",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     },
@@ -242,8 +236,7 @@
                                         {
                                           "figmaId": "I4408:44897;1154:7847",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     }
@@ -256,8 +249,7 @@
                                     {
                                       "figmaId": "I4408:44897;7752:54884",
                                       "kind": "text",
-                                      "children": [],
-                                      "wrap": "flexibleLoose"
+                                      "children": []
                                     }
                                   ]
                                 }
@@ -281,8 +273,7 @@
                                 {
                                   "figmaId": "I4408:44897;1154:7849;1149:9469",
                                   "kind": "text",
-                                  "children": [],
-                                  "wrap": "expanded"
+                                  "children": []
                                 },
                                 {
                                   "figmaId": "I4408:44897;1154:7849;1149:9855",
@@ -346,8 +337,7 @@
                                         {
                                           "figmaId": "I4408:44898;1154:7846",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     },
@@ -358,8 +348,7 @@
                                         {
                                           "figmaId": "I4408:44898;1154:7847",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     }
@@ -372,8 +361,7 @@
                                     {
                                       "figmaId": "I4408:44898;7752:54884",
                                       "kind": "text",
-                                      "children": [],
-                                      "wrap": "flexibleLoose"
+                                      "children": []
                                     }
                                   ]
                                 }
@@ -397,8 +385,7 @@
                                 {
                                   "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479;910:3261",
                                   "kind": "text",
-                                  "children": [],
-                                  "wrap": "expanded"
+                                  "children": []
                                 },
                                 {
                                   "figmaId": "I4408:44898;1154:7849;1149:9469",
@@ -473,8 +460,7 @@
                                         {
                                           "figmaId": "I4408:44901;1154:7846",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     },
@@ -485,8 +471,7 @@
                                         {
                                           "figmaId": "I4408:44901;1154:7847",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     }
@@ -543,8 +528,7 @@
                                         {
                                           "figmaId": "I4408:44902;1154:7846",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     },
@@ -555,8 +539,7 @@
                                         {
                                           "figmaId": "I4408:44902;1154:7847",
                                           "kind": "text",
-                                          "children": [],
-                                          "wrap": "flexibleLoose"
+                                          "children": []
                                         }
                                       ]
                                     }
@@ -595,7 +578,7 @@
                           "children": [
                             {
                               "figmaId": "I4408:44903;1162:9965",
-                              "kind": "auto",
+                              "kind": "row",
                               "children": [
                                 {
                                   "figmaId": "I4408:44903;1162:9863",
@@ -679,8 +662,7 @@
                                 {
                                   "figmaId": "I4408:44904;1162:10181",
                                   "kind": "text",
-                                  "children": [],
-                                  "wrap": "flexibleLoose"
+                                  "children": []
                                 }
                               ]
                             }
@@ -704,8 +686,7 @@
                             {
                               "figmaId": "I4408:44904;1154:8077;1149:9856;1149:9479;910:3261",
                               "kind": "text",
-                              "children": [],
-                              "wrap": "expanded"
+                              "children": []
                             },
                             {
                               "figmaId": "I4408:44904;1154:8077;1149:9469",
@@ -751,19 +732,19 @@
         },
         {
           "figmaId": "4408:44908",
-          "kind": "auto",
+          "kind": "stack",
           "children": [
             {
               "figmaId": "4408:44909",
-              "kind": "auto",
+              "kind": "column",
               "children": [
                 {
                   "figmaId": "4408:44910",
-                  "kind": "auto",
+                  "kind": "row",
                   "children": [
                     {
                       "figmaId": "4408:44911",
-                      "kind": "auto",
+                      "kind": "text",
                       "children": [],
                       "wrap": "flexibleLoose"
                     }
@@ -771,29 +752,29 @@
                 },
                 {
                   "figmaId": "4408:44912",
-                  "kind": "auto",
+                  "kind": "stack",
                   "children": [
                     {
                       "figmaId": "4408:44913",
-                      "kind": "auto",
+                      "kind": "row",
                       "children": [
                         {
                           "figmaId": "4408:44914",
-                          "kind": "auto",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "I4408:44914;1356:10660",
-                              "kind": "auto",
+                              "kind": "text",
                               "children": []
                             },
                             {
                               "figmaId": "I4408:44914;1356:10661",
-                              "kind": "auto",
+                              "kind": "container",
                               "children": []
                             },
                             {
                               "figmaId": "I4408:44914;1356:10662",
-                              "kind": "auto",
+                              "kind": "stack",
                               "children": []
                             },
                             {
@@ -803,11 +784,11 @@
                             },
                             {
                               "figmaId": "I4408:44914;1356:10664",
-                              "kind": "auto",
+                              "kind": "row",
                               "children": [
                                 {
                                   "figmaId": "I4408:44914;1356:10664;1356:10367",
-                                  "kind": "auto",
+                                  "kind": "text",
                                   "children": [],
                                   "wrap": "flexibleLoose"
                                 }
@@ -817,25 +798,25 @@
                         },
                         {
                           "figmaId": "4408:44915",
-                          "kind": "auto",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "I4408:44915;1356:10705",
-                              "kind": "auto",
+                              "kind": "text",
                               "children": []
                             },
                             {
                               "figmaId": "I4408:44915;1356:10706",
-                              "kind": "auto",
+                              "kind": "container",
                               "children": []
                             },
                             {
                               "figmaId": "I4408:44915;1356:10708",
-                              "kind": "auto",
+                              "kind": "row",
                               "children": [
                                 {
                                   "figmaId": "I4408:44915;1356:10710",
-                                  "kind": "auto",
+                                  "kind": "text",
                                   "children": [],
                                   "wrap": "flexibleLoose"
                                 }
@@ -848,11 +829,11 @@
                             },
                             {
                               "figmaId": "I4408:44915;1356:10712",
-                              "kind": "auto",
+                              "kind": "row",
                               "children": [
                                 {
                                   "figmaId": "I4408:44915;1356:10712;910:3253",
-                                  "kind": "auto",
+                                  "kind": "stack",
                                   "children": [
                                     {
                                       "figmaId": "I4408:44915;1356:10712;910:3253;910:3248",
@@ -867,36 +848,36 @@
                         },
                         {
                           "figmaId": "4408:44916",
-                          "kind": "auto",
+                          "kind": "stack",
                           "children": [
                             {
                               "figmaId": "I4408:44916;1356:10666",
-                              "kind": "auto",
+                              "kind": "text",
                               "children": []
                             },
                             {
                               "figmaId": "I4408:44916;1356:10667",
-                              "kind": "auto",
+                              "kind": "container",
                               "children": []
                             },
                             {
                               "figmaId": "I4408:44916;1356:10668",
-                              "kind": "auto",
+                              "kind": "stack",
                               "children": []
                             },
                             {
                               "figmaId": "I4408:44916;1356:10669",
-                              "kind": "auto",
+                              "kind": "row",
                               "children": [
                                 {
                                   "figmaId": "I4408:44916;1356:10670",
-                                  "kind": "auto",
+                                  "kind": "text",
                                   "children": [],
                                   "wrap": "flexibleLoose"
                                 },
                                 {
                                   "figmaId": "I4408:44916;1356:10671",
-                                  "kind": "auto",
+                                  "kind": "text",
                                   "children": [],
                                   "wrap": "flexibleLoose"
                                 }
@@ -909,11 +890,11 @@
                             },
                             {
                               "figmaId": "I4408:44916;1356:10673",
-                              "kind": "auto",
+                              "kind": "row",
                               "children": [
                                 {
                                   "figmaId": "I4408:44916;1356:10673;910:3253",
-                                  "kind": "auto",
+                                  "kind": "stack",
                                   "children": [
                                     {
                                       "figmaId": "I4408:44916;1356:10673;910:3253;910:3248",
@@ -973,10 +954,10 @@
     },
     "omitFigmaIds": [],
     "stackChildOrder": [
-      "4408:44908",
       "4408:44887",
       "4408:44888",
-      "4408:44886"
+      "4408:44886",
+      "4408:44908"
     ],
     "stateByFigmaId": {
       "4408:44889": "default",
@@ -1036,16 +1017,16 @@
     },
     "adaptiveRules": [],
     "semanticSummary": {
-      "screenRole": "checkout_addons_overlay",
-      "confidence": 0.97,
-      "explanation": "Absolute-positioned order customization overlay with a modal product editor, promotional action card, add-on carousel, and fixed checkout bar.",
+      "screenRole": "order_customization_sheet",
+      "confidence": 0.94,
+      "explanation": "Composite order modal with product list, quantity steppers, promo entry, add-on suggestions, and a primary checkout action.",
       "warnings": [
-        "Stack-root overlay composition with multiple independently positioned sections."
+        "Vector-rich modal subtree extracted as ModalWidget."
       ]
     },
     "semanticVerdicts": [
       {
-        "nodeId": "I4408:44889;919:5313",
+        "nodeId": "I4408:44889;919:5313;913:17731",
         "role": "button",
         "subtype": "close",
         "controlNodeId": "I4408:44889;919:5313",
@@ -1054,35 +1035,67 @@
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [
-          "I4408:44889;919:5313;913:17731",
           "I4408:44889;919:5313;913:17731;913:17711"
         ],
         "optionNodeIds": [],
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
           "actionKind": "dismiss",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "minimum_44x44_touch_target"
+          "min_touch_target_44dp"
         ],
         "options": [],
-        "confidence": 0.99,
+        "confidence": 0.98,
         "proposedEffects": [
           "dismiss_modal"
         ],
-        "explanation": "Top-right close affordance for the modal overlay."
+        "explanation": "Top-right close affordance for dismissing the modal sheet."
       },
       {
-        "nodeId": "4408:44903",
+        "nodeId": "I4408:44896;1154:7849",
+        "role": "stepper",
+        "subtype": "quantity_adjuster",
+        "controlNodeId": "I4408:44896;1154:7849",
+        "boundaryNodeId": "I4408:44896;1154:7849",
+        "labelNodeIds": [
+          "I4408:44896;1154:7849;1149:9469"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I4408:44896;1154:7849;1149:9469"
+        ],
+        "decorationNodeIds": [
+          "I4408:44896;1154:7849;1149:9856",
+          "I4408:44896;1154:7849;1149:9855"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "input_stepper",
+        "contractTraits": {
+          "currentValue": "2",
+          "actionKind": "quantity_adjustment",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "horizontal_stepper_value_centered"
+        ],
+        "value": "2",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "increment_decrement_quantity"
+        ],
+        "explanation": "Quantity stepper with minus/value/plus cluster."
+      },
+      {
+        "nodeId": "I4408:44903",
         "role": "button",
         "subtype": "promo_action",
-        "controlNodeId": "4408:44903",
-        "boundaryNodeId": "4408:44903",
+        "controlNodeId": "I4408:44903;1159:8235",
+        "boundaryNodeId": "I4408:44903",
         "labelNodeIds": [
           "I4408:44903;1154:8380"
         ],
@@ -1096,21 +1109,18 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "apply_promo",
+          "actionKind": "promo_entry",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "icon_label_arrow_affordance"
+          "icon_label_button_row"
         ],
         "options": [],
-        "confidence": 0.95,
+        "confidence": 0.9,
         "proposedEffects": [
           "open_promo_entry"
         ],
-        "explanation": "Tappable promo code action card with icon, label, and arrow affordance."
+        "explanation": "Tap target for applying a promo code."
       },
       {
         "nodeId": "I4408:44917;1026:6371",
@@ -1128,179 +1138,18 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
           "actionKind": "checkout",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "full_width_primary_action"
+          "primary_cta_min_touch_target_44dp"
         ],
         "options": [],
         "confidence": 0.99,
         "proposedEffects": [
-          "submit_order"
+          "place_order"
         ],
-        "explanation": "Primary checkout CTA in the fixed bottom bar."
-      },
-      {
-        "nodeId": "I4408:44896;1154:7849",
-        "role": "button",
-        "subtype": "quantity_stepper",
-        "controlNodeId": "I4408:44896;1154:7849",
-        "boundaryNodeId": "I4408:44896;1154:7849",
-        "labelNodeIds": [
-          "I4408:44896;1154:7849;1149:9469"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [
-          "I4408:44896;1154:7849;1149:9469"
-        ],
-        "decorationNodeIds": [
-          "I4408:44896;1154:7849;1149:9856",
-          "I4408:44896;1154:7849;1149:9856;1149:9479",
-          "I4408:44896;1154:7849;1149:9855",
-          "I4408:44896;1154:7849;1149:9855;1149:9481"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "unknown",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "currentValue": 2,
-          "actionKind": "adjust_quantity",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "quantity_stepper_horizontal"
-        ],
-        "value": 2,
-        "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [
-          "increase_or_decrease_item_count"
-        ],
-        "explanation": "Inline quantity control for the main order item."
-      },
-      {
-        "nodeId": "I4408:44897;1154:7849",
-        "role": "button",
-        "subtype": "quantity_stepper",
-        "controlNodeId": "I4408:44897;1154:7849",
-        "boundaryNodeId": "I4408:44897;1154:7849",
-        "labelNodeIds": [
-          "I4408:44897;1154:7849;1149:9469"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [
-          "I4408:44897;1154:7849;1149:9469"
-        ],
-        "decorationNodeIds": [
-          "I4408:44897;1154:7849;1149:9856",
-          "I4408:44897;1154:7849;1149:9856;1149:9479",
-          "I4408:44897;1154:7849;1149:9855",
-          "I4408:44897;1154:7849;1149:9855;1149:9481"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "unknown",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "currentValue": 1,
-          "actionKind": "adjust_quantity",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "quantity_stepper_horizontal"
-        ],
-        "value": 1,
-        "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [
-          "increase_or_decrease_item_count"
-        ],
-        "explanation": "Inline quantity control for a secondary order item."
-      },
-      {
-        "nodeId": "I4408:44898;1154:7849",
-        "role": "button",
-        "subtype": "quantity_stepper",
-        "controlNodeId": "I4408:44898;1154:7849",
-        "boundaryNodeId": "I4408:44898;1154:7849",
-        "labelNodeIds": [
-          "I4408:44898;1154:7849;1149:9469"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [
-          "I4408:44898;1154:7849;1149:9469"
-        ],
-        "decorationNodeIds": [
-          "I4408:44898;1154:7849;1149:9856",
-          "I4408:44898;1154:7849;1149:9856;1149:9479",
-          "I4408:44898;1154:7849;1149:9855",
-          "I4408:44898;1154:7849;1149:9855;1149:9481"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "unknown",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "currentValue": 1,
-          "actionKind": "adjust_quantity",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "quantity_stepper_horizontal"
-        ],
-        "value": 1,
-        "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [
-          "increase_or_decrease_item_count"
-        ],
-        "explanation": "Inline quantity control for another order item."
-      },
-      {
-        "nodeId": "I4408:44904;1154:8077",
-        "role": "button",
-        "subtype": "add_product",
-        "controlNodeId": "I4408:44904;1154:8077",
-        "boundaryNodeId": "I4408:44904;1154:8077",
-        "labelNodeIds": [
-          "I4408:44904;1162:10181"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [
-          "I4408:44904;1162:10180",
-          "I4408:44904;1162:10180;4181:43463"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "button",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "add_item",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "icon_label_horizontal"
-        ],
-        "options": [],
-        "confidence": 0.93,
-        "proposedEffects": [
-          "increase_cutlery_quantity"
-        ],
-        "explanation": "Add control for the cutlery add-on row."
+        "explanation": "Primary checkout button in the add bar."
       },
       {
         "nodeId": "I4408:44914;1356:10664",
@@ -1318,87 +1167,18 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
           "actionKind": "add_item",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "small_card_cta"
+          "compact_icon_label_button"
         ],
         "options": [],
-        "confidence": 0.92,
+        "confidence": 0.86,
         "proposedEffects": [
-          "add_item_to_order"
+          "add_item_to_cart"
         ],
-        "explanation": "CTA for the sauces carousel card."
-      },
-      {
-        "nodeId": "I4408:44915;1356:10712",
-        "role": "button",
-        "subtype": "add_item",
-        "controlNodeId": "I4408:44915;1356:10712",
-        "boundaryNodeId": "I4408:44915;1356:10712",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [
-          "I4408:44915;1356:10712;910:3253",
-          "I4408:44915;1356:10712;910:3253;910:3248"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "button",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "add_item",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "icon_only_small_cta"
-        ],
-        "options": [],
-        "confidence": 0.92,
-        "proposedEffects": [
-          "add_item_to_order"
-        ],
-        "explanation": "Icon-only add control on a product card."
-      },
-      {
-        "nodeId": "I4408:44916;1356:10673",
-        "role": "button",
-        "subtype": "add_item",
-        "controlNodeId": "I4408:44916;1356:10673",
-        "boundaryNodeId": "I4408:44916;1356:10673",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [
-          "I4408:44916;1356:10673;910:3253",
-          "I4408:44916;1356:10673;910:3253;910:3248"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "button",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "add_item",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "icon_only_small_cta"
-        ],
-        "options": [],
-        "confidence": 0.92,
-        "proposedEffects": [
-          "add_item_to_order"
-        ],
-        "explanation": "Icon-only add control on the promo product card."
+        "explanation": "Compact add button on a suggested product card."
       }
     ]
   },
@@ -1411,20 +1191,20 @@
         "children": [
           {
             "figmaId": "4408:44889",
-            "kind": "stack",
+            "kind": "auto",
             "children": [
               {
                 "figmaId": "I4408:44889;919:5312",
-                "kind": "container",
+                "kind": "auto",
                 "children": []
               },
               {
                 "figmaId": "I4408:44889;919:5313",
-                "kind": "row",
+                "kind": "auto",
                 "children": [
                   {
                     "figmaId": "I4408:44889;919:5313;913:17731",
-                    "kind": "stack",
+                    "kind": "auto",
                     "children": [
                       {
                         "figmaId": "I4408:44889;919:5313;913:17731;913:17711",
@@ -1439,29 +1219,31 @@
           },
           {
             "figmaId": "4408:44890",
-            "kind": "column",
+            "kind": "auto",
             "children": [
               {
                 "figmaId": "4408:44891",
-                "kind": "column",
+                "kind": "auto",
                 "children": [
                   {
                     "figmaId": "4408:44892",
-                    "kind": "row",
+                    "kind": "auto",
                     "children": [
                       {
                         "figmaId": "4408:44893",
-                        "kind": "text",
-                        "children": []
+                        "kind": "auto",
+                        "children": [],
+                        "wrap": "flexibleLoose"
                       },
                       {
                         "figmaId": "4408:44894",
-                        "kind": "row",
+                        "kind": "auto",
                         "children": [
                           {
                             "figmaId": "I4408:44894;1154:8698",
-                            "kind": "text",
-                            "children": []
+                            "kind": "auto",
+                            "children": [],
+                            "wrap": "flexibleLoose"
                           }
                         ]
                       }
@@ -1469,55 +1251,57 @@
                   },
                   {
                     "figmaId": "4408:44895",
-                    "kind": "text",
+                    "kind": "auto",
                     "children": []
                   }
                 ]
               },
               {
                 "figmaId": "4408:44896",
-                "kind": "column",
+                "kind": "auto",
                 "children": [
                   {
                     "figmaId": "I4408:44896;1154:7841",
-                    "kind": "row",
+                    "kind": "auto",
                     "children": [
                       {
                         "figmaId": "I4408:44896;1154:7842",
-                        "kind": "image",
+                        "kind": "auto",
                         "children": []
                       },
                       {
                         "figmaId": "I4408:44896;1154:7843",
-                        "kind": "column",
+                        "kind": "auto",
                         "children": [
                           {
                             "figmaId": "I4408:44896;1154:7844",
-                            "kind": "column",
+                            "kind": "auto",
                             "children": [
                               {
                                 "figmaId": "I4408:44896;1154:7845",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44896;1902:25381",
-                                    "kind": "row",
+                                    "kind": "auto",
                                     "children": [
                                       {
                                         "figmaId": "I4408:44896;1154:7846",
-                                        "kind": "text",
-                                        "children": []
+                                        "kind": "auto",
+                                        "children": [],
+                                        "wrap": "flexibleLoose"
                                       }
                                     ]
                                   },
                                   {
                                     "figmaId": "I4408:44896;1902:25583",
-                                    "kind": "row",
+                                    "kind": "auto",
                                     "children": [
                                       {
                                         "figmaId": "I4408:44896;1154:7847",
-                                        "kind": "text",
-                                        "children": []
+                                        "kind": "auto",
+                                        "children": [],
+                                        "wrap": "flexibleLoose"
                                       }
                                     ]
                                   }
@@ -1527,15 +1311,15 @@
                           },
                           {
                             "figmaId": "I4408:44896;1154:7849",
-                            "kind": "row",
+                            "kind": "auto",
                             "children": [
                               {
                                 "figmaId": "I4408:44896;1154:7849;1149:9856",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479",
-                                    "kind": "stack",
+                                    "kind": "auto",
                                     "children": [
                                       {
                                         "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479;910:3261",
@@ -1548,16 +1332,17 @@
                               },
                               {
                                 "figmaId": "I4408:44896;1154:7849;1149:9469",
-                                "kind": "text",
-                                "children": []
+                                "kind": "auto",
+                                "children": [],
+                                "wrap": "expanded"
                               },
                               {
                                 "figmaId": "I4408:44896;1154:7849;1149:9855",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481",
-                                    "kind": "stack",
+                                    "kind": "auto",
                                     "children": [
                                       {
                                         "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481;910:3248",
@@ -1576,7 +1361,7 @@
                   },
                   {
                     "figmaId": "I4408:44896;1154:7850",
-                    "kind": "stack",
+                    "kind": "auto",
                     "children": [
                       {
                         "figmaId": "I4408:44896;1154:7850;933:4776",
@@ -1589,48 +1374,50 @@
               },
               {
                 "figmaId": "4408:44897",
-                "kind": "column",
+                "kind": "auto",
                 "children": [
                   {
                     "figmaId": "I4408:44897;1154:7841",
-                    "kind": "row",
+                    "kind": "auto",
                     "children": [
                       {
                         "figmaId": "I4408:44897;1154:7842",
-                        "kind": "image",
+                        "kind": "auto",
                         "children": []
                       },
                       {
                         "figmaId": "I4408:44897;1154:7843",
-                        "kind": "column",
+                        "kind": "auto",
                         "children": [
                           {
                             "figmaId": "I4408:44897;1154:7844",
-                            "kind": "column",
+                            "kind": "auto",
                             "children": [
                               {
                                 "figmaId": "I4408:44897;1154:7845",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44897;1902:25381",
-                                    "kind": "row",
+                                    "kind": "auto",
                                     "children": [
                                       {
                                         "figmaId": "I4408:44897;1154:7846",
-                                        "kind": "text",
-                                        "children": []
+                                        "kind": "auto",
+                                        "children": [],
+                                        "wrap": "flexibleLoose"
                                       }
                                     ]
                                   },
                                   {
                                     "figmaId": "I4408:44897;1902:25583",
-                                    "kind": "row",
+                                    "kind": "auto",
                                     "children": [
                                       {
                                         "figmaId": "I4408:44897;1154:7847",
-                                        "kind": "text",
-                                        "children": []
+                                        "kind": "auto",
+                                        "children": [],
+                                        "wrap": "flexibleLoose"
                                       }
                                     ]
                                   }
@@ -1638,12 +1425,13 @@
                               },
                               {
                                 "figmaId": "I4408:44897;7752:55704",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44897;7752:54884",
-                                    "kind": "text",
-                                    "children": []
+                                    "kind": "auto",
+                                    "children": [],
+                                    "wrap": "flexibleLoose"
                                   }
                                 ]
                               }
@@ -1651,31 +1439,32 @@
                           },
                           {
                             "figmaId": "I4408:44897;1154:7849",
-                            "kind": "row",
+                            "kind": "auto",
                             "children": [
                               {
                                 "figmaId": "I4408:44897;1154:7849;1149:9856",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479",
-                                    "kind": "stack",
+                                    "kind": "auto",
                                     "children": []
                                   }
                                 ]
                               },
                               {
                                 "figmaId": "I4408:44897;1154:7849;1149:9469",
-                                "kind": "text",
-                                "children": []
+                                "kind": "auto",
+                                "children": [],
+                                "wrap": "expanded"
                               },
                               {
                                 "figmaId": "I4408:44897;1154:7849;1149:9855",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481",
-                                    "kind": "stack",
+                                    "kind": "auto",
                                     "children": []
                                   }
                                 ]
@@ -1688,7 +1477,7 @@
                   },
                   {
                     "figmaId": "I4408:44897;1154:7850",
-                    "kind": "stack",
+                    "kind": "auto",
                     "children": [
                       {
                         "figmaId": "I4408:44897;1154:7850;933:4776",
@@ -1701,48 +1490,50 @@
               },
               {
                 "figmaId": "4408:44898",
-                "kind": "column",
+                "kind": "auto",
                 "children": [
                   {
                     "figmaId": "I4408:44898;1154:7841",
-                    "kind": "row",
+                    "kind": "auto",
                     "children": [
                       {
                         "figmaId": "I4408:44898;1154:7842",
-                        "kind": "image",
+                        "kind": "auto",
                         "children": []
                       },
                       {
                         "figmaId": "I4408:44898;1154:7843",
-                        "kind": "column",
+                        "kind": "auto",
                         "children": [
                           {
                             "figmaId": "I4408:44898;1154:7844",
-                            "kind": "column",
+                            "kind": "auto",
                             "children": [
                               {
                                 "figmaId": "I4408:44898;1154:7845",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44898;1902:25381",
-                                    "kind": "row",
+                                    "kind": "auto",
                                     "children": [
                                       {
                                         "figmaId": "I4408:44898;1154:7846",
-                                        "kind": "text",
-                                        "children": []
+                                        "kind": "auto",
+                                        "children": [],
+                                        "wrap": "flexibleLoose"
                                       }
                                     ]
                                   },
                                   {
                                     "figmaId": "I4408:44898;1902:25583",
-                                    "kind": "row",
+                                    "kind": "auto",
                                     "children": [
                                       {
                                         "figmaId": "I4408:44898;1154:7847",
-                                        "kind": "text",
-                                        "children": []
+                                        "kind": "auto",
+                                        "children": [],
+                                        "wrap": "flexibleLoose"
                                       }
                                     ]
                                   }
@@ -1750,12 +1541,13 @@
                               },
                               {
                                 "figmaId": "I4408:44898;7752:55704",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44898;7752:54884",
-                                    "kind": "text",
-                                    "children": []
+                                    "kind": "auto",
+                                    "children": [],
+                                    "wrap": "flexibleLoose"
                                   }
                                 ]
                               }
@@ -1763,31 +1555,32 @@
                           },
                           {
                             "figmaId": "I4408:44898;1154:7849",
-                            "kind": "row",
+                            "kind": "auto",
                             "children": [
                               {
                                 "figmaId": "I4408:44898;1154:7849;1149:9856",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479",
-                                    "kind": "stack",
+                                    "kind": "auto",
                                     "children": []
                                   }
                                 ]
                               },
                               {
                                 "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479;910:3261",
-                                "kind": "text",
-                                "children": []
+                                "kind": "auto",
+                                "children": [],
+                                "wrap": "expanded"
                               },
                               {
                                 "figmaId": "I4408:44898;1154:7849;1149:9469",
-                                "kind": "row",
+                                "kind": "auto",
                                 "children": [
                                   {
                                     "figmaId": "I4408:44898;1154:7849;1149:9855",
-                                    "kind": "stack",
+                                    "kind": "auto",
                                     "children": []
                                   }
                                 ]
@@ -1800,7 +1593,7 @@
                   },
                   {
                     "figmaId": "I4408:44898;1154:7850",
-                    "kind": "stack",
+                    "kind": "auto",
                     "children": [
                       {
                         "figmaId": "I4408:44898;1154:7850;933:4776",
@@ -1815,7 +1608,7 @@
           },
           {
             "figmaId": "4408:44899",
-            "kind": "text",
+            "kind": "auto",
             "children": []
           },
           {
@@ -2073,11 +1866,11 @@
                         "children": [
                           {
                             "figmaId": "I4408:44904;1154:8077;1149:9856",
-                            "kind": "row",
+                            "kind": "auto",
                             "children": [
                               {
                                 "figmaId": "I4408:44904;1154:8077;1149:9856;1149:9479",
-                                "kind": "stack",
+                                "kind": "auto",
                                 "children": []
                               }
                             ]
@@ -2089,11 +1882,11 @@
                           },
                           {
                             "figmaId": "I4408:44904;1154:8077;1149:9469",
-                            "kind": "row",
+                            "kind": "auto",
                             "children": [
                               {
                                 "figmaId": "I4408:44904;1154:8077;1149:9855",
-                                "kind": "stack",
+                                "kind": "auto",
                                 "children": []
                               }
                             ]

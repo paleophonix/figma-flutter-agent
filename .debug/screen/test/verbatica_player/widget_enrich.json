@@ -1,0 +1,72 @@
+{
+  "cacheKey": "bdf256bb78487f809348d64262a7b6ea766348c812111c66506784f81367a2e7",
+  "response": {
+    "entries": [
+      {
+        "clusterId": "component_111_16846_79147318",
+        "widgetName": "CheckAnswerButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_118_6158_f8acca7f",
+        "widgetName": "StatusBarDynamicIslandWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_185_29821_f78f254f",
+        "widgetName": "PlayerTopBarWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_21_3528",
+        "widgetName": "HomeIndicatorWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_38_5610_bcd9ea9d",
+        "widgetName": "BackNavigationButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_38_5773_8a12212d",
+        "widgetName": "DetailDisclosureWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "component_54_3907_58c331e9",
+        "widgetName": "CloseButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_0",
+        "widgetName": "Rewind5SecondsButtonWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_1",
+        "widgetName": "AudioQuestionTitleWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_2",
+        "widgetName": "TranscriptItemWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_3",
+        "widgetName": "TranscriptTextWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_4",
+        "widgetName": "DisclosureAccessoryWidget",
+        "paramRenames": {}
+      },
+      {
+        "clusterId": "shape_6",
+        "widgetName": "DisclosureChevronWidget",
+        "paramRenames": {}
+      }
+    ]
+  }
+}

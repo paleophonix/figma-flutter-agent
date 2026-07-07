@@ -1,0 +1,15 @@
+{
+  "feature": "verbatica_player",
+  "pipeline_run_id": "40623d777315",
+  "candidate_build_run_id": "40623d777315",
+  "status": "failed",
+  "writeback": "failed",
+  "written_files": [],
+  "analyze_passed": null,
+  "runMetaSchemaVersion": "2",
+  "captured_at": "2026-07-07T12:47:20.038688+00:00",
+  "run_started_at": "2026-07-07T12:45:17.425778+00:00",
+  "cached_ir_verdict": null,
+  "clean_tree_hash": "0bd969960fb9e1515e630f02dc8a951648d6b400e16e3291ecb08a32e0f38d34",
+  "last_error": "Cluster widget StatusBarDynamicIslandWidget cannot materialize: visible vector node(s) I981:66796;185:29822;118:6154, I981:66796;185:29822;118:6156, I981:66796;185:29822;118:6157 lack exported drawable assets."
+}

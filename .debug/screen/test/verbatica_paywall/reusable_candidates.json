@@ -1,89 +1,104 @@
 {
-  "cacheKey": "19015c8b44c83ee169de47a1094bca213661c1cc384ccd76bfbc095ad47daa5e",
+  "cacheKey": "8f10c792cc76e99b2d168ae5783aabd023a26de4074583580a0f3b27cb8a5160",
   "response": {
     "candidates": [
       {
-        "nodeId": "2399:42789",
-        "widgetName": "SubscriptionPlanOptionRow",
-        "reason": "Three pricing rows share the same structure for term, total price, monthly price, and selection indicator; the first row only adds a savings badge.",
+        "nodeId": "2399:42788",
+        "widgetName": "SubscriptionPlanOption",
+        "reason": "Repeated subscription-plan row pattern with title, monthly price, total price, and check icon across three options.",
         "confidence": 0.97,
         "suggestedParams": [
-          "termLabel",
-          "totalPrice",
-          "monthlyPrice",
-          "isSelected",
+          "durationText",
+          "totalPriceText",
+          "pricePerMonthText",
           "badgeText"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42802",
-            "2399:42813"
+            "2399:42801",
+            "2399:42812"
           ],
-          "shapeSimilarity": 0.95,
-          "semanticRole": "subscription plan selector item"
+          "shapeSimilarity": 0.96,
+          "semanticRole": "subscription plan option row"
         }
       },
       {
         "nodeId": "2399:42837",
-        "widgetName": "SubscribeCallToActionButton",
-        "reason": "Primary paywall CTA with title and supporting trial text is a reusable action pattern.",
-        "confidence": 0.93,
+        "widgetName": "PrimaryPaywallCtaButton",
+        "reason": "Primary call-to-action button with a title and subtitle stacked inside the same button container.",
+        "confidence": 0.94,
         "suggestedParams": [
           "title",
           "subtitle"
         ],
-        "evidence": null
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "primary subscription CTA button"
+        }
       },
       {
         "nodeId": "2399:42838",
-        "widgetName": "TertiaryActionButton",
-        "reason": "Tertiary button family is repeated for the two lower paywall actions with the same component group and similar structure.",
-        "confidence": 0.92,
+        "widgetName": "SecondaryPaywallActionButton",
+        "reason": "Same button component is used for the two secondary actions, differing mainly by label and height.",
+        "confidence": 0.95,
         "suggestedParams": [
           "label",
-          "isCompact"
+          "buttonHeight"
         ],
         "evidence": {
           "similarNodes": [
             "2399:42839"
           ],
-          "shapeSimilarity": 0.98,
-          "semanticRole": "secondary subscription action"
+          "shapeSimilarity": 1.0,
+          "semanticRole": "secondary action button"
+        }
+      },
+      {
+        "nodeId": "2399:42783",
+        "widgetName": "StatusBar",
+        "reason": "Standard mobile status bar system component, already isolated as a reusable component in the tree.",
+        "confidence": 0.99,
+        "suggestedParams": [
+          "timeText",
+          "showCamera",
+          "showDate",
+          "showBatteryTime"
+        ],
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "device status bar"
         }
       },
       {
         "nodeId": "2399:42786",
-        "widgetName": "CloseIconButton",
-        "reason": "Standard trailing close control can be reused across modal and paywall screens.",
-        "confidence": 0.86,
+        "widgetName": "CloseButton",
+        "reason": "Standalone trailing close icon button used in the header area.",
+        "confidence": 0.98,
         "suggestedParams": [
-          "iconGlyph"
+          "iconLabel"
         ],
-        "evidence": null
-      },
-      {
-        "nodeId": "2399:42783",
-        "widgetName": "PaywallStatusBar",
-        "reason": "System status bar component is reusable across mobile screens and appears as a dedicated component here.",
-        "confidence": 0.84,
-        "suggestedParams": [
-          "timeText",
-          "showCamera",
-          "showBattery"
-        ],
-        "evidence": null
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "dismiss/close button"
+        }
       },
       {
         "nodeId": "2399:42843",
         "widgetName": "HomeIndicator",
-        "reason": "Reusable iPhone home indicator shell for full-screen mobile layouts.",
-        "confidence": 0.9,
+        "reason": "iPhone home indicator system element, suitable as a reusable device chrome widget.",
+        "confidence": 0.99,
         "suggestedParams": [
-          "device",
           "orientation",
           "mode"
         ],
-        "evidence": null
+        "evidence": {
+          "similarNodes": [],
+          "shapeSimilarity": null,
+          "semanticRole": "system home indicator"
+        }
       }
     ]
   }

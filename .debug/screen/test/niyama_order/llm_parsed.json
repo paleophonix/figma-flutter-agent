@@ -7,210 +7,35 @@
       "kind": "auto",
       "children": [
         {
-          "figmaId": "4408:44908",
+          "figmaId": "4408:44887",
           "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "4408:44888",
+          "kind": "extracted",
           "children": [
             {
-              "figmaId": "4408:44909",
+              "figmaId": "4408:44889",
               "kind": "auto",
               "children": [
                 {
-                  "figmaId": "4408:44910",
+                  "figmaId": "I4408:44889;919:5312",
                   "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "4408:44911",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
+                  "children": []
                 },
                 {
-                  "figmaId": "4408:44912",
+                  "figmaId": "I4408:44889;919:5313",
                   "kind": "auto",
                   "children": [
                     {
-                      "figmaId": "4408:44913",
+                      "figmaId": "I4408:44889;919:5313;913:17731",
                       "kind": "auto",
                       "children": [
                         {
-                          "figmaId": "4408:44914",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "I4408:44914;1356:10663",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44914;1356:10661",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44914;1356:10662",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44914;1356:10660",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44914;1356:10664",
-                              "kind": "auto",
-                              "children": [
-                                {
-                                  "figmaId": "I4408:44914;1356:10664;1356:10367",
-                                  "kind": "auto",
-                                  "children": []
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "figmaId": "4408:44915",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "I4408:44915;1356:10711",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44915;1356:10706",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44915;1356:10705",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44915;1356:10708",
-                              "kind": "auto",
-                              "children": [
-                                {
-                                  "figmaId": "I4408:44915;1356:10710",
-                                  "kind": "auto",
-                                  "children": []
-                                }
-                              ]
-                            },
-                            {
-                              "figmaId": "I4408:44915;1356:10712",
-                              "kind": "auto",
-                              "children": [
-                                {
-                                  "figmaId": "I4408:44915;1356:10712;910:3253",
-                                  "kind": "auto",
-                                  "children": [
-                                    {
-                                      "figmaId": "I4408:44915;1356:10712;910:3253;910:3248",
-                                      "kind": "auto",
-                                      "children": []
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "figmaId": "4408:44916",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "I4408:44916;1356:10672",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44916;1356:10667",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44916;1356:10668",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44916;1356:10666",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "I4408:44916;1356:10669",
-                              "kind": "auto",
-                              "children": [
-                                {
-                                  "figmaId": "I4408:44916;1356:10670",
-                                  "kind": "auto",
-                                  "children": []
-                                },
-                                {
-                                  "figmaId": "I4408:44916;1356:10671",
-                                  "kind": "auto",
-                                  "children": []
-                                }
-                              ]
-                            },
-                            {
-                              "figmaId": "I4408:44916;1356:10673",
-                              "kind": "auto",
-                              "children": [
-                                {
-                                  "figmaId": "I4408:44916;1356:10673;910:3253",
-                                  "kind": "auto",
-                                  "children": [
-                                    {
-                                      "figmaId": "I4408:44916;1356:10673;910:3253;910:3248",
-                                      "kind": "auto",
-                                      "children": []
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "figmaId": "4408:44917",
-                  "kind": "auto",
-                  "children": [
-                    {
-                      "figmaId": "I4408:44917;1007:7123",
-                      "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "I4408:44917;1007:7123;908:4710",
+                          "figmaId": "I4408:44889;919:5313;913:17731;913:17711",
                           "kind": "auto",
                           "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "figmaId": "I4408:44917;1026:6403",
-                      "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "I4408:44917;1026:6371",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "I4408:44917;1026:6371;932:4600",
-                              "kind": "auto",
-                              "children": []
-                            }
-                          ]
                         }
                       ]
                     }
@@ -219,23 +44,1355 @@
               ]
             },
             {
-              "figmaId": "4408:44887",
+              "figmaId": "4408:44890",
               "kind": "auto",
-              "children": []
-            },
-            {
-              "figmaId": "4408:44888",
-              "kind": "extracted",
-              "children": [],
-              "ref": {
-                "widgetName": "ModalWidget",
-                "namedArgs": {}
-              }
-            },
-            {
-              "figmaId": "4408:44886",
-              "kind": "auto",
-              "children": []
+              "children": [
+                {
+                  "figmaId": "4408:44891",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "4408:44892",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "4408:44893",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "4408:44894",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I4408:44894;1154:8698",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "4408:44895",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "4408:44896",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I4408:44896;1154:7841",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I4408:44896;1154:7842",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I4408:44896;1154:7843",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I4408:44896;1154:7844",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I4408:44896;1154:7845",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I4408:44896;1902:25381",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I4408:44896;1154:7846",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I4408:44896;1902:25583",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I4408:44896;1154:7847",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "I4408:44896;1154:7849",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I4408:44896;1154:7849;1149:9856",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479;910:3261",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I4408:44896;1154:7849;1149:9469",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "I4408:44896;1154:7849;1149:9855",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481;910:3248",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "I4408:44896;1154:7850",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I4408:44896;1154:7850;933:4776",
+                                  "kind": "auto",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "4408:44897",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I4408:44897;1154:7841",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I4408:44897;1154:7842",
+                                  "kind": "auto",
+                                  "children": []
+                                },
+                                {
+                                  "figmaId": "I4408:44897;1154:7843",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I4408:44897;1154:7844",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I4408:44897;1154:7845",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I4408:44897;1902:25381",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I4408:44897;1154:7846",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "figmaId": "I4408:44897;1902:25583",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I4408:44897;1154:7847",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I4408:44897;7752:55704",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I4408:44897;7752:54884",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I4408:44897;1154:7849",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I4408:44897;1154:7849;1149:9856",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "I4408:44897;1154:7849;1149:9469",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I4408:44897;1154:7849;1149:9855",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "I4408:44897;1154:7850",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I4408:44897;1154:7850;933:4776",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "4408:44898",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I4408:44898;1154:7841",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "I4408:44898;1154:7842",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "I4408:44898;1154:7843",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "I4408:44898;1154:7844",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I4408:44898;1154:7845",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I4408:44898;1902:25381",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I4408:44898;1154:7846",
+                                                          "kind": "auto",
+                                                          "children": []
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "figmaId": "I4408:44898;1902:25583",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I4408:44898;1154:7847",
+                                                          "kind": "auto",
+                                                          "children": []
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "figmaId": "I4408:44898;7752:55704",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I4408:44898;7752:54884",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "figmaId": "I4408:44898;1154:7849",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I4408:44898;1154:7849;1149:9856",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479;910:3261",
+                                                          "kind": "auto",
+                                                          "children": []
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "figmaId": "I4408:44898;1154:7849;1149:9469",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                },
+                                                {
+                                                  "figmaId": "I4408:44898;1154:7849;1149:9855",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I4408:44898;1154:7849;1149:9855;1149:9481",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "figmaId": "I4408:44898;1154:7850",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I4408:44898;1154:7850;933:4776",
+                                                  "kind": "auto",
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "4408:44899",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "4408:44900",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "4408:44901",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "I4408:44901;1154:7841",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "I4408:44901;1154:7842",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "figmaId": "I4408:44901;1154:7843",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I4408:44901;1154:7844",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I4408:44901;1154:7845",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I4408:44901;1902:25381",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I4408:44901;1154:7846",
+                                                                      "kind": "auto",
+                                                                      "children": []
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "figmaId": "I4408:44901;1902:25583",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I4408:44901;1154:7847",
+                                                                      "kind": "auto",
+                                                                      "children": []
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "figmaId": "I4408:44901;1154:7850",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I4408:44901;1154:7850;933:4776",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "figmaId": "4408:44902",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I4408:44902;1154:7841",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I4408:44902;1154:7842",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44902;1154:7843",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I4408:44902;1154:7844",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I4408:44902;1154:7845",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44902;1902:25381",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44902;1154:7846",
+                                                                              "kind": "auto",
+                                                                              "children": []
+                                                                            }
+                                                                          ]
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44902;1902:25583",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44902;1154:7847",
+                                                                              "kind": "auto",
+                                                                              "children": []
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "figmaId": "I4408:44902;1154:7850",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44902;1154:7850;933:4776",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "figmaId": "4408:44903",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I4408:44903;1315:9811",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44903;1159:8235",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44903;1162:9965",
+                                                                              "kind": "auto",
+                                                                              "children": [
+                                                                                {
+                                                                                  "figmaId": "I4408:44903;1162:9863",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44903;1162:9863;1162:10106",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    }
+                                                                                  ]
+                                                                                },
+                                                                                {
+                                                                                  "figmaId": "I4408:44903;1315:9349",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44903;1154:8380",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            },
+                                                                            {
+                                                                              "figmaId": "I4408:44903;1154:8385",
+                                                                              "kind": "auto",
+                                                                              "children": [
+                                                                                {
+                                                                                  "figmaId": "I4408:44903;1154:8385;1003:4475",
+                                                                                  "kind": "auto",
+                                                                                  "children": []
+                                                                                }
+                                                                              ]
+                                                                            },
+                                                                            {
+                                                                              "figmaId": "I4408:44903;1159:8160",
+                                                                              "kind": "auto",
+                                                                              "children": [
+                                                                                {
+                                                                                  "figmaId": "I4408:44903;1159:8160;933:4776",
+                                                                                  "kind": "auto",
+                                                                                  "children": []
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "figmaId": "4408:44904",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44904;1159:8273",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44904;1154:8071",
+                                                                              "kind": "auto",
+                                                                              "children": [
+                                                                                {
+                                                                                  "figmaId": "I4408:44904;1162:10179",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44904;1162:10180",
+                                                                                      "kind": "auto",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "figmaId": "I4408:44904;1162:10180;4181:43463",
+                                                                                          "kind": "auto",
+                                                                                          "children": []
+                                                                                        }
+                                                                                      ]
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44904;1162:10181",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    }
+                                                                                  ]
+                                                                                },
+                                                                                {
+                                                                                  "figmaId": "I4408:44904;1154:8077",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44904;1154:8077;1149:9856",
+                                                                                      "kind": "auto",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "figmaId": "I4408:44904;1154:8077;1149:9856;1149:9479",
+                                                                                          "kind": "auto",
+                                                                                          "children": []
+                                                                                        }
+                                                                                      ]
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44904;1154:8077;1149:9469",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44904;1154:8077;1149:9855",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "figmaId": "4408:44905",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "4408:44906",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "4408:44907",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ],
+                                                                  "ref": {
+                                                                    "widgetName": "ModalWidget",
+                                                                    "namedArgs": {}
+                                                                  }
+                                                                },
+                                                                {
+                                                                  "figmaId": "4408:44886",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                },
+                                                                {
+                                                                  "figmaId": "4408:44908",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "4408:44909",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "4408:44910",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "4408:44911",
+                                                                              "kind": "auto",
+                                                                              "children": []
+                                                                            }
+                                                                          ]
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "4408:44912",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "4408:44913",
+                                                                              "kind": "auto",
+                                                                              "children": [
+                                                                                {
+                                                                                  "figmaId": "4408:44914",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44914;1356:10660",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44914;1356:10661",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44914;1356:10662",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44914;1356:10663",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44914;1356:10664",
+                                                                                      "kind": "auto",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "figmaId": "I4408:44914;1356:10664;1356:10367",
+                                                                                          "kind": "auto",
+                                                                                          "children": []
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                },
+                                                                                {
+                                                                                  "figmaId": "4408:44915",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44915;1356:10705",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44915;1356:10706",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44915;1356:10708",
+                                                                                      "kind": "auto",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "figmaId": "I4408:44915;1356:10710",
+                                                                                          "kind": "auto",
+                                                                                          "children": []
+                                                                                        }
+                                                                                      ]
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44915;1356:10711",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44915;1356:10712",
+                                                                                      "kind": "auto",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "figmaId": "I4408:44915;1356:10712;910:3253",
+                                                                                          "kind": "auto",
+                                                                                          "children": [
+                                                                                            {
+                                                                                              "figmaId": "I4408:44915;1356:10712;910:3253;910:3248",
+                                                                                              "kind": "auto",
+                                                                                              "children": []
+                                                                                            }
+                                                                                          ]
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                },
+                                                                                {
+                                                                                  "figmaId": "4408:44916",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44916;1356:10666",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44916;1356:10667",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44916;1356:10668",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44916;1356:10669",
+                                                                                      "kind": "auto",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "figmaId": "I4408:44916;1356:10670",
+                                                                                          "kind": "auto",
+                                                                                          "children": []
+                                                                                        },
+                                                                                        {
+                                                                                          "figmaId": "I4408:44916;1356:10671",
+                                                                                          "kind": "auto",
+                                                                                          "children": []
+                                                                                        }
+                                                                                      ]
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44916;1356:10672",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    },
+                                                                                    {
+                                                                                      "figmaId": "I4408:44916;1356:10673",
+                                                                                      "kind": "auto",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "figmaId": "I4408:44916;1356:10673;910:3253",
+                                                                                          "kind": "auto",
+                                                                                          "children": [
+                                                                                            {
+                                                                                              "figmaId": "I4408:44916;1356:10673;910:3253;910:3248",
+                                                                                              "kind": "auto",
+                                                                                              "children": []
+                                                                                            }
+                                                                                          ]
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            },
+                                                                            {
+                                                                              "figmaId": "4408:44917",
+                                                                              "kind": "auto",
+                                                                              "children": [
+                                                                                {
+                                                                                  "figmaId": "I4408:44917;1026:6403",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44917;1026:6371",
+                                                                                      "kind": "auto",
+                                                                                      "children": [
+                                                                                        {
+                                                                                          "figmaId": "I4408:44917;1026:6371;932:4600",
+                                                                                          "kind": "auto",
+                                                                                          "children": []
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                },
+                                                                                {
+                                                                                  "figmaId": "I4408:44917;1007:7123",
+                                                                                  "kind": "auto",
+                                                                                  "children": [
+                                                                                    {
+                                                                                      "figmaId": "I4408:44917;1007:7123;908:4710",
+                                                                                      "kind": "auto",
+                                                                                      "children": []
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "figmaId": "4408:44906",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "figmaId": "4408:44907",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "figmaId": "4408:44886",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    },
+                                                    {
+                                                      "figmaId": "4408:44908",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "4408:44909",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "4408:44910",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "4408:44911",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "figmaId": "4408:44912",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "4408:44913",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "4408:44914",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44914;1356:10660",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44914;1356:10661",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44914;1356:10662",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44914;1356:10663",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44914;1356:10664",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44914;1356:10664;1356:10367",
+                                                                              "kind": "auto",
+                                                                              "children": []
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "figmaId": "4408:44915",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44915;1356:10705",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44915;1356:10706",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44915;1356:10708",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44915;1356:10710",
+                                                                              "kind": "auto",
+                                                                              "children": []
+                                                                            }
+                                                                          ]
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44915;1356:10711",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44915;1356:10712",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44915;1356:10712;910:3253",
+                                                                              "kind": "auto",
+                                                                              "children": [
+                                                                                {
+                                                                                  "figmaId": "I4408:44915;1356:10712;910:3253;910:3248",
+                                                                                  "kind": "auto",
+                                                                                  "children": []
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "figmaId": "4408:44916",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44916;1356:10666",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44916;1356:10667",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44916;1356:10668",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44916;1356:10669",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44916;1356:10670",
+                                                                              "kind": "auto",
+                                                                              "children": []
+                                                                            },
+                                                                            {
+                                                                              "figmaId": "I4408:44916;1356:10671",
+                                                                              "kind": "auto",
+                                                                              "children": []
+                                                                            }
+                                                                          ]
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44916;1356:10672",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        },
+                                                                        {
+                                                                          "figmaId": "I4408:44916;1356:10673",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44916;1356:10673;910:3253",
+                                                                              "kind": "auto",
+                                                                              "children": [
+                                                                                {
+                                                                                  "figmaId": "I4408:44916;1356:10673;910:3253;910:3248",
+                                                                                  "kind": "auto",
+                                                                                  "children": []
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "figmaId": "4408:44917",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I4408:44917;1026:6403",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44917;1026:6371",
+                                                                          "kind": "auto",
+                                                                          "children": [
+                                                                            {
+                                                                              "figmaId": "I4408:44917;1026:6371;932:4600",
+                                                                              "kind": "auto",
+                                                                              "children": []
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "figmaId": "I4408:44917;1007:7123",
+                                                                      "kind": "auto",
+                                                                      "children": [
+                                                                        {
+                                                                          "figmaId": "I4408:44917;1007:7123;908:4710",
+                                                                          "kind": "auto",
+                                                                          "children": []
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "figmaId": "4408:44886",
+                                          "kind": "auto",
+                                          "children": []
+                                        },
+                                        {
+                                          "figmaId": "4408:44908",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "4408:44909",
+                                              "kind": "auto",
+                                              "children": [
+                                                {
+                                                  "figmaId": "4408:44910",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "4408:44911",
+                                                      "kind": "auto",
+                                                      "children": []
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "figmaId": "4408:44912",
+                                                  "kind": "auto",
+                                                  "children": [
+                                                    {
+                                                      "figmaId": "4408:44913",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "4408:44914",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I4408:44914;1356:10660",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44914;1356:10661",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44914;1356:10662",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44914;1356:10663",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44914;1356:10664",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I4408:44914;1356:10664;1356:10367",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "figmaId": "4408:44915",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I4408:44915;1356:10705",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44915;1356:10706",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44915;1356:10708",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I4408:44915;1356:10710",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44915;1356:10711",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44915;1356:10712",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I4408:44915;1356:10712;910:3253",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I4408:44915;1356:10712;910:3253;910:3248",
+                                                                      "kind": "auto",
+                                                                      "children": []
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "figmaId": "4408:44916",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I4408:44916;1356:10666",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44916;1356:10667",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44916;1356:10668",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44916;1356:10669",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I4408:44916;1356:10670",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                },
+                                                                {
+                                                                  "figmaId": "I4408:44916;1356:10671",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44916;1356:10672",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            },
+                                                            {
+                                                              "figmaId": "I4408:44916;1356:10673",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I4408:44916;1356:10673;910:3253",
+                                                                  "kind": "auto",
+                                                                  "children": [
+                                                                    {
+                                                                      "figmaId": "I4408:44916;1356:10673;910:3253;910:3248",
+                                                                      "kind": "auto",
+                                                                      "children": []
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "figmaId": "4408:44917",
+                                                      "kind": "auto",
+                                                      "children": [
+                                                        {
+                                                          "figmaId": "I4408:44917;1026:6403",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I4408:44917;1026:6371",
+                                                              "kind": "auto",
+                                                              "children": [
+                                                                {
+                                                                  "figmaId": "I4408:44917;1026:6371;932:4600",
+                                                                  "kind": "auto",
+                                                                  "children": []
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "figmaId": "I4408:44917;1007:7123",
+                                                          "kind": "auto",
+                                                          "children": [
+                                                            {
+                                                              "figmaId": "I4408:44917;1007:7123;908:4710",
+                                                              "kind": "auto",
+                                                              "children": []
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -243,24 +1400,24 @@
     },
     "omitFigmaIds": [],
     "stackChildOrder": [
-      "4408:44908",
       "4408:44887",
       "4408:44888",
-      "4408:44886"
+      "4408:44886",
+      "4408:44908"
     ],
     "stateByFigmaId": {},
     "adaptiveRules": [],
     "semanticSummary": {
-      "screenRole": "checkout_addons_overlay",
-      "confidence": 0.97,
-      "explanation": "Absolute-positioned order customization overlay with a modal product editor, promotional action card, add-on carousel, and fixed checkout bar.",
+      "screenRole": "order_customization_sheet",
+      "confidence": 0.94,
+      "explanation": "Composite order modal with product list, quantity steppers, promo entry, add-on suggestions, and a primary checkout action.",
       "warnings": [
-        "Stack-root overlay composition with multiple independently positioned sections."
+        "Vector-rich modal subtree extracted as ModalWidget."
       ]
     },
     "semanticVerdicts": [
       {
-        "nodeId": "I4408:44889;919:5313",
+        "nodeId": "I4408:44889;919:5313;913:17731",
         "role": "button",
         "subtype": "close",
         "controlNodeId": "I4408:44889;919:5313",
@@ -269,35 +1426,67 @@
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [
-          "I4408:44889;919:5313;913:17731",
           "I4408:44889;919:5313;913:17731;913:17711"
         ],
         "optionNodeIds": [],
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
           "actionKind": "dismiss",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "minimum_44x44_touch_target"
+          "min_touch_target_44dp"
         ],
         "options": [],
-        "confidence": 0.99,
+        "confidence": 0.98,
         "proposedEffects": [
           "dismiss_modal"
         ],
-        "explanation": "Top-right close affordance for the modal overlay."
+        "explanation": "Top-right close affordance for dismissing the modal sheet."
       },
       {
-        "nodeId": "4408:44903",
+        "nodeId": "I4408:44896;1154:7849",
+        "role": "stepper",
+        "subtype": "quantity_adjuster",
+        "controlNodeId": "I4408:44896;1154:7849",
+        "boundaryNodeId": "I4408:44896;1154:7849",
+        "labelNodeIds": [
+          "I4408:44896;1154:7849;1149:9469"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I4408:44896;1154:7849;1149:9469"
+        ],
+        "decorationNodeIds": [
+          "I4408:44896;1154:7849;1149:9856",
+          "I4408:44896;1154:7849;1149:9855"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "input_stepper",
+        "contractTraits": {
+          "currentValue": "2",
+          "actionKind": "quantity_adjustment",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "horizontal_stepper_value_centered"
+        ],
+        "value": "2",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [
+          "increment_decrement_quantity"
+        ],
+        "explanation": "Quantity stepper with minus/value/plus cluster."
+      },
+      {
+        "nodeId": "I4408:44903",
         "role": "button",
         "subtype": "promo_action",
-        "controlNodeId": "4408:44903",
-        "boundaryNodeId": "4408:44903",
+        "controlNodeId": "I4408:44903;1159:8235",
+        "boundaryNodeId": "I4408:44903",
         "labelNodeIds": [
           "I4408:44903;1154:8380"
         ],
@@ -311,21 +1500,18 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "apply_promo",
+          "actionKind": "promo_entry",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "icon_label_arrow_affordance"
+          "icon_label_button_row"
         ],
         "options": [],
-        "confidence": 0.95,
+        "confidence": 0.9,
         "proposedEffects": [
           "open_promo_entry"
         ],
-        "explanation": "Tappable promo code action card with icon, label, and arrow affordance."
+        "explanation": "Tap target for applying a promo code."
       },
       {
         "nodeId": "I4408:44917;1026:6371",
@@ -343,179 +1529,18 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
           "actionKind": "checkout",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "full_width_primary_action"
+          "primary_cta_min_touch_target_44dp"
         ],
         "options": [],
         "confidence": 0.99,
         "proposedEffects": [
-          "submit_order"
+          "place_order"
         ],
-        "explanation": "Primary checkout CTA in the fixed bottom bar."
-      },
-      {
-        "nodeId": "I4408:44896;1154:7849",
-        "role": "button",
-        "subtype": "quantity_stepper",
-        "controlNodeId": "I4408:44896;1154:7849",
-        "boundaryNodeId": "I4408:44896;1154:7849",
-        "labelNodeIds": [
-          "I4408:44896;1154:7849;1149:9469"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [
-          "I4408:44896;1154:7849;1149:9469"
-        ],
-        "decorationNodeIds": [
-          "I4408:44896;1154:7849;1149:9856",
-          "I4408:44896;1154:7849;1149:9856;1149:9479",
-          "I4408:44896;1154:7849;1149:9855",
-          "I4408:44896;1154:7849;1149:9855;1149:9481"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "unknown",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "currentValue": 2,
-          "actionKind": "adjust_quantity",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "quantity_stepper_horizontal"
-        ],
-        "value": 2,
-        "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [
-          "increase_or_decrease_item_count"
-        ],
-        "explanation": "Inline quantity control for the main order item."
-      },
-      {
-        "nodeId": "I4408:44897;1154:7849",
-        "role": "button",
-        "subtype": "quantity_stepper",
-        "controlNodeId": "I4408:44897;1154:7849",
-        "boundaryNodeId": "I4408:44897;1154:7849",
-        "labelNodeIds": [
-          "I4408:44897;1154:7849;1149:9469"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [
-          "I4408:44897;1154:7849;1149:9469"
-        ],
-        "decorationNodeIds": [
-          "I4408:44897;1154:7849;1149:9856",
-          "I4408:44897;1154:7849;1149:9856;1149:9479",
-          "I4408:44897;1154:7849;1149:9855",
-          "I4408:44897;1154:7849;1149:9855;1149:9481"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "unknown",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "currentValue": 1,
-          "actionKind": "adjust_quantity",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "quantity_stepper_horizontal"
-        ],
-        "value": 1,
-        "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [
-          "increase_or_decrease_item_count"
-        ],
-        "explanation": "Inline quantity control for a secondary order item."
-      },
-      {
-        "nodeId": "I4408:44898;1154:7849",
-        "role": "button",
-        "subtype": "quantity_stepper",
-        "controlNodeId": "I4408:44898;1154:7849",
-        "boundaryNodeId": "I4408:44898;1154:7849",
-        "labelNodeIds": [
-          "I4408:44898;1154:7849;1149:9469"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [
-          "I4408:44898;1154:7849;1149:9469"
-        ],
-        "decorationNodeIds": [
-          "I4408:44898;1154:7849;1149:9856",
-          "I4408:44898;1154:7849;1149:9856;1149:9479",
-          "I4408:44898;1154:7849;1149:9855",
-          "I4408:44898;1154:7849;1149:9855;1149:9481"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "unknown",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "currentValue": 1,
-          "actionKind": "adjust_quantity",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "quantity_stepper_horizontal"
-        ],
-        "value": 1,
-        "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [
-          "increase_or_decrease_item_count"
-        ],
-        "explanation": "Inline quantity control for another order item."
-      },
-      {
-        "nodeId": "I4408:44904;1154:8077",
-        "role": "button",
-        "subtype": "add_product",
-        "controlNodeId": "I4408:44904;1154:8077",
-        "boundaryNodeId": "I4408:44904;1154:8077",
-        "labelNodeIds": [
-          "I4408:44904;1162:10181"
-        ],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [
-          "I4408:44904;1162:10180",
-          "I4408:44904;1162:10180;4181:43463"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "button",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "add_item",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "icon_label_horizontal"
-        ],
-        "options": [],
-        "confidence": 0.93,
-        "proposedEffects": [
-          "increase_cutlery_quantity"
-        ],
-        "explanation": "Add control for the cutlery add-on row."
+        "explanation": "Primary checkout button in the add bar."
       },
       {
         "nodeId": "I4408:44914;1356:10664",
@@ -533,87 +1558,18 @@
         "stateNodeIds": [],
         "contractKind": "button",
         "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
           "actionKind": "add_item",
           "visualState": "default"
         },
         "proposedLayoutLaws": [
-          "small_card_cta"
+          "compact_icon_label_button"
         ],
         "options": [],
-        "confidence": 0.92,
+        "confidence": 0.86,
         "proposedEffects": [
-          "add_item_to_order"
+          "add_item_to_cart"
         ],
-        "explanation": "CTA for the sauces carousel card."
-      },
-      {
-        "nodeId": "I4408:44915;1356:10712",
-        "role": "button",
-        "subtype": "add_item",
-        "controlNodeId": "I4408:44915;1356:10712",
-        "boundaryNodeId": "I4408:44915;1356:10712",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [
-          "I4408:44915;1356:10712;910:3253",
-          "I4408:44915;1356:10712;910:3253;910:3248"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "button",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "add_item",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "icon_only_small_cta"
-        ],
-        "options": [],
-        "confidence": 0.92,
-        "proposedEffects": [
-          "add_item_to_order"
-        ],
-        "explanation": "Icon-only add control on a product card."
-      },
-      {
-        "nodeId": "I4408:44916;1356:10673",
-        "role": "button",
-        "subtype": "add_item",
-        "controlNodeId": "I4408:44916;1356:10673",
-        "boundaryNodeId": "I4408:44916;1356:10673",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [
-          "I4408:44916;1356:10673;910:3253",
-          "I4408:44916;1356:10673;910:3253;910:3248"
-        ],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "contractKind": "button",
-        "contractTraits": {
-          "isMultiline": false,
-          "maxLines": 1,
-          "obscureText": false,
-          "actionKind": "add_item",
-          "visualState": "default"
-        },
-        "proposedLayoutLaws": [
-          "icon_only_small_cta"
-        ],
-        "options": [],
-        "confidence": 0.92,
-        "proposedEffects": [
-          "add_item_to_order"
-        ],
-        "explanation": "Icon-only add control on the promo product card."
+        "explanation": "Compact add button on a suggested product card."
       }
     ]
   },
@@ -625,146 +1581,112 @@
         "kind": "auto",
         "children": [
           {
-            "figmaId": "4408:44905",
+            "figmaId": "4408:44889",
             "kind": "auto",
             "children": [
               {
-                "figmaId": "4408:44906",
+                "figmaId": "I4408:44889;919:5312",
                 "kind": "auto",
                 "children": []
               },
               {
-                "figmaId": "4408:44907",
+                "figmaId": "I4408:44889;919:5313",
                 "kind": "auto",
-                "children": []
+                "children": [
+                  {
+                    "figmaId": "I4408:44889;919:5313;913:17731",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I4408:44889;919:5313;913:17731;913:17711",
+                        "kind": "auto",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           },
           {
-            "figmaId": "4408:44900",
+            "figmaId": "4408:44890",
             "kind": "auto",
             "children": [
               {
-                "figmaId": "4408:44901",
+                "figmaId": "4408:44891",
                 "kind": "auto",
                 "children": [
                   {
-                    "figmaId": "I4408:44901;1154:7841",
+                    "figmaId": "4408:44892",
                     "kind": "auto",
                     "children": [
                       {
-                        "figmaId": "I4408:44901;1154:7842",
+                        "figmaId": "4408:44893",
                         "kind": "auto",
                         "children": []
                       },
                       {
-                        "figmaId": "I4408:44901;1154:7843",
+                        "figmaId": "4408:44894",
                         "kind": "auto",
                         "children": [
                           {
-                            "figmaId": "I4408:44901;1154:7844",
+                            "figmaId": "I4408:44894;1154:8698",
                             "kind": "auto",
-                            "children": [
-                              {
-                                "figmaId": "I4408:44901;1154:7845",
-                                "kind": "auto",
-                                "children": [
-                                  {
-                                    "figmaId": "I4408:44901;1902:25381",
-                                    "kind": "auto",
-                                    "children": [
-                                      {
-                                        "figmaId": "I4408:44901;1154:7846",
-                                        "kind": "auto",
-                                        "children": []
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "figmaId": "I4408:44901;1902:25583",
-                                    "kind": "auto",
-                                    "children": [
-                                      {
-                                        "figmaId": "I4408:44901;1154:7847",
-                                        "kind": "auto",
-                                        "children": []
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            "figmaId": "I4408:44901;1154:7850",
-                            "kind": "auto",
-                            "children": [
-                              {
-                                "figmaId": "I4408:44901;1154:7850;933:4776",
-                                "kind": "auto",
-                                "children": []
-                              }
-                            ]
+                            "children": []
                           }
                         ]
+                      }
+                    ]
+                  },
+                  {
+                    "figmaId": "4408:44895",
+                    "kind": "auto",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "figmaId": "4408:44896",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I4408:44896;1154:7841",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I4408:44896;1154:7842",
+                        "kind": "auto",
+                        "children": []
                       },
                       {
-                        "figmaId": "4408:44902",
+                        "figmaId": "I4408:44896;1154:7843",
                         "kind": "auto",
                         "children": [
                           {
-                            "figmaId": "I4408:44902;1154:7841",
+                            "figmaId": "I4408:44896;1154:7844",
                             "kind": "auto",
                             "children": [
                               {
-                                "figmaId": "I4408:44902;1154:7842",
-                                "kind": "auto",
-                                "children": []
-                              },
-                              {
-                                "figmaId": "I4408:44902;1154:7843",
+                                "figmaId": "I4408:44896;1154:7845",
                                 "kind": "auto",
                                 "children": [
                                   {
-                                    "figmaId": "I4408:44902;1154:7844",
+                                    "figmaId": "I4408:44896;1902:25381",
                                     "kind": "auto",
                                     "children": [
                                       {
-                                        "figmaId": "I4408:44902;1154:7845",
+                                        "figmaId": "I4408:44896;1154:7846",
                                         "kind": "auto",
-                                        "children": [
-                                          {
-                                            "figmaId": "I4408:44902;1902:25381",
-                                            "kind": "auto",
-                                            "children": [
-                                              {
-                                                "figmaId": "I4408:44902;1154:7846",
-                                                "kind": "auto",
-                                                "children": []
-                                              }
-                                            ]
-                                          },
-                                          {
-                                            "figmaId": "I4408:44902;1902:25583",
-                                            "kind": "auto",
-                                            "children": [
-                                              {
-                                                "figmaId": "I4408:44902;1154:7847",
-                                                "kind": "auto",
-                                                "children": []
-                                              }
-                                            ]
-                                          }
-                                        ]
+                                        "children": []
                                       }
                                     ]
                                   },
                                   {
-                                    "figmaId": "I4408:44902;1154:7850",
+                                    "figmaId": "I4408:44896;1902:25583",
                                     "kind": "auto",
                                     "children": [
                                       {
-                                        "figmaId": "I4408:44902;1154:7850;933:4776",
+                                        "figmaId": "I4408:44896;1154:7847",
                                         "kind": "auto",
                                         "children": []
                                       }
@@ -773,120 +1695,41 @@
                                 ]
                               },
                               {
-                                "figmaId": "4408:44903",
+                                "figmaId": "I4408:44896;1154:7849",
                                 "kind": "auto",
                                 "children": [
                                   {
-                                    "figmaId": "I4408:44903;1315:9811",
+                                    "figmaId": "I4408:44896;1154:7849;1149:9856",
                                     "kind": "auto",
                                     "children": [
                                       {
-                                        "figmaId": "I4408:44903;1159:8235",
+                                        "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479",
                                         "kind": "auto",
                                         "children": [
                                           {
-                                            "figmaId": "I4408:44903;1159:8160",
+                                            "figmaId": "I4408:44896;1154:7849;1149:9856;1149:9479;910:3261",
                                             "kind": "auto",
-                                            "children": [
-                                              {
-                                                "figmaId": "I4408:44903;1159:8160;933:4776",
-                                                "kind": "auto",
-                                                "children": []
-                                              }
-                                            ]
-                                          },
-                                          {
-                                            "figmaId": "I4408:44903;1162:9965",
-                                            "kind": "auto",
-                                            "children": [
-                                              {
-                                                "figmaId": "I4408:44903;1162:9863",
-                                                "kind": "auto",
-                                                "children": [
-                                                  {
-                                                    "figmaId": "I4408:44903;1162:9863;1162:10106",
-                                                    "kind": "auto",
-                                                    "children": []
-                                                  }
-                                                ]
-                                              },
-                                              {
-                                                "figmaId": "I4408:44903;1315:9349",
-                                                "kind": "auto",
-                                                "children": [
-                                                  {
-                                                    "figmaId": "I4408:44903;1154:8380",
-                                                    "kind": "auto",
-                                                    "children": []
-                                                  }
-                                                ]
-                                              }
-                                            ]
-                                          },
-                                          {
-                                            "figmaId": "I4408:44903;1154:8385",
-                                            "kind": "auto",
-                                            "children": [
-                                              {
-                                                "figmaId": "I4408:44903;1154:8385;1003:4475",
-                                                "kind": "auto",
-                                                "children": []
-                                              }
-                                            ]
+                                            "children": []
                                           }
                                         ]
                                       }
                                     ]
                                   },
                                   {
-                                    "figmaId": "I4408:44903;1154:7850",
+                                    "figmaId": "I4408:44896;1154:7849;1149:9469",
                                     "kind": "auto",
-                                    "children": [
-                                      {
-                                        "figmaId": "I4408:44903;1154:7850;933:4776",
-                                        "kind": "auto",
-                                        "children": []
-                                      }
-                                    ]
-                                  }
-                                ]
-                              },
-                              {
-                                "figmaId": "4408:44904",
-                                "kind": "auto",
-                                "children": [
+                                    "children": []
+                                  },
                                   {
-                                    "figmaId": "I4408:44904;1159:8273",
+                                    "figmaId": "I4408:44896;1154:7849;1149:9855",
                                     "kind": "auto",
                                     "children": [
                                       {
-                                        "figmaId": "I4408:44904;1154:8071",
+                                        "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481",
                                         "kind": "auto",
                                         "children": [
                                           {
-                                            "figmaId": "I4408:44904;1162:10179",
-                                            "kind": "auto",
-                                            "children": [
-                                              {
-                                                "figmaId": "I4408:44904;1162:10180",
-                                                "kind": "auto",
-                                                "children": [
-                                                  {
-                                                    "figmaId": "I4408:44904;1162:10180;4181:43463",
-                                                    "kind": "auto",
-                                                    "children": []
-                                                  }
-                                                ]
-                                              },
-                                              {
-                                                "figmaId": "I4408:44904;1162:10181",
-                                                "kind": "auto",
-                                                "children": []
-                                              }
-                                            ]
-                                          },
-                                          {
-                                            "figmaId": "I4408:44904;1154:8077",
+                                            "figmaId": "I4408:44896;1154:7849;1149:9855;1149:9481;910:3248",
                                             "kind": "auto",
                                             "children": []
                                           }
@@ -897,18 +1740,545 @@
                                 ]
                               },
                               {
-                                "figmaId": "4408:44905",
+                                "figmaId": "I4408:44896;1154:7850",
                                 "kind": "auto",
                                 "children": [
                                   {
-                                    "figmaId": "4408:44906",
+                                    "figmaId": "I4408:44896;1154:7850;933:4776",
+                                    "kind": "auto",
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "figmaId": "4408:44897",
+                            "kind": "auto",
+                            "children": [
+                              {
+                                "figmaId": "I4408:44897;1154:7841",
+                                "kind": "auto",
+                                "children": [
+                                  {
+                                    "figmaId": "I4408:44897;1154:7842",
                                     "kind": "auto",
                                     "children": []
                                   },
                                   {
-                                    "figmaId": "4408:44907",
+                                    "figmaId": "I4408:44897;1154:7843",
                                     "kind": "auto",
-                                    "children": []
+                                    "children": [
+                                      {
+                                        "figmaId": "I4408:44897;1154:7844",
+                                        "kind": "auto",
+                                        "children": [
+                                          {
+                                            "figmaId": "I4408:44897;1154:7845",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "I4408:44897;1902:25381",
+                                                "kind": "auto",
+                                                "children": [
+                                                  {
+                                                    "figmaId": "I4408:44897;1154:7846",
+                                                    "kind": "auto",
+                                                    "children": []
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "figmaId": "I4408:44897;1902:25583",
+                                                "kind": "auto",
+                                                "children": [
+                                                  {
+                                                    "figmaId": "I4408:44897;1154:7847",
+                                                    "kind": "auto",
+                                                    "children": []
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "figmaId": "I4408:44897;7752:55704",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "I4408:44897;7752:54884",
+                                                "kind": "auto",
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "figmaId": "I4408:44897;1154:7849",
+                                        "kind": "auto",
+                                        "children": [
+                                          {
+                                            "figmaId": "I4408:44897;1154:7849;1149:9856",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479",
+                                                "kind": "auto",
+                                                "children": []
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "figmaId": "I4408:44897;1154:7849;1149:9469",
+                                            "kind": "auto",
+                                            "children": []
+                                          },
+                                          {
+                                            "figmaId": "I4408:44897;1154:7849;1149:9855",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481",
+                                                "kind": "auto",
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "figmaId": "I4408:44897;1154:7850",
+                                        "kind": "auto",
+                                        "children": [
+                                          {
+                                            "figmaId": "I4408:44897;1154:7850;933:4776",
+                                            "kind": "auto",
+                                            "children": []
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "figmaId": "4408:44898",
+                                    "kind": "auto",
+                                    "children": [
+                                      {
+                                        "figmaId": "I4408:44898;1154:7841",
+                                        "kind": "auto",
+                                        "children": [
+                                          {
+                                            "figmaId": "I4408:44898;1154:7842",
+                                            "kind": "auto",
+                                            "children": []
+                                          },
+                                          {
+                                            "figmaId": "I4408:44898;1154:7843",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "I4408:44898;1154:7844",
+                                                "kind": "auto",
+                                                "children": [
+                                                  {
+                                                    "figmaId": "I4408:44898;1154:7845",
+                                                    "kind": "auto",
+                                                    "children": [
+                                                      {
+                                                        "figmaId": "I4408:44898;1902:25381",
+                                                        "kind": "auto",
+                                                        "children": [
+                                                          {
+                                                            "figmaId": "I4408:44898;1154:7846",
+                                                            "kind": "auto",
+                                                            "children": []
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "figmaId": "I4408:44898;1902:25583",
+                                                        "kind": "auto",
+                                                        "children": [
+                                                          {
+                                                            "figmaId": "I4408:44898;1154:7847",
+                                                            "kind": "auto",
+                                                            "children": []
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "figmaId": "I4408:44898;7752:55704",
+                                                    "kind": "auto",
+                                                    "children": [
+                                                      {
+                                                        "figmaId": "I4408:44898;7752:54884",
+                                                        "kind": "auto",
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "figmaId": "I4408:44898;1154:7849",
+                                                "kind": "auto",
+                                                "children": [
+                                                  {
+                                                    "figmaId": "I4408:44898;1154:7849;1149:9856",
+                                                    "kind": "auto",
+                                                    "children": [
+                                                      {
+                                                        "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479",
+                                                        "kind": "auto",
+                                                        "children": [
+                                                          {
+                                                            "figmaId": "I4408:44898;1154:7849;1149:9856;1149:9479;910:3261",
+                                                            "kind": "auto",
+                                                            "children": []
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "figmaId": "I4408:44898;1154:7849;1149:9469",
+                                                    "kind": "auto",
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "figmaId": "I4408:44898;1154:7849;1149:9855",
+                                                    "kind": "auto",
+                                                    "children": [
+                                                      {
+                                                        "figmaId": "I4408:44898;1154:7849;1149:9855;1149:9481",
+                                                        "kind": "auto",
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "figmaId": "I4408:44898;1154:7850",
+                                                "kind": "auto",
+                                                "children": [
+                                                  {
+                                                    "figmaId": "I4408:44898;1154:7850;933:4776",
+                                                    "kind": "auto",
+                                                    "children": []
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "figmaId": "4408:44899",
+                                            "kind": "auto",
+                                            "children": []
+                                          },
+                                          {
+                                            "figmaId": "4408:44900",
+                                            "kind": "auto",
+                                            "children": [
+                                              {
+                                                "figmaId": "4408:44901",
+                                                "kind": "auto",
+                                                "children": [
+                                                  {
+                                                    "figmaId": "I4408:44901;1154:7841",
+                                                    "kind": "auto",
+                                                    "children": [
+                                                      {
+                                                        "figmaId": "I4408:44901;1154:7842",
+                                                        "kind": "auto",
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "figmaId": "I4408:44901;1154:7843",
+                                                        "kind": "auto",
+                                                        "children": [
+                                                          {
+                                                            "figmaId": "I4408:44901;1154:7844",
+                                                            "kind": "auto",
+                                                            "children": [
+                                                              {
+                                                                "figmaId": "I4408:44901;1154:7845",
+                                                                "kind": "auto",
+                                                                "children": [
+                                                                  {
+                                                                    "figmaId": "I4408:44901;1902:25381",
+                                                                    "kind": "auto",
+                                                                    "children": [
+                                                                      {
+                                                                        "figmaId": "I4408:44901;1154:7846",
+                                                                        "kind": "auto",
+                                                                        "children": []
+                                                                      }
+                                                                    ]
+                                                                  },
+                                                                  {
+                                                                    "figmaId": "I4408:44901;1902:25583",
+                                                                    "kind": "auto",
+                                                                    "children": [
+                                                                      {
+                                                                        "figmaId": "I4408:44901;1154:7847",
+                                                                        "kind": "auto",
+                                                                        "children": []
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          },
+                                                          {
+                                                            "figmaId": "I4408:44901;1154:7850",
+                                                            "kind": "auto",
+                                                            "children": [
+                                                              {
+                                                                "figmaId": "I4408:44901;1154:7850;933:4776",
+                                                                "kind": "auto",
+                                                                "children": []
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "figmaId": "4408:44902",
+                                                        "kind": "auto",
+                                                        "children": [
+                                                          {
+                                                            "figmaId": "I4408:44902;1154:7841",
+                                                            "kind": "auto",
+                                                            "children": [
+                                                              {
+                                                                "figmaId": "I4408:44902;1154:7842",
+                                                                "kind": "auto",
+                                                                "children": []
+                                                              },
+                                                              {
+                                                                "figmaId": "I4408:44902;1154:7843",
+                                                                "kind": "auto",
+                                                                "children": [
+                                                                  {
+                                                                    "figmaId": "I4408:44902;1154:7844",
+                                                                    "kind": "auto",
+                                                                    "children": [
+                                                                      {
+                                                                        "figmaId": "I4408:44902;1154:7845",
+                                                                        "kind": "auto",
+                                                                        "children": [
+                                                                          {
+                                                                            "figmaId": "I4408:44902;1902:25381",
+                                                                            "kind": "auto",
+                                                                            "children": [
+                                                                              {
+                                                                                "figmaId": "I4408:44902;1154:7846",
+                                                                                "kind": "auto",
+                                                                                "children": []
+                                                                              }
+                                                                            ]
+                                                                          },
+                                                                          {
+                                                                            "figmaId": "I4408:44902;1902:25583",
+                                                                            "kind": "auto",
+                                                                            "children": [
+                                                                              {
+                                                                                "figmaId": "I4408:44902;1154:7847",
+                                                                                "kind": "auto",
+                                                                                "children": []
+                                                                              }
+                                                                            ]
+                                                                          }
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "figmaId": "I4408:44902;1154:7850",
+                                                                        "kind": "auto",
+                                                                        "children": [
+                                                                          {
+                                                                            "figmaId": "I4408:44902;1154:7850;933:4776",
+                                                                            "kind": "auto",
+                                                                            "children": []
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  },
+                                                                  {
+                                                                    "figmaId": "4408:44903",
+                                                                    "kind": "auto",
+                                                                    "children": [
+                                                                      {
+                                                                        "figmaId": "I4408:44903;1315:9811",
+                                                                        "kind": "auto",
+                                                                        "children": [
+                                                                          {
+                                                                            "figmaId": "I4408:44903;1159:8235",
+                                                                            "kind": "auto",
+                                                                            "children": [
+                                                                              {
+                                                                                "figmaId": "I4408:44903;1162:9965",
+                                                                                "kind": "auto",
+                                                                                "children": [
+                                                                                  {
+                                                                                    "figmaId": "I4408:44903;1162:9863",
+                                                                                    "kind": "auto",
+                                                                                    "children": [
+                                                                                      {
+                                                                                        "figmaId": "I4408:44903;1162:9863;1162:10106",
+                                                                                        "kind": "auto",
+                                                                                        "children": []
+                                                                                      }
+                                                                                    ]
+                                                                                  },
+                                                                                  {
+                                                                                    "figmaId": "I4408:44903;1315:9349",
+                                                                                    "kind": "auto",
+                                                                                    "children": [
+                                                                                      {
+                                                                                        "figmaId": "I4408:44903;1154:8380",
+                                                                                        "kind": "auto",
+                                                                                        "children": []
+                                                                                      }
+                                                                                    ]
+                                                                                  }
+                                                                                ]
+                                                                              },
+                                                                              {
+                                                                                "figmaId": "I4408:44903;1154:8385",
+                                                                                "kind": "auto",
+                                                                                "children": [
+                                                                                  {
+                                                                                    "figmaId": "I4408:44903;1154:8385;1003:4475",
+                                                                                    "kind": "auto",
+                                                                                    "children": []
+                                                                                  }
+                                                                                ]
+                                                                              },
+                                                                              {
+                                                                                "figmaId": "I4408:44903;1159:8160",
+                                                                                "kind": "auto",
+                                                                                "children": [
+                                                                                  {
+                                                                                    "figmaId": "I4408:44903;1159:8160;933:4776",
+                                                                                    "kind": "auto",
+                                                                                    "children": []
+                                                                                  }
+                                                                                ]
+                                                                              }
+                                                                            ]
+                                                                          },
+                                                                          {
+                                                                            "figmaId": "4408:44904",
+                                                                            "kind": "auto",
+                                                                            "children": [
+                                                                              {
+                                                                                "figmaId": "I4408:44904;1159:8273",
+                                                                                "kind": "auto",
+                                                                                "children": [
+                                                                                  {
+                                                                                    "figmaId": "I4408:44904;1154:8071",
+                                                                                    "kind": "auto",
+                                                                                    "children": [
+                                                                                      {
+                                                                                        "figmaId": "I4408:44904;1162:10179",
+                                                                                        "kind": "auto",
+                                                                                        "children": [
+                                                                                          {
+                                                                                            "figmaId": "I4408:44904;1162:10180",
+                                                                                            "kind": "auto",
+                                                                                            "children": [
+                                                                                              {
+                                                                                                "figmaId": "I4408:44904;1162:10180;4181:43463",
+                                                                                                "kind": "auto",
+                                                                                                "children": []
+                                                                                              }
+                                                                                            ]
+                                                                                          },
+                                                                                          {
+                                                                                            "figmaId": "I4408:44904;1162:10181",
+                                                                                            "kind": "auto",
+                                                                                            "children": []
+                                                                                          }
+                                                                                        ]
+                                                                                      },
+                                                                                      {
+                                                                                        "figmaId": "I4408:44904;1154:8077",
+                                                                                        "kind": "auto",
+                                                                                        "children": [
+                                                                                          {
+                                                                                            "figmaId": "I4408:44904;1154:8077;1149:9856",
+                                                                                            "kind": "auto",
+                                                                                            "children": [
+                                                                                              {
+                                                                                                "figmaId": "I4408:44904;1154:8077;1149:9856;1149:9479",
+                                                                                                "kind": "auto",
+                                                                                                "children": []
+                                                                                              }
+                                                                                            ]
+                                                                                          },
+                                                                                          {
+                                                                                            "figmaId": "I4408:44904;1154:8077;1149:9469",
+                                                                                            "kind": "auto",
+                                                                                            "children": []
+                                                                                          },
+                                                                                          {
+                                                                                            "figmaId": "I4408:44904;1154:8077;1149:9855",
+                                                                                            "kind": "auto",
+                                                                                            "children": []
+                                                                                          }
+                                                                                        ]
+                                                                                      }
+                                                                                    ]
+                                                                                  }
+                                                                                ]
+                                                                              }
+                                                                            ]
+                                                                          },
+                                                                          {
+                                                                            "figmaId": "4408:44905",
+                                                                            "kind": "auto",
+                                                                            "children": [
+                                                                              {
+                                                                                "figmaId": "4408:44906",
+                                                                                "kind": "auto",
+                                                                                "children": []
+                                                                              },
+                                                                              {
+                                                                                "figmaId": "4408:44907",
+                                                                                "kind": "auto",
+                                                                                "children": []
+                                                                              }
+                                                                            ]
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ],
+                                                                    "ref": {
+                                                                      "widgetName": "ModalWidget",
+                                                                      "namedArgs": {}
+                                                                    }
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
                                   }
                                 ]
                               }

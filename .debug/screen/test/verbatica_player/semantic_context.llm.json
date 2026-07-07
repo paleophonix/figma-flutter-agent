@@ -1,0 +1,3207 @@
+{
+  "stage": "semantic_context_llm",
+  "featureName": "verbatica_player",
+  "treeOutline": [
+    {
+      "id": "981:66795",
+      "parent_id": null,
+      "depth": 0,
+      "name": "•",
+      "type": "COLUMN",
+      "children_count": 3,
+      "size": {
+        "width": 393.0,
+        "height": 852.0
+      }
+    },
+    {
+      "id": "981:66796",
+      "parent_id": "981:66795",
+      "depth": 1,
+      "name": "Nav",
+      "type": "COLUMN",
+      "children_count": 3,
+      "size": {
+        "width": 393.0,
+        "height": 128.0
+      },
+      "componentName": "Nav"
+    },
+    {
+      "id": "I981:66796;185:29822",
+      "parent_id": "981:66796",
+      "depth": 2,
+      "name": "Status Bar Dynamic Island",
+      "type": "STACK",
+      "children_count": 3,
+      "size": {
+        "width": 393.0,
+        "height": 54.0
+      },
+      "componentName": "Status Bar Dynamic Island"
+    },
+    {
+      "id": "I981:66796;185:29822;118:6149",
+      "parent_id": "I981:66796;185:29822",
+      "depth": 3,
+      "name": "Time",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 140.5,
+        "height": 54.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:6150",
+      "parent_id": "I981:66796;185:29822;118:6149",
+      "depth": 4,
+      "name": "Time",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 37.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:6151",
+      "parent_id": "I981:66796;185:29822",
+      "depth": 3,
+      "name": "Levels",
+      "type": "STACK",
+      "children_count": 3,
+      "size": {
+        "width": 140.5,
+        "height": 54.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:6156",
+      "parent_id": "I981:66796;185:29822;118:6151",
+      "depth": 4,
+      "name": "Wifi",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 17.141666412353516,
+        "height": 12.328306198120117
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:6157",
+      "parent_id": "I981:66796;185:29822;118:6151",
+      "depth": 4,
+      "name": "Cellular Connection",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 19.200000762939453,
+        "height": 12.226415634155273
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:6152",
+      "parent_id": "I981:66796;185:29822;118:6151",
+      "depth": 4,
+      "name": "Battery",
+      "type": "STACK",
+      "children_count": 3,
+      "size": {
+        "width": 27.32803726196289,
+        "height": 13.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:6153",
+      "parent_id": "I981:66796;185:29822;118:6152",
+      "depth": 5,
+      "name": "Border",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 25.0,
+        "height": 13.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:6154",
+      "parent_id": "I981:66796;185:29822;118:6152",
+      "depth": 5,
+      "name": "Cap",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 1.328037977218628,
+        "height": 4.075471878051758
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:6155",
+      "parent_id": "I981:66796;185:29822;118:6152",
+      "depth": 5,
+      "name": "Capacity",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 21.0,
+        "height": 9.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29822;118:7483",
+      "parent_id": "I981:66796;185:29822",
+      "depth": 3,
+      "name": "Rectangle 4",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 125.0,
+        "height": 37.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29823",
+      "parent_id": "981:66796",
+      "depth": 2,
+      "name": "Title and Controls",
+      "type": "STACK",
+      "children_count": 3,
+      "size": {
+        "width": 393.0,
+        "height": 44.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29824",
+      "parent_id": "I981:66796;185:29823",
+      "depth": 3,
+      "name": "Leading",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 87.0,
+        "height": 44.0
+      },
+      "componentName": "Leading"
+    },
+    {
+      "id": "I981:66796;185:29824;58:63222",
+      "parent_id": "I981:66796;185:29824",
+      "depth": 4,
+      "name": "Chevron",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 17.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29824;58:63223",
+      "parent_id": "I981:66796;185:29824",
+      "depth": 4,
+      "name": "Label",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 51.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29826",
+      "parent_id": "I981:66796;185:29823",
+      "depth": 3,
+      "name": "_Controls/Trailing/Close Button",
+      "type": "BUTTON",
+      "children_count": 1,
+      "size": {
+        "width": 30.0,
+        "height": 30.0
+      },
+      "componentName": "_Controls/Trailing/Close Button"
+    },
+    {
+      "id": "I981:66796;185:29826;54:3908",
+      "parent_id": "I981:66796;185:29826",
+      "depth": 4,
+      "name": "X",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 30.0,
+        "height": 30.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29827",
+      "parent_id": "I981:66796;185:29823",
+      "depth": 3,
+      "name": "Уровень английского",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 49.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29828",
+      "parent_id": "981:66796",
+      "depth": 2,
+      "name": "Progress",
+      "type": "STACK",
+      "children_count": 2,
+      "size": {
+        "width": 390.0,
+        "height": 18.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29829",
+      "parent_id": "I981:66796;185:29828",
+      "depth": 3,
+      "name": " ",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 194.0,
+        "height": 2.0
+      }
+    },
+    {
+      "id": "I981:66796;185:29830",
+      "parent_id": "I981:66796;185:29828",
+      "depth": 3,
+      "name": " ",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 148.0,
+        "height": 2.0
+      }
+    },
+    {
+      "id": "981:66797",
+      "parent_id": "981:66795",
+      "depth": 1,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 610.0
+      }
+    },
+    {
+      "id": "981:66798",
+      "parent_id": "981:66797",
+      "depth": 2,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 2,
+      "size": {
+        "width": 393.0,
+        "height": 610.0
+      }
+    },
+    {
+      "id": "981:66799",
+      "parent_id": "981:66798",
+      "depth": 3,
+      "name": " ",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 167.0
+      }
+    },
+    {
+      "id": "981:66800",
+      "parent_id": "981:66799",
+      "depth": 4,
+      "name": " ",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 167.0
+      }
+    },
+    {
+      "id": "981:66801",
+      "parent_id": "981:66800",
+      "depth": 5,
+      "name": " ",
+      "type": "STACK",
+      "children_count": 6,
+      "size": {
+        "width": 361.0,
+        "height": 167.0
+      }
+    },
+    {
+      "id": "981:66802",
+      "parent_id": "981:66801",
+      "depth": 6,
+      "name": "Unplayed",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 316.0,
+        "height": 4.0
+      }
+    },
+    {
+      "id": "981:66803",
+      "parent_id": "981:66801",
+      "depth": 6,
+      "name": "Played",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 124.0,
+        "height": 4.0
+      }
+    },
+    {
+      "id": "981:66804",
+      "parent_id": "981:66801",
+      "depth": 6,
+      "name": "Ellipse 4",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 20.0,
+        "height": 20.0
+      }
+    },
+    {
+      "id": "981:66805",
+      "parent_id": "981:66801",
+      "depth": 6,
+      "name": "Played time",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 31.0,
+        "height": 17.0
+      }
+    },
+    {
+      "id": "981:66806",
+      "parent_id": "981:66801",
+      "depth": 6,
+      "name": "Time left",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 41.0,
+        "height": 17.0
+      }
+    },
+    {
+      "id": "981:66807",
+      "parent_id": "981:66801",
+      "depth": 6,
+      "name": "Controls",
+      "type": "ROW",
+      "children_count": 3,
+      "size": {
+        "width": 212.0,
+        "height": 68.0
+      }
+    },
+    {
+      "id": "981:66808",
+      "parent_id": "981:66807",
+      "depth": 7,
+      "name": "Backwards",
+      "type": "STACK",
+      "children_count": 3,
+      "size": {
+        "width": 40.0,
+        "height": 40.0
+      }
+    },
+    {
+      "id": "981:66809",
+      "parent_id": "981:66808",
+      "depth": 8,
+      "name": "Ellipse 3",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 40.0,
+        "height": 40.0
+      }
+    },
+    {
+      "id": "981:66810",
+      "parent_id": "981:66808",
+      "depth": 8,
+      "name": "Time",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 40.0,
+        "height": 40.0
+      }
+    },
+    {
+      "id": "981:66811",
+      "parent_id": "981:66808",
+      "depth": 8,
+      "name": "Vector 2",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 9.0,
+        "height": 11.25
+      }
+    },
+    {
+      "id": "981:66812",
+      "parent_id": "981:66807",
+      "depth": 7,
+      "name": "Play pause button",
+      "type": "BUTTON",
+      "children_count": 2,
+      "size": {
+        "width": 68.0,
+        "height": 68.0
+      }
+    },
+    {
+      "id": "981:66813",
+      "parent_id": "981:66812",
+      "depth": 8,
+      "name": "Ellipse 1",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 68.0,
+        "height": 68.0
+      }
+    },
+    {
+      "id": "981:66814",
+      "parent_id": "981:66812",
+      "depth": 8,
+      "name": "play_arrow_48dp_FILL1_wght400_GRAD0_opsz48 1",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 48.0,
+        "height": 48.0
+      }
+    },
+    {
+      "id": "981:66815",
+      "parent_id": "981:66814",
+      "depth": 9,
+      "name": "Vector",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 22.0,
+        "height": 28.0
+      }
+    },
+    {
+      "id": "981:66816",
+      "parent_id": "981:66807",
+      "depth": 7,
+      "name": "Backwards",
+      "type": "STACK",
+      "children_count": 3,
+      "size": {
+        "width": 40.0,
+        "height": 40.0
+      }
+    },
+    {
+      "id": "981:66817",
+      "parent_id": "981:66816",
+      "depth": 8,
+      "name": "Ellipse 3",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 40.0,
+        "height": 40.0
+      }
+    },
+    {
+      "id": "981:66818",
+      "parent_id": "981:66816",
+      "depth": 8,
+      "name": "Time",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 40.0,
+        "height": 40.0
+      }
+    },
+    {
+      "id": "981:66819",
+      "parent_id": "981:66816",
+      "depth": 8,
+      "name": "Vector 2",
+      "type": "VECTOR",
+      "children_count": 0,
+      "size": {
+        "width": 9.0,
+        "height": 11.25
+      }
+    },
+    {
+      "id": "981:66820",
+      "parent_id": "981:66798",
+      "depth": 3,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 2,
+      "size": {
+        "width": 393.0,
+        "height": 279.0
+      }
+    },
+    {
+      "id": "981:66821",
+      "parent_id": "981:66820",
+      "depth": 4,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66822",
+      "parent_id": "981:66821",
+      "depth": 5,
+      "name": "О чем говорится в аудио?",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 393.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66823",
+      "parent_id": "981:66820",
+      "depth": 4,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 4,
+      "size": {
+        "width": 393.0,
+        "height": 248.0
+      }
+    },
+    {
+      "id": "981:66824",
+      "parent_id": "981:66823",
+      "depth": 5,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66825",
+      "parent_id": "981:66824",
+      "depth": 6,
+      "name": "Slot",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 361.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66826",
+      "parent_id": "981:66825",
+      "depth": 7,
+      "name": "Body",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 313.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66827",
+      "parent_id": "981:66826",
+      "depth": 8,
+      "name": "Had been written",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 189.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66829",
+      "parent_id": "981:66825",
+      "depth": 7,
+      "name": "Accessories and Grabber",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 24.0,
+        "height": 24.0
+      }
+    },
+    {
+      "id": "981:66830",
+      "parent_id": "981:66829",
+      "depth": 8,
+      "name": "Contents - Trailing",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 36.0,
+        "height": 32.0
+      },
+      "componentName": "Contents - Trailing"
+    },
+    {
+      "id": "I981:66830;212:117598",
+      "parent_id": "981:66830",
+      "depth": 9,
+      "name": "Detail",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 45.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "I981:66830;212:124673",
+      "parent_id": "981:66830",
+      "depth": 9,
+      "name": "Drill-in",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 8.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "I981:66830;212:124674",
+      "parent_id": "I981:66830;212:124673",
+      "depth": 10,
+      "name": "Drill-in",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 11.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "981:66833",
+      "parent_id": "981:66823",
+      "depth": 5,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66834",
+      "parent_id": "981:66833",
+      "depth": 6,
+      "name": "Slot",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 361.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66835",
+      "parent_id": "981:66834",
+      "depth": 7,
+      "name": "Body",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 313.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66836",
+      "parent_id": "981:66835",
+      "depth": 8,
+      "name": "Had written",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 189.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66838",
+      "parent_id": "981:66834",
+      "depth": 7,
+      "name": "Accessories and Grabber",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 24.0,
+        "height": 24.0
+      }
+    },
+    {
+      "id": "981:66839",
+      "parent_id": "981:66838",
+      "depth": 8,
+      "name": "Contents - Trailing",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 36.0,
+        "height": 32.0
+      },
+      "componentName": "Contents - Trailing"
+    },
+    {
+      "id": "I981:66839;212:117598",
+      "parent_id": "981:66839",
+      "depth": 9,
+      "name": "Detail",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 45.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "I981:66839;212:124673",
+      "parent_id": "981:66839",
+      "depth": 9,
+      "name": "Drill-in",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 8.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "I981:66839;212:124674",
+      "parent_id": "I981:66839;212:124673",
+      "depth": 10,
+      "name": "Drill-in",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 11.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "981:66842",
+      "parent_id": "981:66823",
+      "depth": 5,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66843",
+      "parent_id": "981:66842",
+      "depth": 6,
+      "name": "Slot",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 361.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66844",
+      "parent_id": "981:66843",
+      "depth": 7,
+      "name": "Body",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 313.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66845",
+      "parent_id": "981:66844",
+      "depth": 8,
+      "name": "Has been written",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 189.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66847",
+      "parent_id": "981:66843",
+      "depth": 7,
+      "name": "Accessories and Grabber",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 24.0,
+        "height": 24.0
+      }
+    },
+    {
+      "id": "981:66848",
+      "parent_id": "981:66847",
+      "depth": 8,
+      "name": "Contents - Trailing",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 36.0,
+        "height": 32.0
+      },
+      "componentName": "Contents - Trailing"
+    },
+    {
+      "id": "I981:66848;212:117598",
+      "parent_id": "981:66848",
+      "depth": 9,
+      "name": "Detail",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 45.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "I981:66848;212:124673",
+      "parent_id": "981:66848",
+      "depth": 9,
+      "name": "Drill-in",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 8.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "I981:66848;212:124674",
+      "parent_id": "I981:66848;212:124673",
+      "depth": 10,
+      "name": "Drill-in",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 11.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "981:66851",
+      "parent_id": "981:66823",
+      "depth": 5,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66852",
+      "parent_id": "981:66851",
+      "depth": 6,
+      "name": "Slot",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 361.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66853",
+      "parent_id": "981:66852",
+      "depth": 7,
+      "name": "Body",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 313.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66854",
+      "parent_id": "981:66853",
+      "depth": 8,
+      "name": "Was written",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 189.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66856",
+      "parent_id": "981:66852",
+      "depth": 7,
+      "name": "Accessories and Grabber",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 24.0,
+        "height": 24.0
+      }
+    },
+    {
+      "id": "981:66857",
+      "parent_id": "981:66856",
+      "depth": 8,
+      "name": "Contents - Trailing",
+      "type": "ROW",
+      "children_count": 2,
+      "size": {
+        "width": 36.0,
+        "height": 32.0
+      },
+      "componentName": "Contents - Trailing"
+    },
+    {
+      "id": "I981:66857;212:117598",
+      "parent_id": "981:66857",
+      "depth": 9,
+      "name": "Detail",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 45.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "I981:66857;212:124673",
+      "parent_id": "981:66857",
+      "depth": 9,
+      "name": "Drill-in",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 8.0,
+        "height": 32.0
+      }
+    },
+    {
+      "id": "I981:66857;212:124674",
+      "parent_id": "I981:66857;212:124673",
+      "depth": 10,
+      "name": "Drill-in",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 11.0,
+        "height": 22.0
+      }
+    },
+    {
+      "id": "981:66860",
+      "parent_id": "981:66795",
+      "depth": 1,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 2,
+      "size": {
+        "width": 393.0,
+        "height": 114.0
+      }
+    },
+    {
+      "id": "981:66861",
+      "parent_id": "981:66860",
+      "depth": 2,
+      "name": " ",
+      "type": "ROW",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 56.0
+      }
+    },
+    {
+      "id": "981:66862",
+      "parent_id": "981:66861",
+      "depth": 3,
+      "name": "Button",
+      "type": "BUTTON",
+      "children_count": 1,
+      "size": {
+        "width": 361.0,
+        "height": 56.0
+      },
+      "componentName": "Button"
+    },
+    {
+      "id": "I981:66862;1866:23605",
+      "parent_id": "981:66862",
+      "depth": 4,
+      "name": " ",
+      "type": "COLUMN",
+      "children_count": 1,
+      "size": {
+        "width": 87.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "I981:66862;111:16845",
+      "parent_id": "I981:66862;1866:23605",
+      "depth": 5,
+      "name": "Text",
+      "type": "TEXT",
+      "children_count": 0,
+      "size": {
+        "width": 87.0,
+        "height": 19.0
+      }
+    },
+    {
+      "id": "981:66863",
+      "parent_id": "981:66860",
+      "depth": 2,
+      "name": "iOS / NavBar",
+      "type": "STACK",
+      "children_count": 1,
+      "size": {
+        "width": 393.0,
+        "height": 34.0
+      },
+      "componentName": "iOS / NavBar"
+    },
+    {
+      "id": "I981:66863;21:3527",
+      "parent_id": "981:66863",
+      "depth": 3,
+      "name": "Home Indicator",
+      "type": "CONTAINER",
+      "children_count": 0,
+      "size": {
+        "width": 134.0,
+        "height": 5.0
+      }
+    }
+  ],
+  "textInventory": [
+    {
+      "id": "I981:66796;185:29822;118:6150",
+      "parent_id": "I981:66796;185:29822;118:6149",
+      "text": "9:41",
+      "name": "Time",
+      "bounds": {
+        "left": 11146.923828125,
+        "top": 12064.33984375,
+        "width": 37.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "9:41",
+      "style": {
+        "fontSize": 17.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "CENTER",
+        "fontFamily": "SF Pro Text"
+      }
+    },
+    {
+      "id": "I981:66796;185:29826;54:3908",
+      "parent_id": "I981:66796;185:29826",
+      "text": "􀅾",
+      "name": "X",
+      "bounds": {
+        "left": 11442.0,
+        "top": 12107.0,
+        "width": 30.0,
+        "height": 30.0
+      },
+      "accessibilityLabel": "􀅾",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF000000",
+        "textAlign": "CENTER",
+        "fontFamily": "SF Pro Text"
+      }
+    },
+    {
+      "id": "I981:66796;185:29824;58:63222",
+      "parent_id": "I981:66796;185:29824",
+      "text": "􀆉",
+      "name": "Chevron",
+      "bounds": {
+        "left": 11111.0,
+        "top": 12111.0,
+        "width": 17.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "􀆉",
+      "style": {
+        "fontSize": 17.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF6B48A3",
+        "textAlign": "CENTER",
+        "fontFamily": "SF Pro Text"
+      }
+    },
+    {
+      "id": "I981:66796;185:29824;58:63223",
+      "parent_id": "I981:66796;185:29824",
+      "text": "Назад",
+      "name": "Label",
+      "bounds": {
+        "left": 11131.0,
+        "top": 12112.5,
+        "width": 51.0,
+        "height": 19.0
+      },
+      "accessibilityLabel": "Назад",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w500",
+        "textColor": "0xFF6B48A3",
+        "textAlign": "LEFT",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "I981:66796;185:29827",
+      "parent_id": "I981:66796;185:29823",
+      "text": "Урок 1",
+      "name": "Уровень английского",
+      "bounds": {
+        "left": 11268.0,
+        "top": 12112.5,
+        "width": 49.0,
+        "height": 19.0
+      },
+      "accessibilityLabel": "Урок 1",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF19191A",
+        "textAlign": "CENTER",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "981:66805",
+      "parent_id": "981:66801",
+      "text": "11:23",
+      "name": "Played time",
+      "bounds": {
+        "left": 11127.0,
+        "top": 12220.0,
+        "width": 31.0,
+        "height": 17.0
+      },
+      "accessibilityLabel": "11:23",
+      "style": {
+        "fontSize": 14.0,
+        "fontWeight": "w500",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "LEFT",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "981:66806",
+      "parent_id": "981:66801",
+      "text": "-21:42",
+      "name": "Time left",
+      "bounds": {
+        "left": 11394.0,
+        "top": 12220.0,
+        "width": 41.0,
+        "height": 17.0
+      },
+      "accessibilityLabel": "-21:42",
+      "style": {
+        "fontSize": 14.0,
+        "fontWeight": "w500",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "RIGHT",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "981:66810",
+      "parent_id": "981:66808",
+      "text": "5",
+      "name": "Time",
+      "bounds": {
+        "left": 11185.5,
+        "top": 12263.0,
+        "width": 40.0,
+        "height": 40.0
+      },
+      "accessibilityLabel": "5",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w600",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "CENTER",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "981:66818",
+      "parent_id": "981:66816",
+      "text": "5",
+      "name": "Time",
+      "bounds": {
+        "left": 11357.5,
+        "top": 12263.0,
+        "width": 40.0,
+        "height": 40.0
+      },
+      "accessibilityLabel": "5",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w600",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "CENTER",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "981:66822",
+      "parent_id": "981:66821",
+      "text": "О чем говорится в аудио?",
+      "name": "О чем говорится в аудио?",
+      "bounds": {
+        "left": 11095.0,
+        "top": 12365.0,
+        "width": 393.0,
+        "height": 19.0
+      },
+      "accessibilityLabel": "О чем говорится в аудио?",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w600",
+        "textColor": "0xFF19191A",
+        "textAlign": "CENTER",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "I981:66830;212:124674",
+      "parent_id": "I981:66830;212:124673",
+      "text": "􀆊",
+      "name": "Drill-in",
+      "bounds": {
+        "left": 11444.0,
+        "top": 12413.0,
+        "width": 11.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "􀆊",
+      "style": {
+        "fontSize": 17.0,
+        "fontWeight": "w600",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "CENTER",
+        "fontFamily": "SF Pro Text"
+      }
+    },
+    {
+      "id": "I981:66839;212:124674",
+      "parent_id": "I981:66839;212:124673",
+      "text": "􀆊",
+      "name": "Drill-in",
+      "bounds": {
+        "left": 11444.0,
+        "top": 12413.0,
+        "width": 11.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "􀆊",
+      "style": {
+        "fontSize": 17.0,
+        "fontWeight": "w600",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "CENTER",
+        "fontFamily": "SF Pro Text"
+      }
+    },
+    {
+      "id": "I981:66848;212:124674",
+      "parent_id": "I981:66848;212:124673",
+      "text": "􀆊",
+      "name": "Drill-in",
+      "bounds": {
+        "left": 11444.0,
+        "top": 12413.0,
+        "width": 11.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "􀆊",
+      "style": {
+        "fontSize": 17.0,
+        "fontWeight": "w600",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "CENTER",
+        "fontFamily": "SF Pro Text"
+      }
+    },
+    {
+      "id": "I981:66857;212:124674",
+      "parent_id": "I981:66857;212:124673",
+      "text": "􀆊",
+      "name": "Drill-in",
+      "bounds": {
+        "left": 11444.0,
+        "top": 12413.0,
+        "width": 11.0,
+        "height": 22.0
+      },
+      "accessibilityLabel": "􀆊",
+      "style": {
+        "fontSize": 17.0,
+        "fontWeight": "w600",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "CENTER",
+        "fontFamily": "SF Pro Text"
+      }
+    },
+    {
+      "id": "981:66827",
+      "parent_id": "981:66826",
+      "text": "Had been written",
+      "name": "Had been written",
+      "bounds": {
+        "left": 11127.0,
+        "top": 12414.5,
+        "width": 189.0,
+        "height": 19.0
+      },
+      "accessibilityLabel": "Had been written",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w500",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "LEFT",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "981:66836",
+      "parent_id": "981:66835",
+      "text": "Had written",
+      "name": "Had written",
+      "bounds": {
+        "left": 11127.0,
+        "top": 12478.5,
+        "width": 189.0,
+        "height": 19.0
+      },
+      "accessibilityLabel": "Had written",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w500",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "LEFT",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "981:66845",
+      "parent_id": "981:66844",
+      "text": "Has been written",
+      "name": "Has been written",
+      "bounds": {
+        "left": 11127.0,
+        "top": 12542.5,
+        "width": 189.0,
+        "height": 19.0
+      },
+      "accessibilityLabel": "Has been written",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w500",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "LEFT",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "981:66854",
+      "parent_id": "981:66853",
+      "text": "Was written",
+      "name": "Was written",
+      "bounds": {
+        "left": 11127.0,
+        "top": 12606.5,
+        "width": 189.0,
+        "height": 19.0
+      },
+      "accessibilityLabel": "Was written",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w500",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "LEFT",
+        "fontFamily": "Nekst"
+      }
+    },
+    {
+      "id": "I981:66862;111:16845",
+      "parent_id": "I981:66862;1866:23605",
+      "text": "Проверить",
+      "name": "Text",
+      "bounds": {
+        "left": 11248.0,
+        "top": 12802.5,
+        "width": 87.0,
+        "height": 19.0
+      },
+      "accessibilityLabel": "Проверить",
+      "style": {
+        "fontSize": 16.0,
+        "fontWeight": "w500",
+        "textColor": "0xFFFFFFFF",
+        "textAlign": "CENTER",
+        "fontFamily": "Nekst"
+      }
+    }
+  ],
+  "componentInventory": [
+    {
+      "id": "981:66796",
+      "parent_id": "981:66795",
+      "name": "Nav",
+      "type": "COLUMN",
+      "bounds": {
+        "left": 11095.0,
+        "top": 12046.0,
+        "width": 393.0,
+        "height": 128.0
+      },
+      "children_count": 3,
+      "componentRef": "185:29821",
+      "componentName": "Nav",
+      "variantProperties": {
+        "Type": "White"
+      }
+    },
+    {
+      "id": "I981:66796;185:29822",
+      "parent_id": "981:66796",
+      "name": "Status Bar Dynamic Island",
+      "type": "STACK",
+      "bounds": {
+        "left": 11095.0,
+        "top": 12046.0,
+        "width": 393.0,
+        "height": 54.0
+      },
+      "children_count": 3,
+      "componentRef": "118:6158",
+      "componentName": "Status Bar Dynamic Island",
+      "variantProperties": {
+        "Type": "Day"
+      }
+    },
+    {
+      "id": "I981:66796;185:29824",
+      "parent_id": "I981:66796;185:29823",
+      "name": "Leading",
+      "type": "ROW",
+      "bounds": {
+        "left": 11103.0,
+        "top": 12100.0,
+        "width": 87.0,
+        "height": 44.0
+      },
+      "children_count": 2,
+      "componentRef": "38:5610",
+      "componentName": "Leading",
+      "variantProperties": {
+        "Symbol#2:40": "􀓔",
+        "Label#1:14": "Label",
+        "Left Label#2:24": "Назад",
+        "Enabled": "True"
+      }
+    },
+    {
+      "id": "I981:66796;185:29826",
+      "parent_id": "I981:66796;185:29823",
+      "name": "_Controls/Trailing/Close Button",
+      "type": "BUTTON",
+      "bounds": {
+        "left": 11442.0,
+        "top": 12107.0,
+        "width": 30.0,
+        "height": 30.0
+      },
+      "children_count": 1,
+      "componentRef": "54:3907",
+      "componentName": "_Controls/Trailing/Close Button",
+      "variantProperties": {
+        "Mode": "Light",
+        "Vibrant": "False"
+      }
+    },
+    {
+      "id": "981:66830",
+      "parent_id": "981:66829",
+      "name": "Contents - Trailing",
+      "type": "ROW",
+      "bounds": {
+        "left": 11434.0,
+        "top": 12408.0,
+        "width": 36.0,
+        "height": 32.0
+      },
+      "children_count": 2,
+      "componentRef": "38:5773",
+      "componentName": "Contents - Trailing",
+      "variantProperties": {
+        "Button Label#212:66": "Button",
+        "Detail Text#508:54": "Detail",
+        "Show Drill-in#212:3": "True",
+        "Show Detail#212:8": "True",
+        "Show Info#212:7": "False",
+        "Show Checkmark#212:4": "False",
+        "Show Symbol#212:5": "False",
+        "Type": "Default"
+      }
+    },
+    {
+      "id": "981:66839",
+      "parent_id": "981:66838",
+      "name": "Contents - Trailing",
+      "type": "ROW",
+      "bounds": {
+        "left": 11434.0,
+        "top": 12408.0,
+        "width": 36.0,
+        "height": 32.0
+      },
+      "children_count": 2,
+      "componentRef": "38:5773",
+      "componentName": "Contents - Trailing",
+      "variantProperties": {
+        "Button Label#212:66": "Button",
+        "Detail Text#508:54": "Detail",
+        "Show Drill-in#212:3": "True",
+        "Show Detail#212:8": "True",
+        "Show Info#212:7": "False",
+        "Show Checkmark#212:4": "False",
+        "Show Symbol#212:5": "False",
+        "Type": "Default"
+      }
+    },
+    {
+      "id": "981:66848",
+      "parent_id": "981:66847",
+      "name": "Contents - Trailing",
+      "type": "ROW",
+      "bounds": {
+        "left": 11434.0,
+        "top": 12408.0,
+        "width": 36.0,
+        "height": 32.0
+      },
+      "children_count": 2,
+      "componentRef": "38:5773",
+      "componentName": "Contents - Trailing",
+      "variantProperties": {
+        "Button Label#212:66": "Button",
+        "Detail Text#508:54": "Detail",
+        "Show Drill-in#212:3": "True",
+        "Show Detail#212:8": "True",
+        "Show Info#212:7": "False",
+        "Show Checkmark#212:4": "False",
+        "Show Symbol#212:5": "False",
+        "Type": "Default"
+      }
+    },
+    {
+      "id": "981:66857",
+      "parent_id": "981:66856",
+      "name": "Contents - Trailing",
+      "type": "ROW",
+      "bounds": {
+        "left": 11434.0,
+        "top": 12408.0,
+        "width": 36.0,
+        "height": 32.0
+      },
+      "children_count": 2,
+      "componentRef": "38:5773",
+      "componentName": "Contents - Trailing",
+      "variantProperties": {
+        "Button Label#212:66": "Button",
+        "Detail Text#508:54": "Detail",
+        "Show Drill-in#212:3": "True",
+        "Show Detail#212:8": "True",
+        "Show Info#212:7": "False",
+        "Show Checkmark#212:4": "False",
+        "Show Symbol#212:5": "False",
+        "Type": "Default"
+      }
+    },
+    {
+      "id": "981:66862",
+      "parent_id": "981:66861",
+      "name": "Button",
+      "type": "BUTTON",
+      "bounds": {
+        "left": 11111.0,
+        "top": 12784.0,
+        "width": 361.0,
+        "height": 56.0
+      },
+      "children_count": 1,
+      "componentRef": "111:16846",
+      "componentName": "Button",
+      "variantProperties": {
+        "Type": "Primary"
+      }
+    },
+    {
+      "id": "981:66863",
+      "parent_id": "981:66860",
+      "name": "iOS / NavBar",
+      "type": "STACK",
+      "bounds": {
+        "left": 11095.0,
+        "top": 12864.0,
+        "width": 393.0,
+        "height": 34.0
+      },
+      "children_count": 1,
+      "componentRef": "21:3528",
+      "componentName": "iOS / NavBar"
+    }
+  ],
+  "relationshipHints": [
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66795",
+      "to_node_id": "981:66796",
+      "relation": "parent_child",
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66796",
+      "to_node_id": "981:66797",
+      "relation": "next_sibling",
+      "distance_px": 369.0,
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "981:66796",
+      "to_node_id": "981:66797",
+      "relation": "next_sibling_in_column",
+      "distance_px": 369.0,
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66796",
+      "to_node_id": "I981:66796;185:29822",
+      "relation": "parent_child",
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29822",
+      "to_node_id": "I981:66796;185:29823",
+      "relation": "next_sibling",
+      "distance_px": 49.0,
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "I981:66796;185:29822",
+      "to_node_id": "I981:66796;185:29823",
+      "relation": "next_sibling_in_column",
+      "distance_px": 49.0,
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822",
+      "to_node_id": "I981:66796;185:29822;118:6149",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6149",
+      "to_node_id": "I981:66796;185:29822;118:6151",
+      "relation": "next_sibling",
+      "distance_px": 252.5,
+      "parent_id": "I981:66796;185:29822"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822;118:6149",
+      "to_node_id": "I981:66796;185:29822;118:6150",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822;118:6149"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822",
+      "to_node_id": "I981:66796;185:29822;118:6151",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6151",
+      "to_node_id": "I981:66796;185:29822;118:6149",
+      "relation": "previous_sibling",
+      "distance_px": 252.5,
+      "parent_id": "I981:66796;185:29822"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6151",
+      "to_node_id": "I981:66796;185:29822;118:7483",
+      "relation": "next_sibling",
+      "distance_px": 126.5,
+      "parent_id": "I981:66796;185:29822"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822;118:6151",
+      "to_node_id": "I981:66796;185:29822;118:6156",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822;118:6151"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6156",
+      "to_node_id": "I981:66796;185:29822;118:6157",
+      "relation": "next_sibling",
+      "distance_px": 25.67,
+      "parent_id": "I981:66796;185:29822;118:6151"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822;118:6151",
+      "to_node_id": "I981:66796;185:29822;118:6157",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822;118:6151"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6157",
+      "to_node_id": "I981:66796;185:29822;118:6156",
+      "relation": "previous_sibling",
+      "distance_px": 25.67,
+      "parent_id": "I981:66796;185:29822;118:6151"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6157",
+      "to_node_id": "I981:66796;185:29822;118:6152",
+      "relation": "next_sibling",
+      "distance_px": 55.06,
+      "parent_id": "I981:66796;185:29822;118:6151"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822;118:6151",
+      "to_node_id": "I981:66796;185:29822;118:6152",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822;118:6151"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6152",
+      "to_node_id": "I981:66796;185:29822;118:6157",
+      "relation": "previous_sibling",
+      "distance_px": 55.06,
+      "parent_id": "I981:66796;185:29822;118:6151"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822;118:6152",
+      "to_node_id": "I981:66796;185:29822;118:6153",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822;118:6152"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6153",
+      "to_node_id": "I981:66796;185:29822;118:6154",
+      "relation": "next_sibling",
+      "distance_px": 14.17,
+      "parent_id": "I981:66796;185:29822;118:6152"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822;118:6152",
+      "to_node_id": "I981:66796;185:29822;118:6154",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822;118:6152"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6154",
+      "to_node_id": "I981:66796;185:29822;118:6153",
+      "relation": "previous_sibling",
+      "distance_px": 14.17,
+      "parent_id": "I981:66796;185:29822;118:6152"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6154",
+      "to_node_id": "I981:66796;185:29822;118:6155",
+      "relation": "next_sibling",
+      "distance_px": 14.17,
+      "parent_id": "I981:66796;185:29822;118:6152"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822;118:6152",
+      "to_node_id": "I981:66796;185:29822;118:6155",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822;118:6152"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29822;118:6155",
+      "to_node_id": "I981:66796;185:29822;118:6154",
+      "relation": "previous_sibling",
+      "distance_px": 14.17,
+      "parent_id": "I981:66796;185:29822;118:6152"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29822",
+      "to_node_id": "I981:66796;185:29822;118:7483",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29822"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29822;118:7483",
+      "to_node_id": "I981:66796;185:29822;118:6151",
+      "relation": "previous_sibling",
+      "distance_px": 126.5,
+      "parent_id": "I981:66796;185:29822"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66796",
+      "to_node_id": "I981:66796;185:29823",
+      "relation": "parent_child",
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29823",
+      "to_node_id": "I981:66796;185:29822",
+      "relation": "previous_sibling",
+      "distance_px": 49.0,
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "I981:66796;185:29823",
+      "to_node_id": "I981:66796;185:29822",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 49.0,
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29823",
+      "to_node_id": "I981:66796;185:29828",
+      "relation": "next_sibling",
+      "distance_px": 31.04,
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "I981:66796;185:29823",
+      "to_node_id": "I981:66796;185:29828",
+      "relation": "next_sibling_in_column",
+      "distance_px": 31.04,
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29823",
+      "to_node_id": "I981:66796;185:29824",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29823"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29824",
+      "to_node_id": "I981:66796;185:29826",
+      "relation": "next_sibling",
+      "distance_px": 310.5,
+      "parent_id": "I981:66796;185:29823"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29824",
+      "to_node_id": "I981:66796;185:29824;58:63222",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29824"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29824;58:63222",
+      "to_node_id": "I981:66796;185:29824;58:63223",
+      "relation": "next_sibling",
+      "distance_px": 37.0,
+      "parent_id": "I981:66796;185:29824"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29824",
+      "to_node_id": "I981:66796;185:29824;58:63223",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29824"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29824;58:63223",
+      "to_node_id": "I981:66796;185:29824;58:63222",
+      "relation": "previous_sibling",
+      "distance_px": 37.0,
+      "parent_id": "I981:66796;185:29824"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29823",
+      "to_node_id": "I981:66796;185:29826",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29823"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29826",
+      "to_node_id": "I981:66796;185:29824",
+      "relation": "previous_sibling",
+      "distance_px": 310.5,
+      "parent_id": "I981:66796;185:29823"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29826",
+      "to_node_id": "I981:66796;185:29827",
+      "relation": "next_sibling",
+      "distance_px": 164.5,
+      "parent_id": "I981:66796;185:29823"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29826",
+      "to_node_id": "I981:66796;185:29826;54:3908",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29826"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29823",
+      "to_node_id": "I981:66796;185:29827",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29823"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29827",
+      "to_node_id": "I981:66796;185:29826",
+      "relation": "previous_sibling",
+      "distance_px": 164.5,
+      "parent_id": "I981:66796;185:29823"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66796",
+      "to_node_id": "I981:66796;185:29828",
+      "relation": "parent_child",
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29828",
+      "to_node_id": "I981:66796;185:29823",
+      "relation": "previous_sibling",
+      "distance_px": 31.04,
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "I981:66796;185:29828",
+      "to_node_id": "I981:66796;185:29823",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 31.04,
+      "parent_id": "981:66796"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29828",
+      "to_node_id": "I981:66796;185:29829",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29828"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66796;185:29829",
+      "to_node_id": "I981:66796;185:29830",
+      "relation": "next_sibling",
+      "distance_px": 171.0,
+      "parent_id": "I981:66796;185:29828"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66796;185:29828",
+      "to_node_id": "I981:66796;185:29830",
+      "relation": "parent_child",
+      "parent_id": "I981:66796;185:29828"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66796;185:29830",
+      "to_node_id": "I981:66796;185:29829",
+      "relation": "previous_sibling",
+      "distance_px": 171.0,
+      "parent_id": "I981:66796;185:29828"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66795",
+      "to_node_id": "981:66797",
+      "relation": "parent_child",
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66797",
+      "to_node_id": "981:66796",
+      "relation": "previous_sibling",
+      "distance_px": 369.0,
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "981:66797",
+      "to_node_id": "981:66796",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 369.0,
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66797",
+      "to_node_id": "981:66860",
+      "relation": "next_sibling",
+      "distance_px": 362.0,
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "981:66797",
+      "to_node_id": "981:66860",
+      "relation": "next_sibling_in_column",
+      "distance_px": 362.0,
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66797",
+      "to_node_id": "981:66798",
+      "relation": "parent_child",
+      "parent_id": "981:66797"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66798",
+      "to_node_id": "981:66799",
+      "relation": "parent_child",
+      "parent_id": "981:66798"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66799",
+      "to_node_id": "981:66820",
+      "relation": "next_sibling",
+      "distance_px": 247.0,
+      "parent_id": "981:66798"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "981:66799",
+      "to_node_id": "981:66820",
+      "relation": "next_sibling_in_column",
+      "distance_px": 247.0,
+      "parent_id": "981:66798"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66799",
+      "to_node_id": "981:66800",
+      "relation": "parent_child",
+      "parent_id": "981:66799"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66800",
+      "to_node_id": "981:66801",
+      "relation": "parent_child",
+      "parent_id": "981:66800"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66801",
+      "to_node_id": "981:66802",
+      "relation": "parent_child",
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66802",
+      "to_node_id": "981:66803",
+      "relation": "next_sibling",
+      "distance_px": 96.0,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66801",
+      "to_node_id": "981:66803",
+      "relation": "parent_child",
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66803",
+      "to_node_id": "981:66802",
+      "relation": "previous_sibling",
+      "distance_px": 96.0,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66803",
+      "to_node_id": "981:66804",
+      "relation": "next_sibling",
+      "distance_px": 70.01,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66801",
+      "to_node_id": "981:66804",
+      "relation": "parent_child",
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66804",
+      "to_node_id": "981:66803",
+      "relation": "previous_sibling",
+      "distance_px": 70.01,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66804",
+      "to_node_id": "981:66805",
+      "relation": "next_sibling",
+      "distance_px": 118.47,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66801",
+      "to_node_id": "981:66805",
+      "relation": "parent_child",
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66805",
+      "to_node_id": "981:66804",
+      "relation": "previous_sibling",
+      "distance_px": 118.47,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66805",
+      "to_node_id": "981:66806",
+      "relation": "next_sibling",
+      "distance_px": 272.0,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66801",
+      "to_node_id": "981:66806",
+      "relation": "parent_child",
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66806",
+      "to_node_id": "981:66805",
+      "relation": "previous_sibling",
+      "distance_px": 272.0,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66806",
+      "to_node_id": "981:66807",
+      "relation": "next_sibling",
+      "distance_px": 134.53,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66801",
+      "to_node_id": "981:66807",
+      "relation": "parent_child",
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66807",
+      "to_node_id": "981:66806",
+      "relation": "previous_sibling",
+      "distance_px": 134.53,
+      "parent_id": "981:66801"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66807",
+      "to_node_id": "981:66808",
+      "relation": "parent_child",
+      "parent_id": "981:66807"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66808",
+      "to_node_id": "981:66812",
+      "relation": "next_sibling",
+      "distance_px": 86.0,
+      "parent_id": "981:66807"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66808",
+      "to_node_id": "981:66809",
+      "relation": "parent_child",
+      "parent_id": "981:66808"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66809",
+      "to_node_id": "981:66810",
+      "relation": "next_sibling",
+      "distance_px": 0.0,
+      "parent_id": "981:66808"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66808",
+      "to_node_id": "981:66810",
+      "relation": "parent_child",
+      "parent_id": "981:66808"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66810",
+      "to_node_id": "981:66809",
+      "relation": "previous_sibling",
+      "distance_px": 0.0,
+      "parent_id": "981:66808"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66810",
+      "to_node_id": "981:66811",
+      "relation": "next_sibling",
+      "distance_px": 18.67,
+      "parent_id": "981:66808"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66808",
+      "to_node_id": "981:66811",
+      "relation": "parent_child",
+      "parent_id": "981:66808"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66811",
+      "to_node_id": "981:66810",
+      "relation": "previous_sibling",
+      "distance_px": 18.67,
+      "parent_id": "981:66808"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66807",
+      "to_node_id": "981:66812",
+      "relation": "parent_child",
+      "parent_id": "981:66807"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66812",
+      "to_node_id": "981:66808",
+      "relation": "previous_sibling",
+      "distance_px": 86.0,
+      "parent_id": "981:66807"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66812",
+      "to_node_id": "981:66816",
+      "relation": "next_sibling",
+      "distance_px": 86.0,
+      "parent_id": "981:66807"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66812",
+      "to_node_id": "981:66813",
+      "relation": "parent_child",
+      "parent_id": "981:66812"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66813",
+      "to_node_id": "981:66814",
+      "relation": "next_sibling",
+      "distance_px": 0.0,
+      "parent_id": "981:66812"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66812",
+      "to_node_id": "981:66814",
+      "relation": "parent_child",
+      "parent_id": "981:66812"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66814",
+      "to_node_id": "981:66813",
+      "relation": "previous_sibling",
+      "distance_px": 0.0,
+      "parent_id": "981:66812"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66814",
+      "to_node_id": "981:66815",
+      "relation": "parent_child",
+      "parent_id": "981:66814"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66807",
+      "to_node_id": "981:66816",
+      "relation": "parent_child",
+      "parent_id": "981:66807"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66816",
+      "to_node_id": "981:66812",
+      "relation": "previous_sibling",
+      "distance_px": 86.0,
+      "parent_id": "981:66807"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66816",
+      "to_node_id": "981:66817",
+      "relation": "parent_child",
+      "parent_id": "981:66816"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66817",
+      "to_node_id": "981:66818",
+      "relation": "next_sibling",
+      "distance_px": 0.0,
+      "parent_id": "981:66816"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66816",
+      "to_node_id": "981:66818",
+      "relation": "parent_child",
+      "parent_id": "981:66816"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66818",
+      "to_node_id": "981:66817",
+      "relation": "previous_sibling",
+      "distance_px": 0.0,
+      "parent_id": "981:66816"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66818",
+      "to_node_id": "981:66819",
+      "relation": "next_sibling",
+      "distance_px": 18.67,
+      "parent_id": "981:66816"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66816",
+      "to_node_id": "981:66819",
+      "relation": "parent_child",
+      "parent_id": "981:66816"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66819",
+      "to_node_id": "981:66818",
+      "relation": "previous_sibling",
+      "distance_px": 18.67,
+      "parent_id": "981:66816"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66798",
+      "to_node_id": "981:66820",
+      "relation": "parent_child",
+      "parent_id": "981:66798"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66820",
+      "to_node_id": "981:66799",
+      "relation": "previous_sibling",
+      "distance_px": 247.0,
+      "parent_id": "981:66798"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "981:66820",
+      "to_node_id": "981:66799",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 247.0,
+      "parent_id": "981:66798"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66820",
+      "to_node_id": "981:66821",
+      "relation": "parent_child",
+      "parent_id": "981:66820"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66821",
+      "to_node_id": "981:66823",
+      "relation": "next_sibling",
+      "distance_px": 145.5,
+      "parent_id": "981:66820"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "981:66821",
+      "to_node_id": "981:66823",
+      "relation": "next_sibling_in_column",
+      "distance_px": 145.5,
+      "parent_id": "981:66820"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66821",
+      "to_node_id": "981:66822",
+      "relation": "parent_child",
+      "parent_id": "981:66821"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66820",
+      "to_node_id": "981:66823",
+      "relation": "parent_child",
+      "parent_id": "981:66820"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66823",
+      "to_node_id": "981:66821",
+      "relation": "previous_sibling",
+      "distance_px": 145.5,
+      "parent_id": "981:66820"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "981:66823",
+      "to_node_id": "981:66821",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 145.5,
+      "parent_id": "981:66820"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66823",
+      "to_node_id": "981:66824",
+      "relation": "parent_child",
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66824",
+      "to_node_id": "981:66833",
+      "relation": "next_sibling",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "981:66824",
+      "to_node_id": "981:66833",
+      "relation": "next_sibling_in_column",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66824",
+      "to_node_id": "981:66825",
+      "relation": "parent_child",
+      "parent_id": "981:66824"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66825",
+      "to_node_id": "981:66826",
+      "relation": "parent_child",
+      "parent_id": "981:66825"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66826",
+      "to_node_id": "981:66829",
+      "relation": "next_sibling",
+      "distance_px": 168.5,
+      "parent_id": "981:66825"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66826",
+      "to_node_id": "981:66827",
+      "relation": "parent_child",
+      "parent_id": "981:66826"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66825",
+      "to_node_id": "981:66829",
+      "relation": "parent_child",
+      "parent_id": "981:66825"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66829",
+      "to_node_id": "981:66826",
+      "relation": "previous_sibling",
+      "distance_px": 168.5,
+      "parent_id": "981:66825"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66829",
+      "to_node_id": "981:66830",
+      "relation": "parent_child",
+      "parent_id": "981:66829"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66830",
+      "to_node_id": "I981:66830;212:117598",
+      "relation": "parent_child",
+      "parent_id": "981:66830"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66830;212:117598",
+      "to_node_id": "I981:66830;212:124673",
+      "relation": "next_sibling",
+      "distance_px": 42.5,
+      "parent_id": "981:66830"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66830",
+      "to_node_id": "I981:66830;212:124673",
+      "relation": "parent_child",
+      "parent_id": "981:66830"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66830;212:124673",
+      "to_node_id": "I981:66830;212:117598",
+      "relation": "previous_sibling",
+      "distance_px": 42.5,
+      "parent_id": "981:66830"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66830;212:124673",
+      "to_node_id": "I981:66830;212:124674",
+      "relation": "parent_child",
+      "parent_id": "I981:66830;212:124673"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66823",
+      "to_node_id": "981:66833",
+      "relation": "parent_child",
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66833",
+      "to_node_id": "981:66824",
+      "relation": "previous_sibling",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "981:66833",
+      "to_node_id": "981:66824",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66833",
+      "to_node_id": "981:66842",
+      "relation": "next_sibling",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "981:66833",
+      "to_node_id": "981:66842",
+      "relation": "next_sibling_in_column",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66833",
+      "to_node_id": "981:66834",
+      "relation": "parent_child",
+      "parent_id": "981:66833"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66834",
+      "to_node_id": "981:66835",
+      "relation": "parent_child",
+      "parent_id": "981:66834"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66835",
+      "to_node_id": "981:66838",
+      "relation": "next_sibling",
+      "distance_px": 168.5,
+      "parent_id": "981:66834"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66835",
+      "to_node_id": "981:66836",
+      "relation": "parent_child",
+      "parent_id": "981:66835"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66834",
+      "to_node_id": "981:66838",
+      "relation": "parent_child",
+      "parent_id": "981:66834"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66838",
+      "to_node_id": "981:66835",
+      "relation": "previous_sibling",
+      "distance_px": 168.5,
+      "parent_id": "981:66834"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66838",
+      "to_node_id": "981:66839",
+      "relation": "parent_child",
+      "parent_id": "981:66838"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66839",
+      "to_node_id": "I981:66839;212:117598",
+      "relation": "parent_child",
+      "parent_id": "981:66839"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66839;212:117598",
+      "to_node_id": "I981:66839;212:124673",
+      "relation": "next_sibling",
+      "distance_px": 42.5,
+      "parent_id": "981:66839"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66839",
+      "to_node_id": "I981:66839;212:124673",
+      "relation": "parent_child",
+      "parent_id": "981:66839"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66839;212:124673",
+      "to_node_id": "I981:66839;212:117598",
+      "relation": "previous_sibling",
+      "distance_px": 42.5,
+      "parent_id": "981:66839"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66839;212:124673",
+      "to_node_id": "I981:66839;212:124674",
+      "relation": "parent_child",
+      "parent_id": "I981:66839;212:124673"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66823",
+      "to_node_id": "981:66842",
+      "relation": "parent_child",
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66842",
+      "to_node_id": "981:66833",
+      "relation": "previous_sibling",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "981:66842",
+      "to_node_id": "981:66833",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66842",
+      "to_node_id": "981:66851",
+      "relation": "next_sibling",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "981:66842",
+      "to_node_id": "981:66851",
+      "relation": "next_sibling_in_column",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66842",
+      "to_node_id": "981:66843",
+      "relation": "parent_child",
+      "parent_id": "981:66842"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66843",
+      "to_node_id": "981:66844",
+      "relation": "parent_child",
+      "parent_id": "981:66843"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66844",
+      "to_node_id": "981:66847",
+      "relation": "next_sibling",
+      "distance_px": 168.5,
+      "parent_id": "981:66843"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66844",
+      "to_node_id": "981:66845",
+      "relation": "parent_child",
+      "parent_id": "981:66844"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66843",
+      "to_node_id": "981:66847",
+      "relation": "parent_child",
+      "parent_id": "981:66843"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66847",
+      "to_node_id": "981:66844",
+      "relation": "previous_sibling",
+      "distance_px": 168.5,
+      "parent_id": "981:66843"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66847",
+      "to_node_id": "981:66848",
+      "relation": "parent_child",
+      "parent_id": "981:66847"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66848",
+      "to_node_id": "I981:66848;212:117598",
+      "relation": "parent_child",
+      "parent_id": "981:66848"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66848;212:117598",
+      "to_node_id": "I981:66848;212:124673",
+      "relation": "next_sibling",
+      "distance_px": 42.5,
+      "parent_id": "981:66848"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66848",
+      "to_node_id": "I981:66848;212:124673",
+      "relation": "parent_child",
+      "parent_id": "981:66848"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66848;212:124673",
+      "to_node_id": "I981:66848;212:117598",
+      "relation": "previous_sibling",
+      "distance_px": 42.5,
+      "parent_id": "981:66848"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66848;212:124673",
+      "to_node_id": "I981:66848;212:124674",
+      "relation": "parent_child",
+      "parent_id": "I981:66848;212:124673"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66823",
+      "to_node_id": "981:66851",
+      "relation": "parent_child",
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66851",
+      "to_node_id": "981:66842",
+      "relation": "previous_sibling",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "981:66851",
+      "to_node_id": "981:66842",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 64.0,
+      "parent_id": "981:66823"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66851",
+      "to_node_id": "981:66852",
+      "relation": "parent_child",
+      "parent_id": "981:66851"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66852",
+      "to_node_id": "981:66853",
+      "relation": "parent_child",
+      "parent_id": "981:66852"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66853",
+      "to_node_id": "981:66856",
+      "relation": "next_sibling",
+      "distance_px": 168.5,
+      "parent_id": "981:66852"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66853",
+      "to_node_id": "981:66854",
+      "relation": "parent_child",
+      "parent_id": "981:66853"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66852",
+      "to_node_id": "981:66856",
+      "relation": "parent_child",
+      "parent_id": "981:66852"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66856",
+      "to_node_id": "981:66853",
+      "relation": "previous_sibling",
+      "distance_px": 168.5,
+      "parent_id": "981:66852"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66856",
+      "to_node_id": "981:66857",
+      "relation": "parent_child",
+      "parent_id": "981:66856"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66857",
+      "to_node_id": "I981:66857;212:117598",
+      "relation": "parent_child",
+      "parent_id": "981:66857"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "I981:66857;212:117598",
+      "to_node_id": "I981:66857;212:124673",
+      "relation": "next_sibling",
+      "distance_px": 42.5,
+      "parent_id": "981:66857"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66857",
+      "to_node_id": "I981:66857;212:124673",
+      "relation": "parent_child",
+      "parent_id": "981:66857"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "I981:66857;212:124673",
+      "to_node_id": "I981:66857;212:117598",
+      "relation": "previous_sibling",
+      "distance_px": 42.5,
+      "parent_id": "981:66857"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66857;212:124673",
+      "to_node_id": "I981:66857;212:124674",
+      "relation": "parent_child",
+      "parent_id": "I981:66857;212:124673"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66795",
+      "to_node_id": "981:66860",
+      "relation": "parent_child",
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66860",
+      "to_node_id": "981:66797",
+      "relation": "previous_sibling",
+      "distance_px": 362.0,
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "981:66860",
+      "to_node_id": "981:66797",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 362.0,
+      "parent_id": "981:66795"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66860",
+      "to_node_id": "981:66861",
+      "relation": "parent_child",
+      "parent_id": "981:66860"
+    },
+    {
+      "kind": "next_sibling",
+      "from_node_id": "981:66861",
+      "to_node_id": "981:66863",
+      "relation": "next_sibling",
+      "distance_px": 69.0,
+      "parent_id": "981:66860"
+    },
+    {
+      "kind": "next_sibling_in_column",
+      "from_node_id": "981:66861",
+      "to_node_id": "981:66863",
+      "relation": "next_sibling_in_column",
+      "distance_px": 69.0,
+      "parent_id": "981:66860"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66861",
+      "to_node_id": "981:66862",
+      "relation": "parent_child",
+      "parent_id": "981:66861"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66862",
+      "to_node_id": "I981:66862;1866:23605",
+      "relation": "parent_child",
+      "parent_id": "981:66862"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "I981:66862;1866:23605",
+      "to_node_id": "I981:66862;111:16845",
+      "relation": "parent_child",
+      "parent_id": "I981:66862;1866:23605"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66860",
+      "to_node_id": "981:66863",
+      "relation": "parent_child",
+      "parent_id": "981:66860"
+    },
+    {
+      "kind": "previous_sibling",
+      "from_node_id": "981:66863",
+      "to_node_id": "981:66861",
+      "relation": "previous_sibling",
+      "distance_px": 69.0,
+      "parent_id": "981:66860"
+    },
+    {
+      "kind": "previous_sibling_in_column",
+      "from_node_id": "981:66863",
+      "to_node_id": "981:66861",
+      "relation": "previous_sibling_in_column",
+      "distance_px": 69.0,
+      "parent_id": "981:66860"
+    },
+    {
+      "kind": "parent_child",
+      "from_node_id": "981:66863",
+      "to_node_id": "I981:66863;21:3527",
+      "relation": "parent_child",
+      "parent_id": "981:66863"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "981:66830",
+      "to_node_id": "981:66839",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "981:66830",
+      "to_node_id": "981:66848",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "981:66830",
+      "to_node_id": "981:66857",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "981:66839",
+      "to_node_id": "981:66848",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "981:66839",
+      "to_node_id": "981:66857",
+      "relation": "same_component_group"
+    },
+    {
+      "kind": "same_component_group",
+      "from_node_id": "981:66848",
+      "to_node_id": "981:66857",
+      "relation": "same_component_group"
+    }
+  ]
+}

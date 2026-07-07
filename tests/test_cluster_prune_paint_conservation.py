@@ -112,3 +112,66 @@ def test_duplicate_plus_icon_forwards_vector_asset_when_template_bound() -> None
 
     assert duplicate.vector_asset_key == "assets/icons/plus.svg"
     assert duplicate.children == []
+
+
+def test_late_image_asset_does_not_unlock_prune_when_child_vectors_remain() -> None:
+    """Raster on the cluster root must not clear inline VECTOR children (CP0b idempotency)."""
+    vector = CleanDesignTreeNode(
+        id="vec-rich",
+        name="Vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=14.0, height=14.0),
+        style=NodeStyle(background_color="0xFFFFFFFF"),
+    )
+    template = CleanDesignTreeNode(
+        id="cutlery-1",
+        name="Cutlery",
+        type=NodeType.COLUMN,
+        cluster_id="component_cutlery",
+        sizing=Sizing(width=375.0, height=76.0),
+        children=[
+            CleanDesignTreeNode(
+                id="body-1",
+                name="Body",
+                type=NodeType.STACK,
+                children=[vector],
+            )
+        ],
+    )
+    duplicate = CleanDesignTreeNode(
+        id="cutlery-2",
+        name="Cutlery",
+        type=NodeType.COLUMN,
+        cluster_id="component_cutlery",
+        image_asset_key="assets/images/tableware.png",
+        sizing=Sizing(width=375.0, height=76.0),
+        children=[
+            CleanDesignTreeNode(
+                id="body-2",
+                name="Body",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="vec-dup",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=14.0, height=14.0),
+                        style=NodeStyle(background_color="0xFFFFFFFF"),
+                    )
+                ],
+            )
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[template, duplicate],
+    )
+    before = conservation_node_multiset(deepcopy(root))
+    prune_generation_layout_tree(root, checkpoint="CP0b_reprune")
+    after = conservation_node_multiset(root)
+
+    assert before == after
+    assert duplicate.children
+    assert duplicate.children[0].children
