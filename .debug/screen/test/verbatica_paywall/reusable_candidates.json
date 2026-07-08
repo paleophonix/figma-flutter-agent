@@ -1,59 +1,81 @@
 {
-  "cacheKey": "2281c4db2e138b7731a9f6c83a3cbccb2eaaf4278c7cd6b611702ab5ddb0fb77",
+  "cacheKey": "f6997c0ebc4cddc9a2a3c1b838a4766c976a48cd3241bbb1e9c21f6cefa3c8cc",
   "response": {
     "candidates": [
       {
-        "nodeId": "2399:42789",
-        "widgetName": "PricingPlanOptionRow",
-        "reason": "Three nearly identical plan rows repeat in the pricing section, differing mainly by term, prices, and the optional savings badge.",
-        "confidence": 0.98,
+        "nodeId": "2399:42788",
+        "widgetName": "PlanOptionCard",
+        "reason": "Repeated subscription-plan row with the same title/price/check layout across multiple options; the first variant adds an optional savings badge, so this is a strong reusable card candidate.",
+        "confidence": 0.96,
         "suggestedParams": [
-          "termLabel",
-          "monthlyPriceLabel",
-          "totalPriceLabel",
-          "savingsLabel",
-          "isSelected"
+          "periodLabel",
+          "monthlyPrice",
+          "totalPrice",
+          "badgeText",
+          "showBadge"
         ],
         "evidence": {
           "similarNodes": [
-            "2399:42802",
-            "2399:42813"
+            "2399:42801",
+            "2399:42812"
           ],
-          "shapeSimilarity": 0.99,
+          "shapeSimilarity": 0.95,
           "semanticRole": "subscription plan selection row"
         }
       },
       {
         "nodeId": "2399:42838",
-        "widgetName": "TertiaryActionButton",
-        "reason": "This tertiary button component is reused twice with different labels and heights, making it a good shared action widget.",
-        "confidence": 0.91,
+        "widgetName": "SecondarySubscriptionButton",
+        "reason": "Tertiary action button family reused twice with the same component group and nearly identical structure, differing mainly by label and height.",
+        "confidence": 0.98,
         "suggestedParams": [
           "label",
-          "isCompact"
+          "buttonHeight"
         ],
         "evidence": {
           "similarNodes": [
             "2399:42839"
           ],
-          "shapeSimilarity": 0.88,
-          "semanticRole": "secondary paywall action button"
+          "shapeSimilarity": 0.99,
+          "semanticRole": "secondary action button"
         }
       },
       {
         "nodeId": "2399:42837",
-        "widgetName": "PrimarySubscribeButton",
-        "reason": "Prominent primary CTA button for the paywall; the component is already isolated and suitable for reuse across subscription screens.",
-        "confidence": 0.78,
+        "widgetName": "PrimarySubscriptionButton",
+        "reason": "Primary CTA button component with a two-line label/subtitle arrangement, intended to be reused as the main paywall action.",
+        "confidence": 0.91,
         "suggestedParams": [
           "title",
-          "subtitle"
+          "subtitle",
+          "onPressed"
         ],
-        "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": null,
-          "semanticRole": "primary subscription call to action"
-        }
+        "evidence": null
+      },
+      {
+        "nodeId": "2399:42783",
+        "widgetName": "StatusBar",
+        "reason": "Prebuilt system status bar component on the screen header; reusable as a top-level mobile chrome widget.",
+        "confidence": 0.88,
+        "suggestedParams": [
+          "timeText",
+          "showCamera",
+          "showDate",
+          "showBatteryTime"
+        ],
+        "evidence": null
+      },
+      {
+        "nodeId": "2399:42843",
+        "widgetName": "HomeIndicator",
+        "reason": "Prebuilt iPhone home indicator component used as a reusable device chrome element at the bottom of the screen.",
+        "confidence": 0.87,
+        "suggestedParams": [
+          "device",
+          "orientation",
+          "mode"
+        ],
+        "evidence": null
       }
     ]
   }

@@ -2,6 +2,21 @@ version: 1
 family_id: flex_cross_stretch_inflates_fixed_child
 generated: true
 cases:
+- case_id: 2026-07-08-niyama-order2-flex-slot-inflation
+  case_file: cases/2026-07-08-niyama-order2-flex-slot-inflation.yaml
+  title: order2 flex cross-stretch squares chip/address slots and product column
+    overflows
+  project: test
+  feature: niyama_order_2
+  occurrence_id: niyama-order2-flex-slot-inflation
+  status: FIXED
+  observed_at: '2026-07-08'
+  created_at: '2026-07-08T09:10:00Z'
+  updated_at: '2026-07-08T09:10:00Z'
+  summary: niyama_order_2 BonusBadge +13 chip (43x26 pill) emitted as SizedBox 
+    43x43 and address TEXT wider than parent ROW (325px in 309px) squared to 
+    325x325, flushing content left and occluding lower stack bands. Product list
+    COLUMN fixed 116px plus zero-height hairline divider with r...
 - case_id: 2026-07-08-niyama-promo-row-slot-inflation
   case_file: cases/2026-07-08-niyama-promo-row-slot-inflation.yaml
   title: Promo action row flex slot inflates to 212px creating dead gap before 

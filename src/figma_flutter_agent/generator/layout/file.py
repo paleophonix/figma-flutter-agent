@@ -346,6 +346,11 @@ class {class_name} extends StatelessWidget {{
     content = strip_tight_proportional_leading_in_text_styles(content)
     content = _relax_tight_text_positioned_heights(content, render_tree)
     content = expand_text_positioned_widths_from_tree(content, render_tree)
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        repair_nested_flex_parent_data_in_source,
+    )
+
+    content = repair_nested_flex_parent_data_in_source(content)
     content = ensure_layout_chrome_nav_helpers(content, theme_variant=theme_variant)
     from figma_flutter_agent.generator.layout.interactive_chrome import (
         ensure_interactive_layout_helpers,

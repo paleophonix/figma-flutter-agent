@@ -50,6 +50,23 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
         css_key="border-color" if has_stroke else "background-color",
         fallback="Theme.of(context).colorScheme.onSurfaceVariant",
     )
+    span_w = float(node.sizing.width or width or 0.0)
+    span_h = float(node.sizing.height or height or 0.0)
+    if has_fill and not has_stroke and span_w > 0 and span_h > 0:
+        if abs(span_w - span_h) <= max(2.0, min(span_w, span_h) * 0.15) and max(
+            span_w, span_h
+        ) <= 32.0:
+            width_lit = format_geometry_literal(span_w)
+            height_lit = format_geometry_literal(span_h)
+            radius_lit = format_geometry_literal(max(span_w, span_h) / 2.0)
+            return (
+                f"Container(width: {width_lit}, height: {height_lit}, "
+                f"decoration: BoxDecoration(color: {color}, "
+                f"borderRadius: BorderRadius.circular({radius_lit})))"
+            )
+        if span_h > span_w * 1.05 and span_w <= 28.0 and span_h <= 40.0:
+            size_lit = format_geometry_literal(max(span_w, span_h))
+            return f"Icon(Icons.play_arrow, color: {color}, size: {size_lit})"
     if has_stroke and height >= width * 1.15 and width <= 14.0:
         # Figma reports tight vector bounds (e.g. 5×10); scale for ~48dp tap targets.
         chevron_size = min(max(width, height) * 2.4, 24.0)

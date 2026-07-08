@@ -1,0 +1,17 @@
+version: 1
+family_id: positioned_center_pin_text_lane_underflow
+generated: true
+cases:
+- case_id: 2026-07-08-verbatica-player-center-pin-title-lane
+  case_file: cases/2026-07-08-verbatica-player-center-pin-title-lane.yaml
+  title: Center-pinned nav title lane underfits measured copy width
+  project: test
+  feature: verbatica_player
+  occurrence_id: verbatica-player-center-pin-title-underflow
+  status: FIXED
+  observed_at: '2026-07-08'
+  created_at: '2026-07-08T12:00:00Z'
+  updated_at: '2026-07-08T12:00:00Z'
+  summary: Center-pinned toolbar titles kept dual left/right insets from a 49px 
+    Figma box even when estimated label width exceeded the lane, clipping «Урок 
+    1» to «Урок».

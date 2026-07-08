@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.geometry.text_metrics import (
+    center_pinned_text_explicit_lane_width,
     placement_is_center_pinned_horizontal,
     positioned_text_allows_metric_slack,
     positioned_text_preserves_right_edge,
@@ -372,6 +373,16 @@ def _ensure_positioned_stack_bounds(
 
     width, height = figma_positioned_dimensions(node, placement)
     figma_width_before_slack: float | None = None
+    lane_override = center_pinned_text_explicit_lane_width(
+        node,
+        placement,
+        parent_width=parent_width,
+    )
+    if lane_override is not None and parent_width is not None:
+        width = lane_override
+        left_override = (float(parent_width) - lane_override) / 2.0
+    else:
+        left_override = None
     if positioned_text_allows_metric_slack(node, placement) and width is not None and width > 0:
         figma_width_before_slack = float(width)
         width = positioned_text_width_with_metric_slack(float(width))
@@ -380,6 +391,8 @@ def _ensure_positioned_stack_bounds(
         placement,
         parent_width=parent_width,
     )
+    if left_override is not None:
+        left = left_override
     if (
         figma_width_before_slack is not None
         and width is not None
@@ -417,7 +430,7 @@ def _ensure_positioned_stack_bounds(
             parent_width=parent_width,
             width=width,
             parent_node=parent_node,
-        )
+        ) or lane_override is not None
         if pin_bottom:
             bottom = _resolved_bottom_offset(placement, parent_height=parent_height)
             bottom_token = format_geometry_literal(bottom)

@@ -581,12 +581,32 @@ def layout_fact_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
     return horizontal >= 1 and vertical >= 1
 
 
+def _codepoint_is_private_use_area(code: int) -> bool:
+    """Return True for BMP and supplementary Unicode private-use codepoints."""
+    if 0xE000 <= code <= 0xF8FF:
+        return True
+    if 0xF0000 <= code <= 0xFFFFD:
+        return True
+    return 0x100000 <= code <= 0x10FFFD
+
+
 def is_private_use_area_glyph(text: str) -> bool:
     """Return True when ``text`` uses the Unicode private-use area (SF Symbol exports)."""
     stripped = text.strip()
     if not stripped:
         return False
-    return any(0xE000 <= ord(char) <= 0xF8FF for char in stripped)
+    return any(_codepoint_is_private_use_area(ord(char)) for char in stripped)
+
+
+def _compact_disclosure_chevron_host(node: CleanDesignTreeNode) -> bool:
+    """Compact trailing slots that carry SF Symbol chevron glyphs in list rows."""
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    span_w = float(width)
+    span_h = float(height)
+    return span_w <= 24.0 and span_h <= 40.0 and span_w > 0 and span_h > 0
 
 
 def _compact_dismiss_icon_host(node: CleanDesignTreeNode) -> bool:
@@ -620,13 +640,17 @@ def private_use_glyph_icon_expr(
         return None
     if host.type not in {NodeType.BUTTON, NodeType.STACK, NodeType.ROW}:
         return None
-    if not _compact_dismiss_icon_host(host) and host.type != NodeType.BUTTON:
+    if _compact_dismiss_icon_host(host) or host.type == NodeType.BUTTON:
+        icon_name = "Icons.close"
+    elif _compact_disclosure_chevron_host(host):
+        icon_name = "Icons.chevron_right"
+    else:
         return None
     color = dart_color_expr(node.style, fallback="Theme.of(context).colorScheme.primary")
     size_lit = format_geometry_literal(
         min(float(node.sizing.height or 20.0), float(node.style.font_size or 20.0))
     )
-    return f"Icon(Icons.close, color: {color}, size: {size_lit})"
+    return f"Icon({icon_name}, color: {color}, size: {size_lit})"
 
 
 def layout_fact_stroke_minus_icon(node: CleanDesignTreeNode) -> bool:

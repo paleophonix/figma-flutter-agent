@@ -98,14 +98,19 @@ def method_node_suppresses_compose_flex_fill(
     (``SizedBox`` / ``Align`` and optional outer ``Expanded``).
     """
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        is_viewport_chrome_band,
         stack_child_is_growable_panel,
     )
 
-    _ = render_tree
-    return (
-        stack_child_is_growable_panel(node)
-        and node.sizing.height_mode == SizingMode.FILL
-    )
+    if node.sizing.height_mode != SizingMode.FILL:
+        return False
+    if is_viewport_chrome_band(node):
+        return False
+    if stack_child_is_growable_panel(node):
+        return True
+    if render_tree.type != NodeType.COLUMN or len(render_tree.children) < 2:
+        return False
+    return node.type == NodeType.COLUMN and node.scroll_axis == "none"
 
 
 def strip_top_level_flex_parent_data(widget: str) -> str:

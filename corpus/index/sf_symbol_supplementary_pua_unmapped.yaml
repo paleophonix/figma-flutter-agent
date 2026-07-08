@@ -1,0 +1,17 @@
+version: 1
+family_id: sf_symbol_supplementary_pua_unmapped
+generated: true
+cases:
+- case_id: 2026-07-08-verbatica-player-sf-symbol-supplementary-pua
+  case_file: cases/2026-07-08-verbatica-player-sf-symbol-supplementary-pua.yaml
+  title: Supplementary-plane SF Symbol PUA glyphs not mapped to Material icons
+  project: test
+  feature: verbatica_player
+  occurrence_id: verbatica-player-supplementary-pua-glyphs
+  status: FIXED
+  observed_at: '2026-07-08'
+  created_at: '2026-07-08T12:00:00Z'
+  updated_at: '2026-07-08T12:00:00Z'
+  summary: SF Symbol exports in supplementary private-use planes (U+F0000+) were
+    not recognized by is_private_use_area_glyph, so close and chevron rows 
+    emitted raw PUA Text instead of Icons.close / Icons.chevron_right.

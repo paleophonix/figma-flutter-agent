@@ -1,0 +1,17 @@
+version: 1
+family_id: vector_filled_leaf_paint_fallback_gap
+generated: true
+cases:
+- case_id: 2026-07-08-verbatica-player-filled-vector-fallback
+  case_file: cases/2026-07-08-verbatica-player-filled-vector-fallback.yaml
+  title: Filled VECTOR leaves without exports emit SizedBox.shrink
+  project: test
+  feature: verbatica_player
+  occurrence_id: verbatica-player-filled-vector-shrink
+  status: FIXED
+  observed_at: '2026-07-08'
+  created_at: '2026-07-08T12:00:00Z'
+  updated_at: '2026-07-08T12:00:00Z'
+  summary: Small filled VECTOR nodes (scrubber thumb, play glyph) without 
+    vector_asset_key fell through to SizedBox.shrink instead of primitive 
+    paint/icon fallbacks.

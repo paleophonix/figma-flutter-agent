@@ -1,0 +1,52 @@
+version: 1
+
+case:
+  id: 2026-07-08-verbatica-player-filled-vector-fallback
+  title: Filled VECTOR leaves without exports emit SizedBox.shrink
+  case_kind: regression
+  project: test
+  feature: verbatica_player
+  observed_at: 2026-07-08
+  created_at: '2026-07-08T12:00:00Z'
+  updated_at: '2026-07-08T12:00:00Z'
+  summary: >
+    Small filled VECTOR nodes (scrubber thumb, play glyph) without vector_asset_key
+    fell through to SizedBox.shrink instead of primitive paint/icon fallbacks.
+
+occurrences:
+  - id: verbatica-player-filled-vector-shrink
+    family_id: vector_filled_leaf_paint_fallback_gap
+    pipeline_arrow: A3
+    law_id: LAW-VECTOR-FILLED-LEAF-FALLBACK
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/widgets/decoration.py
+      symbol: _render_stroke_glyph_fallback
+    contract:
+      field: vector_asset_key
+      field_class: fact
+      category: lossy
+      expected: >
+        Filled VECTOR leaves without exported assets emit circle fill or play-arrow
+        icon fallbacks from geometry and fill color.
+      actual: >
+        Scrubber thumb and play vector nodes emitted const SizedBox.shrink().
+    authority_boundary: emitter
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_player/screen.dart
+        summary: figma-981_66804 and figma-981_66815 shrink in player card stack.
+    repair:
+      summary: >
+        Extend _render_stroke_glyph_fallback with filled-circle and play-arrow heuristics
+        for small VECTOR leaves missing exports.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/widgets/decoration.py
+      regression_tests:
+        - tests/test_verbatica_player_emit_laws.py::test_filled_vector_paint_fallback_emits_circle_and_play_icon
+      verification:
+        - poetry run pytest tests/test_verbatica_player_emit_laws.py::test_filled_vector_paint_fallback_emits_circle_and_play_icon -q

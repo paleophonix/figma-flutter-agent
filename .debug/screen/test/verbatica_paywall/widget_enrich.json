@@ -1,5 +1,5 @@
 {
-  "cacheKey": "6400f891e1260d35ae0d54c444ab680447472b7f81c1082a99e750ca55e184fc",
+  "cacheKey": "1c1e20e953ab4b0ea949d8e5d8ee4efa1ec8cb2e121b38aafc397b70600f9a17",
   "response": {
     "entries": [
       {
@@ -14,32 +14,32 @@
       },
       {
         "clusterId": "component_118_7511_24ebf3ca",
-        "widgetName": "PaywallTertiaryActionButtonWidget",
+        "widgetName": "FreeTrialButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23327",
-        "widgetName": "CellularSignalIconWidget",
+        "widgetName": "CellularSignalWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23343",
-        "widgetName": "WifiStatusIconWidget",
+        "widgetName": "WifiSignalWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23346",
-        "widgetName": "BatteryStatusIconWidget",
+        "widgetName": "BatteryWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23393_de98d704",
-        "widgetName": "StatusInfoWidget",
+        "widgetName": "DeviceStatusWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_282_23556_de98d704",
-        "widgetName": "PaywallTopBarWidget",
+        "widgetName": "PaywallStatusBarWidget",
         "paramRenames": {}
       },
       {

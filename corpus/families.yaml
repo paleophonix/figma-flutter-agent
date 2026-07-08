@@ -1134,3 +1134,61 @@ families:
       scroll screen must be one unified scroll (hero band as a normal-flow child that
       scrolls away with the content), not a pinned backdrop plus nested content scrollers.
     status: active
+
+  - id: sf_symbol_supplementary_pua_unmapped
+    title: Supplementary-plane SF Symbol PUA glyphs not mapped to portable icons
+    pipeline_arrows:
+      - A3
+    owning_stage: classifier
+    owners:
+      - module: src/figma_flutter_agent/parser/interaction/icons.py
+        symbol: is_private_use_area_glyph
+      - module: src/figma_flutter_agent/parser/interaction/icons.py
+        symbol: private_use_glyph_icon_expr
+    law_ids:
+      - LAW-SF-SYMBOL-PUA-PORTABLE-ICON
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      SF Symbol exports in supplementary Unicode private-use planes are not recognized,
+      so dismiss and disclosure rows emit raw PUA Text instead of Material icons.
+    status: active
+
+  - id: positioned_center_pin_text_lane_underflow
+    title: Center-pinned positioned text lane underfits measured copy
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/geometry/text_metrics.py
+        symbol: center_pinned_text_explicit_lane_width
+      - module: src/figma_flutter_agent/generator/layout/widgets/position.py
+        symbol: _ensure_positioned_stack_bounds
+    law_ids:
+      - LAW-POSITIONED-TEXT-LANE-WIDTH
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Center-pinned toolbar titles keep dual left/right insets from a narrow Figma box
+      even when estimated label width exceeds the lane, clipping trailing glyphs.
+    status: active
+
+  - id: vector_filled_leaf_paint_fallback_gap
+    title: Filled VECTOR leaves without exports emit shrink instead of paint fallback
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/decoration.py
+        symbol: _render_stroke_glyph_fallback
+    law_ids:
+      - LAW-VECTOR-FILLED-LEAF-FALLBACK
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Small filled VECTOR nodes without vector_asset_key fall through to SizedBox.shrink
+      instead of primitive circle fill or play-arrow icon fallbacks.
+    status: active

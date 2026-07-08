@@ -100,6 +100,32 @@ def positioned_text_allows_metric_slack(
     return not placement_is_center_pinned_horizontal(placement)
 
 
+def center_pinned_text_explicit_lane_width(
+    node: CleanDesignTreeNode,
+    placement: StackPlacement,
+    *,
+    parent_width: float | None,
+) -> float | None:
+    """Widen center-pinned text lanes when the Figma box underfits measured copy."""
+    if node.type != NodeType.TEXT:
+        return None
+    if not placement_is_center_pinned_horizontal(placement):
+        return None
+    if parent_width is None or parent_width <= 0:
+        return None
+    from figma_flutter_agent.generator.dart.llm_codegen.text_copy import _estimated_text_width
+
+    estimated = _estimated_text_width(node)
+    if estimated is None:
+        return None
+    lane_width = placement.width
+    if lane_width is None and placement.left is not None and placement.right is not None:
+        lane_width = float(parent_width) - float(placement.left) - float(placement.right)
+    if lane_width is None or estimated <= float(lane_width) + 1.5:
+        return None
+    return min(estimated, float(parent_width) - 4.0)
+
+
 def positioned_text_width_with_metric_slack(figma_width: float) -> float:
     """Widen absolute text slots so Flutter font metrics do not clip trailing glyphs."""
     scaled = float(figma_width) * _POSITIONED_TEXT_WIDTH_METRIC_SLACK

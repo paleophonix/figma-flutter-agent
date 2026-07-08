@@ -8,11 +8,11 @@ case:
   feature: verbatica_player
   observed_at: 2026-07-07
   created_at: '2026-07-07T14:30:00Z'
-  updated_at: '2026-07-07T14:30:00Z'
+  updated_at: '2026-07-08T12:00:00Z'
   summary: >
     LAW-FLEX-DECOMPOSED-SLOT — decomposed growable-panel methods emitted Expanded while
     compose wrapped the method call in SizedBox/Align, crashing layout and hiding player
-    content at runtime.
+    content at runtime. Regressed when phone-shell body had a single FILL column child.
 
 occurrences:
   - id: verbatica-player-decomposed-expanded-under-align
@@ -45,12 +45,14 @@ occurrences:
           LayoutBuilder child Expanded under Align; last.log ParentDataWidget illegal host.
     repair:
       summary: >
-        Strip top-level Expanded from decomposed growable-panel method bodies when compose
-        owns phone-shell flex fill; regression tests in test_verbatica_player_emit_laws.py.
+        Broaden method_node_suppresses_compose_flex_fill for all phone-shell FILL column
+        slots; strip top-level Expanded from method bodies; repair illegal flex hosts
+        in layout emit via repair_nested_flex_parent_data_in_source.
       changed_files:
         - src/figma_flutter_agent/generator/layout/file_methods.py
         - src/figma_flutter_agent/generator/layout/file.py
       regression_tests:
         - tests/test_verbatica_player_emit_laws.py::test_decomposed_growable_slot_suppresses_top_level_expanded
+        - tests/test_verbatica_player_emit_laws.py::test_single_child_fill_phone_shell_body_suppresses_top_level_expanded
       verification:
-        - poetry run pytest tests/test_verbatica_player_emit_laws.py::test_decomposed_growable_slot_suppresses_top_level_expanded -q
+        - poetry run pytest tests/test_verbatica_player_emit_laws.py::test_decomposed_growable_slot_suppresses_top_level_expanded tests/test_verbatica_player_emit_laws.py::test_single_child_fill_phone_shell_body_suppresses_top_level_expanded -q
