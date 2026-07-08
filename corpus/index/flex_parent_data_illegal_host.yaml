@@ -2,6 +2,20 @@ version: 1
 family_id: flex_parent_data_illegal_host
 generated: true
 cases:
+- case_id: 2026-07-07-verbatica-status-positioned-in-row
+  case_file: cases/2026-07-07-verbatica-status-positioned-in-row.yaml
+  title: Status bar horizontal inflow Row carries Positioned clock and icons
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-status-positioned-in-row
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T18:30:00Z'
+  updated_at: '2026-07-07T18:30:00Z'
+  summary: stack_should_emit_horizontal_inflow_row composes status chrome 
+    siblings into a Row(spaceBetween) but leaves Positioned wrappers from STACK 
+    finalize on inflow children. Flutter logs Incorrect use of ParentDataWidget 
+    and a 2px horizontal overflow on the status bar.
 - case_id: 2026-07-07-verbatica-player-decomposed-flex-illegal-host
   case_file: cases/2026-07-07-verbatica-player-decomposed-flex-illegal-host.yaml
   title: Expanded under Align in decomposed phone-shell body method

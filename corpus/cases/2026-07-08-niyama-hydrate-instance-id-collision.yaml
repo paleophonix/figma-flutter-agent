@@ -1,0 +1,70 @@
+version: 1
+
+case:
+  id: 2026-07-08-niyama-hydrate-instance-id-collision
+  title: Cluster hydrate copies template instance ids onto duplicate component roots
+  case_kind: regression
+  project: test
+  feature: niyama_order
+  observed_at: 2026-07-07
+  created_at: '2026-07-08T00:00:00Z'
+  updated_at: '2026-07-08T00:00:00Z'
+  summary: >
+    After cluster prune on niyama_order duplicate Order product component instances,
+    hydrate_pruned_cluster_instances copied the template subtree onto pruned stubs
+    without rewriting instance-scoped descendant ids. Two live nodes shared
+    I4408:44897;1154:7849;1149:9856;1149:9479;910:3261 under different parents
+    (4408:44904 and 4408:44898), and validate_unique_node_ids aborted plan before
+    writeback.
+
+occurrences:
+  - id: niyama-order-hydrate-instance-id-collision
+    family_id: cluster_prune_visible_paint_without_transfer
+    pipeline_arrow: A4
+    law_id: LAW-CLUSTER-PRUNE-PAINT-CONSERVATION
+    stage: parser_dedup
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/parser/layout/reconcilers_grid_hydrate.py
+      symbol: _build_product_card_hydration_id_map
+    contract:
+      field: node_id
+      field_class: fact
+      category: illegal
+      expected: >
+        Hydrating a pruned component instance must remap every descendant id from
+        the template instance root onto the target instance root (or allocate fresh
+        instance-scoped ids) so validate_unique_node_ids holds after hydrate.
+      actual: >
+        Hydration id map reused template I{template_root};… ids on duplicate
+        instance children; duplicate node id blocked materialize.
+    authority_boundary: clean_tree
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/niyama_order/run.meta.json
+        summary: >
+          plan failed 2026-07-07T18:27:06Z with GenerationError duplicate node id
+          I4408:44897;1154:7849;1149:9856;1149:9479;910:3261 at 4408:44904 and
+          4408:44898 paths.
+      - kind: source_code
+        path: src/figma_flutter_agent/parser/dedup/hydrate.py
+        summary: >
+          hydrate_pruned_cluster_instances lacked post-hydrate unique-id gate and
+          did not pass template/target roots into subtree remap.
+    repair:
+      summary: >
+        Rewrite component-instance descendant ids during hydration id-map build;
+        filter spare flatten pool to target instance scope; validate_unique_node_ids
+        at end of hydrate_pruned_cluster_instances.
+      changed_files:
+        - src/figma_flutter_agent/parser/layout/reconcilers_grid_hydrate.py
+        - src/figma_flutter_agent/parser/dedup/hydrate.py
+      regression_tests:
+        - tests/test_cluster_prune_paint_conservation.py::test_hydration_rewrites_component_instance_descendant_ids
+        - tests/test_cluster_prune_paint_conservation.py::test_niyama_order_plan_hydrate_keeps_unique_node_ids
+        - tests/test_cluster_prune_paint_conservation.py::test_niyama_order_double_cp0b_reprune_preserves_multiset
+      verification:
+        - poetry run pytest tests/test_cluster_prune_paint_conservation.py -q

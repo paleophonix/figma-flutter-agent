@@ -229,21 +229,44 @@ def padding_edge_insets_fitted_to_host(node: CleanDesignTreeNode) -> str | None:
     )
 
 
+def _text_line_height_px(text_node: CleanDesignTreeNode) -> float | None:
+    """Resolve one text node's vertical line box from metrics or style."""
+    from figma_flutter_agent.schemas import NodeType
+
+    if text_node.type != NodeType.TEXT:
+        return None
+    metrics = text_node.text_metrics_frame
+    if metrics is not None and metrics.line_height_px and metrics.line_height_px > 0:
+        return float(metrics.line_height_px)
+    font_size = text_node.style.font_size
+    line_height = text_node.style.line_height
+    if font_size is not None and font_size > 0:
+        ratio = line_height if line_height is not None and line_height > 0 else 1.2
+        return float(font_size) * float(ratio)
+    return None
+
+
 def _button_label_min_height(node: CleanDesignTreeNode) -> float | None:
     """Minimum vertical space required by button label copy (metrics-first)."""
+    from figma_flutter_agent.generator.layout.flex_policy.buttons import (
+        button_is_pill_with_label_column,
+    )
     from figma_flutter_agent.schemas import NodeType
+
+    if button_is_pill_with_label_column(node):
+        label_column = node.children[0]
+        total = 0.0
+        found = False
+        for child in label_column.children:
+            line_height = _text_line_height_px(child)
+            if line_height is not None:
+                total += line_height
+                found = True
+        return total if found else None
 
     def walk(current: CleanDesignTreeNode) -> float | None:
         if current.type == NodeType.TEXT:
-            metrics = current.text_metrics_frame
-            if metrics is not None and metrics.line_height_px and metrics.line_height_px > 0:
-                return float(metrics.line_height_px)
-            font_size = current.style.font_size
-            line_height = current.style.line_height
-            if font_size is not None and font_size > 0:
-                ratio = line_height if line_height is not None and line_height > 0 else 1.2
-                return float(font_size) * float(ratio)
-            return None
+            return _text_line_height_px(current)
         best: float | None = None
         for child in current.children:
             child_height = walk(child)
@@ -755,9 +778,7 @@ def wrap_horizontal_intrinsic_content_scroll(
 ) -> str:
     """Wrap intrinsic-width horizontal content in a horizontal scroll host."""
     scroll = (
-        "SingleChildScrollView("
-        "scrollDirection: Axis.horizontal, "
-        f"child: {content_widget.strip()})"
+        f"SingleChildScrollView(scrollDirection: Axis.horizontal, child: {content_widget.strip()})"
     )
     if height is not None and float(height) > 0:
         height_lit = format_geometry_literal(float(height))

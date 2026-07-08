@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.style.colors import is_greenish_fill
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 _FLEX_LABEL_HOST_TYPES = frozenset({NodeType.ROW, NodeType.COLUMN, NodeType.CARD, NodeType.STACK})
 
@@ -98,6 +98,39 @@ def layout_fact_payment_plan_row_label_text(node: CleanDesignTreeNode) -> bool:
     if width is None:
         return False
     return 150.0 <= float(width) <= 260.0
+
+
+def layout_fact_payment_plan_slot_shell_row(node: CleanDesignTreeNode) -> bool:
+    """Fixed-height bordered plan card slot row (padding shell around option body)."""
+    if node.type != NodeType.ROW:
+        return False
+    if node.sizing.height_mode != SizingMode.FIXED:
+        return False
+    height = node.sizing.height
+    if height is None or not (64.0 <= float(height) <= 96.0):
+        return False
+    padding = node.padding
+    if min(padding.top, padding.bottom, padding.left, padding.right) < 8.0:
+        return False
+    if not (node.style.has_stroke or node.style.border_color):
+        return False
+    return any(
+        child.type == NodeType.COLUMN and layout_fact_payment_plan_primary_copy_column(child)
+        for child in node.children
+    )
+
+
+def layout_fact_payment_selection_radio_glyph_host(node: CleanDesignTreeNode) -> bool:
+    """Compact trailing radio glyph row inside a payment plan price cluster."""
+    if node.type != NodeType.ROW:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (20.0 <= float(width) <= 28.0 and 20.0 <= float(height) <= 28.0):
+        return False
+    return node.cluster_id is not None or node.vector_asset_key is not None
 
 
 def layout_fact_payment_plan_trailing_price_cluster(node: CleanDesignTreeNode) -> bool:

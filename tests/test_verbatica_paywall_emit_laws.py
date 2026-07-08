@@ -4,12 +4,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from figma_flutter_agent.generator.layout.flex_policy.alignment import (
+    _flex_child_should_bind_fixed_height,
+)
 from figma_flutter_agent.generator.layout.flex_policy.buttons import (
     button_is_pill_with_label_column,
 )
 from figma_flutter_agent.generator.layout.flex_policy.extents import bind_row_cross_axis_height
 from figma_flutter_agent.generator.layout.flex_policy.stack import (
     stack_should_emit_horizontal_inflow_row,
+)
+from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+    neutralize_parent_data_for_flex_child,
 )
 from figma_flutter_agent.generator.layout.scroll import _symmetric_pill_button_padding
 from figma_flutter_agent.generator.layout.style.text_emit import text_style_expr
@@ -36,10 +42,17 @@ from figma_flutter_agent.schemas import (
 from figma_flutter_agent.schemas.geometry import LayoutSlotIr
 
 
+def _write_minimal_viable_png(path: Path) -> None:
+    """Write an 8x8 RGBA PNG that passes ``raster_asset_export_viable``."""
+    from PIL import Image
+
+    Image.new("RGBA", (8, 8), (0, 0, 0, 0)).save(path)
+
+
 def test_semantic_raster_binds_render_boundary_hero(tmp_path: Path) -> None:
     images = tmp_path / "assets" / "images"
     images.mkdir(parents=True)
-    (images / "portrait.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "portrait.png")
     (images / ".figma-bindings.json").write_text(
         '{"bindings": {"portrait.png": "2399:42779"}}',
         encoding="utf-8",
@@ -206,14 +219,18 @@ def test_verbatica_processed_hero_has_no_wrong_vector_after_asset_passes() -> No
     if portrait_entries:
         assert node.image_asset_key == portrait_entries[0].asset_path
     elif (project / "assets" / "images" / "portrait.png").is_file():
-        assert node.image_asset_key is not None
-        assert node.image_asset_key.endswith("portrait.png")
+        portrait_path = project / "assets" / "images" / "portrait.png"
+        if raster_asset_export_viable(portrait_path):
+            assert node.image_asset_key is not None
+            assert node.image_asset_key.endswith("portrait.png")
+        else:
+            assert node.image_asset_key is None
 
 
 def test_render_boundary_candidates_use_figma_bindings_for_flatten_ids(tmp_path: Path) -> None:
     images = tmp_path / "assets" / "images"
     images.mkdir(parents=True)
-    (images / "portrait.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "portrait.png")
     (images / ".figma-bindings.json").write_text(
         '{"bindings": {"portrait.png": "2399:42780"}}',
         encoding="utf-8",
@@ -283,6 +300,80 @@ def test_status_chrome_space_between_inflow_emits_horizontal_row() -> None:
         children=[time_row, icons_row, notch],
     )
     assert stack_should_emit_horizontal_inflow_row(status)
+
+
+def test_horizontal_inflow_row_strips_positioned_parent_data() -> None:
+    """Law: flex_parent_data_illegal_host — Row children must not carry Positioned."""
+    positioned_clock = "Positioned(left: 16.0, top: 0.0, child: Text('9:30'))"
+    stripped = neutralize_parent_data_for_flex_child(positioned_clock)
+    assert "Positioned(" not in stripped
+    assert "Text('9:30')" in stripped
+
+
+def test_payment_plan_slot_shell_row_binds_fixed_height() -> None:
+    """Law: fixed_height_slot_intrinsic_collapse — bordered Slot rows pin Figma height."""
+    slot = CleanDesignTreeNode(
+        id="slot",
+        name="Slot",
+        type=NodeType.ROW,
+        padding=Padding(top=16.0, bottom=16.0, left=16.0, right=16.0),
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FIXED,
+            width=328.0,
+            height=80.0,
+        ),
+        style=NodeStyle(
+            border_radius=24.0,
+            border_width=2.0,
+            border_color="0xFF8459C9",
+            has_stroke=True,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="body",
+                name="Body",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=203.0, height=40.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="label",
+                        name="12 months",
+                        type=NodeType.TEXT,
+                        text="12 months",
+                        sizing=Sizing(width=189.0, height=24.0),
+                    )
+                ],
+            )
+        ],
+    )
+    assert _flex_child_should_bind_fixed_height(slot)
+
+
+def test_payment_radio_glyph_host_skips_layout_slot_width_pin() -> None:
+    """Law: row_list_glyph_svg_extent_mismatch — compact radio host keeps full glyph width."""
+    radio = CleanDesignTreeNode(
+        id="radio",
+        name="check_circle",
+        type=NodeType.ROW,
+        cluster_id="cluster_0",
+        padding=Padding(top=2.0, bottom=2.0, left=2.0, right=2.0),
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=24.0, height=24.0),
+        layout_slot=LayoutSlotIr(wraps=(WrapKind.CONSTRAINED_BOX,)),
+        children=[],
+    )
+    wrapped = _apply_layout_slot_wraps(
+        radio,
+        "SvgPicture.asset('assets/icons/vector_check.svg')",
+        parent_type=NodeType.ROW,
+        parent_node=CleanDesignTreeNode(
+            id="trail",
+            name="price cluster",
+            type=NodeType.ROW,
+            children=[radio],
+        ),
+    )
+    assert "SizedBox(width: 20.0" not in wrapped.replace("\n", "")
 
 
 def test_row_cross_axis_height_clamps_status_icon_cluster_row() -> None:
@@ -466,3 +557,4 @@ def test_pill_button_with_label_column_matches_padding_law() -> None:
     inset = _symmetric_pill_button_padding(button)
     assert inset is not None
     assert "vertical: 14.0" not in inset
+    assert "11.0" in inset

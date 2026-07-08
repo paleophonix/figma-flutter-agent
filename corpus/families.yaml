@@ -520,6 +520,8 @@ families:
     owners:
       - module: src/figma_flutter_agent/generator/layout/widgets/svg.py
         symbol: _intrinsic_glyph_svg_dimensions
+      - module: src/figma_flutter_agent/generator/layout/widgets/positioned.py
+        symbol: _apply_layout_slot_wraps
     law_ids:
       - RowListGlyphIntrinsicBoundsLaw
     default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
@@ -528,6 +530,45 @@ families:
     description: >
       Leading row pictograms size to nested micro-vector paint spans or host
       stack extents instead of the component slot bounds, inflating or shrinking glyphs.
+    status: active
+
+  - id: fixed_height_slot_intrinsic_collapse
+    title: Fixed-height flex slot drops height bind under intrinsic min-height pin
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/alignment.py
+        symbol: _flex_child_should_bind_fixed_height
+      - module: src/figma_flutter_agent/parser/interaction/selection.py
+        symbol: layout_fact_payment_plan_slot_shell_row
+    law_ids:
+      - PaymentPlanSlotFixedHeightLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Bordered payment-plan Slot ROWs with FIXED Figma height lose height binding
+      when flex_host_prefers_min_height_pin blocks pin, collapsing cards 2/3 below
+      the first selected card height.
+    status: active
+
+  - id: pill_button_label_column_padding_overflow
+    title: Pill CTA with multi-line label column keeps Figma vertical padding verbatim
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/scroll.py
+        symbol: _button_label_min_height
+    law_ids:
+      - PillButtonSymmetricPaddingClampLaw
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Pill buttons whose label copy lives in an inner COLUMN sum only the tallest
+      text line when clamping vertical padding, overflowing the fixed host height.
     status: active
 
   - id: figma_chrome_material_elevation_default
@@ -581,6 +622,8 @@ families:
         symbol: collect_descendant_conservation_ids
       - module: src/figma_flutter_agent/parser/dedup/hydrate.py
         symbol: hydrate_pruned_cluster_instances
+      - module: src/figma_flutter_agent/parser/layout/reconcilers_grid_hydrate.py
+        symbol: _build_product_card_hydration_id_map
     law_ids:
       - LAW-CLUSTER-PRUNE-PAINT-CONSERVATION
     default_blast_radius: B3_BLOCKING
@@ -623,6 +666,10 @@ families:
     owners:
       - module: src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
         symbol: collect_illegal_flex_parent_data_host_spans
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
+        symbol: neutralize_parent_data_for_flex_child
+      - module: src/figma_flutter_agent/generator/layout/widgets/emit/stack.py
+        symbol: render_stack_node
       - module: src/figma_flutter_agent/generator/layout/file_methods.py
         symbol: method_node_suppresses_compose_flex_fill
       - module: src/figma_flutter_agent/generator/layout/widgets/finalize.py

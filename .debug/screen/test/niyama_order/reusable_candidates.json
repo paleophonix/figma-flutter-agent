@@ -1,74 +1,97 @@
 {
-  "cacheKey": "fb6765d43cf55bf1994d3f802c25a739909aae7e50ba36a32c2d6dca55777fa6",
+  "cacheKey": "0571f4e1844ba74276a4a58fd16e2308dc67bae93a1c3da15cd5f35865ab99f0",
   "response": {
     "candidates": [
       {
-        "nodeId": "I4408:44896;1154:7849",
-        "widgetName": "QuantityStepper",
-        "reason": "Repeated minus/value/plus control across multiple order items and variants, with only the displayed count and icon state changing.",
-        "confidence": 0.98,
-        "suggestedParams": [
-          "quantityText",
-          "isDark",
-          "onDecrement",
-          "onIncrement"
-        ],
-        "evidence": {
-          "similarNodes": [
-            "I4408:44896;1154:7849",
-            "I4408:44897;1154:7849",
-            "I4408:44898;1154:7849",
-            "I4408:44904;1154:8077"
-          ],
-          "shapeSimilarity": 0.99,
-          "semanticRole": "quantity stepper with decrement, value, and increment actions"
-        }
-      },
-      {
         "nodeId": "4408:44896",
         "widgetName": "OrderProductItem",
-        "reason": "The order product card family repeats several times with the same image-title-price-quantity structure and divider treatment, varying only text content and occasional detail rows.",
-        "confidence": 0.96,
+        "reason": "Repeated order line item card with image, title/price row, optional details, and quantity controls; same structure appears across multiple sibling instances.",
+        "confidence": 0.99,
         "suggestedParams": [
-          "titleText",
+          "productTitle",
           "priceText",
           "detailText",
-          "quantityText",
-          "showDetailRow",
-          "showDivider"
+          "quantity",
+          "showDetails",
+          "imageProvider",
+          "onDecrease",
+          "onIncrease"
         ],
         "evidence": {
           "similarNodes": [
-            "4408:44896",
             "4408:44897",
             "4408:44898",
             "4408:44901",
             "4408:44902"
           ],
-          "shapeSimilarity": 0.94,
-          "semanticRole": "order summary list item with image, title, price, and quantity controls"
+          "shapeSimilarity": 0.98,
+          "semanticRole": "repeated order product row/card"
+        }
+      },
+      {
+        "nodeId": "I4408:44896;1154:7849",
+        "widgetName": "AddProductStepper",
+        "reason": "Reused plus/minus quantity control appears in multiple order product rows and matches the same component group throughout the screen.",
+        "confidence": 0.97,
+        "suggestedParams": [
+          "count",
+          "onDecrease",
+          "onIncrease",
+          "compact"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I4408:44897;1154:7849",
+            "I4408:44898;1154:7849",
+            "I4408:44904;1154:8077",
+            "I4408:44915;1356:10712",
+            "I4408:44916;1356:10673"
+          ],
+          "shapeSimilarity": 0.99,
+          "semanticRole": "quantity adjustment control"
         }
       },
       {
         "nodeId": "4408:44914",
         "widgetName": "ProductSmallCard",
-        "reason": "The horizontal product tiles repeat in the swipe carousel with the same image/title/action layout while price and promo fields vary between instances.",
-        "confidence": 0.92,
+        "reason": "Repeated product suggestion card/grid item with title, image, optional price/discount, and add action; three variants share the same base shape.",
+        "confidence": 0.96,
         "suggestedParams": [
-          "titleText",
-          "currentPriceText",
-          "previousPriceText",
-          "actionLabel",
-          "showPreviousPrice"
+          "title",
+          "priceText",
+          "oldPriceText",
+          "buttonLabel",
+          "showPrice",
+          "onAdd",
+          "imageProvider"
         ],
         "evidence": {
           "similarNodes": [
-            "4408:44914",
             "4408:44915",
             "4408:44916"
           ],
-          "shapeSimilarity": 0.91,
-          "semanticRole": "compact product tile with image, title, pricing, and add action"
+          "shapeSimilarity": 0.93,
+          "semanticRole": "small product recommendation card"
+        }
+      },
+      {
+        "nodeId": "I4408:44915;1356:10712",
+        "widgetName": "AddProductButton",
+        "reason": "Compact repeated add button used inside product cards and order rows; same plus icon control is duplicated in multiple places.",
+        "confidence": 0.95,
+        "suggestedParams": [
+          "onTap",
+          "enabled"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I4408:44916;1356:10673",
+            "I4408:44896;1154:7849;1149:9855",
+            "I4408:44897;1154:7849;1149:9855",
+            "I4408:44904;1154:8077"
+          ],
+          "shapeSimilarity": 0.98,
+          "semanticRole": "add item button"
         }
       }
     ]

@@ -1,0 +1,58 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-status-positioned-in-row
+  title: Status bar horizontal inflow Row carries Positioned clock and icons
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T18:30:00Z'
+  updated_at: '2026-07-07T18:30:00Z'
+  summary: >
+    stack_should_emit_horizontal_inflow_row composes status chrome siblings into a
+    Row(spaceBetween) but leaves Positioned wrappers from STACK finalize on inflow
+    children. Flutter logs Incorrect use of ParentDataWidget and a 2px horizontal
+    overflow on the status bar.
+
+occurrences:
+  - id: verbatica-paywall-status-positioned-in-row
+    family_id: flex_parent_data_illegal_host
+    pipeline_arrow: A3
+    law_id: LAW-FLEX-PARENT-DATA-HOST
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/widgets/emit/stack.py
+      symbol: render_stack_node
+    contract:
+      field: flex_parent_data_wrapper
+      field_class: intent
+      category: illegal
+      expected: >
+        Inflow children composed into Row/Column must not retain Positioned or other
+        stack parent-data wrappers from the prior STACK host.
+      actual: >
+        Status Row children are Positioned(left: 298) icons and Positioned(left: 16)
+        clock text, triggering ParentDataWidget misuse at runtime.
+    authority_boundary: emitter
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/screen.dart
+        summary: Status Row children wrapped in Positioned with absolute left offsets.
+      - kind: log
+        path: .debug/screen/test/verbatica_paywall/last.log
+        summary: Incorrect use of ParentDataWidget; RenderFlex overflowed by 2.0 pixels.
+    repair:
+      summary: >
+        Neutralize stack parent-data wrappers on horizontal inflow Row children via
+        neutralize_parent_data_for_flex_child before composing the spaceBetween row.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/widgets/emit/stack.py
+      regression_tests:
+        - tests/test_verbatica_paywall_emit_laws.py::test_horizontal_inflow_row_strips_positioned_parent_data
+      verification:
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py::test_horizontal_inflow_row_strips_positioned_parent_data -q

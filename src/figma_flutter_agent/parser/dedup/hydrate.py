@@ -95,7 +95,12 @@ def _hydrate_component_instance_from_template(
     if any(template_paths[path] not in id_map for path in template_paths):
         return target
     hydrated = _clear_cluster_ids_subtree(deep_copy_clean_tree(template))
-    hydrated = _remap_subtree_node_ids(hydrated, id_map)
+    hydrated = _remap_subtree_node_ids(
+        hydrated,
+        id_map,
+        template_root=template.id,
+        target_root=target.id,
+    )
     updates: dict[str, object] = {
         "children": hydrated.children,
         "flatten_figma_node_ids": None,
@@ -160,3 +165,6 @@ def hydrate_pruned_cluster_instances(root: CleanDesignTreeNode) -> None:
                 node.image_asset_key = hydrated.image_asset_key
 
     walk_clean_tree(root, apply_hydration, phase="dedup_hydrate_apply")
+    from figma_flutter_agent.generator.ir.tree import validate_unique_node_ids
+
+    validate_unique_node_ids(root)

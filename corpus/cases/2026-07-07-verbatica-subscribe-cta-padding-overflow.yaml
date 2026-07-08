@@ -1,0 +1,54 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-subscribe-cta-padding-overflow
+  title: Subscribe pill CTA overflows 56px host with 14px vertical padding
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T18:30:00Z'
+  updated_at: '2026-07-07T18:30:00Z'
+  summary: >
+    Extracted SubscribeButtonWidget is a pill BUTTON with a two-line label COLUMN.
+    _symmetric_pill_button_padding used only the tallest text line when computing
+    label_min, keeping 14px vertical padding and overflowing the 56px host by ~6px.
+
+occurrences:
+  - id: verbatica-paywall-subscribe-cta-padding-overflow
+    family_id: pill_button_label_column_padding_overflow
+    pipeline_arrow: A3
+    law_id: PillButtonSymmetricPaddingClampLaw
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/scroll.py
+      symbol: _button_label_min_height
+    contract:
+      field: pill button vertical padding clamp
+      field_class: intent
+      category: illegal
+      expected: >
+        Pill buttons with inner label COLUMN sum all text line heights before
+        clamping symmetric vertical padding to fit the fixed host height.
+      actual: >
+        Padding(20, 14, 20, 14) around a two-line Column inside SizedBox(height: 56)
+        overflows bottom by 6px at runtime.
+    authority_boundary: emitter
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/screen.dart
+        summary: SubscribeButtonWidget Padding vertical 14.0 with two-line label column.
+    repair:
+      summary: >
+        _button_label_min_height sums stacked text line metrics for
+        button_is_pill_with_label_column hosts before symmetric padding clamp.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/scroll.py
+      regression_tests:
+        - tests/test_verbatica_paywall_emit_laws.py::test_pill_button_with_label_column_matches_padding_law
+      verification:
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py::test_pill_button_with_label_column_matches_padding_law -q

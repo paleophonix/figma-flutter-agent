@@ -8,11 +8,11 @@ cases:
   project: test
   feature: niyama_order
   occurrence_id: niyama-order-image-node-misbind
-  status: FIXED
+  status: OPEN
   observed_at: '2026-07-07'
   created_at: '2026-07-07T05:00:00Z'
-  updated_at: '2026-07-07T10:50:00Z'
-  summary: In niyama_order the product row images are bound to the wrong nodes. 
-    sussi.png (a sushi photo) is emitted on the "Соевый Соус" (soy sauce) row, 
-    while the actual sushi product "Окинава Монтерей" falls back to portrait.png
-    (a paywall hero photo from another screen). Semantic/orp...
+  updated_at: '2026-07-08T16:30:00Z'
+  summary: 'Product row images bind to the wrong nodes. The prior fix did not hold:
+    on the fresh modal_widget.dart emit the drawable-to-node order is [ramen-chicken,
+    18chip, tomyam, 18chip, vasabi, sussi, promo, guests, 18chip], so the "+18" bonus-chip
+    raster (18chip.png) is bound to THRE...'

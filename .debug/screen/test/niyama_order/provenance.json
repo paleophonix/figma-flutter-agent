@@ -122,7 +122,7 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_fill_text_expanded_guard",
-      "nodeId": "I4408:44898;1154:7849;1149:9469",
+      "nodeId": "II4408:44898;1154:7849;hydrate:2",
       "field": "wrap",
       "old": null,
       "new": "expanded",
@@ -158,7 +158,7 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44902;1154:7847",
+      "nodeId": "II4408:44902;1902:25583;hydrate:0",
       "field": "wrap",
       "old": null,
       "new": "flexibleLoose",
@@ -176,46 +176,10 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_fill_text_expanded_guard",
-      "nodeId": "I4408:44904;1154:8077;1149:9469",
+      "nodeId": "II4408:44904;1154:8077;hydrate:2",
       "field": "wrap",
       "old": null,
       "new": "expanded",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44914;1356:10664;1356:10367",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44915;1356:10710",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44916;1356:10670",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I4408:44916;1356:10671",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
       "policy": null
     },
     {
@@ -407,7 +371,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44897;1154:7850;933:4776",
+      "nodeId": "II4408:44897;1154:7850;hydrate:0",
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
@@ -416,7 +380,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44897;1154:7850;933:4776",
+      "nodeId": "II4408:44897;1154:7850;hydrate:0",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -425,7 +389,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44898;1154:7850;933:4776",
+      "nodeId": "II4408:44898;1154:7850;hydrate:0",
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
@@ -434,7 +398,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44898;1154:7850;933:4776",
+      "nodeId": "II4408:44898;1154:7850;hydrate:0",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -443,7 +407,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44901;1154:7850;933:4776",
+      "nodeId": "II4408:44901;1154:7850;hydrate:0",
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
@@ -452,7 +416,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44901;1154:7850;933:4776",
+      "nodeId": "II4408:44901;1154:7850;hydrate:0",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -461,7 +425,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44902;1154:7850;933:4776",
+      "nodeId": "II4408:44902;1154:7850;hydrate:0",
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
@@ -470,7 +434,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44902;1154:7850;933:4776",
+      "nodeId": "II4408:44902;1154:7850;hydrate:0",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -497,7 +461,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44903;1159:8160;933:4776",
+      "nodeId": "II4408:44903;1159:8160;hydrate:0",
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
@@ -506,7 +470,7 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I4408:44903;1159:8160;933:4776",
+      "nodeId": "II4408:44903;1159:8160;hydrate:0",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -585,76 +549,31 @@
       "policy": "policy_fallback"
     },
     {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44914",
-      "field": "fidelity_tier",
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "II4408:44898;1154:7849;hydrate:2",
+      "field": "wrap",
       "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
+      "new": "expanded",
+      "policy": null
     },
     {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44914",
-      "field": "tier_source",
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "II4408:44902;1902:25583;hydrate:0",
+      "field": "wrap",
       "old": null,
-      "new": "manifest",
-      "policy": "manifest"
+      "new": "flexibleLoose",
+      "policy": null
     },
     {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44915",
-      "field": "fidelity_tier",
+      "checkpoint": "CP1_guards",
+      "transform": "row_fill_text_expanded_guard",
+      "nodeId": "II4408:44904;1154:8077;hydrate:2",
+      "field": "wrap",
       "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44915",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44916",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "4408:44916",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44916;1356:10669",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I4408:44916;1356:10669",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
+      "new": "expanded",
+      "policy": null
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -687,6 +606,114 @@
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "I4408:44896;1154:7850;933:4776",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44897;1154:7850;hydrate:0",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44897;1154:7850;hydrate:0",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44898;1154:7850;hydrate:0",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44898;1154:7850;hydrate:0",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44901;1154:7850;hydrate:0",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44901;1154:7850;hydrate:0",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44902;1154:7850;hydrate:0",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44902;1154:7850;hydrate:0",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "4408:44903",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "4408:44903",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44903;1159:8160;hydrate:0",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "II4408:44903;1159:8160;hydrate:0",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -729,7 +756,7 @@
       }
     },
     {
-      "nodeId": "I4408:44897;1154:7850;933:4776",
+      "nodeId": "II4408:44897;1154:7850;hydrate:0",
       "kind": "technical_divider",
       "confidence": 0.82,
       "evidence": {
@@ -739,7 +766,7 @@
       }
     },
     {
-      "nodeId": "I4408:44898;1154:7850;933:4776",
+      "nodeId": "II4408:44898;1154:7850;hydrate:0",
       "kind": "technical_divider",
       "confidence": 0.82,
       "evidence": {
@@ -749,7 +776,7 @@
       }
     },
     {
-      "nodeId": "I4408:44901;1154:7850;933:4776",
+      "nodeId": "II4408:44901;1154:7850;hydrate:0",
       "kind": "technical_divider",
       "confidence": 0.82,
       "evidence": {
@@ -759,7 +786,7 @@
       }
     },
     {
-      "nodeId": "I4408:44902;1154:7850;933:4776",
+      "nodeId": "II4408:44902;1154:7850;hydrate:0",
       "kind": "technical_divider",
       "confidence": 0.82,
       "evidence": {
@@ -783,7 +810,7 @@
       }
     },
     {
-      "nodeId": "I4408:44903;1159:8160;933:4776",
+      "nodeId": "II4408:44903;1159:8160;hydrate:0",
       "kind": "technical_divider",
       "confidence": 0.82,
       "evidence": {

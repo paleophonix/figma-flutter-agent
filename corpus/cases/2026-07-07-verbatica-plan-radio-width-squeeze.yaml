@@ -1,0 +1,53 @@
+version: 1
+
+case:
+  id: 2026-07-07-verbatica-plan-radio-width-squeeze
+  title: Plan radio glyph host squeezed to 20px interior width
+  case_kind: regression
+  project: test
+  feature: verbatica_paywall
+  observed_at: 2026-07-07
+  created_at: '2026-07-07T18:30:00Z'
+  updated_at: '2026-07-07T18:30:00Z'
+  summary: >
+    Trailing check_circle cluster rows are 24x24 with 2px padding but CONSTRAINED_BOX
+    layout slots pin interior width to 20px, shrinking the 24x24 SvgPicture radio glyph.
+
+occurrences:
+  - id: verbatica-paywall-plan-radio-width-squeeze
+    family_id: row_list_glyph_svg_extent_mismatch
+    pipeline_arrow: A3
+    law_id: RowListGlyphIntrinsicBoundsLaw
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/widgets/positioned.py
+      symbol: _apply_layout_slot_wraps
+    contract:
+      field: compact radio glyph slot width
+      field_class: fact
+      category: lossy
+      expected: >
+        Compact payment-plan radio glyph hosts keep full slot bounds for SvgPicture
+        without an interior width pin below the outer 24px frame.
+      actual: >
+        Emit wraps radio in SizedBox(width: 20.0) before Center+SvgPicture(24x24).
+    authority_boundary: emitter
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_paywall/screen.dart
+        summary: SizedBox(width 20) between 24x24 host and 24x24 SvgPicture on plan radios.
+    repair:
+      summary: >
+        layout_fact_payment_selection_radio_glyph_host skips CONSTRAINED_BOX width
+        pins for compact cluster radio rows so glyphs render at full slot size.
+      changed_files:
+        - src/figma_flutter_agent/parser/interaction/selection.py
+        - src/figma_flutter_agent/generator/layout/widgets/positioned.py
+      regression_tests:
+        - tests/test_verbatica_paywall_emit_laws.py::test_payment_radio_glyph_host_skips_layout_slot_width_pin
+      verification:
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py::test_payment_radio_glyph_host_skips_layout_slot_width_pin -q

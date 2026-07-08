@@ -2,6 +2,21 @@ version: 1
 family_id: cluster_prune_visible_paint_without_transfer
 generated: true
 cases:
+- case_id: 2026-07-08-niyama-hydrate-instance-id-collision
+  case_file: cases/2026-07-08-niyama-hydrate-instance-id-collision.yaml
+  title: Cluster hydrate copies template instance ids onto duplicate component 
+    roots
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-hydrate-instance-id-collision
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-08T00:00:00Z'
+  updated_at: '2026-07-08T00:00:00Z'
+  summary: After cluster prune on niyama_order duplicate Order product component
+    instances, hydrate_pruned_cluster_instances copied the template subtree onto
+    pruned stubs without rewriting instance-scoped descendant ids. Two live 
+    nodes shared I4408:44897;1154:7849;1149:9856;1149:9479;910...
 - case_id: 2026-07-07-niyama-cluster-prune-nested-flatten-reprune
   case_file: cases/2026-07-07-niyama-cluster-prune-nested-flatten-reprune.yaml
   title: CP0b reprune drops nested flatten metadata from pruned cluster stubs

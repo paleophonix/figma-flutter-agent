@@ -941,6 +941,7 @@ def render_stack(
             stack_flow_column_child_sort_key,
         )
         from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+            neutralize_parent_data_for_flex_child,
             repair_flex_parent_data_order,
         )
 
@@ -962,7 +963,11 @@ def render_stack(
             flow_widget = stack_flow_child_horizontal_wrap(child, repaired, parent_node=node)
             if column_child_should_center_hug(node, child):
                 flow_widget = column_center_hug_child_wrap(node, child, flow_widget)
-            inflow_widgets.append(repair_flex_parent_data_order(flow_widget))
+            inflow_widgets.append(
+                neutralize_parent_data_for_flex_child(
+                    repair_flex_parent_data_order(flow_widget),
+                ),
+            )
         inflow_body = ", ".join(inflow_widgets) or "const SizedBox.shrink()"
         inflow_row = (
             "Row("

@@ -380,11 +380,14 @@ def _apply_layout_slot_wraps(
                 from figma_flutter_agent.parser.interaction import row_hosts_checkbox_label_pair
                 from figma_flutter_agent.parser.interaction.selection import (
                     layout_fact_payment_plan_trailing_price_cluster,
+                    layout_fact_payment_selection_radio_glyph_host,
                 )
 
                 if skip_redundant:
                     return inner
                 if layout_fact_payment_plan_trailing_price_cluster(node):
+                    return inner
+                if layout_fact_payment_selection_radio_glyph_host(node):
                     return inner
                 if row_hosts_checkbox_label_pair(node):
                     height = node.sizing.height

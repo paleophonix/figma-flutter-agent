@@ -1,15 +1,15 @@
 {
-  "cacheKey": "fb81079b6de784950214bee1cbb9d58aa4e195994724a2059f74a75c6c51619f",
+  "cacheKey": "e78fe572c6111b15e28a9a49bec93766ff37f5c234c828a8b92f7e398efbe222",
   "response": {
     "entries": [
       {
         "clusterId": "component_1007_7119_e1043bbb",
-        "widgetName": "OrderActionBarWidget",
+        "widgetName": "OrderCheckoutBarWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1149_9467_afa6f842",
-        "widgetName": "QuantityControlWidget",
+        "widgetName": "QuantityStepperWidget",
         "paramRenames": {}
       },
       {
@@ -19,7 +19,7 @@
       },
       {
         "clusterId": "component_1154_8066_faf0fa44",
-        "widgetName": "GuestCountRowWidget",
+        "widgetName": "CutleryCountWidget",
         "paramRenames": {}
       },
       {
@@ -29,17 +29,17 @@
       },
       {
         "clusterId": "component_1154_8697_9095f282",
-        "widgetName": "AgeRatingBadgeWidget",
+        "widgetName": "AgeRestrictionBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10366_754647f7",
-        "widgetName": "AddProductButtonWidget",
+        "widgetName": "AddToOrderButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10701_1aa13d53",
-        "widgetName": "CompactProductCardWidget",
+        "widgetName": "ProductCarouselCardWidget",
         "paramRenames": {}
       },
       {
@@ -49,7 +49,7 @@
       },
       {
         "clusterId": "component_908_4711",
-        "widgetName": "BottomHomeIndicatorWidget",
+        "widgetName": "HomeIndicatorWidget",
         "paramRenames": {}
       },
       {
@@ -64,12 +64,12 @@
       },
       {
         "clusterId": "component_913_8948",
-        "widgetName": "SmallProductIllustrationWidget",
+        "widgetName": "ProductIllustrationWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_919_5311",
-        "widgetName": "ModalSheetHeaderWidget",
+        "widgetName": "OrderModalHeaderWidget",
         "paramRenames": {}
       },
       {
@@ -79,12 +79,12 @@
       },
       {
         "clusterId": "component_933_4777",
-        "widgetName": "SectionDividerWidget",
+        "widgetName": "CardDividerWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_4",
-        "widgetName": "TitlePriceRowWidget",
+        "widgetName": "PriceSuffixLabelWidget",
         "paramRenames": {}
       }
     ]

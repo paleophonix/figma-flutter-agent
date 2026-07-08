@@ -86,6 +86,43 @@ def _subtree_paths(node: CleanDesignTreeNode) -> dict[tuple[int, ...], str]:
     return paths
 
 
+def _rewrite_instance_subtree_id(
+    template_id: str,
+    *,
+    template_root: str,
+    target_root: str,
+) -> str | None:
+    """Rewrite one Figma component-instance id onto a duplicate instance root."""
+    if template_id == template_root:
+        return target_root
+    scoped_prefix = f"I{template_root};"
+    if template_id.startswith(scoped_prefix):
+        return f"I{target_root};{template_id[len(scoped_prefix) :]}"
+    return None
+
+
+def _figma_id_belongs_to_instance_root(figma_id: str, instance_root: str) -> bool:
+    """Return True when ``figma_id`` is scoped to ``instance_root``."""
+    if figma_id == instance_root:
+        return True
+    return figma_id.startswith(f"I{instance_root};")
+
+
+def _allocate_instance_scoped_hydration_id(
+    target_root: str,
+    *,
+    reserved: set[str],
+) -> str:
+    """Allocate a synthetic descendant id under a component instance root."""
+    index = 0
+    while True:
+        candidate = f"I{target_root};hydrate:{index}"
+        index += 1
+        if candidate not in reserved:
+            reserved.add(candidate)
+            return candidate
+
+
 def _collect_flatten_figma_id_pool(node: CleanDesignTreeNode) -> list[str]:
     """Collect pruned-instance node ids preserved on cluster stubs."""
     pool: list[str] = []
@@ -159,6 +196,15 @@ def _build_product_card_hydration_id_map(
     for path, template_id in sorted(template_paths.items()):
         if path == ():
             continue
+        rewritten = _rewrite_instance_subtree_id(
+            template_id,
+            template_root=template.id,
+            target_root=target.id,
+        )
+        if rewritten is not None and rewritten not in used_target_ids:
+            id_map[template_id] = rewritten
+            used_target_ids.add(rewritten)
+            continue
         target_id = target_paths.get(path)
         if target_id is not None and target_id not in used_target_ids:
             id_map[template_id] = target_id
@@ -171,22 +217,30 @@ def _build_product_card_hydration_id_map(
         if target_id not in used_target_ids:
             spare_pool.append(target_id)
     for flatten_id in _collect_flatten_figma_id_pool(target):
+        if not _figma_id_belongs_to_instance_root(flatten_id, target.id):
+            continue
         if flatten_id not in used_target_ids and flatten_id not in spare_pool:
             spare_pool.append(flatten_id)
 
     for template_id in template_only_ids:
         target_id: str | None = None
-        while spare_pool:
+        rewritten = _rewrite_instance_subtree_id(
+            template_id,
+            template_root=template.id,
+            target_root=target.id,
+        )
+        if rewritten is not None and rewritten not in used_target_ids:
+            target_id = rewritten
+        while target_id is None and spare_pool:
             candidate = spare_pool.pop(0)
             if candidate not in used_target_ids:
                 target_id = candidate
                 break
         if target_id is None:
-            target_id = _allocate_hydration_figma_ids(
-                target,
-                count=1,
+            target_id = _allocate_instance_scoped_hydration_id(
+                target.id,
                 reserved=used_target_ids,
-            )[0]
+            )
         id_map[template_id] = target_id
         used_target_ids.add(target_id)
 
@@ -196,13 +250,32 @@ def _build_product_card_hydration_id_map(
 def _remap_subtree_node_ids(
     node: CleanDesignTreeNode,
     id_map: dict[str, str],
+    *,
+    template_root: str | None = None,
+    target_root: str | None = None,
 ) -> CleanDesignTreeNode:
     """Rewrite ids in a copied subtree according to a hydration id map."""
-    new_id = id_map.get(node.id, node.id)
+    new_id = id_map.get(node.id)
+    if new_id is None and template_root is not None and target_root is not None:
+        new_id = _rewrite_instance_subtree_id(
+            node.id,
+            template_root=template_root,
+            target_root=target_root,
+        )
+    if new_id is None:
+        new_id = node.id
     flatten = node.flatten_figma_node_ids
     if flatten:
         flatten = [id_map.get(item, item) for item in flatten]
-    children = [_remap_subtree_node_ids(child, id_map) for child in node.children]
+    children = [
+        _remap_subtree_node_ids(
+            child,
+            id_map,
+            template_root=template_root,
+            target_root=target_root,
+        )
+        for child in node.children
+    ]
     return node.model_copy(
         update={
             "id": new_id,
@@ -231,7 +304,12 @@ def _hydrate_product_card_slot_from_template(
         return None
     hydrated = _clear_cluster_ids_subtree(deep_copy_clean_tree(template_slot))
     reserved_ids.update(id_map.values())
-    return _remap_subtree_node_ids(hydrated, id_map)
+    return _remap_subtree_node_ids(
+        hydrated,
+        id_map,
+        template_root=template_slot.id,
+        target_root=target_slot.id,
+    )
 
 
 def _hydrate_product_card_from_template(

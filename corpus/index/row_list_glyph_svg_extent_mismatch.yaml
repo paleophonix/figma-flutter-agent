@@ -2,6 +2,19 @@ version: 1
 family_id: row_list_glyph_svg_extent_mismatch
 generated: true
 cases:
+- case_id: 2026-07-07-verbatica-plan-radio-width-squeeze
+  case_file: cases/2026-07-07-verbatica-plan-radio-width-squeeze.yaml
+  title: Plan radio glyph host squeezed to 20px interior width
+  project: test
+  feature: verbatica_paywall
+  occurrence_id: verbatica-paywall-plan-radio-width-squeeze
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T18:30:00Z'
+  updated_at: '2026-07-07T18:30:00Z'
+  summary: Trailing check_circle cluster rows are 24x24 with 2px padding but 
+    CONSTRAINED_BOX layout slots pin interior width to 20px, shrinking the 24x24
+    SvgPicture radio glyph.
 - case_id: 2026-07-05-row-list-glyph-svg-extent-mismatch
   case_file: cases/2026-07-05-row-list-glyph-svg-extent-mismatch.yaml
   title: List-row leading glyphs size to wrong paint or host extents
