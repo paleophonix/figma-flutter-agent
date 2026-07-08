@@ -129,10 +129,7 @@ def plan_layout_methods(tree: CleanDesignTreeNode) -> list[LayoutMethod] | None:
     """Split deep layout trees into per-child private builder methods."""
     if _tree_depth(tree) <= MAX_INLINE_LAYOUT_DEPTH:
         return None
-    if (
-        tree.type not in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW}
-        or not tree.children
-    ):
+    if tree.type not in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW} or not tree.children:
         return None
     used: set[str] = set()
     methods: list[LayoutMethod] = []
@@ -197,11 +194,10 @@ def compose_decomposed_root_widget(
     theme_variant: str = "material_3",
     suppress_root_fill: bool = False,
     artboard_background_lead: str | None = None,
+    wallpaper_partitioned: bool = False,
 ) -> str:
     """Compose the root widget expression from extracted builder methods."""
-    pin_bottom_chrome = (
-        tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(tree)
-    )
+    pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(tree)
     allow_outward_paint = stack_needs_soft_clip(tree)
     from figma_flutter_agent.generator.layout.stack_chrome import (
         bottom_chrome_clearance_height,
@@ -242,7 +238,11 @@ def compose_decomposed_root_widget(
             stack_should_flow_as_column,
         )
 
-        if stack_should_flow_as_column(tree) and artboard_background_lead is None:
+        if (
+            stack_should_flow_as_column(tree)
+            and artboard_background_lead is None
+            and not wallpaper_partitioned
+        ):
             from figma_flutter_agent.generator.layout.flex_policy.stack import (
                 _stack_is_phone_shell_layout,
                 is_viewport_chrome_band,
@@ -263,11 +263,8 @@ def compose_decomposed_root_widget(
                 tree,
                 growable_panels=growable_panels,
             )
-            uses_shared_scroll = (
-                pin_bottom_chrome
-                and stack_uses_shared_body_scroll_host(
-                    tree, growable_panels=growable_panels
-                )
+            uses_shared_scroll = pin_bottom_chrome and stack_uses_shared_body_scroll_host(
+                tree, growable_panels=growable_panels
             )
             ordered = sorted(
                 zip(tree.children, methods, strict=True),
@@ -300,25 +297,18 @@ def compose_decomposed_root_widget(
                     parent_node=tree,
                     responsive_enabled=responsive_enabled,
                 ):
-                    widget = stack_flow_child_vertical_extent_wrap(
-                        child, widget, parent_node=tree
-                    )
-                is_scroll_body = (
-                    uses_shared_scroll
-                    and stack_flow_child_is_shared_scroll_body(child, tree)
+                    widget = stack_flow_child_vertical_extent_wrap(child, widget, parent_node=tree)
+                is_scroll_body = uses_shared_scroll and stack_flow_child_is_shared_scroll_body(
+                    child, tree
                 )
-                is_trailing = (
-                    uses_shared_scroll and stack_flow_child_is_trailing_chrome(child)
-                )
+                is_trailing = uses_shared_scroll and stack_flow_child_is_trailing_chrome(child)
                 if not uses_shared_scroll:
                     if (
                         pin_bottom_chrome
                         and responsive_enabled
                         and not is_viewport_chrome_band(child)
                         and not is_bottom_docked_stack_child(child)
-                        and stack_child_should_use_pin_bottom_scroll_host(
-                            child, parent_stack=tree
-                        )
+                        and stack_child_should_use_pin_bottom_scroll_host(child, parent_stack=tree)
                     ):
                         widget = pin_bottom_flow_column_scroll_wrap(
                             widget,
@@ -465,15 +455,18 @@ def compose_decomposed_root_widget(
             _wrap_root_column_viewport,
         )
 
-        growable_panels = sum(
-            1 for child in tree.children if stack_child_is_growable_panel(child)
-        )
+        growable_panels = sum(1 for child in tree.children if stack_child_is_growable_panel(child))
         is_phone_shell = _column_is_phone_shell_layout(
             tree,
             growable_panels=growable_panels,
         )
         if is_phone_shell and len(methods) >= 2:
             flow_parts: list[str] = []
+            if artboard_background_lead:
+                wallpaper_lead = artboard_background_lead
+                if tree.type == NodeType.COLUMN:
+                    wallpaper_lead = _bound_column_wallpaper_lead(wallpaper_lead, tree)
+                flow_parts.append(wallpaper_lead)
             for child, method in zip(tree.children, methods, strict=True):
                 call = f"{method.name}(context)"
                 call = _wrap_column_flow_child_call(

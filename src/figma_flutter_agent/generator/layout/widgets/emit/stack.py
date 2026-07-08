@@ -938,17 +938,13 @@ def render_stack(
         )
         from figma_flutter_agent.generator.layout.flex_policy.stack import (
             stack_child_is_absolute_overlay,
-            stack_flow_column_child_sort_key,
         )
         from figma_flutter_agent.generator.layout.flex_policy.wrap import (
             neutralize_parent_data_for_flex_child,
             repair_flex_parent_data_order,
         )
 
-        ordered_pairs = sorted(
-            emitted_pairs,
-            key=lambda pair: stack_flow_column_child_sort_key(pair[0]),
-        )
+        ordered_pairs = list(emitted_pairs)
         inflow_widgets: list[str] = []
         background_overlays: list[str] = []
         foreground_overlays: list[str] = []

@@ -1,10 +1,10 @@
 {
-  "cacheKey": "e78fe572c6111b15e28a9a49bec93766ff37f5c234c828a8b92f7e398efbe222",
+  "cacheKey": "5c85d5e8410f2dfa53153a3f845ce635f7bc20ee23678f6c663c1175b74978e3",
   "response": {
     "entries": [
       {
         "clusterId": "component_1007_7119_e1043bbb",
-        "widgetName": "OrderCheckoutBarWidget",
+        "widgetName": "CheckoutBarWidget",
         "paramRenames": {}
       },
       {
@@ -14,12 +14,12 @@
       },
       {
         "clusterId": "component_1154_7859_6271d11b",
-        "widgetName": "OrderProductItemWidget",
+        "widgetName": "OrderProductCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1154_8066_faf0fa44",
-        "widgetName": "CutleryCountWidget",
+        "widgetName": "GuestCountWidget",
         "paramRenames": {}
       },
       {
@@ -29,17 +29,17 @@
       },
       {
         "clusterId": "component_1154_8697_9095f282",
-        "widgetName": "AgeRestrictionBadgeWidget",
+        "widgetName": "BonusBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10366_754647f7",
-        "widgetName": "AddToOrderButtonWidget",
+        "widgetName": "AddButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_1356_10701_1aa13d53",
-        "widgetName": "ProductCarouselCardWidget",
+        "widgetName": "CompactProductCardWidget",
         "paramRenames": {}
       },
       {
@@ -69,22 +69,22 @@
       },
       {
         "clusterId": "component_919_5311",
-        "widgetName": "OrderModalHeaderWidget",
+        "widgetName": "ModalHeaderWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_932_4599_e1043bbb",
-        "widgetName": "PlaceOrderButtonWidget",
+        "widgetName": "CheckoutButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_933_4777",
-        "widgetName": "CardDividerWidget",
+        "widgetName": "DividerLineWidget",
         "paramRenames": {}
       },
       {
-        "clusterId": "shape_4",
-        "widgetName": "PriceSuffixLabelWidget",
+        "clusterId": "shape_6",
+        "widgetName": "PriceLabelWidget",
         "paramRenames": {}
       }
     ]

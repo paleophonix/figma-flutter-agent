@@ -161,6 +161,39 @@ def _collect_inter_child_gaps(node: CleanDesignTreeNode, child_count: int) -> li
     return []
 
 
+def _compose_bounded_horizontal_overlap_stack(
+    node: CleanDesignTreeNode,
+    child_widgets: list[str],
+    gaps: list[float],
+) -> str:
+    """Lay out fixed-width row children with negative overlap inside a bounded ``Stack``."""
+    host_width = float(node.sizing.width or 0.0)
+    if host_width <= 0.0:
+        return _compose_flex_children_with_negative_overlap(
+            child_widgets,
+            gaps,
+            axis="horizontal",
+        )
+    layers: list[str] = []
+    cursor = 0.0
+    for index, widget in enumerate(child_widgets):
+        if index > 0:
+            cursor += gaps[index - 1]
+        left = format_geometry_literal(max(cursor, 0.0))
+        layers.append(f"Positioned(left: {left}, child: {widget})")
+        child = node.children[index] if index < len(node.children) else None
+        child_width = float(child.sizing.width or 0.0) if child is not None else 0.0
+        if child_width > 0.0:
+            cursor += child_width
+    body = ", ".join(layers) or "const SizedBox.shrink()"
+    width_lit = format_geometry_literal(host_width)
+    return (
+        f"SizedBox(width: {width_lit}, child: Stack("
+        "clipBehavior: Clip.hardEdge, "
+        f"children: [{body}]))"
+    )
+
+
 def _compose_flex_children_with_negative_overlap(
     child_widgets: list[str],
     gaps: list[float],
@@ -200,6 +233,12 @@ def flex_children_body(
         return "const SizedBox.shrink()"
     inter_child_gaps = _collect_inter_child_gaps(node, len(child_widgets))
     if inter_child_gaps and any(gap < 0 for gap in inter_child_gaps):
+        if (
+            axis == "horizontal"
+            and node.sizing.width_mode == SizingMode.FIXED
+            and (node.sizing.width or 0.0) > 0.0
+        ):
+            return _compose_bounded_horizontal_overlap_stack(node, child_widgets, inter_child_gaps)
         return _compose_flex_children_with_negative_overlap(
             child_widgets,
             inter_child_gaps,

@@ -39,6 +39,7 @@ from figma_flutter_agent.schemas import (
     TextMetricsFrame,
     WrapKind,
 )
+from figma_flutter_agent.schemas.style import ComponentVariant
 from figma_flutter_agent.schemas.geometry import LayoutSlotIr
 
 
@@ -520,7 +521,182 @@ def test_degenerate_raster_stub_not_bound_to_render_boundary(tmp_path: Path) -> 
     assert "2399:42779" in unresolved
 
 
-def test_pill_button_with_label_column_matches_padding_law() -> None:
+def test_home_indicator_skips_orientation_portrait_role_raster(tmp_path: Path) -> None:
+    """Law: iOS chrome Orientation=Portrait must not bind hero portrait.png."""
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    _write_minimal_viable_png(images / "portrait.png")
+    from figma_flutter_agent.parser.boundaries.assets import discover_role_named_raster
+
+    home_indicator = CleanDesignTreeNode(
+        id="2399:42843",
+        name="Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=393.0, height=21.0),
+        variant=ComponentVariant(
+            component_id="111:17496",
+            component_name="Home Indicator",
+            variant_properties={
+                "Device": "iPhone",
+                "Orientation": "Portrait",
+                "Mode": "Light",
+            },
+        ),
+        children=[],
+    )
+    assert discover_role_named_raster(tmp_path, home_indicator) is None
+
+
+def test_promote_render_boundary_flatten_binding(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    _write_minimal_viable_png(images / "portrait.png")
+    (images / ".figma-bindings.json").write_text(
+        '{"bindings": {"portrait.png": "2399:42780"}}',
+        encoding="utf-8",
+    )
+    hero = CleanDesignTreeNode(
+        id="2399:42779",
+        name="Img",
+        type=NodeType.STACK,
+        render_boundary=True,
+        flatten_figma_node_ids=["2399:42780"],
+        sizing=Sizing(width=393.0, height=454.0),
+    )
+    root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[hero])
+    from figma_flutter_agent.parser.boundaries.assets import (
+        promote_render_boundary_flatten_bindings,
+        resolve_missing_image_asset_keys,
+    )
+    from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
+
+    manifest = local_asset_manifest_from_project(tmp_path, clean_tree=root)
+    bindings = {
+        entry.node_id: entry.asset_path
+        for entry in manifest.entries
+        if entry.kind == "image"
+    }
+    resolve_missing_image_asset_keys(root, tmp_path)
+    promote_render_boundary_flatten_bindings(root, tmp_path, bindings)
+    assert hero.image_asset_key == "assets/images/portrait.png"
+
+
+def test_hollow_cluster_vector_shell_inherits_sibling_asset() -> None:
+    populated = CleanDesignTreeNode(
+        id="radio-full",
+        name="check_circle",
+        type=NodeType.ROW,
+        cluster_id="cluster_0",
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_2399_42811.svg",
+            )
+        ],
+    )
+    hollow = CleanDesignTreeNode(
+        id="radio-hollow",
+        name="check_circle",
+        type=NodeType.ROW,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=24.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph-empty",
+                name="Ellipse 697",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=24.0, height=24.0),
+            )
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.ROW,
+        children=[populated, hollow],
+    )
+    resolve_pruned_cluster_instance_assets(root, Path("."))
+    assert hollow.vector_asset_key == "assets/icons/vector_2399_42811.svg"
+
+
+def test_horizontal_inflow_row_preserves_document_child_order() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_flow_column_child_sort_key,
+    )
+
+    time_row = CleanDesignTreeNode(
+        id="time",
+        name="Time",
+        type=NodeType.ROW,
+        sizing=Sizing(width=128.0, height=40.0),
+        stack_placement=StackPlacement(left=16.0, top=0.0, width=128.0, height=40.0),
+        children=[],
+    )
+    icons_row = CleanDesignTreeNode(
+        id="icons",
+        name="Status Icons",
+        type=NodeType.ROW,
+        sizing=Sizing(width=46.0, height=52.0),
+        stack_placement=StackPlacement(left=200.0, top=0.0, width=46.0, height=52.0),
+        children=[],
+    )
+    # Document order: time before icons; vertical sort key would invert them.
+    assert stack_flow_column_child_sort_key(time_row) > stack_flow_column_child_sort_key(
+        icons_row
+    )
+
+
+def test_collapse_nested_positioned_fill_removes_competing_parent_data() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        collapse_nested_positioned_fill,
+    )
+
+    nested = (
+        "Positioned(left: 1.3, width: 13.3, bottom: 1.3, height: 13.3, "
+        "child: Positioned.fill(child: SvgPicture.asset('wifi.svg')))"
+    )
+    collapsed = collapse_nested_positioned_fill(nested)
+    assert "Positioned.fill(" not in collapsed
+    assert "SvgPicture.asset('wifi.svg')" in collapsed
+
+
+def test_bounded_negative_gap_row_uses_stack_not_transform() -> None:
+    from figma_flutter_agent.generator.layout.widgets.flex_sizing import flex_children_body
+
+    wifi = CleanDesignTreeNode(
+        id="wifi",
+        name="Wifi",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=16.0, height=16.0),
+        children=[],
+    )
+    signal = CleanDesignTreeNode(
+        id="signal",
+        name="Signal",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=16.0, height=16.0),
+        children=[],
+    )
+    row = CleanDesignTreeNode(
+        id="wifi-row",
+        name="Wi-Fi Network",
+        type=NodeType.ROW,
+        spacing=-2.0,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=30.0, height=16.0),
+        children=[wifi, signal],
+    )
+    body = flex_children_body(
+        row,
+        ["SizedBox(width: 16.0)", "SizedBox(width: 16.0)"],
+        axis="horizontal",
+    )
+    assert "Transform.translate" not in body
+    assert "Stack(" in body
+    assert "width: 30.0" in body
+
+
     button = CleanDesignTreeNode(
         id="cta",
         name="Button",

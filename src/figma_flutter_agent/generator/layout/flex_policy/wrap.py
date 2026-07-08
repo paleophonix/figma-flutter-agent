@@ -311,12 +311,49 @@ _FLEX_HOIST_WRAPPER_MARKERS = (
 _ILLEGAL_FLEX_PARENT_DATA_HOST_MARKERS = _FLEX_HOIST_WRAPPER_MARKERS
 
 
+def collapse_nested_positioned_fill(widget: str) -> str:
+    """Collapse ``Positioned(..., child: Positioned.fill(child: X))`` to a single ``Positioned``."""
+    from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
+        _find_matching_paren,
+    )
+
+    result = widget.strip()
+    child_bridge = ", child: Positioned.fill("
+    bridge_idx = result.find(child_bridge)
+    if not result.startswith("Positioned(") or bridge_idx < 0:
+        return widget
+    fill_open = bridge_idx + len(child_bridge) - 1
+    fill_close = _find_matching_paren(result, fill_open)
+    if fill_close is None:
+        return widget
+    fill_inner = result[fill_open + 1 : fill_close]
+    fill_child_idx = fill_inner.find("child: ")
+    if fill_child_idx < 0:
+        return widget
+    fill_child = fill_inner[fill_child_idx + len("child: ") :].strip()
+    if not fill_child:
+        return widget
+    outer_open = result.index("(")
+    outer_close = _find_matching_paren(result, outer_open)
+    if outer_close is None:
+        return widget
+    outer_inner = result[outer_open + 1 : outer_close]
+    outer_child_idx = outer_inner.find("child: ")
+    if outer_child_idx < 0:
+        return widget
+    prefix_fields = outer_inner[:outer_child_idx].rstrip().rstrip(",")
+    if prefix_fields:
+        return f"Positioned({prefix_fields}, child: {fill_child})"
+    return f"Positioned(child: {fill_child})"
+
+
 def repair_flex_parent_data_order(widget: str) -> str:
     """Hoist ``Expanded``/``Flexible`` above non-flex wrappers.
 
     Mis-ordered ``Wrapper(child: Expanded(...))`` breaks ROW/COLUMN parent data at
     runtime (e.g. ``Expanded`` under ``RepaintBoundary`` or ``SizedBox``).
     """
+    widget = collapse_nested_positioned_fill(widget)
     descended = _repair_flex_parent_data_descend(widget)
     hoisted = _repair_flex_parent_data_once(descended)
     collapsed = _collapse_adjacent_flex_parent_data(hoisted)

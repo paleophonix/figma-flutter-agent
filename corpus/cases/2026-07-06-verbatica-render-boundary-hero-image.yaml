@@ -8,7 +8,7 @@ case:
   feature: verbatica_paywall
   observed_at: 2026-07-06
   created_at: '2026-07-06T18:35:00Z'
-  updated_at: '2026-07-08T15:00:00Z'
+  updated_at: '2026-07-08T16:25:00Z'
   summary: >
     Paywall hero Img 2399:42779 is flattened to a render boundary without
     imageAssetKey; ambient wallpaper emit produced SizedBox.shrink and the
@@ -48,16 +48,15 @@ occurrences:
         summary: _buildBackground Stack contains SizedBox.shrink only.
     repair:
       summary: >
-        resolve_render_boundary_asset_keys binds raster exports via manifest, flattened
-        descendant ids, and reverse .figma-bindings.json lookups; rejects degenerate
-        placeholder PNG stubs below minimum export dimensions via raster_asset_export_viable.
+        Skip iOS chrome Orientation variant stems for role-named raster pairing;
+        require raster_asset_export_viable for role rasters; promote flatten-child
+        manifest bindings onto render-boundary parents.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
-        - src/figma_flutter_agent/generator/background/detection.py
-        - apps/test/assets/images/.figma-bindings.json
+        - apps/test/assets/images/portrait.png
       regression_tests:
-        - tests/test_verbatica_paywall_emit_laws.py::test_render_boundary_candidates_use_figma_bindings_for_flatten_ids
+        - tests/test_verbatica_paywall_emit_laws.py::test_home_indicator_skips_orientation_portrait_role_raster
+        - tests/test_verbatica_paywall_emit_laws.py::test_promote_render_boundary_flatten_binding
         - tests/test_verbatica_paywall_emit_laws.py::test_verbatica_processed_hero_has_no_wrong_vector_after_asset_passes
-        - tests/test_verbatica_paywall_emit_laws.py::test_degenerate_raster_stub_not_bound_to_render_boundary
       verification:
-        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py -q -k "render_boundary or hero"
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py -q -k "portrait or hero or promote"

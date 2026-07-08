@@ -8,7 +8,7 @@ case:
   feature: verbatica_paywall
   observed_at: 2026-07-08
   created_at: '2026-07-08T12:30:00Z'
-  updated_at: '2026-07-08T15:00:00Z'
+  updated_at: '2026-07-08T16:25:00Z'
   summary: >
     The default browser branch of verbatica_paywall_layout.dart emits an outer
     SingleChildScrollView wrapping SizedBox(height: 780) -> Stack, where the hero band is
@@ -57,7 +57,8 @@ occurrences:
       changed_files:
         - src/figma_flutter_agent/generator/layout/stack_chrome.py
         - src/figma_flutter_agent/generator/layout/file_methods.py
+        - src/figma_flutter_agent/generator/layout/file.py
       regression_tests:
         - tests/test_layout_flex_policy.py::test_wallpaper_pin_bottom_suppresses_nested_content_scrollers
       verification:
-        - poetry run pytest tests/test_layout_flex_policy.py::test_wallpaper_pin_bottom_suppresses_nested_content_scrollers -q
+        - poetry run pytest tests/test_layout_flex_policy.py::test_wallpaper_pin_bottom_suppresses_nested_content_scrollers tests/test_verbatica_paywall_emit_laws.py -q

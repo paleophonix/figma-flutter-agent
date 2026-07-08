@@ -197,6 +197,7 @@ def render_layout_file(
                 theme_variant=theme_variant,
                 suppress_root_fill=bool(wallpaper_children),
                 artboard_background_lead=artboard_background_lead,
+                wallpaper_partitioned=bool(wallpaper_children),
             )
             method_defs = "\n" + "".join(blocks)
             if cover_wallpaper:

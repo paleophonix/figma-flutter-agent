@@ -30,6 +30,7 @@ def raster_asset_export_viable(path: Path) -> bool:
         return len(data) >= 256
     return True
 
+
 _COMPONENT_LEAF_RASTER_ALIASES: dict[str, str] = {
     "map": "location",
     "book-reader": "seat",
@@ -49,6 +50,9 @@ _COMPONENT_LEAF_SVG_ALIASES: dict[str, str] = {
 _VARIANT_VALUE_RASTER_ALIASES: dict[str, str] = {
     "delivered": "meal",
 }
+
+# iOS chrome variant axes must not match hero rasters like ``portrait.png``.
+_CHROME_VARIANT_PROPERTY_KEYS = frozenset({"device", "orientation", "mode"})
 
 
 def _normalize_role_token(value: str) -> str:
@@ -71,7 +75,9 @@ def _component_icon_role_stems(node: CleanDesignTreeNode) -> list[str]:
         stems.append(stem)
 
     if node.variant is not None:
-        for value in node.variant.variant_properties.values():
+        for key, value in node.variant.variant_properties.items():
+            if _normalize_role_token(key) in _CHROME_VARIANT_PROPERTY_KEYS:
+                continue
             normalized = _normalize_role_token(str(value))
             alias = _VARIANT_VALUE_RASTER_ALIASES.get(normalized)
             if alias:
@@ -113,7 +119,7 @@ def discover_role_named_raster(project_dir: Path, node: CleanDesignTreeNode) -> 
         _COMPONENT_LEAF_RASTER_ALIASES,
     ):
         candidate = project_dir / "assets" / "images" / f"{stem}.png"
-        if candidate.is_file():
+        if candidate.is_file() and raster_asset_export_viable(candidate):
             return f"assets/images/{candidate.name}".replace("\\", "/")
     return None
 
@@ -245,6 +251,39 @@ def apply_semantic_image_manifest_bindings(
     from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 
     walk_clean_tree(tree, visit, phase="assets_semantic_manifest")
+    promote_render_boundary_flatten_bindings(tree, project_dir, bindings)
+
+
+def promote_render_boundary_flatten_bindings(
+    tree: CleanDesignTreeNode,
+    project_dir: Path,
+    bindings: dict[str, str],
+) -> None:
+    """Attach flatten-child manifest rasters onto their render-boundary parent hosts."""
+    if not bindings:
+        return
+
+    def visit(node: CleanDesignTreeNode) -> None:
+        if not node.render_boundary or node.image_asset_key:
+            return
+        candidate_ids = [node.id, *(node.flatten_figma_node_ids or ())]
+        for node_id in candidate_ids:
+            bound = bindings.get(node_id)
+            if bound is None:
+                continue
+            asset_path = project_dir / Path(bound)
+            if not asset_path.is_file():
+                continue
+            if bound.lower().endswith(
+                (".png", ".jpg", ".jpeg", ".webp")
+            ) and not raster_asset_export_viable(asset_path):
+                continue
+            node.image_asset_key = bound.replace("\\", "/")
+            return
+
+    from figma_flutter_agent.parser.tree_walk import walk_clean_tree
+
+    walk_clean_tree(tree, visit, phase="assets_render_boundary_flatten_promote")
 
 
 def render_boundary_asset_path(node_id: str) -> str:
@@ -359,9 +398,9 @@ def _prune_missing_render_boundary_asset_keys(
         if not asset_path.is_file():
             setattr(node, attr, None)
             continue
-        if asset_key.lower().endswith((".png", ".jpg", ".jpeg", ".webp")) and not raster_asset_export_viable(
-            asset_path
-        ):
+        if asset_key.lower().endswith(
+            (".png", ".jpg", ".jpeg", ".webp")
+        ) and not raster_asset_export_viable(asset_path):
             setattr(node, attr, None)
 
 
@@ -1047,6 +1086,19 @@ def resolve_pruned_cluster_instance_assets(
 
     cluster_vector_keys: dict[str, str] = {}
 
+    def _cluster_instance_needs_hydration(node: CleanDesignTreeNode) -> bool:
+        if not node.cluster_id:
+            return False
+        if not node.children:
+            return True
+        if len(node.children) == 1:
+            from figma_flutter_agent.schemas import NodeType
+
+            child = node.children[0]
+            if child.type == NodeType.VECTOR and not child.vector_asset_key:
+                return True
+        return False
+
     def _cluster_instance_vector_key(node: CleanDesignTreeNode) -> str | None:
         if node.vector_asset_key:
             return node.vector_asset_key
@@ -1063,11 +1115,12 @@ def resolve_pruned_cluster_instance_assets(
             cluster_vector_keys[node.cluster_id] = vector_key
 
     def visit(node: CleanDesignTreeNode) -> None:
-        if node.cluster_id and not node.children:
-            inherited = cluster_vector_keys.get(node.cluster_id)
-            if inherited is not None and not node.vector_asset_key:
-                node.vector_asset_key = inherited
-                return
+        if not _cluster_instance_needs_hydration(node):
+            return
+        inherited = cluster_vector_keys.get(node.cluster_id)
+        if inherited is not None and not node.vector_asset_key:
+            node.vector_asset_key = inherited
+            return
             resolved: str | None = None
             candidate_ids: list[str] = []
             for node_id in node.flatten_figma_node_ids or ():

@@ -893,6 +893,8 @@ families:
     owners:
       - module: src/figma_flutter_agent/generator/layout/flex_policy/row.py
         symbol: _column_child_keeps_intrinsic_width
+      - module: src/figma_flutter_agent/generator/layout/flex_policy/extents.py
+        symbol: bind_row_cross_axis_height
       - module: src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
         symbol: apply_flex_wrap_to_widget
     law_ids:

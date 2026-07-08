@@ -1,21 +1,22 @@
 {
-  "cacheKey": "0571f4e1844ba74276a4a58fd16e2308dc67bae93a1c3da15cd5f35865ab99f0",
+  "cacheKey": "09df06bb28eab780df86ae180ef533276f927794ae842ca2df721b9df26faa49",
   "response": {
     "candidates": [
       {
         "nodeId": "4408:44896",
-        "widgetName": "OrderProductItem",
-        "reason": "Repeated order line item card with image, title/price row, optional details, and quantity controls; same structure appears across multiple sibling instances.",
-        "confidence": 0.99,
+        "widgetName": "OrderProductCard",
+        "reason": "Repeated product line-item family with the same image/body/quantity structure across multiple instances; only text, price, and detail sections vary.",
+        "confidence": 0.97,
         "suggestedParams": [
-          "productTitle",
+          "titleText",
           "priceText",
-          "detailText",
           "quantity",
+          "detailsText",
           "showDetails",
-          "imageProvider",
-          "onDecrease",
-          "onIncrease"
+          "showDivider",
+          "imageUrl",
+          "onIncrement",
+          "onDecrement"
         ],
         "evidence": {
           "similarNodes": [
@@ -24,20 +25,22 @@
             "4408:44901",
             "4408:44902"
           ],
-          "shapeSimilarity": 0.98,
-          "semanticRole": "repeated order product row/card"
+          "shapeSimilarity": 0.95,
+          "semanticRole": "order product item"
         }
       },
       {
         "nodeId": "I4408:44896;1154:7849",
-        "widgetName": "AddProductStepper",
-        "reason": "Reused plus/minus quantity control appears in multiple order product rows and matches the same component group throughout the screen.",
-        "confidence": 0.97,
+        "widgetName": "QuantityStepper",
+        "reason": "Reusable increment/decrement control repeated in several product rows and cards with the same minus/value/plus layout.",
+        "confidence": 0.98,
         "suggestedParams": [
-          "count",
-          "onDecrease",
-          "onIncrease",
-          "compact"
+          "value",
+          "onIncrement",
+          "onDecrement",
+          "isDark",
+          "minValue",
+          "maxValue"
         ],
         "evidence": {
           "similarNodes": [
@@ -48,50 +51,47 @@
             "I4408:44916;1356:10673"
           ],
           "shapeSimilarity": 0.99,
-          "semanticRole": "quantity adjustment control"
+          "semanticRole": "quantity selector"
         }
       },
       {
         "nodeId": "4408:44914",
         "widgetName": "ProductSmallCard",
-        "reason": "Repeated product suggestion card/grid item with title, image, optional price/discount, and add action; three variants share the same base shape.",
-        "confidence": 0.96,
+        "reason": "Repeated horizontal product tile in the swipe row; shared card anatomy with title, image, price, and add action, while pricing/action content changes by variant.",
+        "confidence": 0.95,
         "suggestedParams": [
-          "title",
+          "titleText",
           "priceText",
-          "oldPriceText",
-          "buttonLabel",
-          "showPrice",
-          "onAdd",
-          "imageProvider"
+          "comparePriceText",
+          "imageUrl",
+          "actionLabel",
+          "showGradient",
+          "isPromo"
         ],
         "evidence": {
           "similarNodes": [
             "4408:44915",
             "4408:44916"
           ],
-          "shapeSimilarity": 0.93,
-          "semanticRole": "small product recommendation card"
+          "shapeSimilarity": 0.92,
+          "semanticRole": "small product tile"
         }
       },
       {
-        "nodeId": "I4408:44915;1356:10712",
-        "widgetName": "AddProductButton",
-        "reason": "Compact repeated add button used inside product cards and order rows; same plus icon control is duplicated in multiple places.",
-        "confidence": 0.95,
+        "nodeId": "4408:44903",
+        "widgetName": "ActionListItem",
+        "reason": "Consistent tappable action row pattern with leading icon, title text, trailing arrow, and divider; suitable for reuse as a generic menu/action item.",
+        "confidence": 0.78,
         "suggestedParams": [
-          "onTap",
-          "enabled"
+          "titleText",
+          "leadingIcon",
+          "trailingIcon",
+          "showDivider"
         ],
         "evidence": {
-          "similarNodes": [
-            "I4408:44916;1356:10673",
-            "I4408:44896;1154:7849;1149:9855",
-            "I4408:44897;1154:7849;1149:9855",
-            "I4408:44904;1154:8077"
-          ],
-          "shapeSimilarity": 0.98,
-          "semanticRole": "add item button"
+          "similarNodes": [],
+          "shapeSimilarity": 0.81,
+          "semanticRole": "action row"
         }
       }
     ]

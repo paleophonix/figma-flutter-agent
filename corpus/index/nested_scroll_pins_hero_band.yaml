@@ -11,7 +11,7 @@ cases:
   status: FIXED
   observed_at: '2026-07-08'
   created_at: '2026-07-08T12:30:00Z'
-  updated_at: '2026-07-08T15:00:00Z'
+  updated_at: '2026-07-08T16:25:00Z'
   summary: 'The default browser branch of verbatica_paywall_layout.dart emits an outer
     SingleChildScrollView wrapping SizedBox(height: 780) -> Stack, where the hero
     band is Positioned.fill(_buildBackground) (non-scroll) and the plan content lives

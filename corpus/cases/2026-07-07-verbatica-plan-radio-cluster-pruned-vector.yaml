@@ -8,7 +8,7 @@ case:
   feature: verbatica_paywall
   observed_at: 2026-07-07
   created_at: '2026-07-07T12:00:00Z'
-  updated_at: '2026-07-08T15:00:00Z'
+  updated_at: '2026-07-08T16:25:00Z'
   summary: >
     Plan row trailing check_circle cluster_0 duplicate 2399:42821 is cluster-pruned
     (no children, no vectorAssetKey) while sibling instances retain the radio vector.
@@ -47,13 +47,12 @@ occurrences:
         summary: third plan radio Semantics Ellipse 697 with const SizedBox.shrink().
     repair:
       summary: >
-        resolve_pruned_cluster_instance_assets pre-collects vectorAssetKey per
-        cluster_id from populated instances (including descendant VECTOR glyphs)
-        and assigns it to pruned duplicates before on-disk lookup.
+        Hydrate cluster duplicates whose sole VECTOR child lacks an export by inheriting
+        the populated cluster vectorAssetKey from sibling instances.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
       regression_tests:
-        - tests/test_verbatica_paywall_emit_laws.py::test_pruned_cluster_inherits_vector_from_populated_sibling
+        - tests/test_verbatica_paywall_emit_laws.py::test_hollow_cluster_vector_shell_inherits_sibling_asset
         - tests/test_verbatica_paywall_emit_laws.py::test_pruned_cluster_inherits_vector_from_child_glyph_only
       verification:
-        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py -q -k pruned_cluster
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py -q -k "cluster or pruned"
