@@ -149,6 +149,8 @@ def compact_icon_host_layers(
     host: CleanDesignTreeNode,
 ) -> tuple[CleanDesignTreeNode | None, CleanDesignTreeNode | None]:
     """Return full-size plate vector and inset foreground glyph for a compact icon host."""
+    if host.image_asset_key and not host.image_asset_key.lower().endswith(".svg"):
+        return None, host
     host_width = float(host.sizing.width or 0.0)
     host_height = float(host.sizing.height or 0.0)
     if host_width <= 0 or host_height <= 0:

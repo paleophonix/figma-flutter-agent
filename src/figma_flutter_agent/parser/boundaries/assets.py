@@ -1084,7 +1084,13 @@ def resolve_pruned_cluster_instance_assets(
             paths.append(discovered)
         return paths
 
-    cluster_vector_keys: dict[str, str] = {}
+    cluster_vector_keys: dict[tuple[str, str | None], str] = {}
+
+    def _cluster_vector_identity_key(node: CleanDesignTreeNode) -> tuple[str, str | None]:
+        component_ref = node.component_ref
+        if component_ref is None and node.variant is not None:
+            component_ref = node.variant.component_id
+        return (node.cluster_id or "", component_ref)
 
     def _cluster_instance_needs_hydration(node: CleanDesignTreeNode) -> bool:
         if not node.cluster_id:
@@ -1110,40 +1116,100 @@ def resolve_pruned_cluster_instance_assets(
         vector_key = _cluster_instance_vector_key(node)
         if not vector_key:
             return
-        existing = cluster_vector_keys.get(node.cluster_id)
+        key = _cluster_vector_identity_key(node)
+        existing = cluster_vector_keys.get(key)
         if existing is None or (node.children and not existing):
-            cluster_vector_keys[node.cluster_id] = vector_key
+            cluster_vector_keys[key] = vector_key
+
+    def _resolve_vector_for_node(node: CleanDesignTreeNode) -> str | None:
+        component_ref = node.component_ref
+        if component_ref is None and node.variant is not None:
+            component_ref = node.variant.component_id
+        candidate_ids: list[str] = []
+        for node_id in node.flatten_figma_node_ids or ():
+            candidate_ids.append(node_id)
+        candidate_ids.append(node.id)
+        for node_id in candidate_ids:
+            for candidate in candidate_paths(node_id, component_ref=component_ref):
+                candidate_path = project_dir / Path(candidate)
+                if candidate_path.is_file() and (
+                    not candidate.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+                    or raster_asset_export_viable(candidate_path)
+                ):
+                    return candidate.replace("\\", "/")
+        return None
 
     def visit(node: CleanDesignTreeNode) -> None:
         if not _cluster_instance_needs_hydration(node):
             return
-        inherited = cluster_vector_keys.get(node.cluster_id)
+        key = _cluster_vector_identity_key(node)
+        inherited = cluster_vector_keys.get(key)
         if inherited is not None and not node.vector_asset_key:
             node.vector_asset_key = inherited
             return
-            resolved: str | None = None
-            candidate_ids: list[str] = []
-            for node_id in node.flatten_figma_node_ids or ():
-                candidate_ids.append(node_id)
-            candidate_ids.append(node.id)
-            for node_id in candidate_ids:
-                for candidate in candidate_paths(node_id, component_ref=node.component_ref):
-                    candidate_path = project_dir / Path(candidate)
-                    if candidate_path.is_file() and (
-                        not candidate.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
-                        or raster_asset_export_viable(candidate_path)
-                    ):
-                        resolved = candidate.replace("\\", "/")
-                        break
-                if resolved is not None:
-                    break
+        resolved = _resolve_vector_for_node(node)
+        if resolved is not None:
+            node.vector_asset_key = resolved
+
+    def _promote_bound_svg_image_key(node: CleanDesignTreeNode) -> str | None:
+        key = node.image_asset_key
+        if key and key.lower().endswith(".svg"):
+            return key.replace("\\", "/")
+        return None
+
+    def _direct_vector_glyph_asset(node: CleanDesignTreeNode) -> str | None:
+        from figma_flutter_agent.schemas import NodeType
+
+        for child in node.children:
+            if child.type != NodeType.VECTOR:
+                continue
+            if child.vector_asset_key:
+                return child.vector_asset_key
+            promoted = _promote_bound_svg_image_key(child)
+            if promoted is not None:
+                return promoted
+        return None
+
+    def visit_icons_component_vectors(node: CleanDesignTreeNode) -> None:
+        from figma_flutter_agent.schemas import NodeType
+
+        variant_name = ""
+        if node.variant is not None and node.variant.component_name:
+            variant_name = node.variant.component_name
+        elif node.name:
+            variant_name = node.name
+        normalized = variant_name.replace("\\", "/")
+        if node.type != NodeType.STACK or not normalized.startswith("Icons/"):
+            return
+
+        def bind_descendants(current: CleanDesignTreeNode) -> None:
+            for child in current.children:
+                bind_descendants(child)
+            promoted = _promote_bound_svg_image_key(current)
+            if promoted is not None:
+                current.vector_asset_key = promoted
+                return
+            direct_glyph = _direct_vector_glyph_asset(current)
+            if direct_glyph is not None:
+                current.vector_asset_key = direct_glyph
+                return
+            descendant_key = _best_descendant_vector_asset(current)
+            if descendant_key is not None:
+                current.vector_asset_key = descendant_key
+                return
+            if current.vector_asset_key:
+                return
+            resolved = _resolve_vector_for_node(current)
             if resolved is not None:
-                node.vector_asset_key = resolved
+                current.vector_asset_key = resolved
+
+        bind_descendants(node)
 
     from figma_flutter_agent.parser.tree_walk import walk_clean_tree
 
     walk_clean_tree(tree, collect_cluster_vectors)
     walk_clean_tree(tree, visit)
+    walk_clean_tree(tree, visit_icons_component_vectors)
 
 
 def resolve_render_boundary_asset_keys(

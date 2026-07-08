@@ -11,7 +11,7 @@ cases:
   status: FIXED
   observed_at: '2026-07-08'
   created_at: '2026-07-08T08:30:00Z'
-  updated_at: '2026-07-08T08:40:00Z'
+  updated_at: '2026-07-08T16:50:00Z'
   summary: Order product stepper Icons/28/Minus and Icons/28/Plus nodes in 
     processed.json have vectorAssetKey=None after cluster prune/hydrate. Emit 
     falls back to Icons.circle_outlined for minus and mis-bound 18chip.png / 
@@ -26,7 +26,7 @@ cases:
   status: FIXED
   observed_at: '2026-07-07'
   created_at: '2026-07-07T10:50:00Z'
-  updated_at: '2026-07-07T10:50:00Z'
+  updated_at: '2026-07-08T16:50:00Z'
   summary: Promo and Guests rows both emitted vector_1162_10106.svg. Users leaf 
     4181:43463 had no on-disk export; family discovery keyed off instance-path 
     file key 1162_ and picked the Ticket export. Promo STACK already had 

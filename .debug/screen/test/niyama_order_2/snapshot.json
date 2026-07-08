@@ -10,7 +10,7 @@
     "lib/widgets/modal_header_widget.dart": "7fc5f0aa97b21c9ea68d7ee8cc6ead473a042c8599a98692856fe9272de0c26f",
     "lib/widgets/home_indicator_widget.dart": "9f910b98f50da742a42675fda6e684f427fbd290234fd2f8d8879f67bd0ee1a9",
     "lib/widgets/divider_line_widget.dart": "b6c0169d70f5348c765eca28a41336a283c476d8a292687a94931b92a37301be",
-    "lib/widgets/order_product_item_widget.dart": "68e6e4de663c2d1d345ce2cc0964b89c9afb760a3a9b8f1d77894960cf06e3b6",
+    "lib/widgets/order_product_item_widget.dart": "5d10e9e9c6fc13b33b9b924ebf36051f05be9e303fe324d24ee785b148d957c0",
     "lib/widgets/cutlery_info_widget.dart": "b23081a561bc82e90a69b1abfc6119f6a549055bf096359123e0cf8b5ff9abe5",
     "lib/widgets/delivery_status_badge_widget.dart": "a1f5e4e87b3373cd65ea15e3130747bc59612b9f47df62d2152a951a73c95a79",
     "lib/widgets/address_info_card_widget.dart": "83168be8cc5e9b126ad7964ba46f47ceadbc3f79d70269ad148c75d2e6969d18",
@@ -25,7 +25,7 @@
     "lib/theme/app_edge_insets.dart": "4e2b49fc67fcbdac9d8df2dd612dc39be0d11efe326bd44d579d5a2ea775dab2",
     "lib/theme/app_elevation.dart": "65d30a52db739f429f47dd0c97ee44d4e631c4a269ac99c6782f335bf545e741",
     "lib/theme/app_theme.dart": "5c096d3d6ac7322706b809f055bbacebeb2540792a336625c2032a464c527798",
-    "lib/generated/niyama_order_2_layout.dart": "4b6d70850532288ada0b48ddec9639f9189455713b21c5cc771d5147a4000fd9",
+    "lib/generated/niyama_order_2_layout.dart": "aa3f8af4c53f99b50f29cbb1862bbf568674bf4109cb104d51209f71a7ca853e",
     "lib/generated/niyama_order_2_chunk_662b1bc1.dart": "9b8d93c0313eb20004e0fa4937e998656005b2f6c36196add35668a39c8e9a66",
     "lib/features/niyama_order_2/niyama_order_2_screen.dart": "c0395e7bb169d10ea0514ec41a687e710c1963974e228ba56623ca304ae1042b",
     "test/golden/niyama_order_2_screen_test.dart": "606f696e0fe5f3fab323725940f30805a3cf4e6d9c53e4dc8747323c9f54f922",
@@ -49,6 +49,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 8,
-  "updated_at": "2026-07-08T08:32:36.861692+00:00"
+  "version": 9,
+  "updated_at": "2026-07-08T14:00:12.440555+00:00"
 }

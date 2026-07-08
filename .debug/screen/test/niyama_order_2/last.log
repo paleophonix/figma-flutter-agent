@@ -1,31 +1,31 @@
 
---- dart format @ 2026-07-08T08:31:44.863100+00:00 ---
+--- dart format @ 2026-07-08T13:59:08.668295+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\action_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\address_info_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\cutlery_info_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\delivery_status_badge_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\modal_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\order_actions_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\order_detail_row_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\lib\widgets\order_product_item_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\test\golden\niyama_order_2_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-cu8d5xbx\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\address_info_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\cutlery_info_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\delivery_status_badge_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\divider_line_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\order_actions_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\order_detail_row_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\test\golden\niyama_order_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-3mt047up\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 22 files (22 changed) in 2.06 seconds.
 
---- pub get --offline @ 2026-07-08T08:31:48.139686+00:00 ---
+--- pub get --offline @ 2026-07-08T13:59:23.774703+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -38,7 +38,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/2) @ 2026-07-08T08:31:51.870008+00:00 ---
+--- dart analyze (generated) (1/2) @ 2026-07-08T13:59:29.993924+00:00 ---
 exit_code=0
 Analyzing action_button_widget.dart, address_info_card_widget.dart, cutlery_info_widget.dart, delivery_status_badge_widget.dart, divider_line_widget.dart, home_indicator_widget.dart...
 
@@ -51,7 +51,7 @@ warning - lib\widgets\home_indicator_widget.dart:6:8 - Unused import: 'package:t
 
 6 issues found.
 
---- dart analyze (generated) (2/2) @ 2026-07-08T08:31:54.940849+00:00 ---
+--- dart analyze (generated) (2/2) @ 2026-07-08T13:59:32.796777+00:00 ---
 exit_code=0
 Analyzing modal_header_widget.dart, order_actions_bar_widget.dart, order_detail_row_widget.dart, order_product_item_widget.dart...
 
@@ -61,7 +61,7 @@ Analyzing modal_header_widget.dart, order_actions_bar_widget.dart, order_detail_
 
 3 issues found.
 
---- dart analyze (generated) (1/4) @ 2026-07-08T08:31:58.145922+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-08T13:59:36.076747+00:00 ---
 exit_code=0
 Analyzing niyama_order_2_screen.dart, niyama_order_2_chunk_662b1bc1.dart, niyama_order_2_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart...
 
@@ -75,13 +75,13 @@ warning - lib\generated\niyama_order_2_layout.dart:11:8 - Unused import: 'packag
 warning - lib\generated\niyama_order_2_layout.dart:12:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_2_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
    info - lib\generated\niyama_order_2_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\niyama_order_2_layout.dart:40:3372 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\niyama_order_2_layout.dart:40:3438 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\niyama_order_2_layout.dart:40:3526 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_2_layout.dart:40:3401 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_2_layout.dart:40:3467 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_2_layout.dart:40:3555 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 13 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-08T08:32:01.222079+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-08T13:59:39.278038+00:00 ---
 exit_code=0
 Analyzing app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart...
 
@@ -89,7 +89,7 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
 
 1 issue found.
 
---- dart analyze (generated) (3/4) @ 2026-07-08T08:32:04.068288+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-08T13:59:42.826390+00:00 ---
 exit_code=0
 Analyzing action_button_widget.dart, address_info_card_widget.dart, cutlery_info_widget.dart, delivery_status_badge_widget.dart, divider_line_widget.dart, home_indicator_widget.dart...
 
@@ -102,7 +102,7 @@ warning - lib\widgets\home_indicator_widget.dart:6:8 - Unused import: 'package:t
 
 6 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-08T08:32:07.184689+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-08T13:59:46.399662+00:00 ---
 exit_code=0
 Analyzing modal_header_widget.dart, order_actions_bar_widget.dart, order_detail_row_widget.dart, order_product_item_widget.dart, niyama_order_2_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -113,85 +113,85 @@ Analyzing modal_header_widget.dart, order_actions_bar_widget.dart, order_detail_
 
 4 issues found.
 
---- dart format @ 2026-07-08T08:32:11.672063+00:00 ---
+--- dart format @ 2026-07-08T13:59:50.423326+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\action_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\address_info_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\cutlery_info_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\delivery_status_badge_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\modal_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\order_actions_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\order_detail_row_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\lib\widgets\order_product_item_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\test\golden\niyama_order_2_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-7cepq4_0\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 22 files (22 changed) in 1.96 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\address_info_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\cutlery_info_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\delivery_status_badge_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\divider_line_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\order_actions_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\order_detail_row_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\test\golden\niyama_order_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-38i_ltwa\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 22 files (22 changed) in 1.77 seconds.
 
---- dart format @ 2026-07-08T08:32:15.946356+00:00 ---
+--- dart format @ 2026-07-08T13:59:54.068483+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\action_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\address_info_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\cutlery_info_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\delivery_status_badge_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\modal_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\order_actions_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\order_detail_row_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\lib\widgets\order_product_item_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\test\golden\niyama_order_2_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6r0f7bze\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 22 files (22 changed) in 1.93 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\features\niyama_order_2\niyama_order_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\address_info_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\cutlery_info_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\delivery_status_badge_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\divider_line_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\order_actions_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\order_detail_row_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\test\golden\niyama_order_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-928nznuo\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 22 files (22 changed) in 1.82 seconds.
 
---- dart format @ 2026-07-08T08:32:21.599286+00:00 ---
+--- dart format @ 2026-07-08T13:59:59.215151+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\features\niyama_order_2\niyama_order_2_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\action_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\address_info_card_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\cutlery_info_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\delivery_status_badge_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\modal_header_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\order_actions_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\order_detail_row_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\lib\widgets\order_product_item_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\test\golden\niyama_order_2_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-vaqoagyp\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 22 files (22 changed) in 2.36 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\features\niyama_order_2\niyama_order_2_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\action_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\address_info_card_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\cutlery_info_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\delivery_status_badge_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\divider_line_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\modal_header_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\order_actions_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\order_detail_row_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\lib\widgets\order_product_item_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\test\golden\niyama_order_2_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-q48j_292\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 22 files (22 changed) in 2.10 seconds.
 
---- pub get --offline @ 2026-07-08T08:32:24.846016+00:00 ---
+--- pub get --offline @ 2026-07-08T14:00:01.990306+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -204,7 +204,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/4) @ 2026-07-08T08:32:27.948487+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-08T14:00:04.540015+00:00 ---
 exit_code=0
 Analyzing niyama_order_2_screen.dart, niyama_order_2_chunk_662b1bc1.dart, niyama_order_2_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart...
 
@@ -218,13 +218,13 @@ warning - lib\generated\niyama_order_2_layout.dart:11:8 - Unused import: 'packag
 warning - lib\generated\niyama_order_2_layout.dart:12:8 - Unused import: 'package:test/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\niyama_order_2_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
    info - lib\generated\niyama_order_2_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\niyama_order_2_layout.dart:40:3372 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\niyama_order_2_layout.dart:40:3438 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\niyama_order_2_layout.dart:40:3526 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_2_layout.dart:40:3401 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_2_layout.dart:40:3467 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\niyama_order_2_layout.dart:40:3555 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 13 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-08T08:32:30.667567+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-08T14:00:06.903704+00:00 ---
 exit_code=0
 Analyzing app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart...
 
@@ -232,7 +232,7 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
 
 1 issue found.
 
---- dart analyze (generated) (3/4) @ 2026-07-08T08:32:33.647407+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-08T14:00:09.628060+00:00 ---
 exit_code=0
 Analyzing action_button_widget.dart, address_info_card_widget.dart, cutlery_info_widget.dart, delivery_status_badge_widget.dart, divider_line_widget.dart, home_indicator_widget.dart...
 
@@ -245,7 +245,7 @@ warning - lib\widgets\home_indicator_widget.dart:4:8 - Unused import: 'package:t
 
 6 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-08T08:32:36.794946+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-08T14:00:12.392251+00:00 ---
 exit_code=0
 Analyzing modal_header_widget.dart, order_actions_bar_widget.dart, order_detail_row_widget.dart, order_product_item_widget.dart, niyama_order_2_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -256,7 +256,7 @@ Analyzing modal_header_widget.dart, order_actions_bar_widget.dart, order_detail_
 
 4 issues found.
 
---- flutter pub get @ 2026-07-08T08:32:41.064879+00:00 ---
+--- flutter pub get @ 2026-07-08T14:00:16.593885+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -268,12 +268,12 @@ Got dependencies!
 4 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-08T08:32:41.065880+00:00 ---
+--- flutter render errors @ 2026-07-08T14:00:16.595559+00:00 ---
 ══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
 The following assertion was thrown during performLayout():
 The relevant error-causing widget was:
 When the exception was thrown, this was the stack:
-The following RenderObject was being processed when the exception was fired: RenderFlex#7e48c relayoutBoundary=up1 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE:
+The following RenderObject was being processed when the exception was fired: RenderFlex#00ff8 relayoutBoundary=up1 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE:
 This RenderObject had the following descendants (showing up to depth 5):
 ════════════════════════════════════════════════════════════════════════════════════════════════════
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
@@ -291,6 +291,9 @@ Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/shifted_box.dart:373:12
 Another exception was thrown: A RenderFlex overflowed by 1.00 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 23 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 1.00 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 1.00 pixels on the bottom.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
@@ -300,78 +303,6 @@ Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/
 Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Cannot hit test a render box with no size.
@@ -395,6 +326,12 @@ Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
@@ -409,11 +346,17 @@ Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
@@ -428,6 +371,12 @@ Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
@@ -443,7 +392,9 @@ Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
@@ -456,33 +407,72 @@ Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/mouse_tracker.dart:199:12
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.

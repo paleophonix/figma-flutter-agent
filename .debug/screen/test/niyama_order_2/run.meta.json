@@ -1,8 +1,8 @@
 {
   "feature": "niyama_order_2",
-  "pipeline_run_id": "15b150c8cf0e",
-  "candidate_build_run_id": "15b150c8cf0e",
-  "committed_build_run_id": "15b150c8cf0e",
+  "pipeline_run_id": "2a466b0ae6e4",
+  "candidate_build_run_id": "2a466b0ae6e4",
+  "committed_build_run_id": "2a466b0ae6e4",
   "writeback": "committed",
   "written_files": [
     "lib/features/niyama_order_2/niyama_order_2_screen.dart",
@@ -31,11 +31,11 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-07-08T08:32:36.919469+00:00",
+  "captured_at": "2026-07-08T14:00:12.490043+00:00",
   "runMetaSchemaVersion": "2",
   "status": "completed",
   "cached_ir_verdict": "incompatible",
   "clean_tree_hash": "8c31616d821330c27472d376de2cbbc2870a2c8bf385c903c3e2f1f2e0bf51a7",
   "generation_config_hash": "2690cb8010d3e28a24f491c05476d2b4e19c4a825c44db1e502cdca3beebac06",
-  "run_started_at": "2026-07-08T08:30:38.112998+00:00"
+  "run_started_at": "2026-07-08T13:58:37.708727+00:00"
 }

@@ -8,7 +8,7 @@ case:
   feature: niyama_order
   observed_at: 2026-07-08
   created_at: '2026-07-08T08:30:00Z'
-  updated_at: '2026-07-08T08:40:00Z'
+  updated_at: '2026-07-08T16:50:00Z'
   summary: >
     Order product stepper Icons/28/Minus and Icons/28/Plus nodes in processed.json
     have vectorAssetKey=None after cluster prune/hydrate. Emit falls back to
@@ -49,12 +49,11 @@ occurrences:
         summary: const Icon(Icons.circle_outlined) minus; Image.asset 18chip.png on plus slots.
     repair:
       summary: >
-        Pass component_ref into pruned-cluster asset discovery; stop list_tile_leading_icon
-        from routing through nav_icon_expr (circle_outlined) on quantity text siblings.
+        Hydrate Icons/* vectors from child svg imageAssetKey before family fallback;
+        use direct VECTOR child glyph for compact icon stacks after cluster inherit.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
-        - src/figma_flutter_agent/generator/layout/widgets/emit/containers.py
       regression_tests:
-        - tests/test_layout_form_controls.py::test_stroke_minus_button_emits_remove_icon
+        - tests/test_niyama_order_emit_laws.py::test_icons_component_vectors_promote_child_svg_image_asset_key
       verification:
-        - poetry run pytest tests/test_niyama_order_emit_laws.py tests/test_layout_form_controls.py::test_stroke_minus_button_emits_remove_icon -q
+        - poetry run pytest tests/test_niyama_order_emit_laws.py::test_icons_component_vectors_promote_child_svg_image_asset_key -q

@@ -8,7 +8,7 @@ case:
   feature: niyama_order
   observed_at: 2026-07-07
   created_at: '2026-07-07T10:50:00Z'
-  updated_at: '2026-07-07T10:50:00Z'
+  updated_at: '2026-07-08T16:50:00Z'
   summary: >
     Promo and Guests rows both emitted vector_1162_10106.svg. Users leaf 4181:43463 had
     no on-disk export; family discovery keyed off instance-path file key 1162_ and picked
@@ -47,12 +47,14 @@ occurrences:
         summary: Guest and promo rows both use vector_1162_10106.svg.
     repair:
       summary: >
-        Pass component_ref into vector family discovery; prefer raster imageAssetKey on
-        compact icon STACK hosts before SvgPicture vector fallback.
+        Pass component_ref into vector family discovery; prefer bound raster on compact
+        icon STACK hosts before nested SvgPicture vector fallback.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
-        - src/figma_flutter_agent/generator/layout/widgets/emit/stack.py
+        - src/figma_flutter_agent/parser/interaction/icons.py
+        - src/figma_flutter_agent/generator/layout/widgets/button/core.py
       regression_tests:
         - tests/test_niyama_order_emit_laws.py::test_component_vector_family_uses_component_ref_prefix
+        - tests/test_niyama_order_emit_laws.py::test_compact_icon_host_prefers_bound_raster_over_nested_vector
       verification:
-        - poetry run pytest tests/test_niyama_order_emit_laws.py::test_component_vector_family_uses_component_ref_prefix -q
+        - poetry run pytest tests/test_niyama_order_emit_laws.py::test_compact_icon_host_prefers_bound_raster_over_nested_vector -q

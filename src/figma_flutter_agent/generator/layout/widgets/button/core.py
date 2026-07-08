@@ -404,17 +404,15 @@ def render_compact_icon_host_stack_body(
         else:
             parts.append(plate_svg)
     glyph_node = foreground
-    if uses_svg and not glyph_node.vector_asset_key:
-        for item in _descendant_nodes(foreground, _BACK_NAV_DESCENDANT_DEPTH):
-            if item.vector_asset_key:
-                glyph_node = item
-                break
-    if glyph_node.vector_asset_key and uses_svg:
-        glyph_width = float(foreground.sizing.width or glyph_node.sizing.width or 24.0)
-        glyph_height = float(foreground.sizing.height or glyph_node.sizing.height or 24.0)
-        glyph = _render_svg_picture(
-            glyph_node,
-            escape_dart_string(glyph_node.vector_asset_key),
+    if foreground.image_asset_key and not foreground.image_asset_key.lower().endswith(".svg"):
+        glyph_width = float(foreground.sizing.width or host_width or 24.0)
+        glyph_height = float(foreground.sizing.height or host_height or 24.0)
+        asset = escape_dart_string(foreground.image_asset_key)
+        glyph = (
+            f"Image.asset('{asset}', "
+            f"width: {format_geometry_literal(glyph_width)}, "
+            f"height: {format_geometry_literal(glyph_height)}, "
+            f"fit: BoxFit.contain)"
         )
         parts.append(
             "Center("
@@ -423,6 +421,26 @@ def render_compact_icon_host_stack_body(
             f"height: {format_geometry_literal(glyph_height)}, "
             f"child: {glyph}))"
         )
+    elif uses_svg:
+        if not glyph_node.vector_asset_key:
+            for item in _descendant_nodes(foreground, _BACK_NAV_DESCENDANT_DEPTH):
+                if item.vector_asset_key:
+                    glyph_node = item
+                    break
+        if glyph_node.vector_asset_key:
+            glyph_width = float(foreground.sizing.width or glyph_node.sizing.width or 24.0)
+            glyph_height = float(foreground.sizing.height or glyph_node.sizing.height or 24.0)
+            glyph = _render_svg_picture(
+                glyph_node,
+                escape_dart_string(glyph_node.vector_asset_key),
+            )
+            parts.append(
+                "Center("
+                f"child: SizedBox("
+                f"width: {format_geometry_literal(glyph_width)}, "
+                f"height: {format_geometry_literal(glyph_height)}, "
+                f"child: {glyph}))"
+            )
     if not parts:
         return None
     if host_width > 0 and host_height > 0:

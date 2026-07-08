@@ -431,6 +431,30 @@ def _render_raster_asset_picture(node: CleanDesignTreeNode, asset: str) -> str:
     )
     image_fit = "BoxFit.cover"
     if node_needs_render_bounds_expansion(node):
+        if (
+            layout_width is not None
+            and layout_height is not None
+            and width is not None
+            and height is not None
+            and (
+                float(width) > float(layout_width) + 0.5
+                or float(height) > float(layout_height) + 0.5
+            )
+        ):
+            paint_width = format_geometry_literal(float(width))
+            paint_height = format_geometry_literal(float(height))
+            slot_width = format_geometry_literal(float(layout_width))
+            slot_height = format_geometry_literal(float(layout_height))
+            image = (
+                f"Image.asset('{asset}', width: {paint_width}, height: {paint_height}, "
+                f"fit: BoxFit.cover)"
+            )
+            return (
+                f"SizedBox(width: {slot_width}, height: {slot_height}, child: ClipRect("
+                f"child: OverflowBox("
+                f"maxWidth: {paint_width}, maxHeight: {paint_height}, "
+                f"alignment: Alignment.center, child: {image})))"
+            )
         image_fit = "BoxFit.contain"
     elif (
         emit_width is not None

@@ -41,6 +41,15 @@ _VARIANT_VALUE_BINDING_ALIASES: dict[str, list[str]] = {
 _PRODUCT_ROW_MEDIA_CHILD_TYPES = frozenset({NodeType.IMAGE, NodeType.STACK, NodeType.CONTAINER})
 _BADGE_ORPHAN_STEM_TOKENS = frozenset({"chip", "badge"})
 _BADGE_LABEL_HINTS = frozenset({"chip", "badge", "bonus", "nomber", "number", "+18", "18"})
+_CONDIMENT_LABEL_TOKENS = frozenset(
+    {"sauce", "sous", "soy", "vasabi", "wasabi", "condiment", "priprav"}
+)
+_ENTREE_PHOTO_STEM_TOKENS = frozenset(
+    {"sussi", "sushi", "philadelphia", "ramen", "tomyam", "tomyum", "meal", "photo"}
+)
+_SUSHI_STEM_ENTREE_LABEL_TOKENS = frozenset(
+    {"okinawa", "monterey", "philadelphia", "sushi", "roll", "filadelfia"}
+)
 _COMPACT_ICON_COMPONENT_MAX = 48.0
 _CYRILLIC_TRANSLIT = str.maketrans(
     {
@@ -147,6 +156,50 @@ def _stem_is_badge_orphan(stem: str) -> bool:
 
 def _labels_allow_badge_raster(labels: list[str]) -> bool:
     return any(any(hint in label for hint in _BADGE_LABEL_HINTS) for label in labels)
+
+
+def _labels_describe_condiment_row(labels: list[str]) -> bool:
+    return any(any(token in label for token in _CONDIMENT_LABEL_TOKENS) for label in labels)
+
+
+def _stem_describes_entree_photo(stem: str) -> bool:
+    token = _normalize_binding_text(stem.replace("_", " "))
+    if not token:
+        return False
+    words = set(token.split())
+    if words & _ENTREE_PHOTO_STEM_TOKENS:
+        return True
+    return "chicken" in token
+
+
+def _stem_describes_condiment_photo(stem: str) -> bool:
+    token = _normalize_binding_text(stem.replace("_", " "))
+    if not token:
+        return False
+    words = set(token.split())
+    return bool(words & {"sauces", "vasabi", "wasabi", "soy"} or "sauce" in token)
+
+
+def _sushi_stem_matches_entree_labels(stem: str, labels: list[str]) -> bool:
+    token = _normalize_binding_text(stem.replace("_", " "))
+    if token not in {"sussi", "sushi"}:
+        return False
+    return any(any(alias in label for alias in _SUSHI_STEM_ENTREE_LABEL_TOKENS) for label in labels)
+
+
+def _binding_allowed_for_labels(labels: list[str], path: Path) -> bool:
+    if _stem_is_badge_orphan(path.stem) and not _labels_allow_badge_raster(labels):
+        return False
+    if _labels_describe_condiment_row(labels) and _stem_describes_entree_photo(path.stem):
+        return False
+    if not _labels_describe_condiment_row(labels) and _stem_describes_condiment_photo(path.stem):
+        return False
+    score = _word_overlap_score(path.stem, labels)
+    if score > 0:
+        return True
+    if _stem_matches_labels(path.stem, labels):
+        return True
+    return _sushi_stem_matches_entree_labels(path.stem, labels)
 
 
 def _is_raster_binding_target(node: CleanDesignTreeNode) -> bool:
@@ -325,6 +378,10 @@ def _stem_matches_labels(stem: str, labels: list[str]) -> bool:
     token = _normalize_binding_text(stem.replace("_", " "))
     if not token:
         return False
+    if token in {"sauces", "sauce"} and any(
+        any(alias in label for alias in ("soy", "soev", "sous", "sauce")) for label in labels
+    ):
+        return True
     stem_words = set(token.split())
     for label in labels:
         if token in label or label in token:
@@ -395,9 +452,11 @@ def _orphan_raster_pairing(
         best_path: Path | None = None
         best_score = 0
         for path in orphan_files:
-            if path in used_files:
+            if path in used_files and not _stem_allows_multi_node_binding(path.stem):
                 continue
             if _stem_is_badge_orphan(path.stem) and not _labels_allow_badge_raster(labels):
+                continue
+            if not _binding_allowed_for_labels(labels, path):
                 continue
             score = _word_overlap_score(path.stem, labels)
             if score > best_score:
@@ -415,6 +474,11 @@ def _orphan_raster_pairing(
             )
         )
     return entries
+
+
+def _stem_allows_multi_node_binding(stem: str) -> bool:
+    """Shared catalog photos may bind to multiple product rows with matching labels."""
+    return _stem_describes_condiment_photo(stem) or _stem_describes_entree_photo(stem)
 
 
 def _semantic_raster_bindings(
@@ -456,11 +520,13 @@ def _semantic_raster_bindings(
     assigned_files: set[Path] = set()
 
     def _binding_score(labels: list[str], path: Path) -> int:
-        if _stem_is_badge_orphan(path.stem) and not _labels_allow_badge_raster(labels):
+        if not _binding_allowed_for_labels(labels, path):
             return 0
         score = _word_overlap_score(path.stem, labels)
         if score <= 0 and _stem_matches_labels(path.stem, labels):
             return 1
+        if score <= 0 and _sushi_stem_matches_entree_labels(path.stem, labels):
+            return 2
         return score
 
     # ponytail: node-first greedy claims best unused orphan raster per target.
@@ -469,7 +535,7 @@ def _semantic_raster_bindings(
         best_path: Path | None = None
         best_score = 0
         for path in orphan_files:
-            if path in assigned_files:
+            if path in assigned_files and not _stem_allows_multi_node_binding(path.stem):
                 continue
             score = _binding_score(labels, path)
             if score > best_score:
@@ -544,10 +610,27 @@ def local_asset_manifest_from_project(
             if path.suffix.lower() not in _RASTER_SUFFIXES:
                 continue
             node_id = node_id_from_asset_stem(path.stem)
+            explicit_node_id = explicit_bindings.get(path.name)
             if node_id is None:
-                node_id = explicit_bindings.get(path.name)
+                node_id = explicit_node_id
             if node_id is None or node_id in excludes:
                 continue
+            is_explicit_binding = explicit_node_id is not None and node_id == explicit_node_id
+            if clean_tree is not None and not is_explicit_binding:
+                tree_by_id = index_clean_tree(clean_tree)
+                parent_by_id = build_parent_map(clean_tree)
+                labels = _collect_binding_labels(
+                    node_id,
+                    tree_by_id=tree_by_id,
+                    parent_by_id=parent_by_id,
+                )
+                if labels and not _binding_allowed_for_labels(labels, path):
+                    logger.warning(
+                        "Skipping raster binding {} -> {} (label mismatch)",
+                        path.name,
+                        node_id,
+                    )
+                    continue
             if node_id in bound_node_ids:
                 svg_entry = next(
                     (

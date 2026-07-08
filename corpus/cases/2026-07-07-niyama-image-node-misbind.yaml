@@ -8,7 +8,7 @@ case:
   feature: niyama_order
   observed_at: 2026-07-07
   created_at: '2026-07-07T05:00:00Z'
-  updated_at: '2026-07-08T08:40:00Z'
+  updated_at: '2026-07-08T16:50:00Z'
   summary: >
     Product row images bind to the wrong nodes on run 5bb7e19e9083. screen.dart
     Image.asset order is ramen-chicken, 18chip (on Icons/28/Plus slot), tomyam,
@@ -51,13 +51,14 @@ occurrences:
         summary: product row image nodes vs bound rasters diverge by identity.
     repair:
       summary: >
-        Exclude Icons/* compact component stacks from semantic raster targets; deny
-        badge orphan stems (18chip) outside badge-labeled hosts; scope product IMAGE
-        labels to owning product row only.
+        Exclude Icons/* from raster targets; guard condiment vs entree stems; trust
+        explicit .figma-bindings.json; allow shared condiment rasters on multiple rows.
       changed_files:
         - src/figma_flutter_agent/pipeline/local_assets.py
+        - apps/test/assets/images/.figma-bindings.json
       regression_tests:
         - tests/test_niyama_order_emit_laws.py::test_semantic_raster_never_binds_chip_orphan_to_product_rows
-        - tests/test_niyama_order_emit_laws.py::test_compact_icon_component_stack_excluded_from_raster_binding_targets
+        - tests/test_niyama_order_emit_laws.py::test_explicit_figma_bindings_skip_label_mismatch_guard
+        - tests/test_niyama_order_emit_laws.py::test_condiment_raster_may_bind_multiple_product_rows
       verification:
         - poetry run pytest tests/test_niyama_order_emit_laws.py -q

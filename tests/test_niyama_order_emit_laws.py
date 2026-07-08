@@ -447,7 +447,7 @@ def test_flat_pill_bonus_chip_host_preserves_non_square_bounds() -> None:
     assert "height: 44.0" not in bounded
 
 
-def test_render_raster_asset_picture_uses_contain_when_slot_clamps_paint_rect() -> None:
+def test_render_raster_asset_picture_uses_overflowbox_when_paint_rect_exceeds_slot() -> None:
     node = CleanDesignTreeNode(
         id="6:img",
         name="thumb",
@@ -460,5 +460,168 @@ def test_render_raster_asset_picture_uses_contain_when_slot_clamps_paint_rect() 
     from figma_flutter_agent.generator.layout.widgets.svg import _render_raster_asset_picture
 
     dart = _render_raster_asset_picture(node, "assets/images/vasabi.png")
-    assert "BoxFit.contain" in dart
+    assert "OverflowBox" in dart
+    assert "BoxFit.cover" in dart
     assert "width: 76.0" in dart
+
+
+def test_explicit_figma_bindings_skip_label_mismatch_guard(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "ramen-chicken.png").write_bytes(b"png")
+    bindings = images / ".figma-bindings.json"
+    bindings.write_text(
+        '{"bindings": {"ramen-chicken.png": "1:img"}}',
+        encoding="utf-8",
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Modal",
+        type=NodeType.STACK,
+        children=[
+            CleanDesignTreeNode(
+                id="1:row",
+                name="Card",
+                type=NodeType.ROW,
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:img",
+                        name="Img",
+                        type=NodeType.IMAGE,
+                        sizing=Sizing(width=76.0, height=76.0),
+                    ),
+                    CleanDesignTreeNode(
+                        id="1:title",
+                        name="Title",
+                        type=NodeType.TEXT,
+                        text="Соевый Соус",
+                    ),
+                ],
+            ),
+        ],
+    )
+    manifest = local_asset_manifest_from_project(tmp_path, clean_tree=root)
+    bound = {entry.node_id: entry.asset_path for entry in manifest.entries if entry.kind == "image"}
+    assert bound.get("1:img") == "assets/images/ramen-chicken.png"
+
+
+def test_condiment_raster_may_bind_multiple_product_rows(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "sauces.png").write_bytes(b"png")
+
+    def product_row(row_id: str, title: str, image_id: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=row_id,
+            name="Card",
+            type=NodeType.ROW,
+            children=[
+                CleanDesignTreeNode(
+                    id=image_id,
+                    name="Img",
+                    type=NodeType.IMAGE,
+                    sizing=Sizing(width=76.0, height=76.0),
+                ),
+                CleanDesignTreeNode(
+                    id=f"{row_id}:title",
+                    name="Title",
+                    type=NodeType.TEXT,
+                    text=title,
+                ),
+            ],
+        )
+
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Modal",
+        type=NodeType.STACK,
+        children=[
+            product_row("1:row-a", "Соусы", "1:img-a"),
+            product_row("1:row-b", "Соевый Соус", "1:img-b"),
+        ],
+    )
+    manifest = local_asset_manifest_from_project(tmp_path, clean_tree=root)
+    bound = {entry.node_id: entry.asset_path for entry in manifest.entries if entry.kind == "image"}
+    assert bound.get("1:img-a") == "assets/images/sauces.png"
+    assert bound.get("1:img-b") == "assets/images/sauces.png"
+
+
+def test_icons_component_vectors_promote_child_svg_image_asset_key() -> None:
+    from figma_flutter_agent.parser.boundaries.assets import resolve_pruned_cluster_instance_assets
+
+    minus_vector = CleanDesignTreeNode(
+        id="1:minus-vector",
+        name="Vector",
+        type=NodeType.VECTOR,
+        image_asset_key="assets/icons/vector_910_3261.svg",
+    )
+    minus = CleanDesignTreeNode(
+        id="1:minus",
+        name="Icons/28/Minus",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="910:3262",
+        variant=ComponentVariant(
+            component_id="910:3262",
+            component_name="Icons/28/Minus",
+        ),
+        children=[minus_vector],
+    )
+    plus_vector = CleanDesignTreeNode(
+        id="1:plus-vector",
+        name="Vector",
+        type=NodeType.VECTOR,
+        image_asset_key="assets/icons/vector_910_3248.svg",
+    )
+    plus = CleanDesignTreeNode(
+        id="1:plus",
+        name="Icons/28/Plus",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="910:3249",
+        variant=ComponentVariant(
+            component_id="910:3249",
+            component_name="Icons/28/Plus",
+        ),
+        children=[plus_vector],
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Modal",
+        type=NodeType.STACK,
+        children=[minus, plus],
+    )
+    resolve_pruned_cluster_instance_assets(root, Path("."))
+    assert minus.vector_asset_key == "assets/icons/vector_910_3261.svg"
+    assert plus.vector_asset_key == "assets/icons/vector_910_3248.svg"
+
+
+def test_compact_icon_host_prefers_bound_raster_over_nested_vector() -> None:
+    from figma_flutter_agent.generator.layout.widgets.button.core import (
+        render_compact_icon_host_stack_body,
+    )
+    from figma_flutter_agent.parser.interaction.icons import compact_icon_host_layers
+
+    host = CleanDesignTreeNode(
+        id="7:host",
+        name="Icons/28/Ticket",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=28.0),
+        image_asset_key="assets/images/promo.png",
+        children=[
+            CleanDesignTreeNode(
+                id="7:vector",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=26.0, height=27.0),
+                vector_asset_key="assets/icons/vector_1162_10106.svg",
+            ),
+        ],
+    )
+    plate, foreground = compact_icon_host_layers(host)
+    assert plate is None
+    assert foreground is host
+    body = render_compact_icon_host_stack_body(host, uses_svg=True)
+    assert body is not None
+    assert "assets/images/promo.png" in body
+    assert "vector_1162_10106" not in body
