@@ -1,17 +1,17 @@
 {
-  "cacheKey": "c15318894124ac9681a1ee0c758e05dffccc1eca512f7fcb513298cdbda587f7",
+  "cacheKey": "f0e43a2a013e1398603e3667c1631294f2aa1bab78b6b7e97812ad7d91b51f9d",
   "response": {
     "candidates": [
       {
         "nodeId": "3561:42990",
         "widgetName": "OrderProductItem",
-        "reason": "Repeated 4 times as the same order-product card group with image, title, price, optional modifiers, and divider; strong reusable list-item pattern.",
+        "reason": "Repeated 4 times with the same card/row layout for product image, title, quantity/price, and optional notes.",
         "confidence": 0.98,
         "suggestedParams": [
-          "itemName",
-          "quantityPriceText",
-          "modifierLines",
-          "imageUrl"
+          "productName",
+          "quantityText",
+          "priceText",
+          "noteText"
         ],
         "evidence": {
           "similarNodes": [
@@ -21,18 +21,18 @@
             "3561:42993"
           ],
           "shapeSimilarity": 0.99,
-          "semanticRole": "ordered menu item row"
+          "semanticRole": "order summary product line item"
         }
       },
       {
         "nodeId": "3561:43000",
         "widgetName": "OrderInfoRow",
-        "reason": "Repeated 5 times as a uniform label/value summary row with a trailing divider and minor value-color differences.",
+        "reason": "Repeated 5 times as a consistent two-column key/value detail row inside the details section.",
         "confidence": 0.99,
         "suggestedParams": [
           "labelText",
           "valueText",
-          "valueTextColor"
+          "valueColor"
         ],
         "evidence": {
           "similarNodes": [
@@ -42,18 +42,18 @@
             "3561:43003",
             "3561:43004"
           ],
-          "shapeSimilarity": 0.98,
-          "semanticRole": "order summary detail row"
+          "shapeSimilarity": 1.0,
+          "semanticRole": "key/value order detail row"
         }
       },
       {
         "nodeId": "3561:43011",
-        "widgetName": "AddressInfoCard",
-        "reason": "Repeated 2 times with the same address/card structure; reusable detail card with optional leading icon and two text lines.",
-        "confidence": 0.91,
+        "widgetName": "OrderLocationRow",
+        "reason": "Repeated 2 times as a compact info card with a leading icon and address/city text block.",
+        "confidence": 0.95,
         "suggestedParams": [
-          "streetText",
-          "cityText",
+          "titleText",
+          "subtitleText",
           "leadingIcon"
         ],
         "evidence": {
@@ -61,16 +61,19 @@
             "3561:43011",
             "3561:43012"
           ],
-          "shapeSimilarity": 0.94,
-          "semanticRole": "address/location info card"
+          "shapeSimilarity": 0.97,
+          "semanticRole": "address or location info row"
         }
       },
       {
         "nodeId": "I3561:42990;1406:11919",
-        "widgetName": "SectionDivider",
-        "reason": "Divider line is reused across the repeated order items and info rows; strong shared structural element from the repeated divider cluster.",
-        "confidence": 0.96,
-        "suggestedParams": [],
+        "widgetName": "OrderDivider",
+        "reason": "Used across the repeated product and detail cards as a shared horizontal separator line.",
+        "confidence": 0.92,
+        "suggestedParams": [
+          "dividerWidth",
+          "dividerColor"
+        ],
         "evidence": {
           "similarNodes": [
             "I3561:42990;1406:11919",
@@ -85,7 +88,7 @@
             "I3561:43011;1435:15491"
           ],
           "shapeSimilarity": 1.0,
-          "semanticRole": "full-width divider line"
+          "semanticRole": "section divider"
         }
       }
     ]

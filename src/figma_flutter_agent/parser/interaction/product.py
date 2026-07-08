@@ -205,6 +205,8 @@ def layout_fact_stack_product_recommendation_hero(node: CleanDesignTreeNode) -> 
 
     if is_sectionize_band_wrapper_id(node.id):
         return False
+    if _stack_hosts_horizontal_product_carrier_row(node):
+        return False
     if node.type != NodeType.STACK:
         return False
     width = node.sizing.width
@@ -317,7 +319,8 @@ def layout_fact_stack_component_catalog_product_tile(node: CleanDesignTreeNode) 
         for item in _descendant_nodes(node, max_depth=4)
     )
     has_title = any(
-        item.type == NodeType.TEXT and (item.text or "").strip() for item in node.children
+        item.type == NodeType.TEXT and (item.text or "").strip()
+        for item in _descendant_nodes(node, max_depth=4)
     )
     return has_image and has_title
 

@@ -2,6 +2,20 @@ version: 1
 family_id: compact_component_leaf_vector_export_gap
 generated: true
 cases:
+- case_id: 2026-07-08-niyama-stepper-vector-unbound
+  case_file: cases/2026-07-08-niyama-stepper-vector-unbound.yaml
+  title: Icons/28 Minus and Plus lack vectorAssetKey after cluster hydrate
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-stepper-vector-unbound
+  status: FIXED
+  observed_at: '2026-07-08'
+  created_at: '2026-07-08T08:30:00Z'
+  updated_at: '2026-07-08T08:40:00Z'
+  summary: Order product stepper Icons/28/Minus and Icons/28/Plus nodes in 
+    processed.json have vectorAssetKey=None after cluster prune/hydrate. Emit 
+    falls back to Icons.circle_outlined for minus and mis-bound 18chip.png / 
+    wrong SVG sizes for plus (vector_910_3261 at 36px, vector_910_3248...
 - case_id: 2026-07-07-niyama-icon-component-ref-alias
   case_file: cases/2026-07-07-niyama-icon-component-ref-alias.yaml
   title: Guest Users icon aliases to Ticket vector via instance-path family 

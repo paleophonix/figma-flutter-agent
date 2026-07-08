@@ -1457,6 +1457,23 @@ def _bound_stack_sized_box(
         layout_fact_back_nav_stack,
         layout_fact_skip_control_stack,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_flat_pill_bonus_chip_host,
+        layout_fact_row_short_labeled_action,
+    )
+
+    if layout_fact_flat_pill_bonus_chip_host(node) or layout_fact_row_short_labeled_action(node):
+        width = float(node.sizing.width or 0.0)
+        height = float(node.sizing.height or 0.0)
+        if width > 0 and height > 0:
+            width_lit = format_geometry_literal(width)
+            height_lit = format_geometry_literal(height)
+            return hoist_flex_parent_data(
+                lambda inner: (
+                    f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
+                ),
+                widget,
+            )
 
     from figma_flutter_agent.generator.layout.widgets.stepper import (
         compact_quantity_stepper_emit_width,

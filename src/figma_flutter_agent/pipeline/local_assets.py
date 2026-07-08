@@ -39,6 +39,9 @@ _VARIANT_VALUE_BINDING_ALIASES: dict[str, list[str]] = {
     "delivered": ["meal"],
 }
 _PRODUCT_ROW_MEDIA_CHILD_TYPES = frozenset({NodeType.IMAGE, NodeType.STACK, NodeType.CONTAINER})
+_BADGE_ORPHAN_STEM_TOKENS = frozenset({"chip", "badge"})
+_BADGE_LABEL_HINTS = frozenset({"chip", "badge", "bonus", "nomber", "number", "+18", "18"})
+_COMPACT_ICON_COMPONENT_MAX = 48.0
 _CYRILLIC_TRANSLIT = str.maketrans(
     {
         "а": "a",
@@ -108,18 +111,53 @@ def _normalize_binding_text(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", transliterated).strip()
 
 
+def _is_compact_icon_component_stack(node: CleanDesignTreeNode) -> bool:
+    """Return True for Icons/* component stacks that must never receive product rasters."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width or 0.0
+    height = node.sizing.height or 0.0
+    if not (
+        20.0 <= width <= _COMPACT_ICON_COMPONENT_MAX
+        and 20.0 <= height <= _COMPACT_ICON_COMPONENT_MAX
+    ):
+        return False
+    if node.component_ref is None and node.variant is None:
+        return False
+    component_name = ""
+    if node.variant is not None and node.variant.component_name:
+        component_name = node.variant.component_name
+    elif node.name:
+        component_name = node.name
+    normalized = component_name.replace("\\", "/").lower()
+    return normalized.startswith("icons/") or "/icons/" in normalized
+
+
+def _stem_is_badge_orphan(stem: str) -> bool:
+    token = _normalize_binding_text(stem.replace("_", " "))
+    if not token:
+        return False
+    if token in _BADGE_ORPHAN_STEM_TOKENS:
+        return True
+    words = set(token.split())
+    if words & _BADGE_ORPHAN_STEM_TOKENS:
+        return True
+    return token[0].isdigit() and any(char.isalpha() for char in token)
+
+
+def _labels_allow_badge_raster(labels: list[str]) -> bool:
+    return any(any(hint in label for hint in _BADGE_LABEL_HINTS) for label in labels)
+
+
 def _is_raster_binding_target(node: CleanDesignTreeNode) -> bool:
+    if _is_compact_icon_component_stack(node):
+        return False
     if node.type == NodeType.IMAGE:
         return True
     if node.render_boundary and node.flatten_figma_node_ids:
         width = node.sizing.width or 0.0
         height = node.sizing.height or 0.0
         if width >= 64.0 and height >= 64.0:
-            return True
-    if node.type == NodeType.STACK and node.component_ref:
-        width = node.sizing.width or 0.0
-        height = node.sizing.height or 0.0
-        if 20.0 <= width <= 48.0 and 20.0 <= height <= 48.0:
             return True
     if node.type != NodeType.CONTAINER or node.children:
         return False
@@ -222,6 +260,33 @@ def _collect_binding_labels(
         tree_by_id=tree_by_id,
         parent_by_id=parent_by_id,
     )
+    if target is not None and target.type == NodeType.IMAGE and scope is not None:
+        scoped_labels: list[str] = []
+        scoped_seen: set[str] = set()
+
+        def add_scoped_label(value: str | None) -> None:
+            if not value:
+                return
+            normalized = _normalize_binding_text(value)
+            if normalized and normalized not in scoped_seen:
+                scoped_seen.add(normalized)
+                scoped_labels.append(normalized)
+
+        if target.name and target.name.lower() not in _GENERIC_NODE_NAMES:
+            add_scoped_label(target.name)
+        add_scoped_label(target.accessibility_label)
+        if target.variant is not None:
+            add_scoped_label(target.variant.component_name)
+            for part in _component_name_path_labels(target.variant.component_name):
+                add_scoped_label(part)
+            for value in target.variant.variant_properties.values():
+                add_scoped_label(str(value))
+        for text_label in _subtree_text_labels(
+            scope,
+            max_depth=_BINDING_PRODUCT_ROW_TEXT_MAX_DEPTH,
+        ):
+            add_scoped_label(text_label)
+        return scoped_labels
     if scope is not None:
         for text_label in _subtree_text_labels(
             scope,
@@ -332,6 +397,8 @@ def _orphan_raster_pairing(
         for path in orphan_files:
             if path in used_files:
                 continue
+            if _stem_is_badge_orphan(path.stem) and not _labels_allow_badge_raster(labels):
+                continue
             score = _word_overlap_score(path.stem, labels)
             if score > best_score:
                 best_score = score
@@ -389,6 +456,8 @@ def _semantic_raster_bindings(
     assigned_files: set[Path] = set()
 
     def _binding_score(labels: list[str], path: Path) -> int:
+        if _stem_is_badge_orphan(path.stem) and not _labels_allow_badge_raster(labels):
+            return 0
         score = _word_overlap_score(path.stem, labels)
         if score <= 0 and _stem_matches_labels(path.stem, labels):
             return 1

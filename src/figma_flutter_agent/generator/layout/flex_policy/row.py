@@ -199,6 +199,50 @@ def layout_fact_row_icon_stepper_control_row(node: CleanDesignTreeNode) -> bool:
     return any(child.sizing.width_mode == SizingMode.FILL for child in node.children[1:-1])
 
 
+def layout_fact_row_short_labeled_action(node: CleanDesignTreeNode) -> bool:
+    """Compact icon+label action rows that must keep intrinsic height in columns."""
+    if node.type != NodeType.ROW or len(node.children) < 2:
+        return False
+    height = node.sizing.height
+    if height is None or float(height) > 36.0:
+        return False
+    from figma_flutter_agent.parser.interaction import _descendant_nodes
+
+    has_text = any(
+        item.type == NodeType.TEXT and (item.text or "").strip()
+        for item in _descendant_nodes(node, max_depth=3)
+    )
+    if not has_text:
+        return False
+    return any(
+        child.type in {NodeType.STACK, NodeType.VECTOR, NodeType.IMAGE, NodeType.CONTAINER}
+        for child in node.children[:2]
+    )
+
+
+def layout_fact_flat_pill_bonus_chip_host(node: CleanDesignTreeNode) -> bool:
+    """Flat pill bonus chips (wider than tall) that must not square under flex stretch."""
+    if node.type not in {NodeType.STACK, NodeType.CONTAINER, NodeType.ROW}:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    span_w = float(width)
+    span_h = float(height)
+    if span_w <= 0 or span_h <= 0 or span_h >= span_w * 0.85 or span_h > 36.0:
+        return False
+    radius = node.style.border_radius
+    if radius is None or float(radius) < 50.0:
+        return False
+    from figma_flutter_agent.parser.interaction import _descendant_nodes
+
+    return any(
+        item.type == NodeType.TEXT and (item.text or "").strip()
+        for item in _descendant_nodes(node, max_depth=2)
+    )
+
+
 def layout_fact_row_status_pill_badge(node: CleanDesignTreeNode) -> bool:
     """Return True when a painted flex pill should hug and center its label."""
     if layout_fact_row_numeric_counter_badge(node):

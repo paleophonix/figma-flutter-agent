@@ -23,8 +23,13 @@ from figma_flutter_agent.parser.interaction.product import (
     _stack_hosts_horizontal_product_carrier_row,
     layout_fact_stack_component_catalog_product_tile,
     layout_fact_stack_detail_hero_banner_host,
+    layout_fact_stack_product_recommendation_hero,
 )
-from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
+from figma_flutter_agent.pipeline.local_assets import (
+    _is_compact_icon_component_stack,
+    _is_raster_binding_target,
+    local_asset_manifest_from_project,
+)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ComponentVariant,
@@ -274,3 +279,186 @@ def test_layout_slot_raster_emit_dimensions_clamps_expanded_bounds_to_sizing() -
     width, height = _layout_slot_raster_emit_dimensions(node, 76.0, 76.0)
     assert width == 76.0
     assert height == 76.0
+
+
+def test_compact_icon_component_stack_excluded_from_raster_binding_targets() -> None:
+    plus = CleanDesignTreeNode(
+        id="1:plus",
+        name="Icons/28/Plus",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="1162:10180",
+        variant=ComponentVariant(
+            component_id="1162:10180",
+            component_name="Icons/28/Plus",
+            variant_properties={"Icons": "28/Plus"},
+        ),
+    )
+    assert _is_compact_icon_component_stack(plus)
+    assert not _is_raster_binding_target(plus)
+
+
+def test_semantic_raster_never_binds_chip_orphan_to_product_rows(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    for name in ("ramen-chicken.png", "tomyam.png", "vasabi.png", "sussi.png", "18chip.png"):
+        (images / name).write_bytes(b"png")
+
+    def product_row(row_id: str, title: str, image_id: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=row_id,
+            name="Card",
+            type=NodeType.ROW,
+            children=[
+                CleanDesignTreeNode(
+                    id=image_id,
+                    name="Img",
+                    type=NodeType.IMAGE,
+                    sizing=Sizing(width=76.0, height=76.0),
+                ),
+                CleanDesignTreeNode(
+                    id=f"{row_id}:title",
+                    name="Title",
+                    type=NodeType.TEXT,
+                    text=title,
+                ),
+            ],
+        )
+
+    plus = CleanDesignTreeNode(
+        id="1:plus",
+        name="Icons/28/Plus",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="1162:10180",
+        variant=ComponentVariant(
+            component_id="1162:10180",
+            component_name="Icons/28/Plus",
+            variant_properties={"Icons": "28/Plus"},
+        ),
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Modal",
+        type=NodeType.STACK,
+        children=[
+            product_row("1:row-a", "Вок рамен с курицей", "1:img-a"),
+            product_row("1:row-b", "Том Ям", "1:img-b"),
+            product_row("1:row-c", "Васаби", "1:img-c"),
+            product_row("1:row-d", "Соевый Соус", "1:img-d"),
+            plus,
+        ],
+    )
+    manifest = local_asset_manifest_from_project(tmp_path, clean_tree=root)
+    bound = {entry.node_id: entry.asset_path for entry in manifest.entries if entry.kind == "image"}
+    assert "1:plus" not in bound
+    assert bound.get("1:img-a") == "assets/images/ramen-chicken.png"
+    assert bound.get("1:img-b") == "assets/images/tomyam.png"
+    assert bound.get("1:img-c") == "assets/images/vasabi.png"
+    assert "18chip" not in bound.values()
+
+
+def test_horizontal_scroll_inferred_when_product_title_is_nested() -> None:
+    tiles = [
+        CleanDesignTreeNode(
+            id=f"4:{index}",
+            name="Product small",
+            type=NodeType.STACK,
+            sizing=Sizing(width=142.0, height=239.0),
+            style=NodeStyle(),
+            component_ref="1356:10701",
+            variant=ComponentVariant(
+                component_id="1356:10701",
+                component_name="Product small",
+                variant_properties={"Product": "Add"},
+            ),
+            children=[
+                CleanDesignTreeNode(
+                    id=f"4:{index}:body",
+                    name="Body",
+                    type=NodeType.COLUMN,
+                    children=[
+                        CleanDesignTreeNode(
+                            id=f"4:{index}:title",
+                            name="Title",
+                            type=NodeType.TEXT,
+                            text="Соусы",
+                        ),
+                    ],
+                ),
+                CleanDesignTreeNode(
+                    id=f"4:{index}:img",
+                    name="Img",
+                    type=NodeType.IMAGE,
+                    sizing=Sizing(width=142.0, height=137.0),
+                ),
+            ],
+        )
+        for index in range(3)
+    ]
+    row = CleanDesignTreeNode(
+        id="4:10",
+        name="product",
+        type=NodeType.ROW,
+        sizing=Sizing(width=446.0, height=239.0),
+        style=NodeStyle(),
+        children=tiles,
+    )
+    stack = CleanDesignTreeNode(
+        id="4:11",
+        name="Swipe",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=239.0),
+        style=NodeStyle(),
+        scroll_axis="none",
+        children=[row],
+    )
+    assert layout_fact_stack_component_catalog_product_tile(tiles[0])
+    assert _stack_supports_horizontal_item_scroll(stack)
+    assert not layout_fact_stack_detail_hero_banner_host(stack)
+    assert not layout_fact_stack_product_recommendation_hero(stack)
+
+
+def test_flat_pill_bonus_chip_host_preserves_non_square_bounds() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_flat_pill_bonus_chip_host,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import _bound_stack_sized_box
+
+    chip = CleanDesignTreeNode(
+        id="5:chip",
+        name="Nomber",
+        type=NodeType.STACK,
+        sizing=Sizing(width=44.0, height=26.0),
+        style=NodeStyle(background_color="0xFFED9B33", border_radius=100.0),
+        children=[
+            CleanDesignTreeNode(
+                id="5:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="+18",
+            ),
+        ],
+    )
+    assert layout_fact_flat_pill_bonus_chip_host(chip)
+    bounded = _bound_stack_sized_box(chip, "const Text('+18')", parent_type=NodeType.ROW)
+    assert bounded is not None
+    assert "height: 26.0" in bounded
+    assert "height: 44.0" not in bounded
+
+
+def test_render_raster_asset_picture_uses_contain_when_slot_clamps_paint_rect() -> None:
+    node = CleanDesignTreeNode(
+        id="6:img",
+        name="thumb",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=76.0, height=76.0),
+        style=NodeStyle(render_bounds_expand=None),
+        stack_placement=StackPlacement(left=0.0, top=0.0, width=76.0, height=76.0),
+    )
+    node.style.render_bounds_expand = Padding(left=22.0, right=22.0, top=29.0, bottom=29.0)
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_raster_asset_picture
+
+    dart = _render_raster_asset_picture(node, "assets/images/vasabi.png")
+    assert "BoxFit.contain" in dart
+    assert "width: 76.0" in dart

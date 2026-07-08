@@ -265,6 +265,12 @@ def bind_row_cross_axis_height(
 
     if layout_fact_centered_glyph_badge(node):
         return widget
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_flat_pill_bonus_chip_host,
+    )
+
+    if layout_fact_flat_pill_bonus_chip_host(node):
+        return widget
     if is_short_centered_glyph_text(node):
         return widget
     if parent_row is not None and layout_fact_centered_glyph_badge(parent_row):

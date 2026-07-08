@@ -655,13 +655,8 @@ class render_misc:
             glyph = _render_svg_picture(node, escape_dart_string(icon_asset))
         elif node.type == NodeType.BUTTON and layout_fact_compact_icon_action_button(node):
             glyph = _find_icon_glyph_expr(node) or "const SizedBox.shrink()"
-        elif parent_node is not None and len(parent_node.children) > 1:
-            from figma_flutter_agent.generator.layout.navigation.items import nav_icon_expr
-
-            title_host = parent_node.children[1]
-            glyph = nav_icon_expr(title_host, uses_svg=False)
         else:
-            glyph = "const SizedBox.shrink()"
+            glyph = _find_icon_glyph_expr(node) or "const SizedBox.shrink()"
         return (
             f"Container(width: {format_geometry_literal(width)}, "
             f"height: {format_geometry_literal(height)}, "

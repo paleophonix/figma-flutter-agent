@@ -2,6 +2,21 @@ version: 1
 family_id: horizontal_scroll_product_tile_miss
 generated: true
 cases:
+- case_id: 2026-07-08-niyama-carousel-chunk-hero-regression
+  case_file: cases/2026-07-08-niyama-carousel-chunk-hero-regression.yaml
+  title: Add-to-order chunk regresses to single hero raster instead of 
+    horizontal tiles
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-carousel-chunk-hero-regression
+  status: FIXED
+  observed_at: '2026-07-08'
+  created_at: '2026-07-08T08:30:00Z'
+  updated_at: '2026-07-08T08:40:00Z'
+  summary: Run 5bb7e19e9083 splits subtree 4408:44908 into FigmaChunk0FEB67AE at
+    Positioned top 1020 outside ModalWidget scroll. processed.json keeps three 
+    Product small tiles (44914–44916) with sauces.png on the first tile image, 
+    but screen.dart / modal emit contain no ListView, no "Доб...
 - case_id: 2026-07-07-niyama-carousel-product-small-scroll
   case_file: cases/2026-07-07-niyama-carousel-product-small-scroll.yaml
   title: Add-to-order carousel collapses because Product small stacks are not 

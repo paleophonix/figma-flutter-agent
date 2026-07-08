@@ -424,12 +424,24 @@ def _render_raster_asset_picture(node: CleanDesignTreeNode, asset: str) -> str:
     width, height = _effective_svg_dimensions(node, width, height)
     layout_width, layout_height = width, height
     width, height = expanded_layout_dimensions(node, width, height)
-    image_fit = "BoxFit.contain" if node_needs_render_bounds_expansion(node) else "BoxFit.cover"
     emit_width, emit_height = _layout_slot_raster_emit_dimensions(
         node,
         layout_width,
         layout_height,
     )
+    image_fit = "BoxFit.cover"
+    if node_needs_render_bounds_expansion(node):
+        image_fit = "BoxFit.contain"
+    elif (
+        emit_width is not None
+        and layout_width is not None
+        and float(emit_width) < float(layout_width) - 0.5
+    ) or (
+        emit_height is not None
+        and layout_height is not None
+        and float(emit_height) < float(layout_height) - 0.5
+    ):
+        image_fit = "BoxFit.contain"
     params = [f"'{asset}'"]
     if emit_width is not None and emit_width > 0:
         params.append(f"width: {emit_width}")

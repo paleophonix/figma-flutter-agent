@@ -1,10 +1,10 @@
 {
-  "cacheKey": "4c5bab3d2fb9b38484fef3c89f787b9848fcbe1660fdd4197e614684f5772ba7",
+  "cacheKey": "ad49b24525570a7f6d7dc732903d2fe7ad14bbd8a34aa49049f36fb25d1cb310",
   "response": {
     "entries": [
       {
         "clusterId": "component_3481_34334_871e00fd",
-        "widgetName": "BonusPointsWidget",
+        "widgetName": "BonusCountWidget",
         "paramRenames": {}
       },
       {
@@ -19,7 +19,7 @@
       },
       {
         "clusterId": "component_3481_34494",
-        "widgetName": "OrderModalHeaderWidget",
+        "widgetName": "ModalHeaderWidget",
         "paramRenames": {}
       },
       {
@@ -34,7 +34,7 @@
       },
       {
         "clusterId": "component_3481_34893",
-        "widgetName": "SectionDividerWidget",
+        "widgetName": "DividerLineWidget",
         "paramRenames": {}
       },
       {
@@ -44,32 +44,32 @@
       },
       {
         "clusterId": "component_3481_35010_49f9e897",
-        "widgetName": "CutleryOptionWidget",
+        "widgetName": "CutleryInfoWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35156",
-        "widgetName": "OrderStatusBadgeWidget",
+        "widgetName": "DeliveryStatusBadgeWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35165_7cbfe998",
-        "widgetName": "InfoWithIconCardWidget",
+        "widgetName": "AddressInfoCardWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35212_0f40abd8",
-        "widgetName": "KeyValueCardWidget",
+        "widgetName": "OrderDetailRowWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35218_9ad9ee27",
-        "widgetName": "LargeActionButtonWidget",
+        "widgetName": "ActionButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_3481_35229_81156683",
-        "widgetName": "OrderActionBarWidget",
+        "widgetName": "OrderActionsBarWidget",
         "paramRenames": {}
       }
     ]

@@ -203,6 +203,12 @@ def resolve_flex_wrap(
             return FlexWrapKind.NONE
         if node.type == NodeType.ROW and layout_fact_row_icon_stepper_control_row(node):
             return FlexWrapKind.SIZED_BOX_WIDTH
+        from figma_flutter_agent.generator.layout.flex_policy.row import (
+            layout_fact_row_short_labeled_action,
+        )
+
+        if node.type == NodeType.ROW and layout_fact_row_short_labeled_action(node):
+            return FlexWrapKind.NONE
         if height_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
         if width_mode == SizingMode.FILL:

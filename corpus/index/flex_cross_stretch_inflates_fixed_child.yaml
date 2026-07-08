@@ -2,6 +2,35 @@ version: 1
 family_id: flex_cross_stretch_inflates_fixed_child
 generated: true
 cases:
+- case_id: 2026-07-08-niyama-promo-row-slot-inflation
+  case_file: cases/2026-07-08-niyama-promo-row-slot-inflation.yaml
+  title: Promo action row flex slot inflates to 212px creating dead gap before 
+    promo
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-promo-row-slot-inflation
+  status: FIXED
+  observed_at: '2026-07-08'
+  created_at: '2026-07-08T08:30:00Z'
+  updated_at: '2026-07-08T08:40:00Z'
+  summary: '"Применить промокод" row in screen.dart wraps icon+title in SizedBox(width:
+    212.0, height: 212.0) with Row spacing 107 to a sibling, producing a large empty
+    vertical gap and stripping horizontal padding context. Guests row exists in emit
+    but is pushed below the inflated promo...'
+- case_id: 2026-07-08-niyama-bonus-chip-square-inflation
+  case_file: cases/2026-07-08-niyama-bonus-chip-square-inflation.yaml
+  title: Nomber +18 bonus chip inflated to square and renders circular
+  project: test
+  feature: niyama_order
+  occurrence_id: niyama-order-bonus-chip-square-inflation
+  status: FIXED
+  observed_at: '2026-07-08'
+  created_at: '2026-07-08T08:30:00Z'
+  updated_at: '2026-07-08T08:40:00Z'
+  summary: 'Header Nomber component 4408:44894 is 44x26 with borderRadius 100 (pill)
+    in processed.json, but plan.dart emits SizedBox(width: 44.0, height: 44.0) around
+    the gradient chip shell. borderRadius 100 on a square host renders as a circle
+    instead of a flattened pill. User observati...'
 - case_id: 2026-07-07-niyama-image-cross-stretch-blowup
   case_file: cases/2026-07-07-niyama-image-cross-stretch-blowup.yaml
   title: Product image inflated by CrossAxisAlignment.stretch and BoxFit.cover

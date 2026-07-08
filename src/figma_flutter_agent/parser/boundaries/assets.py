@@ -1030,7 +1030,7 @@ def resolve_pruned_cluster_instance_assets(
             if entry.kind in {"icon", "illustration", "image"}:
                 manifest_paths.setdefault(entry.node_id, entry.asset_path)
 
-    def candidate_paths(node_id: str) -> list[str]:
+    def candidate_paths(node_id: str, *, component_ref: str | None = None) -> list[str]:
         paths: list[str] = []
         manifest_path = manifest_paths.get(node_id)
         if manifest_path:
@@ -1039,6 +1039,7 @@ def resolve_pruned_cluster_instance_assets(
             project_dir,
             node_id,
             asset_index=asset_index,
+            component_ref=component_ref,
         )
         if discovered and discovered not in paths:
             paths.append(discovered)
@@ -1073,7 +1074,7 @@ def resolve_pruned_cluster_instance_assets(
                 candidate_ids.append(node_id)
             candidate_ids.append(node.id)
             for node_id in candidate_ids:
-                for candidate in candidate_paths(node_id):
+                for candidate in candidate_paths(node_id, component_ref=node.component_ref):
                     candidate_path = project_dir / Path(candidate)
                     if candidate_path.is_file() and (
                         not candidate.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
