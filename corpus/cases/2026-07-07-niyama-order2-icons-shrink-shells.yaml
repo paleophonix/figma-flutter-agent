@@ -8,14 +8,15 @@ case:
   feature: niyama_order_2
   observed_at: 2026-07-07
   created_at: '2026-07-07T14:00:00Z'
-  updated_at: '2026-07-07T16:05:00Z'
+  updated_at: '2026-07-08T09:10:00Z'
   summary: >
     In niyama_order_2 the top meal illustration ("Img") and several vector icons
     (location, guest/seat, cutlery) emit Semantics(label, SizedBox.shrink()) — empty
-    shells — even though the drawables (meal.png and the icon SVGs) exist on disk under
-    assets/images and assets/icons. Batch repair 2026-07-07 reduced shrink shells and
-    restored cutlery/location/MapIcon emit; product-row thumbnails and a few vector slots
-    may still shrink when semantic manifest pairing cannot read nested row titles.
+    shells — when drawables are missing or semantic manifest cannot pair Cyrillic product
+    titles to on-disk rasters. Batch repair 2026-07-08 restored location/cutlery via role
+    raster; Cyrillic title→latin stem semantic bind is proven in unit tests; product-row
+    thumbnails I3561:42992/42993 still shrink until okinawa-monterey.png and
+    oblepih-mango.png exist under assets/images (or live Figma export runs).
 
 occurrences:
   - id: niyama-order2-icons-shrink-shells
@@ -49,6 +50,9 @@ occurrences:
       - kind: debug_artifact
         path: apps/test/assets/images
         summary: meal.png and product/icon assets exist on disk but are not bound to the nodes.
+      - kind: debug_artifact
+        path: .debug/screen/test/niyama_order_2/processed.json
+        summary: IMAGE nodes I3561:42992;1406:11911 and I3561:42993;1406:11911 lack imageAssetKey; titles Окинава Монтерей / Облепиха-Манго.
     repair:
       summary: >
         Bind role-named raster PNGs from component variant labels (Map→location,
@@ -56,7 +60,9 @@ occurrences:
         resolve_discovered_vector_asset_keys; reconcile icon-library SVG aliases;
         propagate compact icon raster keys; apply semantic manifest bindings; emit role
         PNG on compact icon stacks; promote screen IR extracted hosts before materialize.
-        Partial proof: offline emit shrink_count 5→3, tableware/MapIcon/maxLines laws green.
+        Cyrillic product titles pair to latin-stem orphan rasters via existing translit
+        manifest scoring (test_cyrillic_product_thumbnail_semantic_bind). Product thumbs
+        still need on-disk PNG exports or live Figma raster export.
       changed_files:
         - src/figma_flutter_agent/parser/boundaries/assets.py
         - src/figma_flutter_agent/pipeline/local_assets.py
@@ -66,6 +72,7 @@ occurrences:
         - src/figma_flutter_agent/generator/ir/extracted.py
         - src/figma_flutter_agent/generator/ir/materialize.py
       regression_tests:
+        - tests/test_niyama_order_2_emit_laws.py::test_cyrillic_product_thumbnail_semantic_bind
         - tests/test_niyama_order_2_emit_laws.py
       verification:
         - poetry run pytest -q tests/test_niyama_order_2_emit_laws.py

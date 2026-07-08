@@ -1,34 +1,28 @@
 
---- dart format @ 2026-07-07T14:26:44.468861+00:00 ---
+--- dart format @ 2026-07-08T12:04:42.162748+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\features\verbatica_player\verbatica_player_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\widgets\battery_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\widgets\dynamic_island_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\widgets\playback_controls_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\widgets\player_navigation_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\lib\widgets\verify_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\test\golden\verbatica_player_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-14nf4p9w\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 18 files (18 changed) in 0.97 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\features\verbatica_player\verbatica_player_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\widgets\battery_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\widgets\check_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\widgets\close_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\widgets\dynamic_island_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\lib\widgets\player_top_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\test\golden\verbatica_player_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wda2_3k8\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 18 files (18 changed) in 0.92 seconds.
 
---- pub get --offline @ 2026-07-07T14:26:49.503598+00:00 ---
+--- pub get --offline @ 2026-07-08T12:04:44.929417+00:00 ---
 exit_code=0
-
-┌─────────────────────────────────────────────────────────┐
-│ A new version of Flutter is available!                  │
-│                                                         │
-│ To update to the latest version, run "flutter upgrade". │
-└─────────────────────────────────────────────────────────┘
 Resolving dependencies...
 Downloading packages...
   flutter_lints 4.0.0 (6.0.0 available)
@@ -40,17 +34,17 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-07-07T14:26:52.402427+00:00 ---
+--- dart analyze (generated) @ 2026-07-08T12:04:47.614070+00:00 ---
 exit_code=0
-Analyzing battery_widget.dart, dynamic_island_status_bar_widget.dart, home_indicator_widget.dart, playback_controls_widget.dart, player_navigation_bar_widget.dart, verify_button_widget.dart...
+Analyzing battery_widget.dart, check_button_widget.dart, close_button_widget.dart, dynamic_island_status_bar_widget.dart, home_indicator_widget.dart, player_top_bar_widget.dart...
 
-   info - lib\widgets\player_navigation_bar_widget.dart:17:2658 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\player_navigation_bar_widget.dart:17:2743 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\verify_button_widget.dart:15:285 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\player_top_bar_widget.dart:17:712 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\player_top_bar_widget.dart:17:1980 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\player_top_bar_widget.dart:17:2065 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 3 issues found.
 
---- dart analyze (generated) (1/4) @ 2026-07-07T14:26:56.423964+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-08T12:04:50.001732+00:00 ---
 exit_code=0
 Analyzing verbatica_player_screen.dart, verbatica_player_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -65,27 +59,27 @@ warning - lib\generated\verbatica_player_layout.dart:13:8 - Unused import: 'pack
 warning - lib\generated\verbatica_player_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\verbatica_player_layout.dart:32:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\verbatica_player_layout.dart:50:168 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\verbatica_player_layout.dart:50:361 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\verbatica_player_layout.dart:54:168 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\verbatica_player_layout.dart:54:361 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 13 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-07T14:26:59.272992+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-08T12:04:52.337744+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, battery_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/4) @ 2026-07-07T14:27:02.326900+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-08T12:04:54.923974+00:00 ---
 exit_code=0
-Analyzing dynamic_island_status_bar_widget.dart, home_indicator_widget.dart, playback_controls_widget.dart, player_navigation_bar_widget.dart, verify_button_widget.dart, verbatica_player_screen_test.dart...
+Analyzing check_button_widget.dart, close_button_widget.dart, dynamic_island_status_bar_widget.dart, home_indicator_widget.dart, player_top_bar_widget.dart, verbatica_player_screen_test.dart...
 
-   info - lib\widgets\player_navigation_bar_widget.dart:17:2658 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\player_navigation_bar_widget.dart:17:2743 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\verify_button_widget.dart:15:285 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\player_top_bar_widget.dart:17:712 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\player_top_bar_widget.dart:17:1980 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\player_top_bar_widget.dart:17:2065 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 3 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-07T14:27:05.121979+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-08T12:04:57.210242+00:00 ---
 exit_code=0
 Analyzing element_coordinate_mapper.dart...
 
@@ -93,73 +87,73 @@ Analyzing element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-07-07T14:27:12.703795+00:00 ---
+--- dart format @ 2026-07-08T12:04:59.924670+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\features\verbatica_player\verbatica_player_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\widgets\battery_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\widgets\dynamic_island_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\widgets\playback_controls_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\widgets\player_navigation_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\lib\widgets\verify_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\test\golden\verbatica_player_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-55adbr7z\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\features\verbatica_player\verbatica_player_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\widgets\battery_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\widgets\check_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\widgets\close_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\widgets\dynamic_island_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\lib\widgets\player_top_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\test\golden\verbatica_player_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-rooswio6\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 18 files (18 changed) in 0.91 seconds.
+
+--- dart format @ 2026-07-08T12:05:02.506014+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\features\verbatica_player\verbatica_player_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\widgets\battery_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\widgets\check_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\widgets\close_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\widgets\dynamic_island_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\lib\widgets\player_top_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\test\golden\verbatica_player_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d4i1etue\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 18 files (18 changed) in 0.92 seconds.
 
---- dart format @ 2026-07-07T14:27:20.535310+00:00 ---
+--- dart format @ 2026-07-08T12:05:05.825739+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\features\verbatica_player\verbatica_player_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\widgets\battery_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\widgets\dynamic_island_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\widgets\playback_controls_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\widgets\player_navigation_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\lib\widgets\verify_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\test\golden\verbatica_player_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-91x5s7_z\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 18 files (18 changed) in 0.93 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\features\verbatica_player\verbatica_player_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\widgets\battery_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\widgets\check_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\widgets\close_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\widgets\dynamic_island_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\widgets\home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\lib\widgets\player_top_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\test\golden\verbatica_player_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-06vux6z3\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 18 files (18 changed) in 1.11 seconds.
 
---- dart format @ 2026-07-07T14:27:27.681694+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\features\verbatica_player\verbatica_player_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\widgets\battery_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\widgets\dynamic_island_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\widgets\playback_controls_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\widgets\player_navigation_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\lib\widgets\verify_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\test\golden\verbatica_player_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-0pjgl54w\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 18 files (18 changed) in 0.92 seconds.
-
---- pub get --offline @ 2026-07-07T14:27:30.430904+00:00 ---
+--- pub get --offline @ 2026-07-08T12:05:08.582609+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -172,7 +166,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/4) @ 2026-07-07T14:27:35.339904+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-08T12:05:11.030839+00:00 ---
 exit_code=0
 Analyzing verbatica_player_screen.dart, verbatica_player_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -187,27 +181,27 @@ warning - lib\generated\verbatica_player_layout.dart:13:8 - Unused import: 'pack
 warning - lib\generated\verbatica_player_layout.dart:14:8 - Unused import: 'package:test/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\verbatica_player_layout.dart:32:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\verbatica_player_layout.dart:50:168 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\verbatica_player_layout.dart:50:361 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\verbatica_player_layout.dart:54:168 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\verbatica_player_layout.dart:54:361 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 13 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-07T14:27:40.417057+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-08T12:05:13.350264+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, battery_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/4) @ 2026-07-07T14:27:45.448238+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-08T12:05:15.763033+00:00 ---
 exit_code=0
-Analyzing dynamic_island_status_bar_widget.dart, home_indicator_widget.dart, playback_controls_widget.dart, player_navigation_bar_widget.dart, verify_button_widget.dart, verbatica_player_screen_test.dart...
+Analyzing check_button_widget.dart, close_button_widget.dart, dynamic_island_status_bar_widget.dart, home_indicator_widget.dart, player_top_bar_widget.dart, verbatica_player_screen_test.dart...
 
-   info - lib\widgets\player_navigation_bar_widget.dart:174:49 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\player_navigation_bar_widget.dart:180:48 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\verify_button_widget.dart:30:58 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\player_top_bar_widget.dart:48:43 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\player_top_bar_widget.dart:123:65 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\player_top_bar_widget.dart:129:64 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
 3 issues found.
 
---- dart analyze (generated) (4/4) @ 2026-07-07T14:27:48.013158+00:00 ---
+--- dart analyze (generated) (4/4) @ 2026-07-08T12:05:18.180487+00:00 ---
 exit_code=0
 Analyzing element_coordinate_mapper.dart...
 
@@ -215,7 +209,7 @@ Analyzing element_coordinate_mapper.dart...
 
 1 issue found.
 
---- flutter pub get @ 2026-07-07T14:27:53.907049+00:00 ---
+--- flutter pub get @ 2026-07-08T12:05:21.695187+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -227,7 +221,7 @@ Got dependencies!
 4 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-07T14:27:53.908054+00:00 ---
+--- flutter render errors @ 2026-07-08T12:05:21.697313+00:00 ---
 ══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
 The following assertion was thrown while applying parent data.:
 RenderObject, which has been set up to accept ParentData of incompatible type BoxParentData.
@@ -246,9 +240,71 @@ Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/shifted_box.dart:373:12
-Another exception was thrown: Incorrect use of ParentDataWidget.
-Another exception was thrown: Incorrect use of ParentDataWidget.
-Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
+Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Cannot hit test a render box with no size.
 Another exception was thrown: Cannot hit test a render box with no size.

@@ -1,10 +1,10 @@
 {
-  "cacheKey": "d135cd7a631dba98c4b4a0cee91801433ecab11cc43bbecebf5d56dc2e7d0841",
+  "cacheKey": "faf90c7dee70b4b29c2a717db3b9dbe6de76b08530ec55a4fe31f2de4db5d5b2",
   "response": {
     "entries": [
       {
         "clusterId": "component_111_16846_79147318",
-        "widgetName": "VerifyButtonWidget",
+        "widgetName": "CheckButtonWidget",
         "paramRenames": {}
       },
       {
@@ -14,7 +14,7 @@
       },
       {
         "clusterId": "component_185_29821_f78f254f",
-        "widgetName": "PlayerNavigationBarWidget",
+        "widgetName": "PlayerTopBarWidget",
         "paramRenames": {}
       },
       {
@@ -24,42 +24,42 @@
       },
       {
         "clusterId": "component_38_5610_bcd9ea9d",
-        "widgetName": "BackNavigationWidget",
+        "widgetName": "BackNavigationButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_38_5773_8a12212d",
-        "widgetName": "TrailingDisclosureWidget",
+        "widgetName": "TrailingDetailDisclosureWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "component_54_3907_58c331e9",
-        "widgetName": "PlaybackControlsWidget",
+        "widgetName": "CloseButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_0",
-        "widgetName": "SkipBack5SecondsButtonWidget",
+        "widgetName": "SkipBackwardButtonWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_1",
-        "widgetName": "TranscriptListItemWidget",
+        "widgetName": "SectionHeaderWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_2",
-        "widgetName": "TranscriptRowWidget",
+        "widgetName": "ChoiceRowWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_3",
-        "widgetName": "TranscriptTextWidget",
+        "widgetName": "ChoiceTextWidget",
         "paramRenames": {}
       },
       {
         "clusterId": "shape_4",
-        "widgetName": "TrailingAccessoryGrabberWidget",
+        "widgetName": "RowTrailingAccessoryWidget",
         "paramRenames": {}
       },
       {

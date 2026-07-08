@@ -320,6 +320,59 @@ def test_resolve_uniform_text_override_color_reads_single_override_id() -> None:
     assert color.upper().endswith("8E8E93")
 
 
+def test_cyrillic_product_thumbnail_semantic_bind(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "okinawa-monterey.png").write_bytes(b"png")
+    (images / "oblepih-mango.png").write_bytes(b"png")
+    img_a = CleanDesignTreeNode(
+        id="1:img-a",
+        name="Img",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=76.0, height=76.0),
+    )
+    title_a = CleanDesignTreeNode(
+        id="1:title-a",
+        name="Title",
+        type=NodeType.TEXT,
+        text="Окинава Монтерей",
+    )
+    img_b = CleanDesignTreeNode(
+        id="1:img-b",
+        name="Img",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=76.0, height=76.0),
+    )
+    title_b = CleanDesignTreeNode(
+        id="1:title-b",
+        name="Title",
+        type=NodeType.TEXT,
+        text="Облепиха-Манго",
+    )
+    row_a = CleanDesignTreeNode(
+        id="1:row-a",
+        name="Card",
+        type=NodeType.ROW,
+        children=[img_a, title_a],
+    )
+    row_b = CleanDesignTreeNode(
+        id="1:row-b",
+        name="Card",
+        type=NodeType.ROW,
+        children=[img_b, title_b],
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Order",
+        type=NodeType.COLUMN,
+        children=[row_a, row_b],
+    )
+    manifest = local_asset_manifest_from_project(tmp_path, clean_tree=root)
+    bound = {entry.node_id: entry.asset_path for entry in manifest.entries if entry.kind == "image"}
+    assert bound["1:img-a"] == "assets/images/okinawa-monterey.png"
+    assert bound["1:img-b"] == "assets/images/oblepih-mango.png"
+
+
 @pytest.mark.parametrize(
     ("debug_root",),
     [(Path(".debug/screen/test/niyama_order_2"),)],
@@ -368,6 +421,8 @@ def test_offline_emit_laws_from_debug_bundle(debug_root: Path) -> None:
     layout = files["lib/generated/niyama_order_2_layout.dart"]
     assert "maxLines: 1" in layout
     assert "vector_1162_10106" not in layout
+    assert "325.0, height: 325.0" not in layout
+    assert "SizedBox(width: 43.0, height: 43.0" not in layout
     assert layout.count("SizedBox.shrink()") <= 3
 
     from figma_flutter_agent.validation.emit_conservation import (
@@ -377,6 +432,7 @@ def test_offline_emit_laws_from_debug_bundle(debug_root: Path) -> None:
 
     missing_text = find_missing_text_survivors(norm, files)
     assert "Детали" not in missing_text
+    assert "Оплачено" not in missing_text
     assert find_unmaterialized_chunk_refs(files) == []
 
 

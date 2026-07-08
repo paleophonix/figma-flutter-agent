@@ -13,6 +13,7 @@ from figma_flutter_agent.schemas import (
     LayoutSlotIr,
     NodeStyle,
     NodeType,
+    Padding,
     Sizing,
     SizingMode,
     WrapKind,
@@ -75,6 +76,63 @@ def test_row_cross_stretch_height_uses_figma_height_not_infinity() -> None:
     body = render_node_body(row, uses_svg=False)
     assert "height: double.infinity" not in body
     assert "height: 36.0" in body
+
+
+def test_row_wide_text_clamps_to_parent_width_not_square() -> None:
+    """TEXT wider than ROW must not square width into cross-axis height."""
+    text = CleanDesignTreeNode(
+        id="addr",
+        name="Address",
+        type=NodeType.TEXT,
+        text="Пражская",
+        sizing=Sizing(width=325.0, height=22.0),
+    )
+    row = CleanDesignTreeNode(
+        id="row",
+        name="Row",
+        type=NodeType.ROW,
+        sizing=Sizing(width=309.0, height=22.0),
+        children=[text],
+    )
+    body = render_node_body(row, uses_svg=False)
+    assert "325.0, height: 325.0" not in body
+    assert "width: 309.0" in body
+    assert "height: 22.0" in body
+
+
+def test_product_list_column_fixed_height_gets_clip_rect() -> None:
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_column_fixed_product_list_item,
+    )
+
+    divider = CleanDesignTreeNode(
+        id="divider",
+        name="Divider",
+        type=NodeType.STACK,
+        sizing=Sizing(width=347.0, height=0.0),
+        style=NodeStyle(render_bounds_expand=Padding(top=1.0)),
+        children=[],
+    )
+    column = CleanDesignTreeNode(
+        id="product",
+        name="Order product",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=116.0),
+        children=[
+            CleanDesignTreeNode(
+                id="body",
+                name="Body",
+                type=NodeType.ROW,
+                sizing=Sizing(width=375.0, height=115.0),
+                children=[],
+            ),
+            divider,
+        ],
+    )
+    assert layout_fact_column_fixed_product_list_item(column)
+    body = render_node_body(column, uses_svg=False)
+    assert "ClipRect" in body
+    assert "height: 116.0" in body
 
 
 def test_flexible_is_never_wrapped_by_sized_box() -> None:

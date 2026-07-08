@@ -162,7 +162,19 @@ def post_flex_layout_slot_extents(
             else:
                 width_lit = format_geometry_literal(float(slot_width))
                 working = f"SizedBox(width: {width_lit}, child: {working})"
-    if node.type == NodeType.STACK and (
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_flat_pill_bonus_chip_host,
+    )
+
+    if layout_fact_flat_pill_bonus_chip_host(node) and parent_type in {
+        NodeType.COLUMN,
+        NodeType.ROW,
+        NodeType.CARD,
+    }:
+        bounded = _bound_stack_sized_box(node, working, parent_type=parent_type)
+        if bounded is not None:
+            working = bounded
+    elif node.type == NodeType.STACK and (
         parent_type == NodeType.COLUMN
         or (
             parent_type == NodeType.ROW
@@ -197,6 +209,20 @@ def post_flex_layout_slot_extents(
 
     if layout_fact_column_compact_nav_tab(node):
         working = f"ClipRect(child: Align(alignment: Alignment.center, child: {working}))"
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_column_fixed_product_list_item,
+    )
+
+    if layout_fact_column_fixed_product_list_item(node):
+        width = node.sizing.width
+        height = node.sizing.height
+        if width is not None and height is not None and float(height) > 0:
+            width_lit = format_geometry_literal(float(width))
+            height_lit = format_geometry_literal(float(height))
+            working = (
+                f"SizedBox(width: {width_lit}, height: {height_lit}, "
+                f"child: ClipRect(child: {working}))"
+            )
     if parent_type == NodeType.ROW:
         working = bind_row_cross_axis_height(
             node,
@@ -271,6 +297,23 @@ def bind_row_cross_axis_height(
 
     if layout_fact_flat_pill_bonus_chip_host(node):
         return widget
+    if (
+        parent_row is not None
+        and node.type == NodeType.TEXT
+        and parent_row.sizing.width is not None
+        and node.sizing.width is not None
+        and float(node.sizing.width) > float(parent_row.sizing.width) + 0.5
+    ):
+        width_lit = format_geometry_literal(float(parent_row.sizing.width))
+        text_height = node.sizing.height
+        if text_height is not None and float(text_height) > 0:
+            height_lit = format_geometry_literal(float(text_height))
+            return hoist_flex_parent_data(
+                lambda inner: (
+                    f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
+                ),
+                widget,
+            )
     if is_short_centered_glyph_text(node):
         return widget
     if parent_row is not None and layout_fact_centered_glyph_badge(parent_row):
@@ -515,12 +558,6 @@ def _pin_row_cross_axis_height_inner(inner: str, height_lit: str) -> str:
             if ", height:" in head:
                 return inner
             if "width:" in head:
-                width_match = re.search(r"width:\s*([\d.]+)", head)
-                if width_match is not None:
-                    width_val = float(width_match.group(1))
-                    height_val = float(height_lit)
-                    if width_val > height_val + 0.5:
-                        height_lit = format_geometry_literal(width_val)
                 return f"{prefix}{head}, height: {height_lit}, child: {tail}"
     return f"{prefix}SizedBox(height: {height_lit}, child: {inner})"
 

@@ -413,20 +413,20 @@
                                   "kind": "row",
                                   "children": [
                                     {
-                                      "figmaId": "981:66839",
+                                      "figmaId": "I981:66838;hydrate:0",
                                       "kind": "row",
                                       "children": [
                                         {
-                                          "figmaId": "I981:66839;212:117598",
+                                          "figmaId": "I981:66838;hydrate:1",
                                           "kind": "container",
                                           "children": []
                                         },
                                         {
-                                          "figmaId": "I981:66839;212:124673",
+                                          "figmaId": "I981:66838;hydrate:2",
                                           "kind": "stack",
                                           "children": [
                                             {
-                                              "figmaId": "I981:66839;212:124674",
+                                              "figmaId": "I981:66838;hydrate:3",
                                               "kind": "text",
                                               "children": []
                                             }
@@ -471,20 +471,20 @@
                                   "kind": "row",
                                   "children": [
                                     {
-                                      "figmaId": "981:66848",
+                                      "figmaId": "I981:66847;hydrate:0",
                                       "kind": "row",
                                       "children": [
                                         {
-                                          "figmaId": "I981:66848;212:117598",
+                                          "figmaId": "I981:66847;hydrate:1",
                                           "kind": "container",
                                           "children": []
                                         },
                                         {
-                                          "figmaId": "I981:66848;212:124673",
+                                          "figmaId": "I981:66847;hydrate:2",
                                           "kind": "stack",
                                           "children": [
                                             {
-                                              "figmaId": "I981:66848;212:124674",
+                                              "figmaId": "I981:66847;hydrate:3",
                                               "kind": "text",
                                               "children": []
                                             }
@@ -529,20 +529,20 @@
                                   "kind": "row",
                                   "children": [
                                     {
-                                      "figmaId": "981:66857",
+                                      "figmaId": "I981:66856;hydrate:0",
                                       "kind": "row",
                                       "children": [
                                         {
-                                          "figmaId": "I981:66857;212:117598",
+                                          "figmaId": "I981:66856;hydrate:1",
                                           "kind": "container",
                                           "children": []
                                         },
                                         {
-                                          "figmaId": "I981:66857;212:124673",
+                                          "figmaId": "I981:66856;hydrate:2",
                                           "kind": "stack",
                                           "children": [
                                             {
-                                              "figmaId": "I981:66857;212:124674",
+                                              "figmaId": "I981:66856;hydrate:3",
                                               "kind": "text",
                                               "children": []
                                             }
@@ -625,11 +625,11 @@
       "I981:66796;185:29824": "default",
       "I981:66796;185:29826": "default",
       "981:66830": "default",
-      "981:66839": "default",
-      "981:66848": "default",
-      "981:66857": "default",
       "981:66862": "default",
-      "981:66863": "default"
+      "981:66863": "default",
+      "I981:66838;hydrate:0": "default",
+      "I981:66847;hydrate:0": "default",
+      "I981:66856;hydrate:0": "default"
     },
     "adaptiveRules": [],
     "semanticSummary": {

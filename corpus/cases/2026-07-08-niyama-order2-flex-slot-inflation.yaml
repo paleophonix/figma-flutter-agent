@@ -1,0 +1,67 @@
+version: 1
+
+case:
+  id: 2026-07-08-niyama-order2-flex-slot-inflation
+  title: order2 flex cross-stretch squares chip/address slots and product column overflows
+  case_kind: regression
+  project: test
+  feature: niyama_order_2
+  observed_at: 2026-07-08
+  created_at: '2026-07-08T09:10:00Z'
+  updated_at: '2026-07-08T09:10:00Z'
+  summary: >
+    niyama_order_2 BonusBadge +13 chip (43x26 pill) emitted as SizedBox 43x43 and
+    address TEXT wider than parent ROW (325px in 309px) squared to 325x325, flushing
+    content left and occluding lower stack bands. Product list COLUMN fixed 116px plus
+    zero-height hairline divider with renderBoundsExpand.top=1 overflowed by 1px.
+    User observation: chip round not pill; Пражская/Стол no padding; ~1px overflow.
+
+occurrences:
+  - id: niyama-order2-flex-slot-inflation
+    family_id: flex_cross_stretch_inflates_fixed_child
+    pipeline_arrow: A3
+    law_id: LAW-CROSS-STRETCH-PRESERVES-FIXED-CHILD
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/flex_policy/extents.py
+      symbol: bind_row_cross_axis_height
+    contract:
+      field: sizing.height
+      field_class: fact
+      category: illegal
+      expected: >
+        ROW cross-axis height pin preserves Figma child height; wide TEXT clamps to
+        parent ROW width without squaring width into height; flat pill chip hosts keep
+        26px height; fixed product columns clip paint-only hairline overflow.
+      actual: >
+        _pin_row_cross_axis_height_inner squared width>height SizedBox hosts (43x43 chip,
+        325x325 address); product column 116px children summed 117px with 1px divider.
+    authority_boundary: clean_tree
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/niyama_order_2/processed.json
+        summary: Chip ROW 43x26 borderRadius 100; address TEXT width 325 in COLUMN 309.
+      - kind: debug_artifact
+        path: .debug/screen/test/niyama_order_2/screen.dart
+        summary: SizedBox 43x43 chip and 325x325 address text before repair.
+      - kind: debug_artifact
+        path: .debug/screen/test/niyama_order_2/last.log
+        summary: RenderFlex overflowed by 1.00 pixels on the bottom.
+    repair:
+      summary: >
+        Remove width-to-height squaring in _pin_row_cross_axis_height_inner; clamp TEXT
+        wider than parent ROW to parent width; bound flat pill chip ROW hosts; wrap fixed
+        product list columns with ClipRect via layout_fact_column_fixed_product_list_item.
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/flex_policy/extents.py
+        - src/figma_flutter_agent/parser/interaction/product.py
+      regression_tests:
+        - tests/test_flex_extents.py::test_row_wide_text_clamps_to_parent_width_not_square
+        - tests/test_flex_extents.py::test_product_list_column_fixed_height_gets_clip_rect
+        - tests/test_niyama_order_2_emit_laws.py::test_offline_emit_laws_from_debug_bundle
+      verification:
+        - poetry run pytest tests/test_flex_extents.py tests/test_niyama_order_2_emit_laws.py -q

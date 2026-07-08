@@ -445,6 +445,31 @@ def layout_fact_row_product_card_price_footer_row(node: CleanDesignTreeNode) -> 
     return _subtree_has_currency_price(price_side) and _hosts_stepper(action_side)
 
 
+def layout_fact_column_fixed_product_list_item(node: CleanDesignTreeNode) -> bool:
+    """Fixed-height product list column whose hairline footer paints outside layout height."""
+    if node.type != NodeType.COLUMN:
+        return False
+    height = node.sizing.height
+    width = node.sizing.width
+    if height is None or width is None:
+        return False
+    if not (100.0 <= float(height) <= 130.0 and float(width) >= 300.0):
+        return False
+    if len(node.children) < 2:
+        return False
+    last = node.children[-1]
+    if last.type != NodeType.STACK:
+        return False
+    last_height = last.sizing.height
+    if last_height is not None and float(last_height) > 0:
+        return False
+    expand = last.style.render_bounds_expand
+    if expand is None:
+        return False
+    paint_extent = float(expand.top or 0.0) + float(expand.bottom or 0.0)
+    return paint_extent > 0.0
+
+
 def layout_fact_stack_square_product_photo_host(node: CleanDesignTreeNode) -> bool:
     """Square cart thumbnail stacks that layer a raster photo and quantity scrim."""
     from .enrichment import extract_cart_quantity_digit

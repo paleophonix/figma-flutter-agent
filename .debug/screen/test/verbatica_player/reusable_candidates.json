@@ -1,69 +1,93 @@
 {
-  "cacheKey": "9b9083c6a334e5060f14a5ed83c58d2725c8912615c254c74c1741c1f74b69f3",
+  "cacheKey": "0e018032a01ae1e15a475650305e0b68db3fd6493fa0efb4b55c2d1d3b73c38a",
   "response": {
     "candidates": [
       {
         "nodeId": "981:66825",
-        "widgetName": "TranscriptListItem",
-        "reason": "Repeated four times as the main transcript/answer row, with only the body text changing and the same trailing drill-in affordance.",
-        "confidence": 0.96,
+        "widgetName": "LessonListItem",
+        "reason": "Four repeated rows share the same structure: body text on the left and a trailing drill-in accessory on the right; only the body copy changes.",
+        "confidence": 0.98,
         "suggestedParams": [
           "bodyText"
         ],
         "evidence": {
           "similarNodes": [
             "981:66825",
-            "981:66833",
-            "981:66842",
-            "981:66851"
+            "981:66834",
+            "981:66843",
+            "981:66852"
           ],
-          "shapeSimilarity": 0.97,
-          "semanticRole": "Repeated transcript line item with trailing action/accessory"
+          "shapeSimilarity": 0.99,
+          "semanticRole": "lesson/audio transcript list item"
         }
       },
       {
         "nodeId": "981:66830",
-        "widgetName": "TrailingDrillInAffordance",
-        "reason": "The same trailing accessory component is reused four times with identical structure and properties.",
-        "confidence": 0.98,
-        "suggestedParams": [],
+        "widgetName": "ContentsTrailing",
+        "reason": "The same trailing accessory component is reused four times with the same detail/drill-in configuration, making it a good standalone widget.",
+        "confidence": 0.97,
+        "suggestedParams": [
+          "detailText"
+        ],
         "evidence": {
           "similarNodes": [
             "981:66830",
-            "981:66839",
-            "981:66848",
-            "981:66857"
+            "I981:66838;hydrate:0",
+            "I981:66847;hydrate:0",
+            "I981:66856;hydrate:0"
           ],
           "shapeSimilarity": 1.0,
-          "semanticRole": "Repeated trailing detail/drill-in affordance"
+          "semanticRole": "trailing list-row accessory"
         }
       },
       {
         "nodeId": "981:66808",
-        "widgetName": "TransportControlButton",
-        "reason": "Circular playback control is duplicated in the transport row with the same visual structure, making it a good reusable control widget.",
-        "confidence": 0.84,
+        "widgetName": "SkipBackButton",
+        "reason": "Two identical circular skip-back controls repeat in the playback controls row and are suitable as a reusable button widget.",
+        "confidence": 0.92,
         "suggestedParams": [
-          "iconLabel"
+          "skipAmount"
         ],
         "evidence": {
           "similarNodes": [
             "981:66808",
             "981:66816"
           ],
-          "shapeSimilarity": 0.95,
-          "semanticRole": "Playback transport control button"
+          "shapeSimilarity": 1.0,
+          "semanticRole": "audio playback seek control"
         }
       },
       {
         "nodeId": "981:66862",
         "widgetName": "PrimaryActionButton",
-        "reason": "Full-width primary CTA button is a clear reusable control for actions like checking answers.",
-        "confidence": 0.87,
+        "reason": "A standard full-width primary CTA button component is present and should be extracted for reuse across screens.",
+        "confidence": 0.94,
         "suggestedParams": [
           "label"
         ],
-        "evidence": null
+        "evidence": {
+          "similarNodes": [
+            "981:66862"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "primary call-to-action button"
+        }
+      },
+      {
+        "nodeId": "I981:66796;185:29824",
+        "widgetName": "LeadingBackButton",
+        "reason": "This leading navigation control combines the back chevron and label into a reusable header action.",
+        "confidence": 0.9,
+        "suggestedParams": [
+          "label"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "I981:66796;185:29824"
+          ],
+          "shapeSimilarity": 1.0,
+          "semanticRole": "header back navigation control"
+        }
       }
     ]
   }
