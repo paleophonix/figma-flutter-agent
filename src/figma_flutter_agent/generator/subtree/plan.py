@@ -298,6 +298,10 @@ def plan_subtree_widget_files(
     cluster_classes: dict[str, str] | None = None,
     cluster_vector_variants: dict | None = None,
     clean_tree: CleanDesignTreeNode | None = None,
+    bundled_font_families: frozenset[str] | None = None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> tuple[dict[str, str], SubtreeWidgetResult | None]:
     """Seed widgets from disk when possible; render only missing or broken bodies."""
     if not specs:
@@ -345,6 +349,10 @@ def plan_subtree_widget_files(
         cluster_classes=cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
         project_dir=project_dir,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
     )
     logger.info(
         "Subtree widgets rendered in {:.1f}s ({} skipped as already valid)",

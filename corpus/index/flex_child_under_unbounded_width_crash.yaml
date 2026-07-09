@@ -2,6 +2,21 @@ version: 1
 family_id: flex_child_under_unbounded_width_crash
 generated: true
 cases:
+- case_id: 2026-07-09-verbatica-player-flex-unbounded-crash
+  case_file: cases/2026-07-09-verbatica-player-flex-unbounded-crash.yaml
+  title: verbatica player audio card Row Expanded under unbounded width crashes 
+    subtree
+  project: test
+  feature: verbatica_player
+  occurrence_id: verbatica-player-flex-unbounded-crash
+  status: FIXED
+  observed_at: '2026-07-09'
+  created_at: '2026-07-09T10:44:00Z'
+  updated_at: '2026-07-09T14:00:00Z'
+  summary: 'User observation: middle content (audio player, question, answer chips)
+    disappeared on verbatica_player; only header and faded bottom CTA remain. Runtime
+    throws RenderFlex unbounded-width on the player card Row (981:66800) with Expanded
+    child under SizedBox(width: double.infin...'
 - case_id: 2026-07-07-niyama-cutlery-expanded-unbounded-width-crash
   case_file: cases/2026-07-07-niyama-cutlery-expanded-unbounded-width-crash.yaml
   title: CutleryOption Expanded under OverflowBox crashes layout and kills 

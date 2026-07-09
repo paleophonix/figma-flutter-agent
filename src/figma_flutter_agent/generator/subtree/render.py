@@ -293,6 +293,10 @@ def _render_subtree_widget_body(
     cluster_classes: dict[str, str] | None = None,
     cluster_vector_variants: dict | None = None,
     project_dir: Path | None = None,
+    bundled_font_families: frozenset[str] | None = None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> str:
     """Render a dedicated subtree widget file (inline cluster body, no sibling delegate)."""
     from figma_flutter_agent.generator.layout.widgets.selection import (
@@ -326,6 +330,10 @@ def _render_subtree_widget_body(
             cluster_classes=inline_cluster_classes,
             cluster_vector_variants=cluster_vector_variants,
             skip_cluster_id=skip_cluster_id,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
         )
 
     root = _prepare_subtree_render_root(representative)
@@ -362,6 +370,10 @@ def _render_subtree_widget_body(
         cluster_classes=inline_cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
         skip_cluster_id=skip_cluster_id,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
     )
     from figma_flutter_agent.generator.ir.extracted import (
         _preserve_extracted_widget_decoration_shell,
@@ -384,6 +396,10 @@ def render_subtree_widgets(
     cluster_classes: dict[str, str] | None = None,
     cluster_vector_variants: dict | None = None,
     project_dir: Path | None = None,
+    bundled_font_families: frozenset[str] | None = None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> SubtreeWidgetResult:
     """Render deterministic widget files for vector-rich subtrees."""
     from figma_flutter_agent.generator.layout.widget_roots import (
@@ -399,6 +415,10 @@ def render_subtree_widgets(
             cluster_classes=cluster_classes,
             cluster_vector_variants=cluster_vector_variants,
             project_dir=project_dir,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
         )
         path = f"lib/widgets/{spec.file_name}.dart"
         widget_source = render_widget_file(

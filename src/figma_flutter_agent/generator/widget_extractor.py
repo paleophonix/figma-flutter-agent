@@ -454,6 +454,10 @@ def render_cluster_widgets(
     clean_trees: list[CleanDesignTreeNode] | None = None,
     project_dir: Path | None = None,
     m3_policy: M3Policy | None = None,
+    bundled_font_families: frozenset[str] | None = None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> ClusterWidgetResult:
     """Render deterministic widget files for structural clusters.
 
@@ -568,6 +572,10 @@ def render_cluster_widgets(
                 cluster_classes=cluster_classes,
                 skip_cluster_id=spec.cluster_id,
                 cluster_vector_variant=variant,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
             )
             if layout_fact_painted_cta_action_shell(representative):
                 from figma_flutter_agent.generator.layout.widgets.button import (

@@ -603,6 +603,101 @@ def repair_overflowbox_unbounded_row_flex_in_source(source: str) -> str:
                 pos = idx + len(repaired)
                 continue
         pos = end + 1
+    return repair_constrainedbox_unbounded_row_flex_in_source(updated)
+
+
+_CONSTRAINEDBOX_MARKER = "ConstrainedBox("
+
+
+def _find_enclosing_finite_sizedbox_width(source: str, before: int) -> str | None:
+    """Return the nearest finite ``SizedBox(width: …)`` literal before *before*."""
+    prefix = source[:before]
+    marker = "SizedBox(width:"
+    best: str | None = None
+    pos = 0
+    while True:
+        idx = prefix.find(marker, pos)
+        if idx < 0:
+            return best
+        tail = prefix[idx + len(marker) :].lstrip()
+        if tail.startswith("double.infinity"):
+            pos = idx + 1
+            continue
+        end = 0
+        for index, char in enumerate(tail):
+            if char in ",)":
+                end = index
+                break
+        else:
+            end = len(tail)
+        value = tail[:end].strip()
+        if value:
+            best = value
+        pos = idx + 1
+
+
+def _constrainedbox_has_minheight_only_unbounded_width(expr: str) -> bool:
+    """True when a ``ConstrainedBox`` only pins minHeight but hosts ``Expanded``."""
+    bc_marker = "BoxConstraints("
+    idx = expr.find(bc_marker)
+    if idx < 0:
+        return False
+    open_paren = expr.find("(", idx)
+    from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
+        _find_matching_paren,
+    )
+
+    end = _find_matching_paren(expr, open_paren)
+    if end is None:
+        return False
+    inner = expr[open_paren + 1 : end]
+    if "minHeight:" not in inner:
+        return False
+    if "maxWidth:" in inner or "minWidth:" in inner:
+        return False
+    return "Expanded(" in expr
+
+
+def _pin_width_on_minheight_constrainedbox(expr: str, width_lit: str) -> str:
+    """Add finite width bounds to a minHeight-only ``ConstrainedBox``."""
+    bc_marker = "constraints: BoxConstraints("
+    idx = expr.find(bc_marker)
+    if idx < 0:
+        return expr
+    insert_at = idx + len(bc_marker)
+    return f"{expr[:insert_at]}minWidth: {width_lit}, maxWidth: {width_lit}, {expr[insert_at:]}"
+
+
+def repair_constrainedbox_unbounded_row_flex_in_source(source: str) -> str:
+    """Bound width for ``Expanded`` rows under minHeight-only ``ConstrainedBox`` hosts."""
+    from figma_flutter_agent.generator.planned.reconcile.ast_helpers import (
+        _find_matching_paren,
+    )
+
+    updated = source
+    pos = 0
+    while True:
+        idx = updated.find(_CONSTRAINEDBOX_MARKER, pos)
+        if idx < 0:
+            return updated
+        open_paren = updated.find("(", idx)
+        end = _find_matching_paren(updated, open_paren)
+        if end is None:
+            return updated
+        expr = updated[idx : end + 1]
+        if not _constrainedbox_has_minheight_only_unbounded_width(expr):
+            pos = end + 1
+            continue
+        width = _find_enclosing_finite_sizedbox_width(updated, idx)
+        if width is None:
+            pos = end + 1
+            continue
+        repaired = _pin_width_on_minheight_constrainedbox(expr, width)
+        if repaired == expr:
+            pos = end + 1
+            continue
+        updated = updated[:idx] + repaired + updated[end + 1 :]
+        pos = idx + len(repaired)
 
 
 def _repair_flex_parent_data_descend(widget: str) -> str:

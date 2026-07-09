@@ -1,0 +1,70 @@
+version: 1
+
+case:
+  id: 2026-07-09-verbatica-player-flex-unbounded-crash
+  title: verbatica player audio card Row Expanded under unbounded width crashes subtree
+  case_kind: regression
+  project: test
+  feature: verbatica_player
+  observed_at: 2026-07-09
+  created_at: '2026-07-09T10:44:00Z'
+  updated_at: '2026-07-09T14:00:00Z'
+  summary: >
+    User observation: middle content (audio player, question, answer chips) disappeared
+    on verbatica_player; only header and faded bottom CTA remain. Runtime throws
+    RenderFlex unbounded-width on the player card Row (981:66800) with Expanded child
+    under SizedBox(width: double.infinity), cascading to box.dart assertions and
+    no-size hit-test failures.
+
+occurrences:
+  - id: verbatica-player-flex-unbounded-crash
+    family_id: flex_child_under_unbounded_width_crash
+    pipeline_arrow: A3
+    law_id: LAW-FLEX-CHILD-BOUNDED-WIDTH
+    stage: emitter
+    origin: COMPILER
+    blast_radius: B3_BLOCKING
+    confidence: high
+    status: FIXED
+    owner:
+      module: src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py
+      symbol: flex_children_body
+    contract:
+      field: flex child width constraints
+      field_class: fact
+      category: illegal
+      expected: >
+        Rows with Expanded/FILL children must receive bounded max width from the
+        emitter; unbounded OverflowBox/Align hosts must not wrap flex children.
+      actual: >
+        Player card Row at 981:66800 keeps Expanded under double.infinity host;
+        Flutter aborts layout and the feature subtree paints with zero size.
+    authority_boundary: clean_tree
+    evidence:
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_player/last.log
+        summary: >
+          RenderFlex children have non-zero flex but incoming width constraints are
+          unbounded; repeated box.dart assertions and Cannot hit test a render box
+          with no size.
+      - kind: source_code
+        path: .debug/screen/test/verbatica_player/screen.dart
+        summary: >
+          _buildFeature player Row uses Expanded inside SizedBox(width: double.infinity)
+          chain around the 167px audio card stack.
+      - kind: debug_artifact
+        path: .debug/screen/test/verbatica_player/processed.json
+        summary: >
+          ROW 981:66800 width 393 FILL hosts STACK 981:66801 width 361 FILL inside
+          padded ROW with cross stretch.
+    repair:
+      summary: >
+        Pin finite width on minHeight-only ConstrainedBox hosts that wrap Expanded
+        descendants, using the nearest enclosing finite SizedBox width (same family
+        as OverflowBox flex repair).
+      changed_files:
+        - src/figma_flutter_agent/generator/layout/flex_policy/wrap.py
+      regression_tests:
+        - tests/test_verbatica_player_emit_laws.py::test_repair_constrainedbox_pins_width_before_expanded_row
+      verification:
+        - poetry run pytest tests/test_verbatica_player_emit_laws.py -q

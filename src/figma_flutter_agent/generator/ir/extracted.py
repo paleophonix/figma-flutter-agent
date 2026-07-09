@@ -281,6 +281,10 @@ def _render_extracted_widget_body(
         ),
         cluster_vector_variants=ctx.cluster_vector_variants,
         skip_cluster_id=_extracted_widget_skip_cluster_id(node, widget_name, ctx),
+        bundled_font_families=ctx.bundled_font_families,
+        dart_weight_overrides_by_family=ctx.dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=ctx.text_theme_slot_by_style_name,
+        text_theme_size_slots=ctx.text_theme_size_slots,
     )
 
 

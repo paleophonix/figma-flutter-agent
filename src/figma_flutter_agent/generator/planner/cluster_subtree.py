@@ -146,6 +146,8 @@ def plan_subtree_widgets(
         cluster_classes=cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
         clean_tree=context.clean_tree,
+        bundled_font_families=frozenset(context.font_manifest.bundled_family_names),
+        dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
     )
     return planned_files, subtree_result
 

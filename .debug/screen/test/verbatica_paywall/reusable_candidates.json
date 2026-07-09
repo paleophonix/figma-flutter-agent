@@ -1,66 +1,72 @@
 {
-  "cacheKey": "f6997c0ebc4cddc9a2a3c1b838a4766c976a48cd3241bbb1e9c21f6cefa3c8cc",
+  "cacheKey": "d4eb96e2ff07664c17e6d6217c369cdb1143d7235e0b05342a3a40b426d78080",
   "response": {
     "candidates": [
       {
         "nodeId": "2399:42788",
-        "widgetName": "PlanOptionCard",
-        "reason": "Repeated subscription-plan row with the same title/price/check layout across multiple options; the first variant adds an optional savings badge, so this is a strong reusable card candidate.",
-        "confidence": 0.96,
+        "widgetName": "PricingPlanOptionCard",
+        "reason": "Repeated pricing row pattern across the three plan entries; same two-column structure with plan term, per-month price, total price, and optional savings badge.",
+        "confidence": 0.98,
         "suggestedParams": [
-          "periodLabel",
-          "monthlyPrice",
-          "totalPrice",
-          "badgeText",
-          "showBadge"
+          "termLabel",
+          "monthlyPriceLabel",
+          "totalPriceLabel",
+          "badgeLabel",
+          "isSelected"
         ],
         "evidence": {
           "similarNodes": [
             "2399:42801",
             "2399:42812"
           ],
-          "shapeSimilarity": 0.95,
-          "semanticRole": "subscription plan selection row"
+          "shapeSimilarity": 0.97,
+          "semanticRole": "subscription plan option"
         }
       },
       {
+        "nodeId": "2399:42837",
+        "widgetName": "PrimarySubscribeButton",
+        "reason": "Standalone primary CTA component with two text lines; good candidate to keep headline and subheadline configurable.",
+        "confidence": 0.88,
+        "suggestedParams": [
+          "title",
+          "subtitle"
+        ],
+        "evidence": null
+      },
+      {
         "nodeId": "2399:42838",
-        "widgetName": "SecondarySubscriptionButton",
-        "reason": "Tertiary action button family reused twice with the same component group and nearly identical structure, differing mainly by label and height.",
-        "confidence": 0.98,
+        "widgetName": "TertiaryActionButton",
+        "reason": "Same component family as the adjacent tertiary button and reused for two different actions; only the label and compactness differ.",
+        "confidence": 0.92,
         "suggestedParams": [
           "label",
-          "buttonHeight"
+          "isCompact"
         ],
         "evidence": {
           "similarNodes": [
             "2399:42839"
           ],
-          "shapeSimilarity": 0.99,
-          "semanticRole": "secondary action button"
+          "shapeSimilarity": 0.95,
+          "semanticRole": "secondary subscription action"
         }
       },
       {
-        "nodeId": "2399:42837",
-        "widgetName": "PrimarySubscriptionButton",
-        "reason": "Primary CTA button component with a two-line label/subtitle arrangement, intended to be reused as the main paywall action.",
-        "confidence": 0.91,
-        "suggestedParams": [
-          "title",
-          "subtitle",
-          "onPressed"
-        ],
+        "nodeId": "2399:42786",
+        "widgetName": "CloseButton",
+        "reason": "Reusable trailing close control component with icon-only presentation.",
+        "confidence": 0.78,
+        "suggestedParams": [],
         "evidence": null
       },
       {
         "nodeId": "2399:42783",
-        "widgetName": "StatusBar",
-        "reason": "Prebuilt system status bar component on the screen header; reusable as a top-level mobile chrome widget.",
-        "confidence": 0.88,
+        "widgetName": "PaywallStatusBar",
+        "reason": "Prebuilt status bar component at the top of the screen; extraction keeps device chrome reusable across paywalls.",
+        "confidence": 0.7,
         "suggestedParams": [
           "timeText",
           "showCamera",
-          "showDate",
           "showBatteryTime"
         ],
         "evidence": null
@@ -68,12 +74,10 @@
       {
         "nodeId": "2399:42843",
         "widgetName": "HomeIndicator",
-        "reason": "Prebuilt iPhone home indicator component used as a reusable device chrome element at the bottom of the screen.",
-        "confidence": 0.87,
+        "reason": "Reusable iPhone home indicator component used as bottom system chrome.",
+        "confidence": 0.76,
         "suggestedParams": [
-          "device",
-          "orientation",
-          "mode"
+          "indicatorWidth"
         ],
         "evidence": null
       }

@@ -46,6 +46,7 @@
           "strokeAlign": "INSIDE",
           "clipsContent": true
         },
+        "imageAssetKey": "assets/images/portrait.png",
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "right": -33.0,
@@ -3441,6 +3442,7 @@
                         "style": {
                           "strokeAlign": "INSIDE"
                         },
+                        "vectorAssetKey": "assets/icons/vector_2399_42811.svg",
                         "clusterId": "cluster_0",
                         "geometryFrame": {
                           "localTransform": {
@@ -4700,7 +4702,6 @@
                 "style": {
                   "strokeAlign": "INSIDE"
                 },
-                "imageAssetKey": "assets/images/portrait.png",
                 "componentRef": "111:17496",
                 "variant": {
                   "componentId": "111:17496",

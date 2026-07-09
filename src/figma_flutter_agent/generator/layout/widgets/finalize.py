@@ -159,9 +159,23 @@ def _wrap_zero_opacity(node: CleanDesignTreeNode, widget: str) -> str:
     return "const SizedBox.shrink()"
 
 
+def _painted_button_should_skip_group_opacity(node: CleanDesignTreeNode) -> bool:
+    """Skip layer opacity on painted buttons unless the variant is explicitly disabled."""
+    if node.type != NodeType.BUTTON:
+        return False
+    opacity = node.style.opacity
+    if opacity is None or opacity >= 1.0 - 1e-6:
+        return False
+    from figma_flutter_agent.generator.variant.state import variant_is_disabled
+
+    return not variant_is_disabled(node)
+
+
 def _wrap_group_opacity(node: CleanDesignTreeNode, widget: str) -> str:
     """Apply frame opacity to the whole subtree (FID-12)."""
     if node.extracted_widget_ref:
+        return widget
+    if _painted_button_should_skip_group_opacity(node):
         return widget
     opacity = node.style.opacity
     if opacity is None or opacity >= 1.0 - 1e-6 or opacity <= 0.0:

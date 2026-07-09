@@ -1194,3 +1194,23 @@ families:
       Small filled VECTOR nodes without vector_asset_key fall through to SizedBox.shrink
       instead of primitive circle fill or play-arrow icon fallbacks.
     status: active
+
+  - id: figma_group_opacity_on_painted_control
+    title: Figma layer opacity on painted controls reduces whole-widget visibility
+    pipeline_arrows:
+      - A3
+    owning_stage: emitter
+    owners:
+      - module: src/figma_flutter_agent/generator/layout/widgets/finalize.py
+        symbol: _wrap_group_opacity
+    law_ids:
+      - LAW-GROUP-OPACITY-FIDELITY
+    default_blast_radius: B2_SILENT_WRONG_BEHAVIOR
+    allowed_origins:
+      - COMPILER
+    description: >
+      Parser preserves frame opacity on BUTTON/CTA instances; emitter wraps the entire
+      interactive subtree in Opacity(). Disabled-state frames and layer-opacity overrides
+      can make primary CTAs look washed out versus fill-only previews unless policy gates
+      opacity on painted interactive controls.
+    status: active

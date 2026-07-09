@@ -130,6 +130,8 @@ def _plan_generation_files_impl(context: GenerationPlanContext) -> dict[str, str
                 clean_trees=clean_trees,
                 project_dir=context.project_dir,
                 m3_policy=context.m3_policy,
+                bundled_font_families=frozenset(context.font_manifest.bundled_family_names),
+                dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
             )
             planned_files.update(cluster_result.files)
 

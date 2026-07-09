@@ -2,6 +2,19 @@ version: 1
 family_id: typography_collapse_drops_font_family
 generated: true
 cases:
+- case_id: 2026-07-09-verbatica-player-title-font-dropped
+  case_file: cases/2026-07-09-verbatica-player-title-font-dropped.yaml
+  title: verbatica player lesson title loses Nekst after typography collapse
+  project: test
+  feature: verbatica_player
+  occurrence_id: verbatica-player-title-font-dropped
+  status: FIXED
+  observed_at: '2026-07-09'
+  created_at: '2026-07-09T10:44:00Z'
+  updated_at: '2026-07-09T14:00:00Z'
+  summary: 'User observation: header title "Урок 1" renders in the wrong font. Figma
+    fact on node I981:66796;185:29827 is fontFamily Nekst w600, but emitted Text binds
+    textTheme.bodyMedium without fontFamily while sibling copy uses labelLarge+Nekst.'
 - case_id: 2026-07-07-verbatica-price-font-collapsed-to-sfpro
   case_file: cases/2026-07-07-verbatica-price-font-collapsed-to-sfpro.yaml
   title: Verbatica prices render in SF Pro Text because Nekst is collapsed away
