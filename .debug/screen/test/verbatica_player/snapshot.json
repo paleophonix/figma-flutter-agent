@@ -9,9 +9,9 @@
   "file_hashes": {
     "lib/widgets/check_button_widget.dart": "5a5a77688e222067c9ec4a27d9c5282d40f668c5c7b653fec8826c471bcaa75c",
     "lib/widgets/dynamic_island_status_bar_widget.dart": "6d94685bbcec97413b51efde1948ed557e77da1dfb928ff04228089cb97b41ca",
-    "lib/widgets/player_top_bar_widget.dart": "94c4d132fe3cd2b2060b419d6ba9e4dbbbf13537783bcc649b00b707aa9db542",
+    "lib/widgets/player_top_bar_widget.dart": "01a3798a21a3151a3800a822e0b81d35a22ecb87b19573c579ab33190160779e",
     "lib/widgets/home_indicator_widget.dart": "f3d5f79020e15c294be8ff72f635561a80e6adbb121fddd224fccf76b036b8b1",
-    "lib/widgets/close_button_widget.dart": "e39ec5cbf9be151db5b564f9d00d65f3e26ee4a371da13e75b3c13d0dde4e3ce",
+    "lib/widgets/close_button_widget.dart": "432a5652ab87d088d1b50554d4bbc09796854ce785251f846b9712df180a8679",
     "lib/widgets/battery_widget.dart": "1d21d643b2677184980fee41fb2cfc84b61bb7251131b12819ddf534c2e15586",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "b06509bb7a36c498c59d7d1ffa266b64251dcbfc5b02bb968b1c40225a01bcf7",
@@ -21,7 +21,7 @@
     "lib/theme/app_edge_insets.dart": "2d84505a17f2d78d3d8181d581bb0c225d7d7d7346fc38b65774584be1f937ae",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "1d835ce8a58e7d895b416846fcf4137f4a805eef1269288cdc2d30b4af4412e0",
-    "lib/generated/verbatica_player_layout.dart": "a2597926f9ecdad9e1b8b53ea3593bf739d95c3dc535794e0dbff3c4ee555817",
+    "lib/generated/verbatica_player_layout.dart": "65d9f4aeaa580abf27b7160bffd1c356eb56d6032a7fbd1b9b3fdf93c0754e87",
     "lib/features/verbatica_player/verbatica_player_screen.dart": "e260ecb1de924f68d4531770ee6ad41579c19a1f6d81f608f241365964e82e43",
     "test/golden/verbatica_player_screen_test.dart": "e2e676aa9163ea4ac4a22c18646b59cb7cef0c696129f97a8e86a7e0e51c798e",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -36,6 +36,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.07.1",
-  "version": 2,
-  "updated_at": "2026-07-08T12:05:18.219851+00:00"
+  "version": 3,
+  "updated_at": "2026-07-08T18:57:59.702934+00:00"
 }

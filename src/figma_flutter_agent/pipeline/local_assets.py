@@ -42,7 +42,7 @@ _PRODUCT_ROW_MEDIA_CHILD_TYPES = frozenset({NodeType.IMAGE, NodeType.STACK, Node
 _BADGE_ORPHAN_STEM_TOKENS = frozenset({"chip", "badge"})
 _BADGE_LABEL_HINTS = frozenset({"chip", "badge", "bonus", "nomber", "number", "+18", "18"})
 _CONDIMENT_LABEL_TOKENS = frozenset(
-    {"sauce", "sous", "soy", "vasabi", "wasabi", "condiment", "priprav"}
+    {"sauce", "sous", "sousy", "soy", "vasabi", "wasabi", "condiment", "priprav"}
 )
 _ENTREE_PHOTO_STEM_TOKENS = frozenset(
     {"sussi", "sushi", "philadelphia", "ramen", "tomyam", "tomyum", "meal", "photo"}
@@ -159,7 +159,11 @@ def _labels_allow_badge_raster(labels: list[str]) -> bool:
 
 
 def _labels_describe_condiment_row(labels: list[str]) -> bool:
-    return any(any(token in label for token in _CONDIMENT_LABEL_TOKENS) for label in labels)
+    for label in labels:
+        words = set(label.split())
+        if words & _CONDIMENT_LABEL_TOKENS:
+            return True
+    return False
 
 
 def _stem_describes_entree_photo(stem: str) -> bool:

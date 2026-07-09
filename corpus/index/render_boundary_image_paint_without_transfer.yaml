@@ -2,6 +2,21 @@ version: 1
 family_id: render_boundary_image_paint_without_transfer
 generated: true
 cases:
+- case_id: 2026-07-07-niyama-order2-icons-shrink-shells
+  case_file: cases/2026-07-07-niyama-order2-icons-shrink-shells.yaml
+  title: order2 top meal image and location/guest/cutlery icons emit empty 
+    shrink shells
+  project: test
+  feature: niyama_order_2
+  occurrence_id: niyama-order2-icons-shrink-shells
+  status: FIXED
+  observed_at: '2026-07-07'
+  created_at: '2026-07-07T14:00:00Z'
+  updated_at: '2026-07-08T19:30:00Z'
+  summary: In niyama_order_2 the top meal illustration and vector icons 
+    (location, guest/seat, cutlery) emitted SizedBox.shrink() when drawables 
+    were missing or semantic manifest could not pair Cyrillic product titles to 
+    on-disk rasters. Batch repair 2026-07-08 restored role-named raster...
 - case_id: 2026-07-06-verbatica-render-boundary-hero-image
   case_file: cases/2026-07-06-verbatica-render-boundary-hero-image.yaml
   title: Hero wallpaper render boundary emits empty shrink shell
@@ -15,21 +30,6 @@ cases:
   summary: Paywall hero Img 2399:42779 is flattened to a render boundary without
     imageAssetKey; ambient wallpaper emit produced SizedBox.shrink and the 
     decomposed stack path omitted Positioned.fill wallpaper lead.
-- case_id: 2026-07-07-niyama-order2-icons-shrink-shells
-  case_file: cases/2026-07-07-niyama-order2-icons-shrink-shells.yaml
-  title: order2 top meal image and location/guest/cutlery icons emit empty 
-    shrink shells
-  project: test
-  feature: niyama_order_2
-  occurrence_id: niyama-order2-icons-shrink-shells
-  status: OPEN
-  observed_at: '2026-07-07'
-  created_at: '2026-07-07T14:00:00Z'
-  updated_at: '2026-07-08T09:10:00Z'
-  summary: In niyama_order_2 the top meal illustration ("Img") and several 
-    vector icons (location, guest/seat, cutlery) emit Semantics(label, 
-    SizedBox.shrink()) — empty shells — when drawables are missing or semantic 
-    manifest cannot pair Cyrillic product titles to on-disk rasters. Batch...
 - case_id: 2026-07-07-verbatica-render-boundary-phantom-vector-key
   case_file: cases/2026-07-07-verbatica-render-boundary-phantom-vector-key.yaml
   title: Render-boundary raster bind leaves stale planned SVG key and blocks IR 

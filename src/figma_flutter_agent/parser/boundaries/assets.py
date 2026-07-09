@@ -83,6 +83,8 @@ def _component_icon_role_stems(node: CleanDesignTreeNode) -> list[str]:
             if alias:
                 add(alias)
             add(str(value))
+            for part in str(value).split("/"):
+                add(part)
         for part in (node.variant.component_name or "").split("/"):
             add(part)
     for part in (node.name or "").split("/"):
@@ -1033,6 +1035,11 @@ def resolve_discovered_vector_asset_keys(
                 candidates.append(discovered.replace("\\", "/"))
         if candidates:
             node.vector_asset_key = min(candidates, key=_vector_asset_discovery_rank)
+            reconcile_role_raster_over_icon_family_alias(
+                node,
+                project_dir,
+                asset_index=asset_index,
+            )
             return
         from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
 

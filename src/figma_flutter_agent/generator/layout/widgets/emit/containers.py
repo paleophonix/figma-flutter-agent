@@ -500,13 +500,14 @@ def render_card(node: CleanDesignTreeNode, ctx: dict[str, Any], flow: dict[str, 
                 if node.style.background_color
                 else "color: Colors.transparent, "
             )
+            card_padding_expr = padding_edge_insets(node) or "const EdgeInsets.all(AppSpacing.md)"
             widget = (
                 f"Card("
                 f"elevation: {elevation}, "
                 f"{card_surface}"
                 f"shape: RoundedRectangleBorder(borderRadius: {radius}), "
                 f"child: Padding("
-                f"padding: const EdgeInsets.all(AppSpacing.md), "
+                f"padding: {card_padding_expr}, "
                 f"child: Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
                 f")"
                 f")"

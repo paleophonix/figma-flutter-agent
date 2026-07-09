@@ -30,12 +30,20 @@ from figma_flutter_agent.schemas import (
     ComponentVariant,
     NodeStyle,
     NodeType,
+    Padding,
     ScreenIr,
     Sizing,
     WidgetIrKind,
     WidgetIrNode,
     WidgetIrRef,
 )
+
+
+def _write_minimal_viable_png(path: Path) -> None:
+    """Write an 8x8 RGBA PNG that passes ``raster_asset_export_viable``."""
+    from PIL import Image
+
+    Image.new("RGBA", (8, 8), (0, 0, 0, 0)).save(path)
 
 
 def test_component_vector_family_skips_adjacent_icon_library_ids(tmp_path: Path) -> None:
@@ -69,7 +77,7 @@ def test_component_vector_family_skips_adjacent_icon_library_ids(tmp_path: Path)
 def test_discover_role_named_raster_maps_icon_component_to_png(tmp_path: Path) -> None:
     images = tmp_path / "assets" / "images"
     images.mkdir(parents=True)
-    (images / "location.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "location.png")
     vector = CleanDesignTreeNode(
         id="1:map",
         name="Vector",
@@ -90,7 +98,7 @@ def test_resolve_discovered_vector_prefers_role_raster_over_family_alias(tmp_pat
     icons.mkdir(parents=True)
     images.mkdir(parents=True)
     (icons / "vector_1162_10106.svg").write_text("<svg></svg>", encoding="utf-8")
-    (images / "tableware.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "tableware.png")
     vector = CleanDesignTreeNode(
         id="I3561:42994;1406:12001;1162:10248",
         name="Vector",
@@ -108,10 +116,34 @@ def test_resolve_discovered_vector_prefers_role_raster_over_family_alias(tmp_pat
     assert vector.image_asset_key == "assets/images/tableware.png"
 
 
+def test_card_padding_uses_figma_padding_not_spacing_token() -> None:
+    """Law: card inner padding mirrors Figma padding facts, not AppSpacing.md."""
+    from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+    label = CleanDesignTreeNode(
+        id="1:label",
+        name="Label",
+        type=NodeType.TEXT,
+        text="Пражская",
+    )
+    card = CleanDesignTreeNode(
+        id="1:card",
+        name="Info2",
+        type=NodeType.CARD,
+        sizing=Sizing(width=343.0, height=120.0),
+        padding=Padding(top=20.0, bottom=20.0, left=14.0, right=14.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=16.0),
+        children=[label],
+    )
+    emitted = render_node_body(card, uses_svg=True, parent_type=NodeType.COLUMN)
+    assert "EdgeInsets.fromLTRB(14.0, 20.0, 14.0, 20.0)" in emitted
+    assert "EdgeInsets.all(AppSpacing.md)" not in emitted
+
+
 def test_semantic_raster_binds_product_thumbnail_by_title_word(tmp_path: Path) -> None:
     images = tmp_path / "assets" / "images"
     images.mkdir(parents=True)
-    (images / "ramen-chicken.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "ramen-chicken.png")
     img = CleanDesignTreeNode(
         id="1:img",
         name="Img",
@@ -157,7 +189,7 @@ def test_semantic_raster_binds_product_thumbnail_by_title_word(tmp_path: Path) -
 def test_delivered_variant_binds_meal_raster(tmp_path: Path) -> None:
     images = tmp_path / "assets" / "images"
     images.mkdir(parents=True)
-    (images / "meal.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "meal.png")
     img = CleanDesignTreeNode(
         id="1:meal",
         name="Img",
@@ -248,8 +280,8 @@ def test_promote_screen_ir_extracted_hosts_upgrades_orphan_blueprints() -> None:
 def test_product_row_nested_title_enables_semantic_thumbnail_bind(tmp_path: Path) -> None:
     images = tmp_path / "assets" / "images"
     images.mkdir(parents=True)
-    (images / "ramen-chicken.png").write_bytes(b"png")
-    (images / "18chip.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "ramen-chicken.png")
+    _write_minimal_viable_png(images / "18chip.png")
     img = CleanDesignTreeNode(
         id="1:img",
         name="Img",
@@ -323,8 +355,8 @@ def test_resolve_uniform_text_override_color_reads_single_override_id() -> None:
 def test_cyrillic_product_thumbnail_semantic_bind(tmp_path: Path) -> None:
     images = tmp_path / "assets" / "images"
     images.mkdir(parents=True)
-    (images / "okinawa-monterey.png").write_bytes(b"png")
-    (images / "oblepih-mango.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "okinawa-monterey.png")
+    _write_minimal_viable_png(images / "oblepih-mango.png")
     img_a = CleanDesignTreeNode(
         id="1:img-a",
         name="Img",
@@ -439,8 +471,8 @@ def test_offline_emit_laws_from_debug_bundle(debug_root: Path) -> None:
 def test_semantic_raster_binding_node_first_assigns_distinct_orphans(tmp_path: Path) -> None:
     images = tmp_path / "assets" / "images"
     images.mkdir(parents=True)
-    (images / "ramen-chicken.png").write_bytes(b"png")
-    (images / "tomyam.png").write_bytes(b"png")
+    _write_minimal_viable_png(images / "ramen-chicken.png")
+    _write_minimal_viable_png(images / "tomyam.png")
     img_a = CleanDesignTreeNode(
         id="1:img-a",
         name="Img",
