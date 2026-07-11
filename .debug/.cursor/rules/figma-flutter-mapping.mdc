@@ -1,0 +1,60 @@
+---
+description: "Figma Auto Layout to Flutter mapping for plan and build phases."
+alwaysApply: false
+---
+# Figma → Flutter mapping
+
+## Inputs by phase
+
+| Phase | Inputs |
+|-------|--------|
+| **layout** | `cleaned.json`, `figma.png`, user context |
+| **plan** | `layout_observation.json`, `cleaned.json`, `assets.manifest.json` |
+| **build** | `build_plan.json` v2 |
+
+## Auto Layout → plan (`widget_tree.layout`)
+
+| Figma | Plan intent |
+|-------|-------------|
+| HORIZONTAL | `row` → `Row` |
+| VERTICAL | `column` → `Column` |
+| Wrap | `wrap` → `Wrap` |
+| Fill container | `expanded` / `flexible` |
+| Absolute | `stack` + `positioned` |
+| Overflow / long lists | `scroll_model` + `ListView` / slivers |
+
+## Layout `ui_role` → plan `widget` (examples)
+
+| `ui_role` | Typical `widget` |
+|-----------|------------------|
+| `button` | `FilledButton`, `TextButton`, `InkWell`+container |
+| `text_field` | `TextField` |
+| `label` | `Text` |
+| `icon` | `SvgPicture`, `Icon` |
+| `image` | `Image.asset` |
+| `list_item` | extract → `StatelessWidget` |
+| `chrome` | `SafeArea`, status placeholders |
+| `decorative` | non-interactive `Container` / `SvgPicture` |
+
+## Fidelity (per `widget_tree` node / extract)
+
+`fidelity`: `native` (default) | `image_bake` | `stub` — an **honest downgrade** beats crooked native layout.
+
+| Value | When | Requirements |
+|-------|------|--------------|
+| `native` | Auto Layout / text / standard controls rebuild faithfully | — |
+| `image_bake` | Complex vector art, gradients, illustrations that native widgets cannot match | `assets[]` binding for the same `figma_id`; **forbidden** on interactive nodes (bake the visual as a child, keep a native tap layer) |
+| `stub` | Content out of scope (maps, webview, video) | `plan_notes` entry + contract `out_of_scope` or coverage note |
+
+Downgrades are recorded in the plan — never decided silently in build.
+
+## plan → build
+
+`build_plan.json` v2 sections:
+
+- `screen_architecture` — shell and scroll
+- `widget_tree` — node map
+- `extracted_widgets`, `theme_bindings`, `assets`, `interactions`
+- `files_to_create` — build checklist
+
+**build** implements verbatim; no geometry outside plan + `cleaned.json`.

@@ -130,7 +130,18 @@ def layout_fact_payment_selection_radio_glyph_host(node: CleanDesignTreeNode) ->
         return False
     if not (20.0 <= float(width) <= 28.0 and 20.0 <= float(height) <= 28.0):
         return False
-    return node.cluster_id is not None or node.vector_asset_key is not None
+    if node.cluster_id is not None or node.vector_asset_key is not None:
+        return True
+    if len(node.children) != 1:
+        return False
+    glyph = node.children[0]
+    if glyph.type not in {NodeType.VECTOR, NodeType.IMAGE, NodeType.STACK}:
+        return False
+    glyph_width = glyph.sizing.width
+    glyph_height = glyph.sizing.height
+    if glyph_width is None or glyph_height is None:
+        return False
+    return float(glyph_width) >= float(width) - 1.0 and float(glyph_height) >= float(height) - 1.0
 
 
 def layout_fact_payment_plan_trailing_price_cluster(node: CleanDesignTreeNode) -> bool:

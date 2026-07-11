@@ -1,0 +1,13 @@
+---
+description: "Promoted corpus lessons: recurring mechanisms turned into permanent one-line laws. Appended by fix during corpus promotion."
+alwaysApply: true
+---
+# Lessons (promoted from corpus)
+
+One line per recurring mechanism. Appended by **fix** when a `family_id` reaches its **2nd FIXED** case (see corpus skill § Promotion). Max 40 lessons — merge or retire stale ones when the cap is hit.
+
+Format: `- <family_id>: <one-line law>. (cases: <id>, <id>)`
+
+## Laws
+
+<!-- promoted lessons below — one bullet per family_id, no duplicates -->

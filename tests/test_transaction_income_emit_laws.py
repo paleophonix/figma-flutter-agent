@@ -659,14 +659,14 @@ def test_wizard_preview_viewport_pins_bottom_chrome_without_outer_scroll() -> No
         viewport_pin_bottom_chrome=True,
     )
     assert "SingleChildScrollView(" not in preview
-    assert "Alignment.bottomCenter" in preview
+    assert "Alignment.topCenter" in preview
     wrapped = wrap_artboard_preview_layout_builder(
         preview_child="SizedBox(width: _artboardPreviewWidth, height: _artboardPreviewHeight, child: child)",
         fallback="child",
         viewport_pin_bottom_chrome=True,
     )
     assert "viewport_pin_bottom_chrome" not in wrapped
-    assert "Alignment.bottomCenter" in wrapped
+    assert "Alignment.topCenter" in wrapped
     assert "SingleChildScrollView(" not in wrapped.split("if (_artboardCaptureMode)")[1]
 
 

@@ -284,13 +284,7 @@
                                     {
                                       "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479",
                                       "kind": "stack",
-                                      "children": [
-                                        {
-                                          "figmaId": "II4408:44897;1154:7849;1149:9856;1149:9479;hydrate:0",
-                                          "kind": "auto",
-                                          "children": []
-                                        }
-                                      ]
+                                      "children": []
                                     }
                                   ]
                                 },
@@ -307,13 +301,7 @@
                                     {
                                       "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481",
                                       "kind": "stack",
-                                      "children": [
-                                        {
-                                          "figmaId": "II4408:44897;1154:7849;1149:9855;1149:9481;hydrate:0",
-                                          "kind": "auto",
-                                          "children": []
-                                        }
-                                      ]
+                                      "children": []
                                     }
                                   ]
                                 }
@@ -417,13 +405,7 @@
                                     {
                                       "figmaId": "II4408:44898;1154:7849;hydrate:1",
                                       "kind": "stack",
-                                      "children": [
-                                        {
-                                          "figmaId": "II4408:44898;1154:7849;1149:9856;1149:9479;hydrate:0",
-                                          "kind": "auto",
-                                          "children": []
-                                        }
-                                      ]
+                                      "children": []
                                     }
                                   ]
                                 },
@@ -440,13 +422,7 @@
                                     {
                                       "figmaId": "II4408:44898;1154:7849;hydrate:4",
                                       "kind": "stack",
-                                      "children": [
-                                        {
-                                          "figmaId": "II4408:44898;1154:7849;1149:9855;1149:9481;hydrate:0",
-                                          "kind": "auto",
-                                          "children": []
-                                        }
-                                      ]
+                                      "children": []
                                     }
                                   ]
                                 }
@@ -772,13 +748,7 @@
                                 {
                                   "figmaId": "II4408:44904;1154:8077;hydrate:1",
                                   "kind": "stack",
-                                  "children": [
-                                    {
-                                      "figmaId": "II4408:44904;1154:8077;1149:9856;1149:9479;hydrate:0",
-                                      "kind": "auto",
-                                      "children": []
-                                    }
-                                  ]
+                                  "children": []
                                 }
                               ]
                             },
@@ -795,13 +765,7 @@
                                 {
                                   "figmaId": "II4408:44904;1154:8077;hydrate:4",
                                   "kind": "stack",
-                                  "children": [
-                                    {
-                                      "figmaId": "II4408:44904;1154:8077;1149:9855;1149:9481;hydrate:0",
-                                      "kind": "auto",
-                                      "children": []
-                                    }
-                                  ]
+                                  "children": []
                                 }
                               ]
                             }
@@ -955,13 +919,7 @@
                                 {
                                   "figmaId": "I4408:44915;1356:10712;910:3253",
                                   "kind": "stack",
-                                  "children": [
-                                    {
-                                      "figmaId": "II4408:44915;1356:10712;910:3253;hydrate:0",
-                                      "kind": "auto",
-                                      "children": []
-                                    }
-                                  ]
+                                  "children": []
                                 }
                               ]
                             }
@@ -1026,13 +984,7 @@
                                 {
                                   "figmaId": "I4408:44916;1356:10673;910:3253",
                                   "kind": "stack",
-                                  "children": [
-                                    {
-                                      "figmaId": "II4408:44916;1356:10673;910:3253;hydrate:0",
-                                      "kind": "auto",
-                                      "children": []
-                                    }
-                                  ]
+                                  "children": []
                                 }
                               ]
                             }
@@ -1596,13 +1548,7 @@
                                   {
                                     "figmaId": "I4408:44897;1154:7849;1149:9856;1149:9479",
                                     "kind": "auto",
-                                    "children": [
-                                      {
-                                        "figmaId": "II4408:44897;1154:7849;1149:9856;1149:9479;hydrate:0",
-                                        "kind": "auto",
-                                        "children": []
-                                      }
-                                    ]
+                                    "children": []
                                   }
                                 ]
                               },
@@ -1619,13 +1565,7 @@
                                   {
                                     "figmaId": "I4408:44897;1154:7849;1149:9855;1149:9481",
                                     "kind": "auto",
-                                    "children": [
-                                      {
-                                        "figmaId": "II4408:44897;1154:7849;1149:9855;1149:9481;hydrate:0",
-                                        "kind": "auto",
-                                        "children": []
-                                      }
-                                    ]
+                                    "children": []
                                   }
                                 ]
                               }
@@ -1724,13 +1664,7 @@
                                   {
                                     "figmaId": "II4408:44898;1154:7849;hydrate:1",
                                     "kind": "stack",
-                                    "children": [
-                                      {
-                                        "figmaId": "II4408:44898;1154:7849;1149:9856;1149:9479;hydrate:0",
-                                        "kind": "auto",
-                                        "children": []
-                                      }
-                                    ]
+                                    "children": []
                                   }
                                 ]
                               },
@@ -1746,13 +1680,7 @@
                                   {
                                     "figmaId": "II4408:44898;1154:7849;hydrate:4",
                                     "kind": "stack",
-                                    "children": [
-                                      {
-                                        "figmaId": "II4408:44898;1154:7849;1149:9855;1149:9481;hydrate:0",
-                                        "kind": "auto",
-                                        "children": []
-                                      }
-                                    ]
+                                    "children": []
                                   }
                                 ]
                               }
@@ -2041,13 +1969,7 @@
                               {
                                 "figmaId": "II4408:44904;1154:8077;hydrate:1",
                                 "kind": "stack",
-                                "children": [
-                                  {
-                                    "figmaId": "II4408:44904;1154:8077;1149:9856;1149:9479;hydrate:0",
-                                    "kind": "auto",
-                                    "children": []
-                                  }
-                                ]
+                                "children": []
                               }
                             ]
                           },
@@ -2063,13 +1985,7 @@
                               {
                                 "figmaId": "II4408:44904;1154:8077;hydrate:4",
                                 "kind": "stack",
-                                "children": [
-                                  {
-                                    "figmaId": "II4408:44904;1154:8077;1149:9855;1149:9481;hydrate:0",
-                                    "kind": "auto",
-                                    "children": []
-                                  }
-                                ]
+                                "children": []
                               }
                             ]
                           }

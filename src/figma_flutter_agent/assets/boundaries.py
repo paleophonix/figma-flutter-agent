@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 
 from loguru import logger
@@ -72,6 +73,14 @@ class RenderBoundaryAssetExportMixin:
             pending.append((node_id, name, target))
 
         if not pending:
+            await self._export_render_boundary_primary_rasters(
+                file_key,
+                node_ids=node_ids,
+                figma_nodes=figma_nodes,
+                project_dir=project_dir,
+                manifest=manifest,
+                continue_on_rate_limit=continue_on_rate_limit,
+            )
             await self._export_render_boundary_raster_fallbacks(
                 file_key,
                 manifest=manifest,
@@ -107,6 +116,14 @@ class RenderBoundaryAssetExportMixin:
                     svg_path_count=path_count,
                 )
             )
+        await self._export_render_boundary_primary_rasters(
+            file_key,
+            node_ids=node_ids,
+            figma_nodes=figma_nodes,
+            project_dir=project_dir,
+            manifest=manifest,
+            continue_on_rate_limit=continue_on_rate_limit,
+        )
         await self._export_render_boundary_raster_fallbacks(
             file_key,
             manifest=manifest,
@@ -120,6 +137,113 @@ class RenderBoundaryAssetExportMixin:
                 ", ".join(unavailable_node_ids[:12]),
             )
         return manifest
+
+    async def _export_render_boundary_primary_rasters(
+        self,
+        file_key: str,
+        *,
+        node_ids: frozenset[str],
+        figma_nodes: dict,
+        project_dir: Path,
+        manifest: AssetManifest,
+        continue_on_rate_limit: bool,
+    ) -> None:
+        """Export PNG rasters for render-boundary hosts and semantic binding targets."""
+        from figma_flutter_agent.parser.boundaries.assets import render_boundary_raster_asset_path
+        from figma_flutter_agent.pipeline.local_assets import load_project_asset_bindings
+
+        bindings = load_project_asset_bindings(project_dir)
+        binding_by_node_id = {bound_id: filename for filename, bound_id in bindings.items()}
+        images_dir = project_dir / "assets" / "images"
+        illustrations_dir = project_dir / "assets" / "illustrations"
+        images_dir.mkdir(parents=True, exist_ok=True)
+        illustrations_dir.mkdir(parents=True, exist_ok=True)
+
+        def _binding_probe_ids(node_id: str) -> list[str]:
+            probe_ids = [node_id]
+            node = figma_nodes.get(node_id)
+            if not isinstance(node, dict):
+                return probe_ids
+            for child in node.get("children") or []:
+                if child.get("visible") is False:
+                    continue
+                child_id = child.get("id")
+                if isinstance(child_id, str) and child_id not in probe_ids:
+                    probe_ids.append(child_id)
+            return probe_ids
+
+        pending_by_node: dict[str, list[tuple[Path, str]]] = {}
+        for node_id in sorted(node_ids):
+            targets: dict[Path, str] = {}
+            canonical_rel = render_boundary_raster_asset_path(node_id)
+            targets[project_dir / Path(canonical_rel)] = canonical_rel.replace("\\", "/")
+            for probe_id in _binding_probe_ids(node_id):
+                bound_filename = binding_by_node_id.get(probe_id)
+                if bound_filename is None:
+                    continue
+                bound_rel = f"assets/images/{bound_filename}".replace("\\", "/")
+                targets[images_dir / bound_filename] = bound_rel
+            node = figma_nodes.get(node_id)
+            raw_name = node.get("name") if isinstance(node, dict) else None
+            name = str(raw_name) if raw_name is not None else node_id
+            illustration_name = asset_filename(name, node_id, "png")
+            illustration_rel = f"assets/illustrations/{illustration_name}"
+            targets[illustrations_dir / illustration_name] = illustration_rel
+            for target_path, rel_path in targets.items():
+                if target_path.is_file():
+                    if not any(
+                        item.node_id == node_id and item.asset_path == rel_path
+                        for item in manifest.entries
+                    ):
+                        manifest.entries.append(
+                            AssetManifestEntry(
+                                node_id=node_id,
+                                asset_path=rel_path,
+                                kind="image",
+                            )
+                        )
+                    continue
+                pending_by_node.setdefault(node_id, []).append((target_path, rel_path))
+
+        if not pending_by_node:
+            return
+
+        result = await self._connector.fetch_image_urls(
+            file_key,
+            sorted(pending_by_node),
+            fmt="png",
+            continue_on_rate_limit=continue_on_rate_limit,
+        )
+        for node_id, targets in pending_by_node.items():
+            url = result.urls.get(node_id)
+            if url is None:
+                logger.warning("Render-boundary PNG export unavailable for node {}", node_id)
+                continue
+            primary_target, primary_rel = targets[0]
+            await self._download_to_file(url, primary_target, optimize_svg_enabled=False)
+            manifest.entries.append(
+                AssetManifestEntry(
+                    node_id=node_id,
+                    asset_path=primary_rel,
+                    kind="image",
+                )
+            )
+            for extra_target, extra_rel in targets[1:]:
+                if extra_target.is_file():
+                    continue
+                extra_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(primary_target, extra_target)
+                if not any(
+                    item.node_id == node_id and item.asset_path == extra_rel
+                    for item in manifest.entries
+                ):
+                    manifest.entries.append(
+                        AssetManifestEntry(
+                            node_id=node_id,
+                            asset_path=extra_rel,
+                            kind="image",
+                        )
+                    )
 
     async def _export_render_boundary_raster_fallbacks(
         self,

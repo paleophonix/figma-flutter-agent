@@ -377,6 +377,72 @@ def test_payment_radio_glyph_host_skips_layout_slot_width_pin() -> None:
     assert "SizedBox(width: 20.0" not in wrapped.replace("\n", "")
 
 
+def test_payment_radio_glyph_host_detects_vector_child_without_cluster() -> None:
+    """Law: row_list_glyph_svg_extent_mismatch — populated glyph child qualifies host."""
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_payment_selection_radio_glyph_host,
+    )
+
+    radio = CleanDesignTreeNode(
+        id="radio",
+        name="check_circle",
+        type=NodeType.ROW,
+        padding=Padding(top=2.0, bottom=2.0, left=2.0, right=2.0),
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=24.0, height=24.0),
+        layout_slot=LayoutSlotIr(wraps=(WrapKind.CONSTRAINED_BOX,)),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="check_circle",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=24.0, height=24.0),
+                vector_asset_key="assets/icons/vector_2399_42798.svg",
+            )
+        ],
+    )
+    assert layout_fact_payment_selection_radio_glyph_host(radio)
+    wrapped = _apply_layout_slot_wraps(
+        radio,
+        "SvgPicture.asset('assets/icons/vector_2399_42798.svg')",
+        parent_type=NodeType.ROW,
+        parent_node=CleanDesignTreeNode(
+            id="trail",
+            name="price cluster",
+            type=NodeType.ROW,
+            children=[radio],
+        ),
+    )
+    assert "SizedBox(width: 20.0" not in wrapped.replace("\n", "")
+
+
+def test_payment_radio_glyph_host_preserves_padding_without_host_fit() -> None:
+    """Law: row_list_glyph_svg_extent_mismatch — radio padding must not collapse to zero."""
+    from figma_flutter_agent.generator.layout.scroll import wrap_flex_auto_layout_padding
+
+    radio = CleanDesignTreeNode(
+        id="radio",
+        name="check_circle",
+        type=NodeType.ROW,
+        padding=Padding(top=2.0, bottom=2.0, left=2.0, right=2.0),
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=24.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="check_circle",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=24.0, height=24.0),
+                vector_asset_key="assets/icons/vector_2399_42798.svg",
+            )
+        ],
+    )
+    wrapped = wrap_flex_auto_layout_padding(
+        radio,
+        "SvgPicture.asset('assets/icons/vector_2399_42798.svg')",
+    )
+    assert "EdgeInsets.fromLTRB(2.0" in wrapped.replace(" ", "")
+    assert "EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0)" not in wrapped.replace(" ", "")
+
+
 def test_row_cross_axis_height_clamps_status_icon_cluster_row() -> None:
     icons = CleanDesignTreeNode(
         id="icons",

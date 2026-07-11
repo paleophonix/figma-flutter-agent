@@ -334,6 +334,9 @@ def wrap_flex_auto_layout_padding(
         segmented_tab_option_vertical_padding_clips_label,
     )
     from figma_flutter_agent.parser.interaction import layout_fact_row_bounded_inline_control_row
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_payment_selection_radio_glyph_host,
+    )
     from figma_flutter_agent.parser.interaction.step import (
         layout_fact_nav_stepper_row,
         layout_fact_step_indicator_title_column,
@@ -365,6 +368,11 @@ def wrap_flex_auto_layout_padding(
         node
     ) and segmented_tab_option_vertical_padding_clips_label(node):
         padding = _horizontal_only_padding_edge_insets(node)
+        if padding is None:
+            return widget
+        return f"Padding(padding: {padding}, child: {widget})"
+    if layout_fact_payment_selection_radio_glyph_host(node):
+        padding = padding_edge_insets(node)
         if padding is None:
             return widget
         return f"Padding(padding: {padding}, child: {widget})"

@@ -1,27 +1,27 @@
 
---- dart format @ 2026-07-08T13:11:18.836795+00:00 ---
+--- dart format @ 2026-07-09T12:20:04.244741+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\generated\niyama_order_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\widgets\checkout_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\widgets\checkout_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\test\golden\niyama_order_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vffpfg67\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 18 files (18 changed) in 0.23 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\widgets\modal_home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\widgets\order_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\widgets\place_order_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lkq0ztzn\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 18 files (18 changed) in 0.22 seconds.
 
---- pub get --offline @ 2026-07-08T13:11:22.032586+00:00 ---
+--- pub get --offline @ 2026-07-09T12:20:07.572552+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -34,49 +34,47 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/2) @ 2026-07-08T13:11:24.940049+00:00 ---
+--- dart analyze (generated) (1/2) @ 2026-07-09T12:20:10.248978+00:00 ---
 exit_code=0
-Analyzing checkout_bar_widget.dart, checkout_button_widget.dart, divider_line_widget.dart, guest_count_widget.dart, home_indicator_widget.dart, modal_widget.dart...
+Analyzing apply_promo_code_card_widget.dart, guest_count_control_widget.dart, modal_home_indicator_widget.dart, modal_widget.dart, order_action_bar_widget.dart, place_order_button_widget.dart...
 
-   info - lib\widgets\checkout_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\checkout_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\checkout_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\checkout_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3562 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3628 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3716 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:4029 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:9191 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:14005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:26850 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:2908 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:2974 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:3062 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:3542 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:8694 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:13584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:26340 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:2908 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:2974 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:3062 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:3542 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:8694 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:13584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:26340 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\widgets\modal_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3577 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3643 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3731 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:18:4029 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:18:9191 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:18:14005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:18:26837 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:2893 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:2959 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3047 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:18:3424 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:18:8468 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:18:13250 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:18:25777 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\order_action_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-20 issues found.
+28 issues found.
 
---- dart analyze (generated) (2/2) @ 2026-07-08T13:11:27.497650+00:00 ---
+--- dart analyze (generated) (2/2) @ 2026-07-09T12:20:12.578014+00:00 ---
 exit_code=0
-Analyzing promo_code_action_card_widget.dart...
+Analyzing section_divider_widget.dart...
+No issues found!
 
-   info - promo_code_action_card_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - promo_code_action_card_widget.dart:17:3562 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - promo_code_action_card_widget.dart:17:3628 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - promo_code_action_card_widget.dart:17:3716 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - promo_code_action_card_widget.dart:18:4029 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - promo_code_action_card_widget.dart:18:9191 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - promo_code_action_card_widget.dart:18:14005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - promo_code_action_card_widget.dart:18:26850 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-
-8 issues found.
-
---- dart analyze (generated) (1/4) @ 2026-07-08T13:11:30.258768+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-09T12:22:16.117926+00:00 ---
 exit_code=0
 Analyzing niyama_order_screen.dart, niyama_order_chunk_0feb67ae.dart, niyama_order_chunk_af4305dd.dart, niyama_order_layout.dart, main.dart, app_colors.dart...
 
@@ -98,7 +96,7 @@ warning - lib\generated\niyama_order_layout.dart:16:8 - Unused import: 'package:
 
 15 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-08T13:11:32.790180+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-09T12:22:18.247740+00:00 ---
 exit_code=0
 Analyzing app_edge_insets.dart, app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart...
 
@@ -106,116 +104,116 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
 
 1 issue found.
 
---- dart analyze (generated) (3/4) @ 2026-07-08T13:11:35.376363+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-09T12:22:20.719478+00:00 ---
 exit_code=0
-Analyzing app_typography.dart, checkout_bar_widget.dart, checkout_button_widget.dart, divider_line_widget.dart, guest_count_widget.dart, home_indicator_widget.dart...
+Analyzing app_typography.dart, apply_promo_code_card_widget.dart, guest_count_control_widget.dart, modal_home_indicator_widget.dart, modal_widget.dart, order_action_bar_widget.dart...
 
-   info - lib\widgets\checkout_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\checkout_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\checkout_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\checkout_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3562 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3628 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3716 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:4029 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:9191 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:14005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:26850 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-
-12 issues found.
-
---- dart analyze (generated) (4/4) @ 2026-07-08T13:11:38.138013+00:00 ---
-exit_code=0
-Analyzing modal_widget.dart, promo_code_action_card_widget.dart, niyama_order_screen_test.dart, element_coordinate_mapper.dart...
-
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:2908 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:2974 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:3062 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:3542 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:8694 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:13584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:26340 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:2908 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:2974 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:3062 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:3542 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:8694 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:13584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:26340 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\widgets\modal_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3577 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3643 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3731 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:18:4029 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:18:9191 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:18:14005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:18:26837 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:17:3562 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:17:3628 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:17:3716 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:18:4029 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:18:9191 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:18:14005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:18:26850 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:2893 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:2959 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3047 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:18:3424 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:18:8468 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:18:13250 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:18:25777 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:18:107 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:18:529 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\order_action_bar_widget.dart:18:1270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:18:1463 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+28 issues found.
+
+--- dart analyze (generated) (4/4) @ 2026-07-09T12:22:23.164534+00:00 ---
+exit_code=0
+Analyzing place_order_button_widget.dart, section_divider_widget.dart, niyama_order_screen_test.dart, element_coordinate_mapper.dart...
+
    info - test\harness\element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
-17 issues found.
+1 issue found.
 
---- dart format @ 2026-07-08T13:11:40.899741+00:00 ---
+--- dart format @ 2026-07-09T12:22:25.621059+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\generated\niyama_order_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\widgets\checkout_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\widgets\checkout_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\test\golden\niyama_order_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-r5gce_3u\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\widgets\modal_home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\widgets\order_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\widgets\place_order_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-xt07_xbs\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 18 files (18 changed) in 0.23 seconds.
+
+--- dart format @ 2026-07-09T12:22:27.688327+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\widgets\modal_home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\widgets\order_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\widgets\place_order_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s7vpl8ea\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 18 files (18 changed) in 0.22 seconds.
 
---- dart format @ 2026-07-08T13:11:42.999284+00:00 ---
+--- dart format @ 2026-07-09T12:22:30.464980+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\features\niyama_order\niyama_order_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\generated\niyama_order_chunk_0feb67ae.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\generated\niyama_order_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\widgets\checkout_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\widgets\checkout_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\test\golden\niyama_order_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fk67d4zm\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 18 files (18 changed) in 0.22 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\features\niyama_order\niyama_order_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\generated\niyama_order_chunk_0feb67ae.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\generated\niyama_order_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\widgets\modal_home_indicator_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\widgets\order_action_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\widgets\place_order_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\lib\widgets\section_divider_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\test\golden\niyama_order_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-nfvj_d9c\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 18 files (18 changed) in 0.30 seconds.
 
---- dart format @ 2026-07-08T13:11:46.107975+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\features\niyama_order\niyama_order_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\generated\niyama_order_chunk_0feb67ae.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\generated\niyama_order_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\widgets\checkout_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\widgets\checkout_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\widgets\divider_line_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\lib\widgets\home_indicator_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\test\golden\niyama_order_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-eryv4r6e\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 18 files (18 changed) in 0.27 seconds.
-
---- pub get --offline @ 2026-07-08T13:11:49.359814+00:00 ---
+--- pub get --offline @ 2026-07-09T12:22:33.780234+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -228,7 +226,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/4) @ 2026-07-08T13:11:52.258759+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-07-09T12:22:36.268923+00:00 ---
 exit_code=0
 Analyzing niyama_order_screen.dart, niyama_order_chunk_0feb67ae.dart, niyama_order_chunk_af4305dd.dart, niyama_order_layout.dart, main.dart, app_colors.dart...
 
@@ -250,7 +248,7 @@ warning - lib\generated\niyama_order_layout.dart:13:8 - Unused import: 'package:
 
 15 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-07-08T13:11:55.349683+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-07-09T12:22:38.421108+00:00 ---
 exit_code=0
 Analyzing app_edge_insets.dart, app_elevation.dart, app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart...
 
@@ -258,46 +256,46 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
 
 1 issue found.
 
---- dart analyze (generated) (3/4) @ 2026-07-08T13:11:57.951248+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-07-09T12:22:40.958723+00:00 ---
 exit_code=0
-Analyzing app_typography.dart, checkout_bar_widget.dart, checkout_button_widget.dart, divider_line_widget.dart, guest_count_widget.dart, home_indicator_widget.dart...
+Analyzing app_typography.dart, apply_promo_code_card_widget.dart, guest_count_control_widget.dart, modal_home_indicator_widget.dart, modal_widget.dart, order_action_bar_widget.dart...
 
-   info - lib\widgets\checkout_bar_widget.dart:22:50 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\checkout_bar_widget.dart:39:54 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\widgets\checkout_bar_widget.dart:66:47 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\checkout_bar_widget.dart:76:57 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3562 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3628 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:17:3716 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:4029 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:9191 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:14005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\guest_count_widget.dart:18:26850 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-
-12 issues found.
-
---- dart analyze (generated) (4/4) @ 2026-07-08T13:12:00.938739+00:00 ---
-exit_code=0
-Analyzing modal_widget.dart, promo_code_action_card_widget.dart, niyama_order_screen_test.dart, element_coordinate_mapper.dart...
-
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:2908 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:2974 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:17:3062 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:3542 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:8694 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:13584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\apply_promo_code_card_widget.dart:18:26340 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:2908 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:2974 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:17:3062 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:3542 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:8694 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:13584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\guest_count_control_widget.dart:18:26340 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\widgets\modal_widget.dart:17:1038 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3518 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3584 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\modal_widget.dart:17:3672 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:17:969 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:17:3562 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:17:3628 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:17:3716 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:18:4029 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:18:9191 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:18:14005 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\widgets\promo_code_action_card_widget.dart:18:26850 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3084 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3150 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\modal_widget.dart:17:3238 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:22:50 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:39:54 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\widgets\order_action_bar_widget.dart:66:47 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\widgets\order_action_bar_widget.dart:76:57 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+24 issues found.
+
+--- dart analyze (generated) (4/4) @ 2026-07-09T12:22:43.449734+00:00 ---
+exit_code=0
+Analyzing place_order_button_widget.dart, section_divider_widget.dart, niyama_order_screen_test.dart, element_coordinate_mapper.dart...
+
    info - test\harness\element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
-13 issues found.
+1 issue found.
 
---- flutter pub get @ 2026-07-08T13:12:04.683513+00:00 ---
+--- flutter pub get @ 2026-07-09T12:22:47.228160+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -309,7 +307,7 @@ Got dependencies!
 4 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-07-08T13:12:04.685509+00:00 ---
+--- flutter render errors @ 2026-07-09T12:22:47.230161+00:00 ---
 ══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
 The following assertion was thrown during layout:
 A RenderFlex overflowed by 1.00 pixels on the bottom.
@@ -319,7 +317,11 @@ The edge of the RenderFlex that is overflowing has been marked in the rendering 
 black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
 RenderFlex to fit within the available space instead of being sized to their natural size.
 This is considered an error condition because it indicates that there is content that cannot be
-The specific RenderFlex in question is: RenderFlex#63879 OVERFLOWING:
+The specific RenderFlex in question is: RenderFlex#51efb OVERFLOWING:
 ════════════════════════════════════════════════════════════════════════════════════════════════════
 Another exception was thrown: A RenderFlex overflowed by 1.00 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 8.0 pixels on the right.
+Another exception was thrown: A RenderFlex overflowed by 192 pixels on the right.
+Another exception was thrown: A RenderFlex overflowed by 192 pixels on the right.
+Another exception was thrown: A RenderFlex overflowed by 192 pixels on the right.
 Another exception was thrown: A RenderFlex overflowed by 192 pixels on the right.

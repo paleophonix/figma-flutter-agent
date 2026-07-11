@@ -1,0 +1,27 @@
+---
+description: "Chat reports: Russian. One report per phase. JSON keys English; JSON prose fields Russian."
+alwaysApply: true
+---
+# Reports (RU locale)
+
+One JSON + one chat report per phase. No `*_brief.md`.
+
+Chat reports are written in **Russian** — the product owner reads them. Rules, skills, code, and JSON keys stay English.
+
+| Phase | Chat header |
+|-------|-------------|
+| layout | ОТЧЁТ: РАЗМЕТКА |
+| plan | ОТЧЁТ: ПЛАН |
+| build | ОТЧЁТ: СБОРКА |
+| inspect | ОТЧЁТ: ОСМОТР |
+| debug | ОТЧЁТ: ТРИАЖ |
+| fix | ОТЧЁТ: ПОЧИНКА |
+| autobuild | ОТЧЁТ: АВТОСБОРКА |
+| autofix | ОТЧЁТ: АВТОПОЧИНКА |
+| batch | ОТЧЁТ: ПАКЕТ |
+
+Clarification block: `УТОЧНЕНИЕ (layout|inspect)` + concrete questions in Russian — region/node, 2–3 options, what is blocked.
+
+Every report ends with a `Check:` line quoting `check.mjs` result (`0 failures` or the failing lines).
+
+JSON keys and `figma_id` values — as-is (English). Prose values in JSON (`screen_summary`, `symptom`, contract statements, …) — Russian.

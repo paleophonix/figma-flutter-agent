@@ -6,6 +6,8 @@ Product feature map: [README.md — Features](README.md#features). Stakeholder o
 
 **Prompt source of truth:** `.cursor/rules/*.mdc` (mirrored in `.claude/prompts/*.md`, `CLAUDE.md`). This file compiles them for agents that read only `AGENTS.md`. On conflict, prefer the newer `.mdc` file.
 
+**Coding-agent kit:** `.figma-flutter-agent/` — phased skills for Figma→Flutter (`layout-plan-build`, `view-debug-fix`). Install: `.\.figma-flutter-agent\install.ps1`.
+
 ## CRITICAL — Defect corpus law
 
 **No compiler fix is done without corpus proof.** `.debug/` is triage only.
@@ -22,7 +24,7 @@ symptom → family_id → corpus/index/<family_id>.yaml → one case YAML → OP
 | Repair | stay `OPEN` until `repair` block + proof → then `FIXED` |
 | Close loop | `poetry run figma-flutter defects index --write` then `defects validate` |
 
-`/repair` alone closes nothing. Max 2 repair tries without fresh `/diagnose`. Template: `corpus/case-template.yaml`. Full law: `corpus-law.mdc`. **Procedure:** `.cursor/skills/corpus/SKILL.md` (mandatory on `/diagnose`, `/repair`).
+`/repair` alone closes nothing. Max 2 repair tries without fresh `/diagnose`. Template: `corpus/case-template.yaml`. Full law: `corpus-law.mdc`. **Procedure:** `.figma-flutter-agent/skills/view-debug-fix/debug.md` and `fix.md` (or legacy `.cursor/skills/corpus/SKILL.md` with diagnose/repair).
 
 ## Purpose
 

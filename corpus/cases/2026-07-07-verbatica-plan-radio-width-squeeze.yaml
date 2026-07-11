@@ -8,7 +8,7 @@ case:
   feature: verbatica_paywall
   observed_at: 2026-07-07
   created_at: '2026-07-07T18:30:00Z'
-  updated_at: '2026-07-07T18:30:00Z'
+  updated_at: '2026-07-09T12:00:00Z'
   summary: >
     Trailing check_circle cluster rows are 24x24 with 2px padding but CONSTRAINED_BOX
     layout slots pin interior width to 20px, shrinking the 24x24 SvgPicture radio glyph.
@@ -44,10 +44,16 @@ occurrences:
       summary: >
         layout_fact_payment_selection_radio_glyph_host skips CONSTRAINED_BOX width
         pins for compact cluster radio rows so glyphs render at full slot size.
+        Detection also covers populated vector-child hosts without cluster_id, and
+        wrap_flex_auto_layout_padding preserves host padding instead of collapsing
+        to zero-width interior pins.
       changed_files:
         - src/figma_flutter_agent/parser/interaction/selection.py
         - src/figma_flutter_agent/generator/layout/widgets/positioned.py
+        - src/figma_flutter_agent/generator/layout/scroll.py
       regression_tests:
         - tests/test_verbatica_paywall_emit_laws.py::test_payment_radio_glyph_host_skips_layout_slot_width_pin
+        - tests/test_verbatica_paywall_emit_laws.py::test_payment_radio_glyph_host_detects_vector_child_without_cluster
+        - tests/test_verbatica_paywall_emit_laws.py::test_payment_radio_glyph_host_preserves_padding_without_host_fit
       verification:
-        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py::test_payment_radio_glyph_host_skips_layout_slot_width_pin -q
+        - poetry run pytest tests/test_verbatica_paywall_emit_laws.py -q -k "radio_glyph"

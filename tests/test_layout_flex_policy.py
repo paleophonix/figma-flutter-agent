@@ -1268,6 +1268,18 @@ def test_decomposed_pin_bottom_viewport_partition_pins_footer() -> None:
     assert compact.rfind("Positioned(", 0, footer_idx) != -1
 
 
+def test_wizard_preview_viewport_pin_uses_top_alignment() -> None:
+    """Law: LAW-SINGLE-SCROLL-HERO-SCROLLS-WITH-CONTENT — tall preview must not bottom-float artboard."""
+    from figma_flutter_agent.generator.layout.common import artboard_static_wizard_preview
+
+    preview = artboard_static_wizard_preview(
+        scroll_child="partitioned",
+        viewport_pin_bottom_chrome=True,
+    )
+    assert "Alignment.topCenter" in preview
+    assert "Alignment.bottomCenter" not in preview
+
+
 def test_wallpaper_pin_bottom_suppresses_nested_content_scrollers() -> None:
     """Law: LAW-SINGLE-SCROLL-HERO-SCROLLS-WITH-CONTENT — one outer scroll host."""
     from figma_flutter_agent.generator.layout.file_methods import (

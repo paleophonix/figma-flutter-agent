@@ -1,0 +1,68 @@
+---
+description: "Project token catalog: reuse across features. Plan reads catalog; build/fix maintain lib/theme."
+alwaysApply: true
+---
+# Token reuse (project scope)
+
+| Layer | Path | Scope |
+|-------|------|--------|
+| **Project catalog** | `.agent/token_catalog.json` | Semantic design tokens → `lib/theme/` |
+| **Feature observed** | `.agent/features/<feature>/tokens.observed.json` | Values from fetch — match input for plan |
+| **Feature plan** | `build_plan.json` → `theme_bindings[]` | This screen: catalog id + action |
+
+`lib/theme/*.dart` is **API truth**. Catalog is discovery + reuse contract — not a second codegen source.
+
+## Categories
+
+`color` | `typography` | `spacing` | `radius` | `elevation` | `shadow`
+
+`id` prefix: `T_` + category + semantic slug (e.g. `T_color_text_primary`).
+
+## When catalog vs browsing Dart
+
+| Situation | Action |
+|-----------|--------|
+| **plan** on new or existing feature | Read **catalog** + `tokens.observed.json`, then spot-check `lib/theme/` |
+| Catalog match on `value` | `action: use_existing` + `catalog_id` — no duplicate const |
+| Catalog missing | Scan `lib/theme/`, seed or refresh `.agent/token_catalog.json` |
+| **build** adds token | Append catalog entry; bump `updated_at` |
+| **fix** changes token API | Sync `dart_symbol` / `value` in catalog |
+
+## Plan obligations
+
+Before `theme_bindings[]`:
+
+1. Load `.agent/token_catalog.json` and `tokens.observed.json` (if present).
+2. Match observed fills, text styles, spacing, radii, effects to catalog `value` (spacing/radius ±0.5 tolerance).
+3. Each binding:
+
+```json
+{
+  "catalog_id": "T_spacing_md",
+  "category": "spacing",
+  "dart_symbol": "AppSpacing.md",
+  "observed": { "itemSpacing": 12, "figma_ids": ["…"] },
+  "action": "use_existing"
+}
+```
+
+`action`: `use_existing` | `add_to_catalog` | `alias_existing` | `inherit_material`
+
+4. `ready_for_build: false` if anonymous hex/spacing/radius remain in `widget_tree` without binding.
+
+## Build / fix obligations
+
+| Event | Catalog |
+|-------|---------|
+| New const in `lib/theme/` | Append entry; `used_by_features: [<feature>]` |
+| Reuse only | Add feature slug to `used_by_features` if missing |
+| Token rename / delete | Update catalog or `status: deprecated` |
+
+Bump `updated_at` (UTC, minute precision) on catalog edit.
+
+## Forbidden
+
+- Per-feature `*_colors.dart` / `*_spacing.dart` files
+- `Color(0xFF…)`, raw `EdgeInsets.all(N)`, `BorderRadius.circular(N)` in `lib/widgets/` or `lib/features/` when a catalog token exists
+- Skipping catalog read on **plan**
+- Feature-local token registry replacing project catalog

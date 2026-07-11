@@ -1,0 +1,28 @@
+---
+description: "Flutter lib/ quality: analyze, structure, theme. Apply when writing or reviewing Dart."
+alwaysApply: false
+globs: "**/lib/**/*.dart"
+---
+# Flutter output
+
+## Must
+
+- `dart analyze` clean
+- `lib/features/<slug>/`, shared `lib/widgets/`
+- Null-safe, modular, `const` where sensible
+- Theme and spacing tokens — no random inline colors, padding, or radii
+- Use `AppColors`, `AppTextStyles`, `AppSpacing`, `AppRadius`, `AppElevation` from `lib/theme/`
+
+## Avoid
+
+- Giant nested Column/Row without extraction
+- Duplicated subtrees — extract a widget file
+- Fixed-width-only where flex should adapt
+
+## After build / fix
+
+```bash
+cd <project_dir> && dart analyze && dart format .
+```
+
+App logic may live in dedicated handlers or stubs — layout still follows plan and theme.

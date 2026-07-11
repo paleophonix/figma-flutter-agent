@@ -1,0 +1,69 @@
+---
+description: "Pipeline phases, artifacts, gates. Strict phase order — one active phase at a time. Gates verified by check.mjs."
+alwaysApply: true
+---
+# Pipeline
+
+```text
+fetch → layout → plan → build → inspect → debug → fix
+         └──── autobuild ────┘   └─── autofix ───┘
+batch = autobuild over screens.yaml
+```
+
+## Phase order (mandatory)
+
+Phases run **strictly in order**. One active phase — no mixing. Every phase skill is a numbered **protocol**: execute steps in order; a step's Check must pass before the next step.
+
+| Rule | Meaning |
+|------|---------|
+| **Linear** | No jumping ahead: plan without `ready_for_plan`, build without `ready_for_build`, debug without inspect, fix without `fix_plan` — all forbidden |
+| **One step = one phase** | `/layout` does layout only; `/plan` does plan only. No `lib/` writes during plan, no fixing during inspect |
+| **Gate → next** | Finish the phase: JSON on disk · gate flag set · **`check.mjs` exit 0** · then the next phase |
+| **autobuild** | layout **fully** → plan **fully** → build. Do not alternate regions and widgets |
+| **autofix** | inspect **fully** → debug **fully** → fix. No diagnosing while observing |
+| **Stop** | Gate failed → **УТОЧНЕНИЕ** (clarification block), do not enter the next phase |
+
+**Forbidden mixing:** `build_plan` + `lib/` in one plan step · `fix_plan` during inspect · `lib/` edits during debug · corpus OPEN during build · skipping inspect before debug.
+
+## Artifacts (rule)
+
+**Per phase:** one JSON on disk + one chat report (RU — see `reports-locale.mdc`). **No** `*_brief.md`, no duplicates.
+
+| Phase | JSON | Chat |
+|-------|------|------|
+| layout | `layout_observation.json` + `screen_contract.json` | ОТЧЁТ: РАЗМЕТКА / УТОЧНЕНИЕ |
+| plan | `build_plan.json` | ОТЧЁТ: ПЛАН |
+| build | `build_report.json` | ОТЧЁТ: СБОРКА |
+| inspect | `inspect_observation.json` | ОТЧЁТ: ОСМОТР |
+| debug | `fix_plan.json` | ОТЧЁТ: ТРИАЖ |
+| fix | `fix_report.json` | ОТЧЁТ: ПОЧИНКА |
+| autobuild | same phase JSONs | one ОТЧЁТ: АВТОСБОРКА |
+| autofix | same phase JSONs | one ОТЧЁТ: АВТОПОЧИНКА |
+| batch | same phase JSONs per screen | one ОТЧЁТ: ПАКЕТ |
+
+Plus `lib/` code and fetch files (`cleaned.json`, `figma.png`, assets). **Never write** `visual_diff_tree.json`.
+
+**inspect:** the agent hunts for gaps itself (figma vs built Dart + `cleaned.json`, plus a user screenshot when provided) — it does not wait for the user to point at bugs. The kit has **no capture tool**; there is no automated pixel diff.
+
+## Gates (flag + mechanical verification)
+
+A gate is passed only when **both** hold: the flag in the artifact **and** `check.mjs` exit 0.
+
+| After phase | Flag | Verify command |
+|-------------|------|----------------|
+| layout | `ready_for_plan: true` | `node .agent/tools/check.mjs --phase layout` |
+| plan | `ready_for_build: true` | `node .agent/tools/check.mjs --phase plan` |
+| build | `analyze_exit_code: 0` | `node .agent/tools/check.mjs --phase build` |
+| inspect | `aligned_with_user: true` | `node .agent/tools/check.mjs --phase inspect` |
+| debug | `ready_for_fix: true` | `node .agent/tools/check.mjs --phase debug` |
+| fix | `analyze_exit_code: 0` | `node .agent/tools/check.mjs --phase fix` |
+
+`check.mjs` failures are **facts**: fix the artifact or the code, never argue with the validator in chat. Quote failing lines in the report.
+
+```bash
+cd apps/agent && dart analyze && dart format .   # build / fix only
+```
+
+Fetch: layout/inspect/build need `figma.png` (full fetch). Project catalogs: `.agent/widget_catalog.json`, `.agent/token_catalog.json`.
+
+**Fetch also writes** `tokens.observed.json` (per feature) — unique colors, typography, spacing, radii, shadows from the tree.

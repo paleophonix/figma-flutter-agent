@@ -1,0 +1,49 @@
+---
+description: "Screen contract (ТЗ): layout writes it, plan covers it, inspect verifies it. Spec adherence is a gate, not a wish."
+alwaysApply: true
+---
+# Screen contract (spec adherence)
+
+`screen_contract.json` in `.agent/features/<feature>/` is the machine-readable **ТЗ** for one screen. It exists so that "did we build what was asked" is a **checkable gate**, not a feeling.
+
+| Phase | Obligation |
+|-------|-----------|
+| **layout** | Create/update the contract from user ТЗ + design. No contract → layout is not done |
+| **plan** | `contract_coverage[]` — every acceptance and interaction item covered or omitted with reason |
+| **build** | Implement covered items; stubs stay stubs (`level: stub`) |
+| **inspect** | `contract_checks[]` — verdict per `verify_by: inspect` item |
+| **debug/fix** | A failed contract check is a queue item like any visual gap |
+
+## Shape
+
+```json
+{
+  "version": 1,
+  "feature": "<slug>",
+  "source": "user ТЗ | design-derived | mixed",
+  "jtbd": "Когда я …, я хочу …, чтобы …",
+  "acceptance": [
+    { "id": "A1", "statement": "Футер с CTA прижат к низу и не скроллится", "verify_by": "inspect" }
+  ],
+  "interactions": [
+    { "id": "I1", "figma_ids": ["…"], "expect": "Тап по CTA — переход к оплате (stub)", "level": "stub" }
+  ],
+  "states": [
+    { "id": "S1", "name": "loading", "in_scope": false }
+  ],
+  "out_of_scope": [],
+  "open_questions": []
+}
+```
+
+- `verify_by`: `inspect` (visual/PNG) | `analyze` (compiles, lint) | `user` (only the user can confirm)
+- `level`: `stub` (handler exists, no logic) | `wired` (logic requested by user)
+- Prose values — Russian (`reports-locale.mdc`); ids `A*` / `I*` / `S*` stable across re-runs.
+
+## Rules
+
+- **No user ТЗ given** → derive the contract from the design itself: every `interactive: yes` node becomes an `I*`; baseline acceptance = "screen matches figma.png with no P0/P1 gaps". Mark `source: design-derived`.
+- User words are **quoted, not paraphrased** into new requirements. Inventing scope = drift.
+- Contract changes mid-flow (user adds ТЗ) → update the contract first, then re-enter **plan**. Never patch `lib/` against an unwritten requirement.
+- `out_of_scope` is explicit — silence is not an omission record.
+- Verified mechanically: `node .agent/tools/check.mjs --phase contract` (shape) and `--phase plan` / `--phase inspect` (coverage / checks).

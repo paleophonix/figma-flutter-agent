@@ -281,6 +281,7 @@
                       "strokeAlign": "INSIDE",
                       "clipsContent": true
                     },
+                    "vectorAssetKey": "assets/icons/vector_913_17711.svg",
                     "componentRef": "913:17712",
                     "variant": {
                       "componentId": "913:17712",
@@ -302,6 +303,7 @@
                           "backgroundColor": "0xFFFFFFFF",
                           "strokeAlign": "INSIDE"
                         },
+                        "vectorAssetKey": "assets/icons/vector_913_17711.svg",
                         "rotation": -0.79,
                         "rotationRad": -0.01,
                         "imageAssetKey": "assets/icons/vector_913_17711.svg",
@@ -1003,6 +1005,7 @@
                           "borderRadius": 12.0,
                           "strokeAlign": "INSIDE"
                         },
+                        "imageAssetKey": "assets/images/sussi.png",
                         "accessibilityLabel": "Img",
                         "geometryFrame": {
                           "layoutRect": {
@@ -1456,6 +1459,7 @@
                                       "strokeAlign": "INSIDE",
                                       "clipsContent": true
                                     },
+                                    "vectorAssetKey": "assets/icons/vector_910_3261.svg",
                                     "componentRef": "910:3262",
                                     "clusterId": "component_910_3262",
                                     "variant": {
@@ -1478,6 +1482,7 @@
                                           "backgroundColor": "0xFFFFFFFF",
                                           "strokeAlign": "INSIDE"
                                         },
+                                        "vectorAssetKey": "assets/icons/vector_910_3261.svg",
                                         "imageAssetKey": "assets/icons/vector_910_3261.svg",
                                         "accessibilityLabel": "Vector",
                                         "layoutPositioning": "ABSOLUTE",
@@ -1728,6 +1733,7 @@
                                       "strokeAlign": "INSIDE",
                                       "clipsContent": true
                                     },
+                                    "vectorAssetKey": "assets/icons/vector_910_3248.svg",
                                     "componentRef": "910:3249",
                                     "clusterId": "component_910_3249",
                                     "variant": {
@@ -1750,6 +1756,7 @@
                                           "backgroundColor": "0xFFFFFFFF",
                                           "strokeAlign": "INSIDE"
                                         },
+                                        "vectorAssetKey": "assets/icons/vector_910_3248.svg",
                                         "imageAssetKey": "assets/icons/vector_910_3248.svg",
                                         "accessibilityLabel": "Vector",
                                         "layoutPositioning": "ABSOLUTE",
@@ -4836,7 +4843,7 @@
                             "right": 30.0
                           }
                         },
-                        "imageAssetKey": "assets/images/sussi.png",
+                        "imageAssetKey": "assets/images/sauces.png",
                         "accessibilityLabel": "Img",
                         "geometryFrame": {
                           "layoutRect": {
@@ -5428,6 +5435,7 @@
                                   "strokeAlign": "INSIDE",
                                   "clipsContent": true
                                 },
+                                "vectorAssetKey": "assets/icons/vector_1162_10106.svg",
                                 "componentRef": "1162:10107",
                                 "variant": {
                                   "componentId": "1162:10107",
@@ -5449,6 +5457,7 @@
                                       "backgroundColor": "0xFF8E8E93",
                                       "strokeAlign": "INSIDE"
                                     },
+                                    "vectorAssetKey": "assets/icons/vector_1162_10106.svg",
                                     "rotation": 0.87,
                                     "rotationRad": 0.02,
                                     "imageAssetKey": "assets/icons/vector_1162_10106.svg",
@@ -5709,6 +5718,7 @@
                               "strokeAlign": "INSIDE",
                               "clipsContent": true
                             },
+                            "vectorAssetKey": "assets/icons/vector_1003_4475.svg",
                             "componentRef": "1003:4476",
                             "variant": {
                               "componentId": "1003:4476",
@@ -5738,6 +5748,7 @@
                                   "backgroundColor": "0xFFFFFFFF",
                                   "strokeAlign": "INSIDE"
                                 },
+                                "vectorAssetKey": "assets/icons/vector_1003_4475.svg",
                                 "imageAssetKey": "assets/icons/vector_1003_4475.svg",
                                 "accessibilityLabel": "Vector",
                                 "layoutPositioning": "ABSOLUTE",
@@ -6137,6 +6148,7 @@
                                       "backgroundColor": "0xFFFFFFFF",
                                       "strokeAlign": "INSIDE"
                                     },
+                                    "vectorAssetKey": "assets/icons/vector_4181_43463.svg",
                                     "imageAssetKey": "assets/icons/vector_4181_43463.svg",
                                     "accessibilityLabel": "Vector",
                                     "layoutPositioning": "ABSOLUTE",
@@ -8096,6 +8108,7 @@
                                   "strokeAlign": "INSIDE",
                                   "clipsContent": true
                                 },
+                                "vectorAssetKey": "assets/icons/vector_910_3248.svg",
                                 "componentRef": "910:3249",
                                 "clusterId": "component_910_3249",
                                 "variant": {

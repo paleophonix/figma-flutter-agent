@@ -1,0 +1,65 @@
+---
+description: "Read corpus before repeating layout mistakes. plan reads playbooks; debug records OPEN; fix applies playbooks and auto-closes."
+alwaysApply: true
+---
+# Corpus
+
+Rake index — do not step on the same rake twice.
+
+**Kit corpus root:** `apps/agent/.agent/corpus/`. **Procedure:** `.cursor/skills/corpus/SKILL.md` — **plan** reads playbooks; **debug** writes OPEN; **fix** applies playbooks and auto-closes.
+
+## Read (plan)
+
+```text
+.agent/corpus/features/<feature>.yaml → cases/<case_id>.yaml (explicit list, no glob)
++ layout → family_id hints → index/<family_id>.yaml when it exists
+```
+
+Lessons go into `build_plan.json` `plan_notes` and layout/assets/stack decisions — **before** the first build.
+
+## Read (debug)
+
+```text
+symptom → family_id (mechanism, not "overflow")
+→ .agent/corpus/families.yaml
+→ .agent/corpus/index/<family_id>.yaml
+→ ONE .agent/corpus/cases/<case_id>.yaml
+```
+
+Never glob `.agent/corpus/cases/*.yaml`. Use FIXED rows as playbook hints before hacking `lib/` again.
+
+## Write OPEN (debug)
+
+When the mechanism is clear and repeatable:
+
+1. Compact `case-template.yaml` → `cases/<case_id>.yaml` (one mechanism per file)
+2. Append the case id to `corpus/features/<feature>.yaml`
+3. `summary` 2–4 sentences — a lesson for the future; ≤2 evidence paths
+4. No `occurrences[]`, no empty `repair` block on OPEN
+
+Skip YAML for one-offs. Promote compiler bugs to the repo-level `corpus/` when needed.
+
+## Skip corpus (trivial — no case YAML)
+
+**Do not** open `.agent/corpus/cases/` for:
+
+| Trivial | Example |
+|---------|---------|
+| Tooling / ops forgotten | forgot `fonts.ps1`, full fetch, `dart format` |
+| Single-file typo or import | wrong path, missing import, analyze-only |
+| First-time config in kit | wrong global theme, one pubspec line |
+| Obvious one-screen mistake | fixed once, no recurring mechanism |
+| Symptom without mechanism | "looks off" with no named `family_id` lesson |
+
+**Enough:** `fix_plan.json` item + chat triage. Optional one line in `plan_notes` if plan should remember it.
+
+**Open a case** only when: same mechanism hit **twice**, or the fix is a **pattern** future screens must not repeat (stack law, asset binding, token drift, flex trap). Then `family_id` + compact OPEN → promotion path to `lessons.mdc`.
+
+## fix
+
+1. Read the playbook from `.agent/corpus/cases/` (or repo corpus if promoted)
+2. Edit `lib/` — and `build_plan.json` if the plan was wrong
+3. `dart analyze && dart format .` → **inspect** again
+4. **Agent auto-FIXED** when proof holds (fix verified or clean inspect) — see corpus skill § Auto-close
+
+Do **not** wait for the user to close cards.

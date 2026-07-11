@@ -1,97 +1,125 @@
 {
-  "cacheKey": "09df06bb28eab780df86ae180ef533276f927794ae842ca2df721b9df26faa49",
+  "cacheKey": "529761d095e17086857d20090bbfeeec8a219d3876ae72e78b623c0214cbcbef",
   "response": {
     "candidates": [
       {
         "nodeId": "4408:44896",
-        "widgetName": "OrderProductCard",
-        "reason": "Repeated product line-item family with the same image/body/quantity structure across multiple instances; only text, price, and detail sections vary.",
-        "confidence": 0.97,
+        "widgetName": "OrderProductItem",
+        "reason": "Repeated order line item card with image, title, price and optional description/quantity controls.",
+        "confidence": 0.99,
         "suggestedParams": [
-          "titleText",
+          "title",
           "priceText",
+          "subtitleText",
           "quantity",
-          "detailsText",
-          "showDetails",
-          "showDivider",
-          "imageUrl",
-          "onIncrement",
-          "onDecrement"
+          "showDivider"
         ],
         "evidence": {
           "similarNodes": [
+            "4408:44896",
             "4408:44897",
             "4408:44898",
             "4408:44901",
             "4408:44902"
           ],
-          "shapeSimilarity": 0.95,
-          "semanticRole": "order product item"
+          "shapeSimilarity": 0.97,
+          "semanticRole": "Order product list item"
         }
       },
       {
         "nodeId": "I4408:44896;1154:7849",
-        "widgetName": "QuantityStepper",
-        "reason": "Reusable increment/decrement control repeated in several product rows and cards with the same minus/value/plus layout.",
-        "confidence": 0.98,
+        "widgetName": "QuantityAdjuster",
+        "reason": "Repeated minus/number/plus control used in multiple order items and extras.",
+        "confidence": 0.99,
         "suggestedParams": [
-          "value",
-          "onIncrement",
-          "onDecrement",
+          "count",
           "isDark",
-          "minValue",
-          "maxValue"
+          "compact"
         ],
         "evidence": {
           "similarNodes": [
+            "I4408:44896;1154:7849",
             "I4408:44897;1154:7849",
             "I4408:44898;1154:7849",
-            "I4408:44904;1154:8077",
-            "I4408:44915;1356:10712",
-            "I4408:44916;1356:10673"
+            "I4408:44904;1154:8077"
           ],
           "shapeSimilarity": 0.99,
-          "semanticRole": "quantity selector"
+          "semanticRole": "Quantity stepper / add-remove control"
         }
       },
       {
         "nodeId": "4408:44914",
         "widgetName": "ProductSmallCard",
-        "reason": "Repeated horizontal product tile in the swipe row; shared card anatomy with title, image, price, and add action, while pricing/action content changes by variant.",
-        "confidence": 0.95,
+        "reason": "Repeated horizontal promo/product card with image, title, price area and add action.",
+        "confidence": 0.97,
         "suggestedParams": [
-          "titleText",
+          "title",
           "priceText",
-          "comparePriceText",
-          "imageUrl",
-          "actionLabel",
-          "showGradient",
-          "isPromo"
+          "oldPriceText",
+          "showAddButton",
+          "imageUrl"
         ],
         "evidence": {
           "similarNodes": [
+            "4408:44914",
             "4408:44915",
             "4408:44916"
           ],
-          "shapeSimilarity": 0.92,
-          "semanticRole": "small product tile"
+          "shapeSimilarity": 0.96,
+          "semanticRole": "Small product promo card"
         }
       },
       {
         "nodeId": "4408:44903",
-        "widgetName": "ActionListItem",
-        "reason": "Consistent tappable action row pattern with leading icon, title text, trailing arrow, and divider; suitable for reuse as a generic menu/action item.",
-        "confidence": 0.78,
+        "widgetName": "PromoActionCard",
+        "reason": "Tapable action row/card combining leading icon, text and trailing arrow; good as a reusable CTA tile.",
+        "confidence": 0.82,
         "suggestedParams": [
-          "titleText",
-          "leadingIcon",
+          "icon",
+          "title",
           "trailingIcon",
-          "showDivider"
+          "onTap"
         ],
         "evidence": {
-          "similarNodes": [],
-          "shapeSimilarity": 0.81,
-          "semanticRole": "action row"
+          "similarNodes": [
+            "4408:44903"
+          ],
+          "shapeSimilarity": 0.89,
+          "semanticRole": "Navigational action card"
+        }
+      },
+      {
+        "nodeId": "4408:44917",
+        "widgetName": "CheckoutBar",
+        "reason": "Bottom action bar with primary checkout button and home-indicator spacing, likely reusable across modal screens.",
+        "confidence": 0.78,
+        "suggestedParams": [
+          "buttonText",
+          "showHomeIndicator"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "4408:44917"
+          ],
+          "shapeSimilarity": 0.87,
+          "semanticRole": "Bottom sticky action bar"
+        }
+      },
+      {
+        "nodeId": "4408:44905",
+        "widgetName": "SupplementaryInfoSection",
+        "reason": "Reusable informational section with explanatory text and secondary action link beneath the product list.",
+        "confidence": 0.74,
+        "suggestedParams": [
+          "bodyText",
+          "actionText"
+        ],
+        "evidence": {
+          "similarNodes": [
+            "4408:44905"
+          ],
+          "shapeSimilarity": 0.84,
+          "semanticRole": "Informational note with secondary action"
         }
       }
     ]

@@ -363,10 +363,7 @@ def static_artboard_viewport(
     ``constraints.maxWidth`` cannot widen phone shells and column roots.
     """
     viewport = f"SizedBox(width: {width_token}, height: {height_token}, child: {child})"
-    return (
-        f"Align(alignment: {alignment}, "
-        f"child: {live_browser_viewport_frame(child=viewport)})"
-    )
+    return f"Align(alignment: {alignment}, child: {live_browser_viewport_frame(child=viewport)})"
 
 
 def live_scroll_stack_viewport(
@@ -629,7 +626,7 @@ def artboard_static_wizard_preview(
         )
         return (
             "Align("
-            "alignment: Alignment.bottomCenter, "
+            "alignment: Alignment.topCenter, "
             f"child: {artboard_preview_viewport_frame(child=viewport)}"
             ")"
         )

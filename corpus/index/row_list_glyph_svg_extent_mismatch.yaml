@@ -11,7 +11,7 @@ cases:
   status: FIXED
   observed_at: '2026-07-07'
   created_at: '2026-07-07T18:30:00Z'
-  updated_at: '2026-07-07T18:30:00Z'
+  updated_at: '2026-07-09T12:00:00Z'
   summary: Trailing check_circle cluster rows are 24x24 with 2px padding but 
     CONSTRAINED_BOX layout slots pin interior width to 20px, shrinking the 24x24
     SvgPicture radio glyph.

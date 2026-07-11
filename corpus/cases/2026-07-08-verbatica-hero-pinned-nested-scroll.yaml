@@ -8,7 +8,7 @@ case:
   feature: verbatica_paywall
   observed_at: 2026-07-08
   created_at: '2026-07-08T12:30:00Z'
-  updated_at: '2026-07-08T16:25:00Z'
+  updated_at: '2026-07-09T12:00:00Z'
   summary: >
     The default browser branch of verbatica_paywall_layout.dart emits an outer
     SingleChildScrollView wrapping SizedBox(height: 780) -> Stack, where the hero band is
@@ -53,12 +53,17 @@ occurrences:
         When artboard_background_lead is set, apply_pin_bottom_chrome_to_stack_layers
         uses unified_wallpaper_scroll so body layers keep Positioned placement only;
         one outer viewport SingleChildScrollView scrolls the full artboard including
-        the wallpaper fill instead of nested per-panel scroll hosts.
+        the wallpaper fill instead of nested per-panel scroll hosts. Wizard static
+        preview with viewport-pinned bottom chrome aligns the artboard from the top
+        so tall host viewports do not grow a dead band above the design.
       changed_files:
         - src/figma_flutter_agent/generator/layout/stack_chrome.py
         - src/figma_flutter_agent/generator/layout/file_methods.py
         - src/figma_flutter_agent/generator/layout/file.py
+        - src/figma_flutter_agent/generator/layout/common.py
       regression_tests:
         - tests/test_layout_flex_policy.py::test_wallpaper_pin_bottom_suppresses_nested_content_scrollers
+        - tests/test_layout_flex_policy.py::test_wizard_preview_viewport_pin_uses_top_alignment
+        - tests/test_transaction_income_emit_laws.py::test_wizard_preview_viewport_pins_bottom_chrome_without_outer_scroll
       verification:
         - poetry run pytest tests/test_layout_flex_policy.py::test_wallpaper_pin_bottom_suppresses_nested_content_scrollers tests/test_verbatica_paywall_emit_laws.py -q

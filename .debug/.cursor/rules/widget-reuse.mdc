@@ -1,0 +1,88 @@
+---
+description: "Project widget catalog: reuse across features. Plan reads the catalog; build/fix maintain it."
+alwaysApply: true
+---
+# Widget reuse (project scope)
+
+Two layers — do not merge them.
+
+| Layer | Path | Scope |
+|-------|------|--------|
+| **Project catalog** | `.agent/widget_catalog.json` | Reusable `lib/widgets/` — semantic index for all features |
+| **Feature plan** | `.agent/features/<feature>/build_plan.json` → `extracted_widgets[]` | This screen: which Figma clusters map to catalog entries or new files |
+
+`lib/widgets/*.dart` is **API truth**. The catalog is a **discovery + reuse contract** — not a second codegen source.
+
+## When catalog vs browsing files
+
+| Situation | Action |
+|-----------|--------|
+| **plan** on a new or existing feature | Read the **catalog first**, then spot-check matching Dart files |
+| Catalog entry exists, semantic match | `action: reuse_existing` + `catalog_id` — do **not** create a duplicate widget file |
+| Catalog missing or empty | Scan `lib/widgets/`, seed or refresh `.agent/widget_catalog.json` |
+| Catalog stale vs Dart (params differ) | Update the catalog after reading the Dart file — the catalog must match the constructor |
+| **fix** changes a widget's public API | Update catalog `parameters` + `updated_at` in the same session |
+
+Browsing files alone is **not enough** for agents: no tags, no cross-feature `used_by`, no explicit reuse decision in the plan artifact.
+
+## Catalog entry shape
+
+```json
+{
+  "id": "W_quantity_stepper",
+  "dart_file": "lib/widgets/quantity_stepper_widget.dart",
+  "class_name": "QuantityStepperWidget",
+  "human_label": "Plain-language purpose",
+  "tags": ["stepper", "control"],
+  "parameters": ["value", "onDecrement", "onIncrement"],
+  "reuse_when": "When to pick this widget over others",
+  "used_by_features": ["niyama_order"],
+  "status": "stable | draft | deprecated"
+}
+```
+
+`id` prefix: `W_` + snake_case slug. Stable across features.
+
+## Plan obligations
+
+Before authoring new `extracted_widgets[]` entries:
+
+1. Load `.agent/widget_catalog.json`.
+2. For each layout cluster that looks like a component (repeat tile, stepper, footer CTA, sheet header, promo row):
+   - Match by `ui_role`, region, and `reuse_when` / `tags`.
+   - Prefer **reuse**; extend an existing widget with optional params only when plan notes justify it.
+3. In `build_plan.json` each extract must declare:
+
+```json
+{
+  "id": "cart_line",
+  "catalog_id": "W_order_line_item",
+  "action": "reuse_existing",
+  "dart_file": "lib/widgets/order_line_item_widget.dart",
+  "class_name": "OrderLineItemWidget",
+  "root_figma_ids": ["…"],
+  "reuse_count": 2
+}
+```
+
+`action`: `reuse_existing` | `create_new` | `extend_existing`
+
+New file only when `action: create_new` — and the plan must explain why no catalog match exists in `plan_notes`.
+
+## Build / fix obligations
+
+| Event | Catalog |
+|-------|---------|
+| New `lib/widgets/*.dart` from plan | Append entry; set `used_by_features: [<feature>]` |
+| Reuse only | Append `<feature>` to `used_by_features` if missing |
+| Rename / delete widget file | Update or mark `status: deprecated` — do not orphan entries |
+| Constructor params change | Sync `parameters` |
+
+Bump `updated_at` (UTC, minute precision) on any catalog edit.
+
+## Forbidden
+
+- Duplicate widget for the same UX pattern on a second screen (e.g. a second checkout bar file)
+- Feature-local registry that replaces the project catalog
+- Catalog entries without a real `lib/` file (`status: draft` only until **build** writes the file)
+- Skipping the catalog read on **plan** when `lib/widgets/` is non-empty

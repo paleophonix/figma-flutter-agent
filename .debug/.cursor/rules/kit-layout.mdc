@@ -1,0 +1,26 @@
+---
+description: "Kit paths: .cursor = prompts, .agent = tools, features/, corpus/."
+alwaysApply: true
+---
+# Kit layout
+
+| Path | Role |
+|------|------|
+| `apps/agent/.cursor/rules/` | Always-on agent rules |
+| `apps/agent/.cursor/skills/` | Phase skills (`/layout` … `/fix`) |
+| `apps/agent/.agent/tools/` | `fetch`, `fonts` — no Python |
+| `apps/agent/.agent/features/<feature>/` | Screen artifacts (gitignored) |
+| `apps/agent/.agent/corpus/` | Families, cases, index (kit defects) |
+| `apps/agent/lib/` | Generated Flutter code |
+
+**Prompts live in `.cursor/`.** Scripts and runtime artifacts live in `.agent/`.
+
+Per-screen artifacts always go under **`.agent/features/<feature>/`** — never in `.cursor/` or the repo root.
+
+Set `AGENT_FEATURE` in `apps/agent/.env` or pass `-Out .\.agent\features\<feature>` to fetch.
+
+## Forbidden (kit boundary)
+
+- **`figma-flutter-agent/.debug/`** — compiler triage only; not an input for `/layout`, `/plan`, `/build`, `/inspect`, `/debug`, `/fix` in this kit.
+- On fetch failure (token, API): **stop and ask the user** — do not copy `raw.json` / `processed.json` / PNGs from `.debug/` or any other screen folder.
+- Project assets live in **`apps/agent/assets/`** when the user says so; fetch still writes manifests under `.agent/features/<feature>/`.
