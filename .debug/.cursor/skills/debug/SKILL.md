@@ -25,7 +25,7 @@ Legacy: if only `visual_observation.json` exists, read it as inspect output.
 
 ## Scope (this phase only)
 
-**Do:** triage → `fix_plan.json` + corpus OPEN **only when the mechanism is recurring or lesson-worthy** (see `corpus-law.mdc` § Skip corpus).
+**Do:** triage → corpus OPEN when lesson-worthy → final `fix_plan.json`.
 **Stop before:** `lib/`, fix, re-inspect.
 **Forbidden in the same turn:** fixing code, analyze, corpus FIXED.
 
@@ -48,7 +48,8 @@ Each step ends with a **Check**. If the Check fails — apply **On fail** and do
 
 ```text
 inspect_observation.json          # queue source: gaps G*, contract_checks fail
-figma.png, compare_*.png          # user screenshot, if provided
+figma.png, compare_*.png          # visual evidence when provided
+runtime errors, stack traces, logs, user description
 layout_observation.json, screen_contract.json, build_plan.json, build_report.json
 cleaned.json, lib/… (read-only)
 ```
@@ -57,8 +58,10 @@ Plus when present: `assets.manifest.json`, `fonts.report.json`, `fetch.meta.json
 
 **Forbidden input:** `figma-flutter-agent/.debug/` — compiler cache only.
 
-**Check:** every gap `G*` and every failed contract check has been read against at least two sources (render + tree/plan).
-**On fail:** do not diagnose from memory or one screenshot.
+A runtime exception plus the relevant Dart/asset/config location is sufficient linked evidence; a screenshot is not required. Do not demand a second user artifact when the second source already exists in the repository.
+
+**Check:** every gap `G*` and every failed contract check has been read against at least two linked sources. Valid pairs include runtime error + Dart, user report + contract, screenshot + design, or plan + implementation.
+**On fail:** do not diagnose from memory or one unsupported assertion.
 
 ### Step 2 — Corpus lookup
 
@@ -106,21 +109,34 @@ root_cause:
     2–3 sentences for /fix — structural intent, not a file list
 ```
 
-User chat notes → evidence, never the sole classifier.
+User chat notes → evidence, never the sole classifier when repository or runtime evidence is available.
 
 **Check:** every `G*` and failed contract check maps to exactly one root cause (several symptoms may share one).
 **On fail:** unmapped symptom = incomplete triage.
 
-### Step 4 — Repair queue
+### Step 4 — Repair queue draft
 
-**Action:** List every distinct bug class as `F*` — do not collapse to one winner. Sort P0 → P1 → P2; respect dependencies (missing asset before pixel nits).
+**Action:** List every distinct bug class as `F*` — do not collapse to one winner. Sort P0 → P1 → P2; respect dependencies (missing asset before pixel nits). Add structural `fix_actions` and a provisional corpus decision to every item.
 
-**Check:** queue covers all root causes; each item has `fix_actions` (structural intent).
+**Check:** queue covers all root causes; each item has `fix_actions`, evidence, and a provisional `corpus_status`.
 **On fail:** complete the queue.
 
-### Step 5 — Write `fix_plan.json` + gate
+### Step 5 — Corpus (only when lesson-worthy)
 
-**Action:**
+**Action:** For every draft item:
+
+- `ready_for_record` + recurring/non-trivial mechanism → write `cases/YYYY-MM-DD-<mechanism>.yaml` with `status: OPEN`, append the id to `corpus/features/<feature>.yaml`, then finalize the item as `corpus_status: record_open` + real `corpus_case_id`.
+- existing playbook only → `corpus_status: playbook_only` + referenced case id when useful.
+- trivial or unclassified without a reusable lesson → `corpus_status: trivial|none`; skip YAML.
+
+**FORBIDDEN:** YAML for forgot-tool / typo / one-off config · YAML in chat only · deferring a required OPEN record until `/fix`.
+
+**Check:** every queue item now has its final corpus outcome, and every `record_open` path exists on disk.
+**On fail:** corpus state is not allowed to be hypothetical in the final fix plan.
+
+### Step 6 — Write `fix_plan.json` + gate
+
+**Action:** Write the final artifact after Step 5:
 
 ```json
 {
@@ -138,7 +154,7 @@ User chat notes → evidence, never the sole classifier.
       "symptom": "…",
       "fix_actions": ["Structural: wrap modal body in Flexible — see build_plan scroll_model"],
       "corpus_status": "record_open|playbook_only|none|trivial",
-      "corpus_case_id": "YYYY-MM-DD-<slug>",
+      "corpus_case_id": "YYYY-MM-DD-<slug> | null",
       "fix_summary_draft": "…"
     }
   ],
@@ -148,27 +164,14 @@ User chat notes → evidence, never the sole classifier.
 }
 ```
 
-`corpus_status` here is the **outcome** of Step 6 (`record_open` — OPEN case written; `playbook_only` — existing case informs; `none`). Set `ready_for_fix: false` if P0 items lack evidence. **Do not write** `visual_diff_tree.json`.
+Set `ready_for_fix: false` if P0 items lack evidence or a required corpus write failed. **Do not write** `visual_diff_tree.json`.
 
 **Check:** `node .agent/tools/check.mjs --phase debug` → exit 0.
-**On fail:** fix the artifact; re-run.
-
-### Step 6 — Corpus (only when lesson-worthy)
-
-**Action:** OPEN a compact case **only** when `corpus_status: ready_for_record` **and** the bug is **not trivial** (`corpus-law.mdc` § Skip corpus): recurring mechanism, or a pattern the next screen must not repeat.
-
-When trivial → set item `corpus_status: none` in `fix_plan.json`; skip YAML.
-
-When recording: `cases/YYYY-MM-DD-<mechanism>.yaml` (`status: OPEN`), append id to `corpus/features/<feature>.yaml` per corpus skill.
-
-**FORBIDDEN:** YAML for forgot-tool / typo / one-off config · YAML in chat only · deferring OPEN to /fix when the mechanism is recurring and non-trivial.
-
-**Check:** report `Corpus recorded: <paths>` or `Corpus: none — trivial|unclassified` for every queue item.
-**On fail:** if recurring and non-trivial but no YAML on disk — debug turn is not done.
+**On fail:** fix the artifact or missing corpus record; re-run.
 
 ### Step 7 — Report + handoff
 
-**Action:** **ОТЧЁТ: ТРИАЖ** (RU): queue F* with priorities and layers, corpus recorded, `ready_for_fix`. End with the `Check:` line.
+**Action:** **ОТЧЁТ: ТРИАЖ** (RU): queue F* with priorities and layers, evidence mode, corpus recorded, `ready_for_fix`. End with the `Check:` line.
 
 Default: report + `fix_plan.json`, **no lib/ edits**. Batch trigger (`/fix`, "чиним") → hand the queue to **fix**.
 
