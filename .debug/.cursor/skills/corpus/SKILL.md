@@ -15,38 +15,43 @@ Root: `apps/agent/.agent/corpus/`. Law: `corpus-law.mdc`.
 | Phase | Corpus |
 |-------|--------|
 | **plan** | read `features/<feature>.yaml` + cases — known failure modes into `plan_notes` |
-| **debug** | OPEN a compact case (on disk, same turn) |
-| **fix** | playbook → **agent auto-FIXED** on proof → promotion check |
-| **inspect** | clean screen → **agent auto-FIXED** all OPEN for the feature |
+| **debug** | OPEN a compact case on disk before finalizing `fix_plan.json` |
+| **fix** | playbook → **agent auto-FIXED** on matching proof → promotion check |
+| **inspect** | close only the OPEN cases supported by the current evidence |
 
 ## Auto-close (agent — without waiting for the user)
 
-The agent **itself** closes cards when the proof exists. Do not ask "close the case?".
+The agent **itself** closes cards when sufficient proof exists. Do not ask “close the case?”. Do not demand a screenshot for a runtime or structural defect when stronger relevant proof already exists.
 
 ### When FIXED
 
-| Trigger | Conditions | `repair` |
-|---------|-----------|----------|
-| **After fix** | `analyze_exit_code: 0` · re-**inspect** · the gap/symptom from `F?` is gone · structural fix (not +1px) | `summary` + `files` from fix |
-| **Screen clean** | `inspect`: `perception_gaps: []` · `inspection_complete: true` · `aligned_with_user: true` | close **all OPEN** `project: agent` + `feature` |
+| Defect/proof | Conditions | `repair` |
+|--------------|------------|----------|
+| analyzer/static | relevant check passes; `analyze_exit_code: 0` when applicable | `summary` + `files` + check path/result |
+| runtime | reproduction/test no longer fails, or the reported exception cause is removed and verifiable | `summary` + `files` + runtime/test evidence |
+| structural | implementation matches `build_plan.json` / contract and fresh inspect no longer reports the gap | `summary` + `files` + inspect evidence |
+| visual | fresh screenshot/user report when needed, or another unambiguous visual proof | `summary` + `files` + visual evidence |
+
+A screenshot is evidence, not a universal gate. Match the proof to the defect.
 
 ### Do not close
 
-- a gap matching the case mechanism is **still in inspect**
+- the case symptom is still present in fresh inspect/runtime evidence
 - `fix_report.items_still_open` contains the related `F?`
-- 2 fix attempts exhausted, the symptom is **still on the PNG** → stays OPEN, needs a fresh **debug**
-- the user explicitly said **"кроме …"** (except) — those case ids stay OPEN
+- 2 fix attempts are exhausted and the symptom still reproduces → stays OPEN, needs fresh **debug**
+- the user explicitly said **“кроме …”** — those case ids stay OPEN
+- the current evidence does not actually verify this case, even if another gap on the same screen was fixed
 
 ### How to close
 
 1. `status: FIXED` · `updated_at` UTC
-2. `repair:` block — `summary` (the pattern), `files`, `verification` (≤1 path, e.g. `inspect_observation.json`)
+2. `repair:` block — `summary` (the reusable pattern), `files`, `verification` (≤1 primary path/result)
 3. `fix_report.json` / **ОТЧЁТ** — `Corpus: … FIXED (auto)`
 4. Do not remove the case from `features/<feature>.yaml` — history stays
 
 ### Screen close-out
 
-A clean inspect on the feature → walk `features/<feature>.yaml` → every OPEN case → FIXED with `repair.summary` from the last fix, or `Verified clean inspect — no remaining gaps`.
+A clean inspect may close multiple OPEN cases for the feature only when its evidence covers their mechanisms. Walk `features/<feature>.yaml`, match each OPEN case to the verified gaps/checks, and leave unrelated or unproven cases OPEN.
 
 ## Promotion (recurring lesson → permanent rule)
 
@@ -58,7 +63,7 @@ When a `family_id` reaches its **2nd FIXED** case:
 4. Cap: 40 lessons — at the cap, merge related bullets or retire the least recurring one.
 5. Report: `Lesson promoted: <family_id>`.
 
-Promotion happens in **fix** (Step 7). plan benefits automatically — `lessons.mdc` is always-on.
+Promotion happens in **fix** after proof and before the final `fix_report.json`. Plan benefits automatically — `lessons.mdc` is always-on.
 
 ## Lookup
 
@@ -79,7 +84,7 @@ Copy `case-template.yaml`. **One file = one mechanism.**
 | `summary` | 2–4 sentences: mechanism + lesson for the future. Not a diary of rounds. |
 | `evidence` | **≤2 paths** — no nested `kind`/`summary` |
 | `figma_ids` | optional, up to 5 ids |
-| `repair` | **FIXED only** — `summary` + `files` |
+| `repair` | **FIXED only** — `summary` + `files` + `verification` |
 
 **Do not write:** `occurrences[]`, `blast_radius`, `origin`, `pipeline_arrow`, `owner`, empty `repair` on OPEN, `title`/`case_kind`/`observed_at`, long evidence lists, compare PNGs in corpus (they live in the feature dir).
 
@@ -89,11 +94,12 @@ Skip YAML for a one-off or `unclassified` without a lesson. **Trivial** (forgot 
 
 1. `cases/YYYY-MM-DD-<slug>.yaml`, `status: OPEN`, `project: agent`
 2. Append the case id to `corpus/features/<feature>.yaml` (create if missing)
-3. `fix_summary_draft` goes into `fix_plan.json` — for fix; do not duplicate it as a case essay
+3. Finalize the matching `fix_plan.json` item with `corpus_status: record_open` + the real case id
+4. `fix_summary_draft` stays in `fix_plan.json` — do not duplicate it as a case essay
 
 ## fix → FIXED (agent auto)
 
-Structural fix + analyze clean + re-inspect symptom gone → **agent writes FIXED** (see Auto-close), then checks Promotion. Max 2 fix attempts without a fresh debug — otherwise it stays OPEN.
+Structural fix + relevant checks + fresh inspect/reproduction proving the symptom gone → **agent writes FIXED**, then checks Promotion. Max 2 fix attempts without a fresh debug — otherwise it stays OPEN.
 
 ## Report
 
