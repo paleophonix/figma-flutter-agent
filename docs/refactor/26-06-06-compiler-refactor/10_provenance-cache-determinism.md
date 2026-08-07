@@ -1,61 +1,55 @@
 # 10 — Provenance, cache & determinism
 
+**Статус:** исследование завершено 2026-07-03; реализация в бэклоге.
+
 ## 1. Исследование
 
-### Модули
+### Проверенные модули
 
 | Область | Путь |
 |---------|------|
-| IR / parser version | `generator/ir/version.py`, `parser/version.py` |
-| Provenance models | `generator/ir/passes/provenance_models.py`, `provenance_record.py` |
-| Sync / incremental | `sync/snapshot.py`, `diff.py`, `regions.py` |
-| Dump prefetch | `pipeline/dump_prefetch.py` — `ScreenDumpPrefetch` |
-| Pipeline stages | `pipeline/run/stages.py`, `pipeline/run/fetch.py` |
+| Parser / emitter versions | `parser/version.py`, `generator/ir/version.py` |
+| IR snapshots | `debug/ir_dumps.py`, `debug/ir_load.py` |
+| Provenance | `debug/provenance.py`, `generator/ir/passes/provenance_models.py`, `provenance_record.py` |
+| Incremental state | `sync/snapshot.py`, `sync/diff.py`, `sync/regions.py`, `pipeline/incremental.py` |
+| Dump prefetch | `pipeline/dump_prefetch.py` |
 | Planner timing | `generator/planner/timing.py` |
-| Config hash surface | `config/` — `Settings`, `.ai-figma-flutter.yml` |
-| Debug provenance | `.debug/screen/*/provenance.json`, `snapshot.json` |
-| LLM cache / IR offline | wizard ir-offline paths, `llm_parsed.json` |
-| Asset index | `parser/boundaries/assets.py` — `build_asset_node_index` |
-| EMITTER_VERSION | grep in `src/` (emitter version stamps) |
 
-### Инциденты (из практики)
+### Находки
 
-- Stale `plan.dart` при hung run.
-- Cached IR переживает parser semantics change.
-- `main.dart wired: mismatch` — wizard bootstrap.
+- Processed dump знает `PARSER_VERSION`; cached IR эту версию не проверяет.
+- `pre_emit` и sync snapshot знают `EMITTER_VERSION`.
+- Snapshot уже хранит hashes дерева, токенов, generated files, regions и clusters.
+- В общей идентичности пока нет normalizer version, IR schema version, settings fingerprint и asset-manifest fingerprint.
+- Dump prefetch сопоставляет только путь к файлу.
+- Planner timing пишет start/finish и duration, но не имеет stage budget.
+- Provenance объясняет изменения полей, однако отдельно от жизненного цикла snapshot/IR artifacts.
+- Atomic snapshot write, lock, optimistic version и quarantine уже реализованы и должны быть сохранены.
+
+### Вывод
+
+В проекте есть отдельные механизмы versioning, provenance и incremental state, но нет единого `ArtifactIdentity`, который одинаково применяется к processed dump, cached IR, pre-emit и snapshot.
 
 ---
 
 ## 2. Анализ
 
-### Идентичность артефакта
+### Приоритеты
 
-Каждый cache key должен включать:
+1. Описать typed `ArtifactIdentity`.
+2. Проверять cached IR перед использованием.
+3. Добавить признак полного завершения producer stage.
+4. Учитывать содержимое dump, settings и asset manifest.
+5. Ввести stage budgets и typed diagnostics.
+6. Проверять стабильность canonical `pre_emit.json` при одинаковых входах и версиях.
 
-```text
-source dump hash
-parser version
-normalizer version
-IR schema version
-config hash
-asset-manifest hash
-upstream artifact hashes
-```
+### Граница детерминизма
 
-### Вопросы
+Нормативная цель — одинаковый canonical pre-emit для одинаковых normalized inputs, versions и settings. Byte-identical final Dart для LLM-assisted path не является первым gate.
 
-- Где cache keyed by filename, не content?
-- Когда ir-offline должен invalidate?
-- Stage budgets: hang без timeout — какой max per substage?
+### Scope
 
-### Гипотезы
-
-- `AssetIndexReuseLaw` — частный случай general «scan once» policy.
-- Provenance.json не участвует в invalidation — bug.
-
-### Сомнения
-
-- Byte-identical emit при LLM — нереалистично; IR determinism достаточен.
+Visual refine не входит в Program 10 и остаётся в backlog.
 
 ---
 
@@ -63,13 +57,16 @@ upstream artifact hashes
 
 ### Целевое состояние
 
-- Content-addressed artifact store под `.debug/screen/` + explicit stale markers.
-- Invalidation: parser/IR version bump → force regen IR, не reuse `llm_validated.json`.
-- Plan substage budgets: log + fail loud после threshold (не silent hang).
-- Determinism gate: same inputs + versions → same `pre_emit.json` hash.
+- Одна identity model для reusable artifacts.
+- Несовместимая версия или settings/assets change дают явный stale verdict.
+- Незавершённый stage не создаёт пригодный для повторного использования artifact.
+- Planner substages имеют duration, budget и typed failure report.
+- Same identity даёт одинаковый canonical pre-emit.
 
 ### Критерии готовности
 
-- Hung run невозможен без `plan: <stage> started` + timeout error.
-- Documented cache key schema в `refactor/contracts/artifact_identity.md`.
-- Wizard ir-offline detects stale IR и предлагает refresh.
+- Cached IR с несовместимой identity не загружается молча.
+- Version change требует regeneration.
+- Settings или asset change обновляют зависимые artifacts.
+- Identity schema описана в `contracts/artifact_identity.md`.
+- Determinism test не зависит от visual refine.
