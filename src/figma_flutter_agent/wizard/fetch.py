@@ -201,9 +201,7 @@ def _wizard_import_figma_frame(
             from figma_flutter_agent.wizard.run_actions import report_preview_launch_failure
 
             report_preview_launch_failure()
-            console.print(
-                f"[yellow]Codegen complete — preview launch failed.[/yellow] — {feature}"
-            )
+            console.print(f"[yellow]Codegen complete — preview launch failed.[/yellow] — {feature}")
         elif launched is False:
             console.print(f"[yellow]Sync complete — Flutter run stopped.[/yellow] — {feature}")
         else:

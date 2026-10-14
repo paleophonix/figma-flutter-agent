@@ -111,9 +111,7 @@ def _wrap_bounded_positioned_slot_child(
         if width is not None and height is not None and width > 0 and height > 0:
             width_lit = format_geometry_literal(width)
             height_lit = format_geometry_literal(height)
-            bounded = (
-                f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
-            )
+            bounded = f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
             if child_has_outward_paint(node):
                 return bounded
             return f"ClipRect(child: {bounded})"

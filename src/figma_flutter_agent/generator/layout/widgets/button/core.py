@@ -51,9 +51,7 @@ def _button_ink_surface_params(
     fill = None
     if gradient_expr is None:
         opacity = surface.style.opacity
-        apply_opacity = not (
-            opacity is not None and 0.0 < opacity < 1.0 - 1e-6
-        )
+        apply_opacity = not (opacity is not None and 0.0 < opacity < 1.0 - 1e-6)
         fill = (
             dart_color_expr(surface.style, apply_opacity=apply_opacity)
             if surface.style.background_color is not None

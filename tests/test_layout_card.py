@@ -60,4 +60,6 @@ def test_horizontal_product_row_card_emits_row_not_column() -> None:
     body = render_node_body(node, uses_svg=False)
 
     assert "Row(" in body
-    assert "Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Image.asset" not in body
+    assert (
+        "Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Image.asset" not in body
+    )

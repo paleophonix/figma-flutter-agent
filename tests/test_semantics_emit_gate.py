@@ -181,7 +181,9 @@ def test_baked_tier_emit_uses_asset_path() -> None:
         id="btn-filled",
         name="icon",
         type=NodeType.VECTOR,
-        sizing=Sizing(width=24.0, height=24.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        sizing=Sizing(
+            width=24.0, height=24.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+        ),
         vector_asset_key="assets/icons/star.svg",
     )
     ir = WidgetIrNode(

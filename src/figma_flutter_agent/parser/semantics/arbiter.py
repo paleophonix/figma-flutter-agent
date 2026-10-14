@@ -221,9 +221,8 @@ def _nav_bottom_bar_hint_vetoed(ctx: DetectorContext, suggested: WidgetIrKind) -
         nav_bottom_bar_kind_contradicts_clean_node,
     )
 
-    return (
-        suggested == WidgetIrKind.NAV_BOTTOM_BAR
-        and nav_bottom_bar_kind_contradicts_clean_node(ctx.clean_node)
+    return suggested == WidgetIrKind.NAV_BOTTOM_BAR and nav_bottom_bar_kind_contradicts_clean_node(
+        ctx.clean_node
     )
 
 

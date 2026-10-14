@@ -14,13 +14,13 @@ from figma_flutter_agent.generator.variant.slider_facts import (
     range_slider_active_color_expr,
     range_slider_emit_height,
 )
-from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.generator.variant.state import (
     variant_button_kind,
     variant_input_has_error,
     variant_is_checked,
     variant_size_label,
 )
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 VARIANT_BUTTON_PADDING: dict[str, tuple[str, str]] = {
@@ -202,11 +202,7 @@ def render_slider_widget(
         active_color = range_slider_active_color_expr(node)
         height = range_slider_emit_height(node)
         if theme_variant == "cupertino":
-            control = (
-                f"CupertinoSlider("
-                f"value: {start}, "
-                f"onChanged: {on_changed})"
-            )
+            control = f"CupertinoSlider(value: {start}, onChanged: {on_changed})"
         else:
             control = (
                 f"RangeSlider("
@@ -214,11 +210,7 @@ def render_slider_widget(
                 f"activeColor: {active_color}, "
                 f"onChanged: {on_changed})"
             )
-        return (
-            f"SizedBox("
-            f"height: {format_geometry_literal(height)}, "
-            f"child: {control})"
-        )
+        return f"SizedBox(height: {format_geometry_literal(height)}, child: {control})"
     value = slider_value_expr(node)
     control = (
         f"CupertinoSlider(value: {value}, onChanged: {on_changed})"

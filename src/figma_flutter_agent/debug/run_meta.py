@@ -55,9 +55,7 @@ _STAMPED_RUN_META_KEYS = frozenset(
     }
 )
 
-_INCOMPLETE_RUN_STATUSES = frozenset(
-    {"started", "parsed", "ir_ready", "planned", "validated"}
-)
+_INCOMPLETE_RUN_STATUSES = frozenset({"started", "parsed", "ir_ready", "planned", "validated"})
 _TERMINAL_FAILURE_STATUSES = frozenset({"failed", "timed_out"})
 INCOMPLETE_RUN_STATUSES = _INCOMPLETE_RUN_STATUSES
 TERMINAL_FAILURE_RUN_STATUSES = _TERMINAL_FAILURE_STATUSES
@@ -125,10 +123,7 @@ class RunMetaRecord:
     def from_dict(cls, data: dict[str, Any]) -> RunMetaRecord:
         """Parse run.meta.json dict without upgrading legacy artifacts."""
         schema_raw = data.get("runMetaSchemaVersion")
-        if schema_raw is None:
-            schema_version = LEGACY_RUN_META_SCHEMA_VERSION
-        else:
-            schema_version = str(schema_raw)
+        schema_version = LEGACY_RUN_META_SCHEMA_VERSION if schema_raw is None else str(schema_raw)
 
         status_raw = data.get("status")
         if status_raw is None:
@@ -154,17 +149,11 @@ class RunMetaRecord:
             cached_ir_verdict=(
                 str(data["cached_ir_verdict"]) if data.get("cached_ir_verdict") else None
             ),
-            clean_tree_hash=(
-                str(data["clean_tree_hash"]) if data.get("clean_tree_hash") else None
-            ),
+            clean_tree_hash=(str(data["clean_tree_hash"]) if data.get("clean_tree_hash") else None),
             generation_config_hash=(
-                str(data["generation_config_hash"])
-                if data.get("generation_config_hash")
-                else None
+                str(data["generation_config_hash"]) if data.get("generation_config_hash") else None
             ),
-            timed_out_stage=(
-                str(data["timed_out_stage"]) if data.get("timed_out_stage") else None
-            ),
+            timed_out_stage=(str(data["timed_out_stage"]) if data.get("timed_out_stage") else None),
         )
 
 
@@ -188,10 +177,7 @@ def _assert_run_meta_ownership(existing: dict[str, Any], *, pipeline_run_id: str
     """Reject lifecycle writes when the on-disk artifact belongs to another run."""
     current = str(existing.get("pipeline_run_id") or "").strip()
     if current and current != pipeline_run_id:
-        msg = (
-            f"run.meta ownership mismatch: writer={pipeline_run_id!r} "
-            f"artifact={current!r}"
-        )
+        msg = f"run.meta ownership mismatch: writer={pipeline_run_id!r} artifact={current!r}"
         raise RunMetaStaleWriterError(msg)
 
 
@@ -305,10 +291,7 @@ def _assert_reconcile_target_writable(
     source_started = _parse_run_started_at(source)
     target_started = _parse_run_started_at(target)
     if source_started is None:
-        msg = (
-            f"run.meta reconcile blocked: missing source chronology, "
-            f"writer={pipeline_run_id!r}"
-        )
+        msg = f"run.meta reconcile blocked: missing source chronology, writer={pipeline_run_id!r}"
         raise RunMetaStaleWriterError(msg)
     if target_started is None:
         msg = (
@@ -348,9 +331,7 @@ def is_run_meta_gate_trusted(meta: RunMetaRecord) -> bool:
         return False
     if meta.status not in KNOWN_RUN_META_STATUSES:
         return False
-    if meta.writeback not in KNOWN_WRITEBACK_OUTCOMES:
-        return False
-    return True
+    return meta.writeback in KNOWN_WRITEBACK_OUTCOMES
 
 
 def begin_run_meta(

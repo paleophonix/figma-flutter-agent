@@ -53,9 +53,10 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
     span_w = float(node.sizing.width or width or 0.0)
     span_h = float(node.sizing.height or height or 0.0)
     if has_fill and not has_stroke and span_w > 0 and span_h > 0:
-        if abs(span_w - span_h) <= max(2.0, min(span_w, span_h) * 0.15) and max(
-            span_w, span_h
-        ) <= 32.0:
+        if (
+            abs(span_w - span_h) <= max(2.0, min(span_w, span_h) * 0.15)
+            and max(span_w, span_h) <= 32.0
+        ):
             width_lit = format_geometry_literal(span_w)
             height_lit = format_geometry_literal(span_h)
             radius_lit = format_geometry_literal(max(span_w, span_h) / 2.0)

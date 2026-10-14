@@ -70,7 +70,9 @@ def range_slider_active_color_expr(node: CleanDesignTreeNode) -> str:
     """Return Dart color expression for the painted range track."""
     for candidate in (node, *node.children):
         if candidate.style.background_color:
-            return dart_color_expr(candidate.style, fallback="Theme.of(context).colorScheme.primary")
+            return dart_color_expr(
+                candidate.style, fallback="Theme.of(context).colorScheme.primary"
+            )
     return "Theme.of(context).colorScheme.primary"
 
 

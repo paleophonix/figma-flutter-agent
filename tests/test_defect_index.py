@@ -5,8 +5,6 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from tests.defect_case_meta import case_timestamps
-
 from figma_flutter_agent.defects.enums import (
     BlastRadius,
     Confidence,
@@ -31,6 +29,7 @@ from figma_flutter_agent.defects.models import (
     OccurrenceEntry,
     OwnerRef,
 )
+from tests.defect_case_meta import case_timestamps
 
 
 def _family(family_id: str = "graph_sync_violation") -> FamilyEntry:

@@ -33,7 +33,9 @@ class OwnershipOverlay:
     edges: tuple[OwnershipEdge, ...]
 
 
-def _infer_edge(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> OwnershipEdge | None:
+def _infer_edge(
+    node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None
+) -> OwnershipEdge | None:
     if parent is None:
         return None
     if node.type == NodeType.INPUT:

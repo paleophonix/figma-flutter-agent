@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 
 def case_timestamps(
@@ -18,7 +18,7 @@ def case_timestamps(
         observed.day,
         created_hour,
         0,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     updated = datetime(
         observed.year,
@@ -26,6 +26,6 @@ def case_timestamps(
         observed.day,
         updated_hour if updated_hour is not None else created_hour,
         0,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     return created, updated

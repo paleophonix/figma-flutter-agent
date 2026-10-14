@@ -34,9 +34,7 @@ def load_allowlist_paths(*, fixture_path: Path | None = None) -> tuple[str, tupl
 def _resolve_dot_path(obj: Any, dot_path: str) -> Any:
     current = obj
     for part in dot_path.split("."):
-        current = (
-            current.get(part) if isinstance(current, dict) else getattr(current, part, None)
-        )
+        current = current.get(part) if isinstance(current, dict) else getattr(current, part, None)
         if current is None:
             return None
     return current

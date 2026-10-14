@@ -14,5 +14,7 @@ def test_property_fast_marker_collects_tests() -> None:
         check=False,
     )
     assert result.returncode == 0
-    assert "test session starts" in result.stdout.lower() or "tests collected" in result.stdout.lower()
+    assert (
+        "test session starts" in result.stdout.lower() or "tests collected" in result.stdout.lower()
+    )
     assert "no tests collected" not in result.stdout.lower()

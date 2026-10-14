@@ -488,8 +488,8 @@ def render_node_body(
     )
 
     segmented_switch_host = layout_fact_switch_hosts_segmented_options(node)
-    segmented_switch_child = (
-        parent_node is not None and layout_fact_switch_hosts_segmented_options(parent_node)
+    segmented_switch_child = parent_node is not None and layout_fact_switch_hosts_segmented_options(
+        parent_node
     )
     prefer_cluster_widget = (
         not inline_cluster_control

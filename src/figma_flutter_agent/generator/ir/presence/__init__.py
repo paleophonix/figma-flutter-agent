@@ -130,9 +130,8 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
     def sync_layout_children(ir_node: WidgetIrNode, clean: CleanDesignTreeNode) -> None:
         if clean.type not in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW}:
             return
-        if (
-            ir_node.kind == WidgetIrKind.EXTRACTED
-            and extracted_reference_valid(ir_node, extracted_widget_names)
+        if ir_node.kind == WidgetIrKind.EXTRACTED and extracted_reference_valid(
+            ir_node, extracted_widget_names
         ):
             ir_node.children = []
             return

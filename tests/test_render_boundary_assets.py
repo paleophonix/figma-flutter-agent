@@ -41,9 +41,7 @@ def test_discover_asset_path_for_instance_leaf_id(tmp_path: Path) -> None:
     icons.mkdir(parents=True)
     (icons / "vector_910_3248.svg").write_text("<svg></svg>", encoding="utf-8")
     instance_id = "I4408:44896;1154:7849;1149:9855;1149:9481;910:3248"
-    assert (
-        discover_asset_path_for_node(tmp_path, instance_id) == "assets/icons/vector_910_3248.svg"
-    )
+    assert discover_asset_path_for_node(tmp_path, instance_id) == "assets/icons/vector_910_3248.svg"
 
 
 def test_discover_asset_path_for_component_vector_family_variant(tmp_path: Path) -> None:
@@ -202,25 +200,25 @@ def test_unresolved_render_boundary_validate_passes_after_non_strict_resolve(
 
 
 def test_resolve_render_boundary_binds_raster_export(tmp_path: Path) -> None:
-  illustrations = tmp_path / "assets" / "illustrations"
-  illustrations.mkdir(parents=True)
-  (illustrations / "render_boundary_2399_42779.png").write_bytes(b"png")
-  node = CleanDesignTreeNode(
-      id="2399:42779",
-      name="Img",
-      type=NodeType.STACK,
-      sizing=Sizing(width=393.0, height=454.0),
-      render_boundary=True,
-      flatten_figma_node_ids=["2399:42780", "2399:42781"],
-      vector_asset_key=render_boundary_asset_path("2399:42779"),
-  )
-  root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
-  unresolved = resolve_render_boundary_asset_keys(root, tmp_path, AssetManifest())
-  assert unresolved == []
-  assert node.image_asset_key == "assets/illustrations/render_boundary_2399_42779.png"
-  assert node.vector_asset_key is None
-  screen_ir = default_screen_ir(root)
-  validate_screen_ir(screen_ir, root, project_dir=tmp_path)
+    illustrations = tmp_path / "assets" / "illustrations"
+    illustrations.mkdir(parents=True)
+    (illustrations / "render_boundary_2399_42779.png").write_bytes(b"png")
+    node = CleanDesignTreeNode(
+        id="2399:42779",
+        name="Img",
+        type=NodeType.STACK,
+        sizing=Sizing(width=393.0, height=454.0),
+        render_boundary=True,
+        flatten_figma_node_ids=["2399:42780", "2399:42781"],
+        vector_asset_key=render_boundary_asset_path("2399:42779"),
+    )
+    root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
+    unresolved = resolve_render_boundary_asset_keys(root, tmp_path, AssetManifest())
+    assert unresolved == []
+    assert node.image_asset_key == "assets/illustrations/render_boundary_2399_42779.png"
+    assert node.vector_asset_key is None
+    screen_ir = default_screen_ir(root)
+    validate_screen_ir(screen_ir, root, project_dir=tmp_path)
 
 
 def test_render_boundary_rejects_descendant_icon_vector(tmp_path: Path) -> None:

@@ -4,4 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-TEST_ALLOWLIST_FIXTURE = Path(__file__).resolve().parent / "generation_config_fingerprint_allowlist.json"
+TEST_ALLOWLIST_FIXTURE = (
+    Path(__file__).resolve().parent / "generation_config_fingerprint_allowlist.json"
+)

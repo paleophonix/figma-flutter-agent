@@ -262,11 +262,7 @@ def layout_fact_labeled_absolute_field_stack(node: CleanDesignTreeNode) -> bool:
     """Return True when an absolute stack hosts an external label plus painted field."""
     if node.type != NodeType.STACK:
         return False
-    shells = [
-        child
-        for child in node.children
-        if layout_fact_painted_field_shell_container(child)
-    ]
+    shells = [child for child in node.children if layout_fact_painted_field_shell_container(child)]
     if len(shells) != 1:
         return False
     shell = shells[0]

@@ -10,7 +10,10 @@ def variant_reference_args(node: CleanDesignTreeNode) -> str:
     variant = node.variant
     if variant is None:
         return ""
-    props = {str(key).strip().lower(): str(value).strip().lower() for key, value in variant.variant_properties.items()}
+    props = {
+        str(key).strip().lower(): str(value).strip().lower()
+        for key, value in variant.variant_properties.items()
+    }
     args: list[str] = []
     state = props.get("state") or (variant.state or "").strip().lower()
     if state == "disabled":
@@ -41,7 +44,10 @@ def variant_constructor_params(node: CleanDesignTreeNode) -> str | None:
     variant = node.variant
     if variant is None:
         return None
-    props = {str(key).strip().lower(): str(value).strip().lower() for key, value in variant.variant_properties.items()}
+    props = {
+        str(key).strip().lower(): str(value).strip().lower()
+        for key, value in variant.variant_properties.items()
+    }
     parts = ["super.key"]
     state = props.get("state") or (variant.state or "").strip().lower()
     if state == "disabled":

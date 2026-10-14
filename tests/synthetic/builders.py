@@ -5,7 +5,9 @@ from __future__ import annotations
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
 
 
-def column_tree(*, depth: int = 1, width: float = 360.0, height: float = 640.0) -> CleanDesignTreeNode:
+def column_tree(
+    *, depth: int = 1, width: float = 360.0, height: float = 640.0
+) -> CleanDesignTreeNode:
     """Build a shallow column tree with deterministic ids."""
     children: list[CleanDesignTreeNode] = []
     for index in range(max(1, depth)):

@@ -101,8 +101,7 @@ def _blocks_nested_decorative_hoist(node: CleanDesignTreeNode) -> bool:
     if node.component_ref is not None:
         return True
     return bool(
-        node.variant is not None
-        and (node.variant.component_id or node.variant.component_name)
+        node.variant is not None and (node.variant.component_id or node.variant.component_name)
     )
 
 

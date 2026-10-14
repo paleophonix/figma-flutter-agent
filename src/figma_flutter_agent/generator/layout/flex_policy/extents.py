@@ -28,7 +28,10 @@ def _row_status_chrome_icon_cluster_cross_extent(node: CleanDesignTreeNode) -> f
     for child in node.children:
         if child.type in {NodeType.STACK, NodeType.VECTOR, NodeType.IMAGE, NodeType.ROW}:
             child_height = child.sizing.height
-            if child_height is not None and 0.0 < float(child_height) <= _COMPACT_ICON_SLOT_MAX_CROSS_EXTENT:
+            if (
+                child_height is not None
+                and 0.0 < float(child_height) <= _COMPACT_ICON_SLOT_MAX_CROSS_EXTENT
+            ):
                 child_heights.append(float(child_height))
     if not child_heights:
         return None
@@ -166,19 +169,21 @@ def post_flex_layout_slot_extents(
         layout_fact_flat_pill_bonus_chip_host,
     )
 
-    if layout_fact_flat_pill_bonus_chip_host(node) and parent_type in {
-        NodeType.COLUMN,
-        NodeType.ROW,
-        NodeType.CARD,
-    }:
-        bounded = _bound_stack_sized_box(node, working, parent_type=parent_type)
-        if bounded is not None:
-            working = bounded
-    elif node.type == NodeType.STACK and (
-        parent_type == NodeType.COLUMN
-        or (
-            parent_type == NodeType.ROW
-            and node.sizing.width_mode in {SizingMode.FIXED, SizingMode.HUG}
+    if (
+        layout_fact_flat_pill_bonus_chip_host(node)
+        and parent_type
+        in {
+            NodeType.COLUMN,
+            NodeType.ROW,
+            NodeType.CARD,
+        }
+        or node.type == NodeType.STACK
+        and (
+            parent_type == NodeType.COLUMN
+            or (
+                parent_type == NodeType.ROW
+                and node.sizing.width_mode in {SizingMode.FIXED, SizingMode.HUG}
+            )
         )
     ):
         bounded = _bound_stack_sized_box(node, working, parent_type=parent_type)
@@ -309,9 +314,7 @@ def bind_row_cross_axis_height(
         if text_height is not None and float(text_height) > 0:
             height_lit = format_geometry_literal(float(text_height))
             return hoist_flex_parent_data(
-                lambda inner: (
-                    f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
-                ),
+                lambda inner: f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})",
                 widget,
             )
     if is_short_centered_glyph_text(node):
@@ -543,9 +546,6 @@ def _row_cross_axis_pin_already_applied(widget: str, height_lit: str) -> bool:
 
 def _pin_row_cross_axis_height_inner(inner: str, height_lit: str) -> str:
     """Add a finite cross-axis height inside a ROW flex child expression."""
-    import re
-
-    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 
     trimmed = inner.lstrip()
     prefix = inner[: len(inner) - len(trimmed)]

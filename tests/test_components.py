@@ -64,7 +64,11 @@ def test_name_modal_rejects_custom_overlay_sheet() -> None:
         "absoluteBoundingBox": {"width": 375, "height": 1213},
         "children": [
             {"type": "FRAME", "name": "Head", "absoluteBoundingBox": {"width": 375, "height": 52}},
-            {"type": "FRAME", "name": "Body", "absoluteBoundingBox": {"width": 375, "height": 1100}},
+            {
+                "type": "FRAME",
+                "name": "Body",
+                "absoluteBoundingBox": {"width": 375, "height": 1100},
+            },
         ],
     }
     assert match_semantic_type_from_name_fallback(node, "Modal") is None
@@ -89,7 +93,11 @@ def test_name_card_rejects_horizontal_product_row_frame() -> None:
         "layoutMode": "HORIZONTAL",
         "absoluteBoundingBox": {"width": 347, "height": 76},
         "children": [
-            {"type": "RECTANGLE", "name": "Img", "absoluteBoundingBox": {"width": 76, "height": 76}},
+            {
+                "type": "RECTANGLE",
+                "name": "Img",
+                "absoluteBoundingBox": {"width": 76, "height": 76},
+            },
             {"type": "FRAME", "name": "Body", "absoluteBoundingBox": {"width": 259, "height": 72}},
         ],
     }

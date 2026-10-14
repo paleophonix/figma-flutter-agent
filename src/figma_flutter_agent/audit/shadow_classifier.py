@@ -380,8 +380,7 @@ def load_ratchet_baseline_records() -> tuple[list[ShadowClassifierRecord], str]:
             f"frozen:{RATCHET_BASELINE_JSON_REL}",
         )
     raise FileNotFoundError(
-        "shadow classifier ratchet baseline not found "
-        f"(git ref={ref!r}, frozen={frozen})",
+        f"shadow classifier ratchet baseline not found (git ref={ref!r}, frozen={frozen})",
     )
 
 

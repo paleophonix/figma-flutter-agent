@@ -5,7 +5,6 @@ from __future__ import annotations
 from figma_flutter_agent.generator.layout.flex_policy.column import wrap_column_child_width_fill
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
-    NodeStyle,
     NodeType,
     Sizing,
     SizingMode,

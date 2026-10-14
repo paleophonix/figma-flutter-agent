@@ -188,13 +188,7 @@ def decomposed_absolute_field_decoration(
         left = _resolve_input_horizontal_inset(shell, value_node)
         left_lit = format_geometry_literal(left)
         padding = f"contentPadding: EdgeInsets.symmetric(horizontal: {left_lit})"
-    return (
-        "InputDecoration("
-        f"{padding}, "
-        "border: InputBorder.none, "
-        "isDense: true"
-        ")"
-    )
+    return f"InputDecoration({padding}, border: InputBorder.none, isDense: true)"
 
 
 def _multiline_input_content_padding(

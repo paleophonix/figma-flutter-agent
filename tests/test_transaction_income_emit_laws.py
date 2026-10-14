@@ -952,7 +952,9 @@ def test_asset_family_key_matches_instance_specific_exports() -> None:
         update={
             "children": [
                 _salary_icon_stack().children[0],
-                _salary_icon_stack().children[1].model_copy(
+                _salary_icon_stack()
+                .children[1]
+                .model_copy(
                     update={
                         "vector_asset_key": "assets/icons/vector_I7110_1051;7102_1277.svg",
                     }
@@ -981,9 +983,7 @@ def test_pruned_component_family_instance_delegates_to_cluster_widget() -> None:
         }
     )
     cluster_classes = {"component_7102_2848": "IconSalaryWidget"}
-    assert (
-        resolve_cluster_delegate_class(pruned, cluster_classes) == "IconSalaryWidget"
-    )
+    assert resolve_cluster_delegate_class(pruned, cluster_classes) == "IconSalaryWidget"
 
 
 def test_collapse_component_family_duplicate_widgets_merges_salary_aliases() -> None:
@@ -997,7 +997,9 @@ def test_collapse_component_family_duplicate_widgets_merges_salary_aliases() -> 
             "component_ref": "7102:2848",
             "children": [
                 _salary_icon_stack().children[0],
-                _salary_icon_stack().children[1].model_copy(
+                _salary_icon_stack()
+                .children[1]
+                .model_copy(
                     update={
                         "vector_asset_key": "assets/icons/vector_I7110_1045;7102_1277.svg",
                     }
@@ -1034,8 +1036,7 @@ def test_collapse_component_family_duplicate_widgets_merges_salary_aliases() -> 
             "}\n"
         ),
         "lib/generated/screen_layout.dart": (
-            "child: const TransactionCategoryIconWidget(),\n"
-            "child: const IconSalaryWidget(),\n"
+            "child: const TransactionCategoryIconWidget(),\nchild: const IconSalaryWidget(),\n"
         ),
     }
     merged = collapse_component_family_duplicate_widgets(

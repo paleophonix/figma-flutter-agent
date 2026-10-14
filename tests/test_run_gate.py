@@ -5,7 +5,12 @@ from __future__ import annotations
 import json
 
 from figma_flutter_agent.debug.paths import screen_root
-from figma_flutter_agent.debug.run_meta import mark_run_meta_failed, write_run_meta, begin_run_meta, read_run_meta
+from figma_flutter_agent.debug.run_meta import (
+    begin_run_meta,
+    mark_run_meta_failed,
+    read_run_meta,
+    write_run_meta,
+)
 from figma_flutter_agent.dev.opencode.failure_class import FailureClass
 from figma_flutter_agent.dev.opencode.run_gate import evaluate_run_gate
 

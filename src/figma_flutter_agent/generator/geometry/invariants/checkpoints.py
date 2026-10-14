@@ -268,9 +268,7 @@ def run_cp1_normalize(
         raise_on_hard_geometry_violations(type_violations, context="CP1_type_truth")
     if check_placement_truth:
         placement_baseline = capture_placement_baseline(baseline)
-        placement_violations = check_placement_truth_preserved(
-            placement_baseline, result
-        )
+        placement_violations = check_placement_truth_preserved(placement_baseline, result)
         raise_on_hard_geometry_violations(
             placement_violations,
             context="CP1_placement_truth",

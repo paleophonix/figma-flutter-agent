@@ -8,9 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-M2_CLOSURE_RECORD_REL = (
-    "docs/refactor/26-06-06-compiler-refactor/generated/m2-closure-record.md"
-)
+M2_CLOSURE_RECORD_REL = "docs/refactor/26-06-06-compiler-refactor/generated/m2-closure-record.md"
 
 _SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 _TABLE_ROW_RE = re.compile(

@@ -90,9 +90,7 @@ def compare_ir_cache_compatibility(
     current_fingerprint: dict[str, object],
 ) -> tuple[IrCacheCompatibilityVerdict, tuple[str, ...], tuple[str, ...]]:
     """Compare cached dump identity to current fingerprint (shadow helper)."""
-    missing = tuple(
-        field for field in _REQUIRED_IDENTITY_FIELDS if field not in cached_metadata
-    )
+    missing = tuple(field for field in _REQUIRED_IDENTITY_FIELDS if field not in cached_metadata)
     if missing:
         return "legacy_unknown", missing, ()
     mismatched: list[str] = []
@@ -126,9 +124,7 @@ def assert_cached_screen_ir_compatible(
     """
     screen_ir = generation.screen_ir
     if screen_ir is None:
-        raise FlutterProjectError(
-            f"Cached screen IR at {dump_path.name} is missing screenIr."
-        )
+        raise FlutterProjectError(f"Cached screen IR at {dump_path.name} is missing screenIr.")
     metadata = cached_ir_metadata(dump_path)
     current_hash = hash_clean_tree(clean_tree)
     cached_hash = metadata.get("cleanTreeHash")

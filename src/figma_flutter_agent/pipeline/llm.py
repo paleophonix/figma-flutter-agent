@@ -73,9 +73,7 @@ def load_cached_ir_llm_outcome(
     from figma_flutter_agent.debug.ir_cache import CACHED_IR_INCOMPATIBLE_MESSAGE
 
     if generation.screen_ir is None:
-        raise FlutterProjectError(
-            f"Cached screen IR at {ir_path.name} is missing screenIr."
-        )
+        raise FlutterProjectError(f"Cached screen IR at {ir_path.name} is missing screenIr.")
     if generation.screen_ir.root.figma_id != clean_tree.id:
         raise FlutterProjectError(
             f"{CACHED_IR_INCOMPATIBLE_MESSAGE} ({ir_path.name}: root figmaId mismatch)."

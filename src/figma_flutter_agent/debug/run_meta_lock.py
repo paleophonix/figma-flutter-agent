@@ -46,9 +46,11 @@ def run_meta_pair_lock(
         with run_meta_lifecycle_lock(ordered[0], timeout_sec=timeout_sec):
             yield
         return
-    with run_meta_lifecycle_lock(ordered[0], timeout_sec=timeout_sec):
-        with run_meta_lifecycle_lock(ordered[1], timeout_sec=timeout_sec):
-            yield
+    with (
+        run_meta_lifecycle_lock(ordered[0], timeout_sec=timeout_sec),
+        run_meta_lifecycle_lock(ordered[1], timeout_sec=timeout_sec),
+    ):
+        yield
 
 
 @contextlib.contextmanager

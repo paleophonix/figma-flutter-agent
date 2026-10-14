@@ -9,9 +9,7 @@ from typing import Literal
 
 WalkStatus = Literal["migrated", "safe_snapshot", "explicit_path_guard", "pending"]
 
-INVENTORY_JSON_REL = (
-    "docs/refactor/26-06-06-compiler-refactor/generated/dedup-walk-inventory.json"
-)
+INVENTORY_JSON_REL = "docs/refactor/26-06-06-compiler-refactor/generated/dedup-walk-inventory.json"
 
 
 @dataclass(frozen=True, slots=True)

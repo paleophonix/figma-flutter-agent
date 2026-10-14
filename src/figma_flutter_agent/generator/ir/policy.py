@@ -44,9 +44,7 @@ def resolve_policy_decision(
     """Resolve emit policy from report_only, classification, and fidelity tier."""
     semantics = ctx.semantics
     report_only = (
-        ctx.semantic_report_only
-        if ctx.semantic_report_only is not None
-        else semantics.report_only
+        ctx.semantic_report_only if ctx.semantic_report_only is not None else semantics.report_only
     )
     emit_path = route_by_fidelity_tier(
         ir,

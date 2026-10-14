@@ -246,7 +246,9 @@ def render_custom_overlay_sheet(
 
 
 def render_slider(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
-    from figma_flutter_agent.generator.variant.slider_facts import layout_fact_dual_thumb_range_slider
+    from figma_flutter_agent.generator.variant.slider_facts import (
+        layout_fact_dual_thumb_range_slider,
+    )
 
     if layout_fact_dual_thumb_range_slider(node):
         control = render_slider_widget(label="", node=node, theme_variant=theme_variant)

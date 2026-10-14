@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-
 from typing import TYPE_CHECKING
 
 from loguru import logger
@@ -138,7 +137,9 @@ class ResponseMixin:
             logger.warning("CPI supervisor validation failed: {}", exc)
             raise LlmError(f"CPI supervisor validation failed: {exc}") from exc
 
-    def _parse_reusable_candidates_response(self, raw_text: str) -> ReusableWidgetCandidatesResponse:
+    def _parse_reusable_candidates_response(
+        self, raw_text: str
+    ) -> ReusableWidgetCandidatesResponse:
         try:
             payload = json.loads(self._coerce_json_text(raw_text))
             return ReusableWidgetCandidatesResponse.model_validate(payload)

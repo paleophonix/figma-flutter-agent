@@ -50,9 +50,7 @@ _SCAN_ROOTS = (
     "src/figma_flutter_agent/schemas",
 )
 
-INVENTORY_JSON_REL = (
-    "docs/refactor/26-06-06-compiler-refactor/generated/constraint-consumers.json"
-)
+INVENTORY_JSON_REL = "docs/refactor/26-06-06-compiler-refactor/generated/constraint-consumers.json"
 RATCHET_BASELINE_JSON_REL = (
     "docs/refactor/26-06-06-compiler-refactor/generated/constraint-consumers-ratchet-baseline.json"
 )
@@ -306,8 +304,7 @@ def load_ratchet_baseline_records() -> tuple[list[ConstraintConsumerRecord], str
             f"frozen:{RATCHET_BASELINE_JSON_REL}",
         )
     raise FileNotFoundError(
-        "constraint consumer ratchet baseline not found "
-        f"(git ref={ref!r}, frozen={frozen})",
+        f"constraint consumer ratchet baseline not found (git ref={ref!r}, frozen={frozen})",
     )
 
 

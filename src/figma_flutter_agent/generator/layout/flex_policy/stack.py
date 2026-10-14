@@ -1469,9 +1469,7 @@ def _bound_stack_sized_box(
             width_lit = format_geometry_literal(width)
             height_lit = format_geometry_literal(height)
             return hoist_flex_parent_data(
-                lambda inner: (
-                    f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
-                ),
+                lambda inner: f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})",
                 widget,
             )
 

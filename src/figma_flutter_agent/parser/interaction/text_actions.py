@@ -226,9 +226,7 @@ def layout_fact_narrow_centered_figma_single_line_title(
         return False
     if font_size is None or text_height is None or line_height_px is None:
         return False
-    if float(text_height) > line_height_px * 1.3:
-        return False
-    return True
+    return not float(text_height) > line_height_px * 1.3
 
 
 def layout_fact_primary_cta_label_in_painted_shell(

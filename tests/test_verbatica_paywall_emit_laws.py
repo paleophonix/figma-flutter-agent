@@ -39,8 +39,8 @@ from figma_flutter_agent.schemas import (
     TextMetricsFrame,
     WrapKind,
 )
-from figma_flutter_agent.schemas.style import ComponentVariant
 from figma_flutter_agent.schemas.geometry import LayoutSlotIr
+from figma_flutter_agent.schemas.style import ComponentVariant
 
 
 def _write_minimal_viable_png(path: Path) -> None:
@@ -638,9 +638,7 @@ def test_promote_render_boundary_flatten_binding(tmp_path: Path) -> None:
 
     manifest = local_asset_manifest_from_project(tmp_path, clean_tree=root)
     bindings = {
-        entry.node_id: entry.asset_path
-        for entry in manifest.entries
-        if entry.kind == "image"
+        entry.node_id: entry.asset_path for entry in manifest.entries if entry.kind == "image"
     }
     resolve_missing_image_asset_keys(root, tmp_path)
     promote_render_boundary_flatten_bindings(root, tmp_path, bindings)
@@ -709,9 +707,7 @@ def test_horizontal_inflow_row_preserves_document_child_order() -> None:
         children=[],
     )
     # Document order: time before icons; vertical sort key would invert them.
-    assert stack_flow_column_child_sort_key(time_row) > stack_flow_column_child_sort_key(
-        icons_row
-    )
+    assert stack_flow_column_child_sort_key(time_row) > stack_flow_column_child_sort_key(icons_row)
 
 
 def test_collapse_nested_positioned_fill_removes_competing_parent_data() -> None:
@@ -761,7 +757,6 @@ def test_bounded_negative_gap_row_uses_stack_not_transform() -> None:
     assert "Transform.translate" not in body
     assert "Stack(" in body
     assert "width: 30.0" in body
-
 
     button = CleanDesignTreeNode(
         id="cta",

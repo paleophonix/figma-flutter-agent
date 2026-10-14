@@ -146,13 +146,9 @@ def scan_decorative_decisions(*, repo_root: Path | None = None) -> list[Decorati
         if target.is_dir():
             for py_file in sorted(target.rglob("*.py")):
                 file_rel = py_file.relative_to(root).as_posix()
-                records.extend(
-                    _scan_file(py_file, rel_path=file_rel, route=route, markers=markers)
-                )
+                records.extend(_scan_file(py_file, rel_path=file_rel, route=route, markers=markers))
         else:
-            records.extend(
-                _scan_file(target, rel_path=rel_path, route=route, markers=markers)
-            )
+            records.extend(_scan_file(target, rel_path=rel_path, route=route, markers=markers))
     records.sort(key=_record_key)
     return records
 

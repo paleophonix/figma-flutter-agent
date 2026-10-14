@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -129,10 +129,7 @@ class CaseMeta(BaseModel):
     @classmethod
     def _minute_precision_utc(cls, value: datetime) -> datetime:
         """Require UTC (or naive-as-UTC) timestamps with minute precision."""
-        if value.tzinfo is None:
-            value = value.replace(tzinfo=timezone.utc)
-        else:
-            value = value.astimezone(timezone.utc)
+        value = value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
         if value.second or value.microsecond:
             msg = "timestamps must use minute precision (seconds and microseconds must be 0)"
             raise ValueError(msg)

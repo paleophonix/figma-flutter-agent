@@ -424,13 +424,16 @@ def _ensure_positioned_stack_bounds(
         width_token = format_geometry_literal(width)
         height_token = format_geometry_literal(height)
         horizontal = placement.horizontal
-        prefer_fixed_width = positioned_text_prefers_explicit_width_pins(
-            node,
-            placement,
-            parent_width=parent_width,
-            width=width,
-            parent_node=parent_node,
-        ) or lane_override is not None
+        prefer_fixed_width = (
+            positioned_text_prefers_explicit_width_pins(
+                node,
+                placement,
+                parent_width=parent_width,
+                width=width,
+                parent_node=parent_node,
+            )
+            or lane_override is not None
+        )
         if pin_bottom:
             bottom = _resolved_bottom_offset(placement, parent_height=parent_height)
             bottom_token = format_geometry_literal(bottom)

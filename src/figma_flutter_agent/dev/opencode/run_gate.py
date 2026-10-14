@@ -189,7 +189,9 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
     elif status in TERMINAL_FAILURE_RUN_STATUSES:
         verdict = FailureClass.ROLLED_BACK
     elif status in INCOMPLETE_RUN_STATUSES:
-        verdict = FailureClass.CANDIDATE_ONLY if candidate_available else FailureClass.UNKNOWN_BLOCKED
+        verdict = (
+            FailureClass.CANDIDATE_ONLY if candidate_available else FailureClass.UNKNOWN_BLOCKED
+        )
     elif status == "completed":
         if writeback == "rollback" or writeback == "failed":
             verdict = FailureClass.ROLLED_BACK

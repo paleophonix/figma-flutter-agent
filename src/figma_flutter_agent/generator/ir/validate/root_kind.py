@@ -49,7 +49,10 @@ def screen_root_kind_contradicts_clean_node(
         return True
     if ir_kind == WidgetIrKind.NAV_BOTTOM_BAR and node.type == NodeType.BOTTOM_NAV:
         return False
-    return node.type != NodeType.BOTTOM_NAV and len(node.children) > SCREEN_ROOT_NAV_DOCK_MAX_CHILD_COUNT
+    return (
+        node.type != NodeType.BOTTOM_NAV
+        and len(node.children) > SCREEN_ROOT_NAV_DOCK_MAX_CHILD_COUNT
+    )
 
 
 def nav_bottom_bar_kind_contradicts_clean_node(node: CleanDesignTreeNode) -> bool:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +11,7 @@ from ruamel.yaml import YAML
 
 from figma_flutter_agent.defects.loader import load_corpus
 from figma_flutter_agent.defects.models import CaseDocument, LoadedCorpus, OccurrenceEntry
-from figma_flutter_agent.defects.paths import cases_dir, corpus_root, index_dir
+from figma_flutter_agent.defects.paths import corpus_root, index_dir
 
 _INDEX_VERSION = 1
 _SUMMARY_MAX_LEN = 280
@@ -21,10 +21,7 @@ _yaml.default_flow_style = False
 
 def format_case_timestamp(value: datetime) -> str:
     """Serialize a case timestamp as UTC ISO-8601 with minute precision."""
-    if value.tzinfo is None:
-        normalized = value.replace(tzinfo=timezone.utc)
-    else:
-        normalized = value.astimezone(timezone.utc)
+    normalized = value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
     return normalized.replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 

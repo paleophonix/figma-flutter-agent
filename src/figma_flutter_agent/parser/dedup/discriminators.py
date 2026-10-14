@@ -53,6 +53,4 @@ def build_cluster_discriminator(node: CleanDesignTreeNode) -> ClusterDiscriminat
 def discriminator_signature_component(node: CleanDesignTreeNode) -> str:
     """Return discriminator component for cluster signature shadow path."""
     disc = build_cluster_discriminator(node)
-    return (
-        f"role:{disc.role_band}|anchor:{disc.anchor_role}|interaction:{disc.interaction_role}"
-    )
+    return f"role:{disc.role_band}|anchor:{disc.anchor_role}|interaction:{disc.interaction_role}"

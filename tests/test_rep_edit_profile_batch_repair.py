@@ -273,8 +273,12 @@ def test_composite_dropdown_veto_rejects_multi_input_host() -> None:
         type=NodeType.DROPDOWN,
         sizing=Sizing(width=345.0, height=80.0),
         children=[
-            CleanDesignTreeNode(id="a", name="a", type=NodeType.INPUT, sizing=Sizing(width=100.0, height=24.0)),
-            CleanDesignTreeNode(id="b", name="b", type=NodeType.INPUT, sizing=Sizing(width=100.0, height=24.0)),
+            CleanDesignTreeNode(
+                id="a", name="a", type=NodeType.INPUT, sizing=Sizing(width=100.0, height=24.0)
+            ),
+            CleanDesignTreeNode(
+                id="b", name="b", type=NodeType.INPUT, sizing=Sizing(width=100.0, height=24.0)
+            ),
         ],
     )
     ctx = _ctx(host)

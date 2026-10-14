@@ -229,19 +229,14 @@ def check_node_multiset_preserved(
         detail_parts.append(
             "count_mismatch=["
             + ", ".join(
-                f"'{node_id}: {before} -> {after}'"
-                for node_id, before, after in count_mismatch[:6]
+                f"'{node_id}: {before} -> {after}'" for node_id, before, after in count_mismatch[:6]
             )
             + "]"
         )
     culprit = (
         missing[0]
         if missing
-        else (
-            extra[0]
-            if extra
-            else (count_mismatch[0][0] if count_mismatch else baseline.id)
-        )
+        else (extra[0] if extra else (count_mismatch[0][0] if count_mismatch else baseline.id))
     )
     return [
         geometry_violation(

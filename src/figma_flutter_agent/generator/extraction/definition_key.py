@@ -18,7 +18,9 @@ class DefinitionKey:
     representative_node_id: str
 
     @classmethod
-    def from_spec(cls, spec: ClusterWidgetSpec, *, topology_variant: str | None = None) -> DefinitionKey:
+    def from_spec(
+        cls, spec: ClusterWidgetSpec, *, topology_variant: str | None = None
+    ) -> DefinitionKey:
         """Build key from extraction spec and variant label."""
         rep = spec.representative.id if spec.representative else spec.cluster_id
         variant = topology_variant if topology_variant is not None else rep

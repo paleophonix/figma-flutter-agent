@@ -315,7 +315,7 @@ async def run_pipeline(
             feature_name=resolved_feature,
         )
         ctx.warnings.extend(sync_warnings)
-    
+
         routing_type = settings.agent.routing.type
         routing_on = routing_enabled(settings)
         navigation_plan, route_transitions, navigation_hints, widget_hints = (
@@ -331,9 +331,9 @@ async def run_pipeline(
             route_transitions=route_transitions or None,
             routing_type=routing_type,
         )
-    
+
         from figma_flutter_agent.pipeline.run.stages import run_reusable_candidates_phase
-    
+
         widget_hints = await run_reusable_candidates_phase(
             ctx,
             settings=settings,
@@ -342,7 +342,7 @@ async def run_pipeline(
             tokens=tokens,
             pipeline_deps=pipeline_deps,
         )
-    
+
         attach_to_llm = settings.agent.generation.llm_figma_reference_image
         needs_reference_png = (
             attach_to_llm
@@ -365,10 +365,10 @@ async def run_pipeline(
                 offline_dump_mode=offline_dump_mode,
                 pipeline_deps=pipeline_deps,
             )
-    
+
         if llm_compare:
             from figma_flutter_agent.llm.compare import run_llm_ir_compare
-    
+
             if ctx.asset_manifest is None:
                 raise PipelineError("LLM compare requires a parsed asset manifest")
             with log_stage(run_log, "llm_compare"):
@@ -409,7 +409,7 @@ async def run_pipeline(
                 warnings=ctx.warnings,
                 run_id=run_id,
             )
-    
+
         llm_outcome, planned_files = await run_llm_and_plan_phase(
             ctx,
             log=run_log,
@@ -433,7 +433,7 @@ async def run_pipeline(
         )
         package_name = read_pubspec_name(project_dir)
         architecture = settings.agent.flutter.architecture
-    
+
         planned_files, _post_gen_request = await run_validate_repair_refine_phase(
             ctx,
             log=run_log,
@@ -456,7 +456,7 @@ async def run_pipeline(
             pipeline_deps=pipeline_deps,
             run_analyze_repair_loop_fn=run_analyze_repair_loop,
         )
-    
+
         result = PipelineResult(
             clean_tree=clean_tree,
             tokens=tokens,
@@ -468,23 +468,25 @@ async def run_pipeline(
             typography_hash=hashes.typography_hash,
             spacing_hash=hashes.spacing_hash,
         )
-    
+
         if dry_run:
             return result
-    
+
         if ctx.analyze_repair_exhausted:
             from figma_flutter_agent.errors import GenerationError
-    
+
             preview = (
                 "; ".join(
-                    warning for warning in ctx.warnings if "analyze repair exhausted" in warning.lower()
+                    warning
+                    for warning in ctx.warnings
+                    if "analyze repair exhausted" in warning.lower()
                 )
                 or "planned Dart analyze failed after repair loop"
             )
             raise GenerationError(
                 f"Skipping write: planned Dart still fails analyze after repair exhaustion ({preview})"
             )
-    
+
         run_write_phase(
             ctx,
             parsed=parsed,
@@ -501,10 +503,10 @@ async def run_pipeline(
             resolved_sync=resolved_sync,
             result=result,
         )
-    
+
         from figma_flutter_agent.dart_error_log import bound_dart_error_log_path
         from figma_flutter_agent.debug.terminal_log import bound_terminal_log_path
-    
+
         terminal_log_path = bound_terminal_log_path()
         if terminal_log_path is not None and terminal_log_path.is_file():
             result.terminal_log = terminal_log_path.as_posix()
@@ -520,10 +522,10 @@ async def run_pipeline(
             if has_png:
                 result.render_log_dir = render_dir.as_posix()
                 run_log.info("Combat render captures: {}", result.render_log_dir)
-    
+
         if settings.agent.dev.debug_capture:
             from figma_flutter_agent.debug.capture import run_project_debug_capture
-    
+
             capture_outcome = await run_project_debug_capture(
                 project_dir=project_dir,
                 feature_name=ctx.resolved_feature,
@@ -537,9 +539,11 @@ async def run_pipeline(
                 result.flutter_capture_ok = capture_outcome.flutter_capture_ok
                 run_log.info("Debug capture artifacts: {}", result.debug_capture_dir)
                 if not capture_outcome.flutter_capture_ok:
-                    summary = "; ".join(capture_outcome.warnings[:2]) or "flutter render capture failed"
+                    summary = (
+                        "; ".join(capture_outcome.warnings[:2]) or "flutter render capture failed"
+                    )
                     result.warnings.append(f"Flutter capture blocked: {summary}")
-    
+
         if not dry_run and ctx.resolved_feature:
             from figma_flutter_agent.compiler.generation_config_fingerprint import (
                 generation_config_fingerprint,

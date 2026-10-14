@@ -54,17 +54,13 @@ def _figma_subtree_has_visible_text(node: dict[str, Any]) -> bool:
     if node.get("type") == "TEXT":
         characters = str(node.get("characters") or "").strip()
         return bool(characters)
-    return any(
-        _figma_subtree_has_visible_text(child) for child in node.get("children") or []
-    )
+    return any(_figma_subtree_has_visible_text(child) for child in node.get("children") or [])
 
 
 def _nested_compact_icon_component_child(node: dict[str, Any]) -> dict[str, Any] | None:
     """Return a smaller nested icon component when a control shell wraps the real glyph."""
     visible_children = [
-        child
-        for child in node.get("children") or []
-        if child.get("visible") is not False
+        child for child in node.get("children") or [] if child.get("visible") is not False
     ]
     if len(visible_children) != 1:
         return None
@@ -128,9 +124,7 @@ def _is_figma_button_like_node(node: dict[str, Any]) -> bool:
     if "button" in name or "btn" in name:
         return True
     node_type = str(node.get("type") or "")
-    return node_type in {"INSTANCE", "COMPONENT"} and (
-        "button" in name or "btn" in name
-    )
+    return node_type in {"INSTANCE", "COMPONENT"} and ("button" in name or "btn" in name)
 
 
 def _count_figma_vectors(node: dict[str, Any]) -> int:

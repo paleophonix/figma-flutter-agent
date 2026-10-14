@@ -116,7 +116,10 @@ def clean_is_custom_overlay_sheet(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return False
-    if float(width) < _MIN_CUSTOM_OVERLAY_SHEET_WIDTH_PX or float(height) < _MIN_CUSTOM_OVERLAY_SHEET_HEIGHT_PX:
+    if (
+        float(width) < _MIN_CUSTOM_OVERLAY_SHEET_WIDTH_PX
+        or float(height) < _MIN_CUSTOM_OVERLAY_SHEET_HEIGHT_PX
+    ):
         return False
     return len(node.children) >= 2
 

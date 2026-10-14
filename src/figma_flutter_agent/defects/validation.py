@@ -82,7 +82,9 @@ def validate_corpus(corpus: LoadedCorpus | None = None) -> list[ValidationError]
     if corpus is None:
         loaded, load_errors = _load_corpus_errors()
         if load_errors:
-            return sorted(load_errors, key=lambda item: (item.file_path, item.field_path, item.message))
+            return sorted(
+                load_errors, key=lambda item: (item.file_path, item.field_path, item.message)
+            )
         assert loaded is not None
         loaded_corpus = loaded
     else:
@@ -98,7 +100,9 @@ def validate_corpus(corpus: LoadedCorpus | None = None) -> list[ValidationError]
         prefix = f"families[{index}]"
         if family.id in family_ids:
             errors.append(
-                ValidationError(families_file, f"{prefix}.id", f"duplicate family id {family.id!r}"),
+                ValidationError(
+                    families_file, f"{prefix}.id", f"duplicate family id {family.id!r}"
+                ),
             )
         family_ids.add(family.id)
         family_by_id[family.id] = family
@@ -339,7 +343,9 @@ def _validate_paths(
         if _is_forbidden_absolute_path(value):
             errors.append(ValidationError(file_path, field_path, "absolute paths are forbidden"))
         if "\\" in value:
-            errors.append(ValidationError(file_path, field_path, "use repository-relative posix paths"))
+            errors.append(
+                ValidationError(file_path, field_path, "use repository-relative posix paths")
+            )
         try:
             PurePosixPath(value)
         except ValueError:

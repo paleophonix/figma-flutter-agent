@@ -324,9 +324,7 @@ PASS_CONTRACT_LAW = PassContractLawMeta(
 def laws_for_stage(stage: ConservationStage) -> tuple[ConservationLaw, ...]:
     """Return executable conservation laws registered for ``stage``."""
     return tuple(
-        law
-        for law in CONSERVATION_LAWS
-        if law.stage == stage and law.executable_at_checkpoint
+        law for law in CONSERVATION_LAWS if law.stage == stage and law.executable_at_checkpoint
     )
 
 

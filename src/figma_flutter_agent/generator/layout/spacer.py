@@ -22,9 +22,7 @@ def layout_fact_dimensioned_spacer_leaf(node: CleanDesignTreeNode) -> bool:
         return False
     if 0.0 < height_px <= _MAX_SPACER_AXIS_PX:
         return True
-    if 0.0 < width_px <= _MAX_SPACER_AXIS_PX and height_px <= 0.0:
-        return True
-    return False
+    return bool(0.0 < width_px <= _MAX_SPACER_AXIS_PX and height_px <= 0.0)
 
 
 def dimensioned_spacer_widget_expr(node: CleanDesignTreeNode) -> str | None:

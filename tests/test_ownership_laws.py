@@ -7,7 +7,9 @@ from figma_flutter_agent.parser.layout.reconcile_registry import list_reconcile_
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
-def _node(node_id: str, node_type: NodeType, *, children: list | None = None) -> CleanDesignTreeNode:
+def _node(
+    node_id: str, node_type: NodeType, *, children: list | None = None
+) -> CleanDesignTreeNode:
     return CleanDesignTreeNode(
         id=node_id,
         name=node_id,
@@ -50,4 +52,7 @@ def test_ownership_icon_plate_law() -> None:
 
 def test_reconcile_hero_conflict_visible() -> None:
     conflicts = list_reconcile_conflicts()
-    assert ("reconcile_product_hero_photo_viewport_in_tree", "reconcile_stack_placements_in_tree") in conflicts
+    assert (
+        "reconcile_product_hero_photo_viewport_in_tree",
+        "reconcile_stack_placements_in_tree",
+    ) in conflicts

@@ -101,7 +101,9 @@ async def test_run_pipeline_reaches_parsed_run_meta_before_llm(tmp_path: Path) -
     settings = Settings()
     deps = pipeline_test_dependencies()
 
-    async def stop_after_parsed_check(*args: object, **kwargs: object) -> tuple[object, dict[str, str]]:
+    async def stop_after_parsed_check(
+        *args: object, **kwargs: object
+    ) -> tuple[object, dict[str, str]]:
         record = read_run_meta(project_dir, "sign_in")
         assert record is not None
         assert record.status == "parsed"
@@ -222,7 +224,6 @@ async def test_run_pipeline_single_run_meta_when_manifest_and_frame_differ(tmp_p
 async def test_pipeline_original_error_survives_stale_failed_write(tmp_path: Path) -> None:
     """Superseded run must not mask the real pipeline failure with RunMetaStaleWriterError."""
     import figma_flutter_agent.pipeline.run.core as pipeline_module
-
     from figma_flutter_agent.errors import RunMetaStaleWriterError
 
     project_dir = tmp_path / "project"
@@ -230,7 +231,9 @@ async def test_pipeline_original_error_survives_stale_failed_write(tmp_path: Pat
     settings = Settings()
     deps = pipeline_test_dependencies()
 
-    async def raise_generation_error(*args: object, **kwargs: object) -> tuple[object, dict[str, str]]:
+    async def raise_generation_error(
+        *args: object, **kwargs: object
+    ) -> tuple[object, dict[str, str]]:
         raise PipelineError("generation boom")
 
     with (

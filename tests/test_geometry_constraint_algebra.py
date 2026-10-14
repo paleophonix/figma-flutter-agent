@@ -46,7 +46,9 @@ def test_raw_round_trip_center() -> None:
 
 
 def test_resolver_shadow_placement_ok() -> None:
-    placement = StackPlacement(horizontal="LEFT", vertical="TOP", left=4, top=6, width=40, height=20)
+    placement = StackPlacement(
+        horizontal="LEFT", vertical="TOP", left=4, top=6, width=40, height=20
+    )
     report = compare_placement_resolver_shadow(placement, source_parent_extent=SOURCE_EXTENT)
     assert report.ok is True
 

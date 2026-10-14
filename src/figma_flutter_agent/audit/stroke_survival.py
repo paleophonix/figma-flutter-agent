@@ -59,4 +59,7 @@ def stroke_audit_summary(records: list[StrokeAuditRecord]) -> dict[str, Any]:
     counts: dict[str, int] = {}
     for record in records:
         counts[record.verdict.value] = counts.get(record.verdict.value, 0) + 1
-    return {"counts": counts, "lost": [r.node_id for r in records if r.verdict == StrokeSurvivalVerdict.LOST]}
+    return {
+        "counts": counts,
+        "lost": [r.node_id for r in records if r.verdict == StrokeSurvivalVerdict.LOST],
+    }

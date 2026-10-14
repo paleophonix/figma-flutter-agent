@@ -152,7 +152,9 @@ def collect_widget_specs(
 
         candidates = llm_candidates or []
         typed_candidates = [
-            item if isinstance(item, ReusableWidgetCandidate) else ReusableWidgetCandidate.model_validate(item)
+            item
+            if isinstance(item, ReusableWidgetCandidate)
+            else ReusableWidgetCandidate.model_validate(item)
             for item in candidates
         ]
         for inference in discover_semantic_candidates(

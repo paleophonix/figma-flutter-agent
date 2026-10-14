@@ -41,14 +41,20 @@ def test_definition_key_lookup_respects_central_gate() -> None:
     legacy = {"c1": "LegacyWidget"}
 
     blocked = M3Policy(definition_key_mode=M3RouteMode.ENFORCE)
-    assert lookup_cluster_class_authoritative(shadow, legacy, key=key, policy=blocked) == "LegacyWidget"
+    assert (
+        lookup_cluster_class_authoritative(shadow, legacy, key=key, policy=blocked)
+        == "LegacyWidget"
+    )
 
     enabled = M3Policy(
         m2_closed=True,
         authority_enabled=True,
         definition_key_mode=M3RouteMode.ENFORCE,
     )
-    assert lookup_cluster_class_authoritative(shadow, legacy, key=key, policy=enabled) == "ShadowWidget"
+    assert (
+        lookup_cluster_class_authoritative(shadow, legacy, key=key, policy=enabled)
+        == "ShadowWidget"
+    )
 
 
 def test_inference_callsite_via_extracted_widget_ref() -> None:
@@ -97,7 +103,10 @@ def test_compiler_modules_do_not_read_env_for_m3() -> None:
 
 
 def test_m2_closure_record_blocks_authority_without_closed_status() -> None:
-    from figma_flutter_agent.compiler.m3_policy import is_m2_closure_closed, m3_policy_at_pipeline_boundary
+    from figma_flutter_agent.compiler.m3_policy import (
+        is_m2_closure_closed,
+        m3_policy_at_pipeline_boundary,
+    )
 
     assert is_m2_closure_closed() is False
     policy = m3_policy_at_pipeline_boundary()

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from datetime import date
 
-from tests.defect_case_meta import case_timestamps
-
 from figma_flutter_agent.defects.enums import (
     BlastRadius,
     Confidence,
@@ -27,6 +25,7 @@ from figma_flutter_agent.defects.models import (
     OwnerRef,
 )
 from figma_flutter_agent.defects.validation import ValidationError, validate_corpus
+from tests.defect_case_meta import case_timestamps
 
 
 def _family() -> FamilyEntry:
@@ -83,7 +82,9 @@ def test_unknown_family_reports_field_path() -> None:
         ],
     )
     errors = validate_corpus(
-        LoadedCorpus(families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]),
+        LoadedCorpus(
+            families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]
+        ),
     )
     assert len(errors) == 1
     assert errors[0].field_path == "case.occurrences[0].family_id"
@@ -132,7 +133,9 @@ def test_fixed_requires_regression_proof() -> None:
         ],
     )
     errors = validate_corpus(
-        LoadedCorpus(families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]),
+        LoadedCorpus(
+            families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]
+        ),
     )
     field_paths = {error.field_path for error in errors}
     assert "case.occurrences[0].repair" in field_paths
@@ -182,7 +185,9 @@ def test_occurrence_law_must_belong_to_family() -> None:
         ],
     )
     errors = validate_corpus(
-        LoadedCorpus(families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]),
+        LoadedCorpus(
+            families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]
+        ),
     )
     assert any("law_id" in error.field_path for error in errors)
 
@@ -229,6 +234,8 @@ def test_windows_drive_path_rejected() -> None:
         ],
     )
     errors = validate_corpus(
-        LoadedCorpus(families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]),
+        LoadedCorpus(
+            families=FamiliesDocument(version=1, families=[_family()]), cases=[("case.yaml", case)]
+        ),
     )
     assert any("absolute paths are forbidden" in error.message for error in errors)
