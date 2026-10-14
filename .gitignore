@@ -33,3 +33,4 @@ Caddyfile
 .worktrees/
 .repair/
 .vscode/
+.debug/
